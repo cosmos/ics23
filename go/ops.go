@@ -43,6 +43,12 @@ func ApplyOp(op *ProofOp, args ...[]byte) ([]byte, error) {
 }
 
 func ApplyLeafOp(op *LeafOp, key []byte, value []byte) ([]byte, error) {
+	if len(key) == 0 {
+		return nil, fmt.Errorf("Leaf node needs key")
+	}
+	if len(value) == 0 {
+		return nil, fmt.Errorf("Leaf node needs value")
+	}
 	// TODO: lengthop before or after hash ???
 	pkey, err := prepareLeafData(op.PrehashKey, op.Length, key)
 	if err != nil {
@@ -86,9 +92,13 @@ func doHashOrNoop(hashOp HashOp, preimage []byte) ([]byte, error) {
 func doHash(hashOp HashOp, preimage []byte) ([]byte, error) {
 	switch hashOp {
 	case HashOp_SHA256:
-		return crypto.SHA256.New().Sum(preimage), nil
+		hash := crypto.SHA256.New()
+		hash.Write(preimage)
+		return hash.Sum(nil), nil
 	case HashOp_SHA512:
-		return crypto.SHA512.New().Sum(preimage), nil
+		hash := crypto.SHA512.New()
+		hash.Write(preimage)
+		return hash.Sum(nil), nil
 	}
 	return nil, fmt.Errorf("Unsupported hashop: %d", hashOp)
 }
