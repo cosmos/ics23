@@ -60,6 +60,7 @@ func ApplyLeafOp(op *LeafOp, key []byte, value []byte) ([]byte, error) {
 	}
 	data := append(op.Prefix, pkey...)
 	data = append(data, pvalue...)
+	fmt.Printf("data: %X\n", data)
 	return doHash(op.Hash, data)
 }
 
@@ -139,6 +140,6 @@ func encodeVarintProto(l int) []byte {
 		res = append(res, uint8(l&0x7f|0x80))
 		l >>= 7
 	}
-	res = append(res, uint8(1))
+	res = append(res, uint8(l))
 	return res
 }
