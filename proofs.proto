@@ -58,7 +58,7 @@ With LengthOp this is tricker but not impossible. Which is why the "leafPrefixEq
 in the ProofSpec is valuable to prevent this mutability. And why all trees should
 length-prefix the data before hashing it.
 */
-message ExistanceProof {
+message ExistenceProof {
     bytes key = 1;
     bytes value = 2;
     repeated ProofOp steps = 3;    

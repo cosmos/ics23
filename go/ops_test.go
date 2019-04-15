@@ -173,7 +173,6 @@ func TestInnerOp(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func fromHex(data string) []byte {
