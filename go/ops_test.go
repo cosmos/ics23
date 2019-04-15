@@ -110,6 +110,73 @@ func TestLeafOp(t *testing.T) {
 	}
 }
 
+func TestInnerOp(t *testing.T) {
+	cases := map[string]struct {
+		op       *InnerOp
+		child    []byte
+		isErr    bool
+		expected []byte
+	}{
+		"requires child": {
+			op: &InnerOp{
+				Hash:   HashOp_SHA256,
+				Prefix: fromHex("0123456789"),
+				Suffix: fromHex("deadbeef"),
+			},
+			isErr: true,
+		},
+		"hash child with prefix and suffix": {
+			op: &InnerOp{
+				Hash:   HashOp_SHA256,
+				Prefix: fromHex("0123456789"),
+				Suffix: fromHex("deadbeef"),
+			},
+			child: fromHex("00cafe00"),
+			// echo -n 012345678900cafe00deadbeef | xxd -r -p | sha256sum
+			expected: fromHex("0339f76086684506a6d42a60da4b5a719febd4d96d8b8d85ae92849e3a849a5e"),
+		},
+		"hash child with only prefix": {
+			op: &InnerOp{
+				Hash:   HashOp_SHA256,
+				Prefix: fromHex("00204080a0c0e0"),
+			},
+			child: fromHex("ffccbb997755331100"),
+			// echo -n 00204080a0c0e0ffccbb997755331100 | xxd -r -p | sha256sum
+			expected: fromHex("45bece1678cf2e9f4f2ae033e546fc35a2081b2415edcb13121a0e908dca1927"),
+		},
+		"hash child with only suffix": {
+			op: &InnerOp{
+				Hash:   HashOp_SHA256,
+				Suffix: []byte(" just kidding!"),
+			},
+			child: []byte("this is a sha256 hash, really...."),
+			// echo -n 'this is a sha256 hash, really.... just kidding!'  | sha256sum
+			expected: fromHex("79ef671d27e42a53fba2201c1bbc529a099af578ee8a38df140795db0ae2184b"),
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			res, err := ApplyInnerOp(tc.op, tc.child)
+			// short-circuit with error case
+			if tc.isErr {
+				if err == nil {
+					t.Fatal("Expected error, but got none")
+				}
+				return
+			}
+
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !bytes.Equal(res, tc.expected) {
+				t.Errorf("Bad result: %s vs %s", toHex(res), toHex(tc.expected))
+			}
+		})
+	}
+
+}
+
 func fromHex(data string) []byte {
 	res, err := hex.DecodeString(data)
 	if err != nil {

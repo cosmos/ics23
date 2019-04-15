@@ -44,12 +44,11 @@ func ApplyOp(op *ProofOp, args ...[]byte) ([]byte, error) {
 
 func ApplyLeafOp(op *LeafOp, key []byte, value []byte) ([]byte, error) {
 	if len(key) == 0 {
-		return nil, fmt.Errorf("Leaf node needs key")
+		return nil, fmt.Errorf("Leaf op needs key")
 	}
 	if len(value) == 0 {
-		return nil, fmt.Errorf("Leaf node needs value")
+		return nil, fmt.Errorf("Leaf op needs value")
 	}
-	// TODO: lengthop before or after hash ???
 	pkey, err := prepareLeafData(op.PrehashKey, op.Length, key)
 	if err != nil {
 		return nil, err
@@ -60,11 +59,11 @@ func ApplyLeafOp(op *LeafOp, key []byte, value []byte) ([]byte, error) {
 	}
 	data := append(op.Prefix, pkey...)
 	data = append(data, pvalue...)
-	fmt.Printf("data: %X\n", data)
 	return doHash(op.Hash, data)
 }
 
 func prepareLeafData(hashOp HashOp, lengthOp LengthOp, data []byte) ([]byte, error) {
+	// TODO: lengthop before or after hash ???
 	hdata, err := doHashOrNoop(hashOp, data)
 	if err != nil {
 		return nil, err
@@ -74,6 +73,9 @@ func prepareLeafData(hashOp HashOp, lengthOp LengthOp, data []byte) ([]byte, err
 }
 
 func ApplyInnerOp(op *InnerOp, child []byte) ([]byte, error) {
+	if len(child) == 0 {
+		return nil, fmt.Errorf("Inner op needs child value")
+	}
 	preimage := append(op.Prefix, child...)
 	preimage = append(preimage, op.Suffix...)
 	return doHash(op.Hash, preimage)
