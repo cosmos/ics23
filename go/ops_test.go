@@ -64,7 +64,7 @@ func TestLeafOp(t *testing.T) {
 			op: &LeafOp{
 				Hash:   HashOp_SHA256,
 				Length: LengthOp_VAR_PROTO,
-				// no prehash, no length prefix
+				// no prehash
 			},
 			// echo -n food | xxs -ps
 			// and manually compute length byte
@@ -78,7 +78,6 @@ func TestLeafOp(t *testing.T) {
 				Hash:         HashOp_SHA256,
 				Length:       LengthOp_VAR_PROTO,
 				PrehashValue: HashOp_SHA256,
-				// no prehash, no length prefix
 			},
 			key: []byte("food"), // 04666f6f64
 			// TODO: this is hash, then length....
@@ -91,7 +90,7 @@ func TestLeafOp(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			res, err := ApplyLeafOp(tc.op, tc.key, tc.value)
+			res, err := tc.op.Apply(tc.key, tc.value)
 			// short-circuit with error case
 			if tc.isErr {
 				if err == nil {
@@ -157,7 +156,7 @@ func TestInnerOp(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			res, err := ApplyInnerOp(tc.op, tc.child)
+			res, err := tc.op.Apply(tc.child)
 			// short-circuit with error case
 			if tc.isErr {
 				if err == nil {

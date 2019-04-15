@@ -9,14 +9,24 @@ import (
 	fmt "fmt"
 )
 
-func ApplyOps(ops []*ProofOp, args ...[]byte) ([]byte, error) {
-	first, rem := ops[0], ops[1:]
-	res, err := ApplyOp(first, args...)
+// Calculate determines the root hash that matches the given proof.
+// You must validate the result is what you have in a header.
+// Returns error if the calculations cannot be performed.
+func (p *ExistanceProof) Calculate() ([]byte, error) {
+	if len(p.Steps) == 0 {
+		return nil, fmt.Errorf("Existence Proof needs at least one step")
+	}
+
+	first, rem := p.Steps[0], p.Steps[1:]
+	// first step takes the key and value as input
+	res, err := first.Apply(p.Key, p.Value)
 	if err != nil {
 		return nil, err
 	}
+
+	// the rest just take the output of the last step (reducing it)
 	for _, step := range rem {
-		res, err = ApplyOp(step, res)
+		res, err = step.Apply(res)
 		if err != nil {
 			return nil, err
 		}
@@ -24,25 +34,25 @@ func ApplyOps(ops []*ProofOp, args ...[]byte) ([]byte, error) {
 	return res, nil
 }
 
-func ApplyOp(op *ProofOp, args ...[]byte) ([]byte, error) {
+func (op *ProofOp) Apply(args ...[]byte) ([]byte, error) {
 	o := op.Op
 	switch o.(type) {
 	case *ProofOp_Leaf:
 		if len(args) != 2 {
 			return nil, fmt.Errorf("Need key and value args, got %d", len(args))
 		}
-		return ApplyLeafOp(op.GetLeaf(), args[0], args[1])
+		return op.GetLeaf().Apply(args[0], args[1])
 	case *ProofOp_Inner:
 		if len(args) != 1 {
 			return nil, fmt.Errorf("Need one child hash, got %d", len(args))
 		}
-		return ApplyInnerOp(op.GetInner(), args[0])
+		return op.GetInner().Apply(args[0])
 	default:
 		panic("Unknown proof op")
 	}
 }
 
-func ApplyLeafOp(op *LeafOp, key []byte, value []byte) ([]byte, error) {
+func (op *LeafOp) Apply(key []byte, value []byte) ([]byte, error) {
 	if len(key) == 0 {
 		return nil, fmt.Errorf("Leaf op needs key")
 	}
@@ -62,6 +72,15 @@ func ApplyLeafOp(op *LeafOp, key []byte, value []byte) ([]byte, error) {
 	return doHash(op.Hash, data)
 }
 
+func (op *InnerOp) Apply(child []byte) ([]byte, error) {
+	if len(child) == 0 {
+		return nil, fmt.Errorf("Inner op needs child value")
+	}
+	preimage := append(op.Prefix, child...)
+	preimage = append(preimage, op.Suffix...)
+	return doHash(op.Hash, preimage)
+}
+
 func prepareLeafData(hashOp HashOp, lengthOp LengthOp, data []byte) ([]byte, error) {
 	// TODO: lengthop before or after hash ???
 	hdata, err := doHashOrNoop(hashOp, data)
@@ -70,15 +89,6 @@ func prepareLeafData(hashOp HashOp, lengthOp LengthOp, data []byte) ([]byte, err
 	}
 	ldata, err := doLengthOp(lengthOp, hdata)
 	return ldata, err
-}
-
-func ApplyInnerOp(op *InnerOp, child []byte) ([]byte, error) {
-	if len(child) == 0 {
-		return nil, fmt.Errorf("Inner op needs child value")
-	}
-	preimage := append(op.Prefix, child...)
-	preimage = append(preimage, op.Suffix...)
-	return doHash(op.Hash, preimage)
 }
 
 // doHashOrNoop will return the preimage untouched if hashOp == NONE,
