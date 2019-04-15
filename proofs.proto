@@ -3,9 +3,8 @@ syntax = "proto3";
 package proofs;
 
 enum HashOp {
-    // ANY is the default if no data passed, it should use a hash function provided
-    // out-of-bounds, if available, or fail otherwise
-    ANY = 0;
+    // NO_HASH is the default if no data passed. Note this is an illegal argument some places.
+    NO_HASH = 0;
     SHA256 = 1;
     SHA512 = 2;
     KECCAK = 3;
@@ -18,8 +17,8 @@ algorithm, the length will be prepended to the key and value bytes.
 (Each one with it's own encoded length)
 */
 enum LengthOp {
-    // NONE don't include any length info
-    NONE = 0; 
+    // NO_PREFIX don't include any length info
+    NO_PREFIX = 0; 
     // VAR_PROTO uses protobuf (and go-amino) varint encoding of the length
     VAR_PROTO = 1; 
     // VAR_RLP uses rlp int encoding of the length (TODO: is this different than protobuf?)
