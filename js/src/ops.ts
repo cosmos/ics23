@@ -123,9 +123,10 @@ function doLengthOp(lengthOp: proofs.LengthOp, data: Uint8Array): Uint8Array {
   throw new Error(`Unsupported lengthop: ${lengthOp}`);
 }
 
-// TODO
 function encodeVarintProto(l: number): Uint8Array {
+  // TODO: handle numbers > 127
   return new Uint8Array([l]);
+
   // // avoid multiple allocs for normal case
   // res := make([]byte, 0, 8)
   // for l >= 1<<7 {
