@@ -19,13 +19,12 @@
     "pack-proto": "pbjs -t static-module -w commonjs -o src/generated/codecimpl.js ../proofs.proto",
     "define-proto": "pbts src/generated/codecimpl.js -o src/generated/codecimpl.d.ts",
     "protoc": "yarn pack-proto && yarn define-proto && yarn format"
-
   },
   "devDependencies": {
     "@types/jasmine": "^3.3.12",
+    "@types/sha.js": "^2.4.0",
     "jasmine": "^3.4.0",
     "prettier": "^1.17.0",
-    "protobufjs": "^6.8.8",
     "sazerac": "^0.4.2",
     "shx": "^0.3.2",
     "tslint": "^5.16.0",
@@ -34,6 +33,7 @@
     "typescript": "^3.4.3"
   },
   "dependencies": {
+    "protobufjs": "^6.8.8",
     "sha.js": "^2.4.11"
   }
 }
