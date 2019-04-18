@@ -13,16 +13,53 @@ export function applyLeaf(
   if (value.length === 0) {
     throw new Error("Missing value");
   }
-  const pkey = prepareLeafData(leaf.prehashKey, leaf.length, key);
-  const pvalue = prepareLeafData(leaf.prehashValue, leaf.length, value);
-  const prefix = leaf.prefix || new Uint8Array([]);
-  const data = new Uint8Array([...prefix, ...pkey, ...pvalue]);
-  return doHash(leaf.hash, data);
+  const pkey = prepareLeafData(
+    ensureHash(leaf.prehashKey),
+    ensureLength(leaf.length),
+    key
+  );
+  const pvalue = prepareLeafData(
+    ensureHash(leaf.prehashValue),
+    ensureLength(leaf.length),
+    value
+  );
+  const data = new Uint8Array([
+    ...ensureBytes(leaf.prefix),
+    ...pkey,
+    ...pvalue
+  ]);
+  return doHash(ensureHash(leaf.hash), data);
 }
 
+export function applyInner(
+  inner: proofs.IInnerOp,
+  child: Uint8Array
+): Uint8Array {
+  if (child.length === 0) {
+    throw new Error("Inner op needs child value");
+  }
+  const preimage = new Uint8Array([
+    ...ensureBytes(inner.prefix),
+    ...child,
+    ...ensureBytes(inner.suffix)
+  ]);
+  return doHash(ensureHash(inner.hash), preimage);
+}
+
+function ensure<T>(maybe: T | undefined | null, value: T): T {
+  return maybe === undefined || maybe === null ? value : maybe;
+}
+
+const ensureHash = (h: proofs.HashOp | null | undefined) =>
+  ensure(h, proofs.HashOp.NO_HASH);
+const ensureLength = (l: proofs.LengthOp | null | undefined) =>
+  ensure(l, proofs.LengthOp.NO_PREFIX);
+const ensureBytes = (b: Uint8Array | null | undefined) =>
+  ensure(b, new Uint8Array([]));
+
 function prepareLeafData(
-  hashOp: proofs.HashOp | undefined | null,
-  lengthOp: proofs.LengthOp | undefined | null,
+  hashOp: proofs.HashOp,
+  lengthOp: proofs.LengthOp,
   data: Uint8Array
 ): Uint8Array {
   const h = doHashOrNoop(hashOp, data);
@@ -31,15 +68,8 @@ function prepareLeafData(
 
 // doHashOrNoop will return the preimage untouched if hashOp == NONE,
 // otherwise, perform doHash
-function doHashOrNoop(
-  hashOp: proofs.HashOp | undefined | null,
-  preimage: Uint8Array
-): Uint8Array {
-  if (
-    hashOp === undefined ||
-    hashOp === null ||
-    hashOp === proofs.HashOp.NO_HASH
-  ) {
+function doHashOrNoop(hashOp: proofs.HashOp, preimage: Uint8Array): Uint8Array {
+  if (hashOp === proofs.HashOp.NO_HASH) {
     return preimage;
   }
   return doHash(hashOp, preimage);
@@ -47,10 +77,7 @@ function doHashOrNoop(
 
 // doHash will preform the specified hash on the preimage.
 // if hashOp == NONE, it will return an error (use doHashOrNoop if you want different behavior)
-function doHash(
-  hashOp: proofs.HashOp | undefined | null,
-  preimage: Uint8Array
-): Uint8Array {
+function doHash(hashOp: proofs.HashOp, preimage: Uint8Array): Uint8Array {
   switch (hashOp) {
     case proofs.HashOp.SHA256:
       return new Uint8Array(
@@ -70,13 +97,8 @@ function doHash(
 
 // doLengthOp will calculate the proper prefix and return it prepended
 //   doLengthOp(op, data) -> length(data) || data
-function doLengthOp(
-  lengthOp: proofs.LengthOp | undefined | null,
-  data: Uint8Array
-): Uint8Array {
+function doLengthOp(lengthOp: proofs.LengthOp, data: Uint8Array): Uint8Array {
   switch (lengthOp) {
-    case null:
-    case undefined:
     case proofs.LengthOp.NO_PREFIX:
       return data;
     case proofs.LengthOp.VAR_PROTO:
