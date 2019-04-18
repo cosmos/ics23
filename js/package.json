@@ -1,0 +1,41 @@
+{
+  "name": "@confio/proofs",
+  "version": "0.0.1",
+  "description": "Merkle proof verification library",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/confio/proofs/tree/master/js"
+  },
+  "author": "Ethan Frey",
+  "license": "Apache-2.0",
+  "private": false,
+  "scripts": {
+    "lint": "tslint -t verbose --project .",
+    "format": "prettier --write --loglevel warn \"./src/**/*.ts\"",
+    "prebuild": "yarn lint && yarn format",
+    "test": "yarn -s build && node jasmine-testrunner.js",
+    "build": "shx rm -rf ./build && tsc && shx cp -r src/generated build/generated",
+    "pack-proto": "pbjs -t static-module -w commonjs -o src/generated/codecimpl.js ../proofs.proto",
+    "define-proto": "pbts src/generated/codecimpl.js -o src/generated/codecimpl.d.ts",
+    "protoc": "yarn pack-proto && yarn define-proto && yarn format"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^3.3.12",
+    "@types/sha.js": "^2.4.0",
+    "jasmine": "^3.4.0",
+    "prettier": "^1.17.0",
+    "shx": "^0.3.2",
+    "tslint": "^5.16.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-immutable": "^5.5.2",
+    "typescript": "^3.4.3"
+  },
+  "dependencies": {
+    "jasmine-console-reporter": "^3.1.0",
+    "protobufjs": "^6.8.8",
+    "sha.js": "^2.4.11",
+    "source-map-support": "^0.5.12"
+  }
+}
