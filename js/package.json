@@ -15,7 +15,11 @@
     "lint": "tslint -t verbose --project .",
     "format": "prettier --write --loglevel warn \"./src/**/*.ts\"",
     "prebuild": "yarn lint && yarn format",
-    "build": "shx rm -rf ./build && tsc"
+    "build": "shx rm -rf ./build && tsc && shx cp -r src/generated build/generated",
+    "pack-proto": "pbjs -t static-module -w commonjs -o src/generated/codecimpl.js ../proofs.proto",
+    "define-proto": "pbts src/generated/codecimpl.js -o src/generated/codecimpl.d.ts",
+    "protoc": "yarn pack-proto && yarn define-proto && yarn format"
+
   },
   "devDependencies": {
     "@types/jasmine": "^3.3.12",
