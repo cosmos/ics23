@@ -26,7 +26,6 @@
     "@types/sha.js": "^2.4.0",
     "jasmine": "^3.4.0",
     "prettier": "^1.17.0",
-    "sazerac": "^0.4.2",
     "shx": "^0.3.2",
     "tslint": "^5.16.0",
     "tslint-config-prettier": "^1.18.0",
@@ -34,7 +33,9 @@
     "typescript": "^3.4.3"
   },
   "dependencies": {
+    "jasmine-console-reporter": "^3.1.0",
     "protobufjs": "^6.8.8",
-    "sha.js": "^2.4.11"
+    "sha.js": "^2.4.11",
+    "source-map-support": "^0.5.12"
   }
 }
