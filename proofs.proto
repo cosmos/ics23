@@ -132,12 +132,17 @@ This can be stored in the client and used to validate any incoming proofs.
 
   verify(ProofSpec, Proof) -> Proof | Error
 
-This verify function could (as an optimization) fill in "ANY" HashOps with
-the externally provided one from the spec.
+As demonstrated in tests, if we don't fix the algorithm used to calculate the
+LeafHash for a given tree, there are many possible key-value pairs that can
+generate a given hash (by interpretting the preimage differently).
+We need this for proper security, requires client knows a priori what
+tree format server uses. But not in code, rather a configuration object.
 */
 message ProofSpec {
-    HashOp leafHash = 1;
-    HashOp innerHash = 2;
-    bytes leafPrefixEqual = 3;
-    bytes innerPrefixStartsWith = 4;
+  // any field in the ExistenceProof must be the same as in this spec.
+  // except Prefix, which is just the first bytes of prefix (spec can be longer) 
+  LeafOp leaf_spec = 1;
+  // the minimum length of a prefix in an InnerOp
+  // note that the prefix *must not* start with the same bytes as leaf_spec.prefix
+  int32 min_inner_prefix = 2;
 }
