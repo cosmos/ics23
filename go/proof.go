@@ -5,6 +5,15 @@ import (
 	"fmt"
 )
 
+var IavlSpec = &ProofSpec{
+	LeafSpec: &LeafOp{
+		Prefix:       []byte{0},
+		Hash:         HashOp_SHA256,
+		PrehashValue: HashOp_SHA256,
+		Length:       LengthOp_VAR_PROTO,
+	},
+}
+
 // Calculate determines the root hash that matches the given proof.
 // You must validate the result is what you have in a header.
 // Returns error if the calculations cannot be performed.
@@ -30,7 +39,7 @@ func (p *ExistenceProof) Calculate() ([]byte, error) {
 	return res, nil
 }
 
-func (p *ExistenceProof) ValidSpec(spec *ProofSpec) error {
+func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
 	if len(p.Steps) == 0 {
 		return fmt.Errorf("Existence Proof needs at least one step")
 	}
@@ -40,7 +49,7 @@ func (p *ExistenceProof) ValidSpec(spec *ProofSpec) error {
 	if err != nil {
 		return err
 	}
-	err = p.checkLeaf(leaf, spec.LeafSpec)
+	err = checkLeaf(leaf, spec.LeafSpec)
 	if err != nil {
 		return err
 	}
@@ -49,14 +58,14 @@ func (p *ExistenceProof) ValidSpec(spec *ProofSpec) error {
 		if err != nil {
 			return err
 		}
-		if err := p.checkInner(inner, spec.LeafSpec.Prefix); err != nil {
+		if err := checkInner(inner, spec.LeafSpec.Prefix); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (p *ExistenceProof) checkLeaf(leaf *LeafOp, spec *LeafOp) error {
+func checkLeaf(leaf *LeafOp, spec *LeafOp) error {
 	if leaf.Hash != spec.Hash {
 		return fmt.Errorf("Unexpected HashOp: %d", leaf.Hash)
 	}
@@ -75,7 +84,7 @@ func (p *ExistenceProof) checkLeaf(leaf *LeafOp, spec *LeafOp) error {
 	return nil
 }
 
-func (p *ExistenceProof) checkInner(inner *InnerOp, leafPrefix []byte) error {
+func checkInner(inner *InnerOp, leafPrefix []byte) error {
 	if bytes.HasPrefix(inner.Prefix, leafPrefix) {
 		return fmt.Errorf("Inner Prefix starts with %X", leafPrefix)
 	}
