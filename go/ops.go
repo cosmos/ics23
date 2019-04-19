@@ -27,6 +27,22 @@ func WrapInner(inner *InnerOp) *ProofOp {
 	}
 }
 
+func asLeaf(op *ProofOp) (*LeafOp, error) {
+	leaf, ok := op.Op.(*ProofOp_Leaf)
+	if !ok {
+		return nil, fmt.Errorf("op is not leaf")
+	}
+	return leaf.Leaf, nil
+}
+
+func asInner(op *ProofOp) (*InnerOp, error) {
+	inner, ok := op.Op.(*ProofOp_Inner)
+	if !ok {
+		return nil, fmt.Errorf("op is not inner")
+	}
+	return inner.Inner, nil
+}
+
 func (op *ProofOp) Apply(args ...[]byte) ([]byte, error) {
 	o := op.Op
 	switch o.(type) {

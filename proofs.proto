@@ -142,7 +142,4 @@ message ProofSpec {
   // any field in the ExistenceProof must be the same as in this spec.
   // except Prefix, which is just the first bytes of prefix (spec can be longer) 
   LeafOp leaf_spec = 1;
-  // the minimum length of a prefix in an InnerOp
-  // note that the prefix *must not* start with the same bytes as leaf_spec.prefix
-  int32 min_inner_prefix = 2;
 }
