@@ -32,6 +32,33 @@ func TestExistenceProof(t *testing.T) {
 			},
 			expected: fromHex("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"),
 		},
+		// iavl leaf: start with 0, length 3
+		// inner prefix: !start with 0, length >= 4
+		"demonstrate maliability of leaf if we change leaf algorithm": {
+			proof: &ExistenceProof{
+				Key:   append([]byte{4}, []byte("food")...),
+				Value: append([]byte{16}, []byte("some longer text")...),
+				Steps: []*ProofOp{
+					WrapLeaf(&LeafOp{
+						Hash: HashOp_SHA256,
+					}),
+				},
+			},
+			expected: fromHex("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"),
+		},
+		"demonstrate maliability of leaf if we change leaf prefix": {
+			proof: &ExistenceProof{
+				Key:   append([]byte("od"), byte(16)),
+				Value: []byte("some longer text"),
+				Steps: []*ProofOp{
+					WrapLeaf(&LeafOp{
+						Prefix: []byte{4, 'f', 'o'},
+						Hash:   HashOp_SHA256,
+					}),
+				},
+			},
+			expected: fromHex("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"),
+		},
 		"cannot execute two leafs": {
 			proof: &ExistenceProof{
 				Key:   []byte("food"),
