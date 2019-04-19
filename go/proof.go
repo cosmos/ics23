@@ -18,11 +18,11 @@ var IavlSpec = &ProofSpec{
 // You must validate the result is what you have in a header.
 // Returns error if the calculations cannot be performed.
 func (p *ExistenceProof) Calculate() ([]byte, error) {
-	if len(p.Steps) == 0 {
-		return nil, fmt.Errorf("Existence Proof needs at least one step")
+	leaf, inners, err := p.TypeCastSteps()
+	if err != nil {
+		return nil, err
 	}
 
-	leaf, inners := p.Steps[0], p.Steps[1:]
 	// leaf step takes the key and value as input
 	res, err := leaf.Apply(p.Key, p.Value)
 	if err != nil {
@@ -40,12 +40,7 @@ func (p *ExistenceProof) Calculate() ([]byte, error) {
 }
 
 func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
-	if len(p.Steps) == 0 {
-		return fmt.Errorf("Existence Proof needs at least one step")
-	}
-
-	leafOp, inners := p.Steps[0], p.Steps[1:]
-	leaf, err := asLeaf(leafOp)
+	leaf, inners, err := p.TypeCastSteps()
 	if err != nil {
 		return err
 	}
@@ -53,16 +48,32 @@ func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
 	if err != nil {
 		return err
 	}
-	for _, innerOp := range inners {
-		inner, err := asInner(innerOp)
-		if err != nil {
-			return err
-		}
+	for _, inner := range inners {
 		if err := checkInner(inner, spec.LeafSpec.Prefix); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func (p *ExistenceProof) TypeCastSteps() (*LeafOp, []*InnerOp, error) {
+	if len(p.Steps) == 0 {
+		return nil, nil, fmt.Errorf("Existence Proof needs at least one step")
+	}
+	leafOp, inners := p.Steps[0], p.Steps[1:]
+	leaf, err := asLeaf(leafOp)
+	if err != nil {
+		return nil, nil, err
+	}
+	var result []*InnerOp
+	for _, innerOp := range inners {
+		inner, err := asInner(innerOp)
+		if err != nil {
+			return nil, nil, err
+		}
+		result = append(result, inner)
+	}
+	return leaf, result, nil
 }
 
 func checkLeaf(leaf *LeafOp, spec *LeafOp) error {
