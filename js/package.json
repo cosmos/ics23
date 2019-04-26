@@ -1,12 +1,16 @@
 {
   "name": "@confio/proofs",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "Merkle proof verification library",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/confio/proofs/tree/master/js"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "author": "Ethan Frey",
   "license": "Apache-2.0",
