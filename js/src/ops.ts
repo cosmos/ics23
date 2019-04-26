@@ -2,6 +2,7 @@ import ripemd160 from "ripemd160";
 import shajs from "sha.js";
 
 import { proofs } from "./generated/codecimpl";
+import { toHex } from "./helpers";
 
 export function applyLeaf(
   leaf: proofs.ILeafOp,
@@ -76,16 +77,30 @@ function doHashOrNoop(hashOp: proofs.HashOp, preimage: Uint8Array): Uint8Array {
   return doHash(hashOp, preimage);
 }
 
+function rp160(preimage: Uint8Array): Uint8Array {
+  // this is a bit tricky to work with besides buffer
+  return new Uint8Array(
+    new ripemd160().update(toHex(preimage), "hex" as any).digest()
+  );
+}
+
+function s256(preimage: Uint8Array): Uint8Array {
+  return new Uint8Array(
+    shajs("sha256")
+      .update(preimage)
+      .digest()
+  );
+}
+
 // doHash will preform the specified hash on the preimage.
 // if hashOp == NONE, it will return an error (use doHashOrNoop if you want different behavior)
-function doHash(hashOp: proofs.HashOp, preimage: Uint8Array): Uint8Array {
+export function doHash(
+  hashOp: proofs.HashOp,
+  preimage: Uint8Array
+): Uint8Array {
   switch (hashOp) {
     case proofs.HashOp.SHA256:
-      return new Uint8Array(
-        shajs("sha256")
-          .update(preimage)
-          .digest()
-      );
+      return s256(preimage);
     case proofs.HashOp.SHA512:
       return new Uint8Array(
         shajs("sha512")
@@ -93,12 +108,10 @@ function doHash(hashOp: proofs.HashOp, preimage: Uint8Array): Uint8Array {
           .digest()
       );
     case proofs.HashOp.RIPEMD160:
-      return new Uint8Array(new ripemd160().update(preimage).digest());
+      // this requires string or Buffer....
+      return rp160(preimage);
     case proofs.HashOp.BITCOIN:
-      const sha = shajs("sha256")
-        .update(preimage)
-        .digest();
-      return new Uint8Array(new ripemd160().update(sha).digest());
+      return rp160(s256(preimage));
   }
   throw new Error(`Unsupported hashop: ${hashOp}`);
 }

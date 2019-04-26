@@ -1,18 +1,31 @@
 import { proofs } from "./generated/codecimpl";
 
 import { fromHex, toAscii } from "./helpers";
-import { applyInner, applyLeaf } from "./ops";
+import { applyInner, applyLeaf, doHash } from "./ops";
 
-// "hash foobar": {
-// 	op: &LeafOp{
-// 		Hash: HashOp_SHA256,
-// 		// no prehash, no length prefix
-// 	},
-// 	key:   []byte("foo"),
-// 	value: []byte("bar"),
-// 	// echo -n foobar | sha256sum
-// 	expected: fromHex("c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"),
-// },
+describe("doHash", () => {
+  it("sha256 hashes food", () => {
+    // echo -n food | sha256sum
+    const hash = doHash(proofs.HashOp.SHA256, toAscii("food"));
+    expect(hash).toEqual(
+      fromHex(
+        "c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b"
+      )
+    );
+  });
+
+  it("ripemd160 hashes food", () => {
+    // echo -n food | openssl dgst -rmd160 -hex | cut -d' ' -f2
+    const hash = doHash(proofs.HashOp.RIPEMD160, toAscii("food"));
+    expect(hash).toEqual(fromHex("b1ab9988c7c7c5ec4b2b291adfeeee10e77cdd46"));
+  });
+
+  it("'bitcoin' hashes food", () => {
+    // echo -n c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b | xxd -r -p | openssl dgst -rmd160 -hex
+    const hash = doHash(proofs.HashOp.BITCOIN, toAscii("food"));
+    expect(hash).toEqual(fromHex("0bcb587dfb4fc10b36d57f2bba1878f139b75d24"));
+  });
+});
 
 describe("applyLeaf", () => {
   it("hashes foobar", () => {
@@ -53,10 +66,10 @@ describe("applyLeaf", () => {
       hash: proofs.HashOp.SHA256,
       length: proofs.LengthOp.VAR_PROTO
     };
-    // echo -n food | xxs -ps
+    // echo -n food | xxd -ps
     const key = toAscii("food"); // 04666f6f64
     const value = toAscii("some longer text"); // 10736f6d65206c6f6e6765722074657874
-    // echo -n 04666f6f6410736f6d65206c6f6e6765722074657874 | xxd -r -p | sha256sum
+    // echo -n 04666f6f6410736f6d65206c6f6e6765722074657874 | xxd -r -p | sha256sum -b
     const expected = fromHex(
       "b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"
     );
