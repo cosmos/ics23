@@ -7,6 +7,8 @@ import (
 	// adds sha512 capability to crypto.SHA512
 	_ "crypto/sha512"
 	fmt "fmt"
+	// adds ripemd160 capability to crypto.RIPEMD160
+	_ "golang.org/x/crypto/ripemd160"
 )
 
 func WrapLeaf(leaf *LeafOp) *ProofOp {
@@ -102,6 +104,18 @@ func doHash(hashOp HashOp, preimage []byte) ([]byte, error) {
 	case HashOp_SHA512:
 		hash := crypto.SHA512.New()
 		hash.Write(preimage)
+		return hash.Sum(nil), nil
+	case HashOp_RIPEMD160:
+		hash := crypto.RIPEMD160.New()
+		hash.Write(preimage)
+		return hash.Sum(nil), nil
+	case HashOp_BITCOIN:
+		// ripemd160(sha256(x))
+		sha := crypto.SHA256.New()
+		sha.Write(preimage)
+		tmp := sha.Sum(nil)
+		hash := crypto.RIPEMD160.New()
+		hash.Write(tmp)
 		return hash.Sum(nil), nil
 	}
 	return nil, fmt.Errorf("Unsupported hashop: %d", hashOp)

@@ -175,6 +175,46 @@ func TestInnerOp(t *testing.T) {
 	}
 }
 
+func TestDoHash(t *testing.T) {
+	cases := map[string]struct {
+		hashOp       HashOp
+		preimage     string
+		expectedHash string
+	}{
+		"sha256": {
+			hashOp:   HashOp_SHA256,
+			preimage: "food",
+			// echo -n food | sha256sum
+			expectedHash: "c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b",
+		},
+		"ripemd160": {
+			hashOp:   HashOp_RIPEMD160,
+			preimage: "food",
+			// echo -n food | openssl dgst -rmd160 -hex | cut -d' ' -f2
+			expectedHash: "b1ab9988c7c7c5ec4b2b291adfeeee10e77cdd46",
+		},
+		"bitcoin": {
+			hashOp:   HashOp_BITCOIN,
+			preimage: "food",
+			// echo -n c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b | xxd -r -p | openssl dgst -rmd160 -hex
+			expectedHash: "0bcb587dfb4fc10b36d57f2bba1878f139b75d24",
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			res, err := doHash(tc.hashOp, []byte(tc.preimage))
+			if err != nil {
+				t.Fatal(err)
+			}
+			hexRes := hex.EncodeToString(res)
+			if hexRes != tc.expectedHash {
+				t.Fatalf("Expected %s got %s", tc.expectedHash, hexRes)
+			}
+		})
+	}
+}
+
 func fromHex(data string) []byte {
 	res, err := hex.DecodeString(data)
 	if err != nil {
