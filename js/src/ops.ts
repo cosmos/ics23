@@ -1,3 +1,4 @@
+import ripemd160 from "ripemd160";
 import shajs from "sha.js";
 
 import { proofs } from "./generated/codecimpl";
@@ -91,6 +92,13 @@ function doHash(hashOp: proofs.HashOp, preimage: Uint8Array): Uint8Array {
           .update(preimage)
           .digest()
       );
+    case proofs.HashOp.RIPEMD160:
+      return new Uint8Array(new ripemd160().update(preimage).digest());
+    case proofs.HashOp.BITCOIN:
+      const sha = shajs("sha256")
+        .update(preimage)
+        .digest();
+      return new Uint8Array(new ripemd160().update(sha).digest());
   }
   throw new Error(`Unsupported hashop: ${hashOp}`);
 }

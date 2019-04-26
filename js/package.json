@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@types/jasmine": "^3.3.12",
+    "@types/ripemd160": "^2.0.0",
     "@types/sha.js": "^2.4.0",
     "jasmine": "^3.4.0",
     "prettier": "^1.17.0",
@@ -35,6 +36,7 @@
   "dependencies": {
     "jasmine-console-reporter": "^3.1.0",
     "protobufjs": "^6.8.8",
+    "ripemd160": "^2.0.2",
     "sha.js": "^2.4.11",
     "source-map-support": "^0.5.12"
   }

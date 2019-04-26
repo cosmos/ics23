@@ -26,6 +26,8 @@ $root.proofs = (function() {
      * @property {number} SHA256=1 SHA256 value
      * @property {number} SHA512=2 SHA512 value
      * @property {number} KECCAK=3 KECCAK value
+     * @property {number} RIPEMD160=4 RIPEMD160 value
+     * @property {number} BITCOIN=5 BITCOIN value
      */
     proofs.HashOp = (function() {
         var valuesById = {}, values = Object.create(valuesById);
@@ -33,6 +35,8 @@ $root.proofs = (function() {
         values[valuesById[1] = "SHA256"] = 1;
         values[valuesById[2] = "SHA512"] = 2;
         values[valuesById[3] = "KECCAK"] = 3;
+        values[valuesById[4] = "RIPEMD160"] = 4;
+        values[valuesById[5] = "BITCOIN"] = 5;
         return values;
     })();
 
@@ -809,6 +813,8 @@ $root.proofs = (function() {
                 case 1:
                 case 2:
                 case 3:
+                case 4:
+                case 5:
                     break;
                 }
             if (message.prehashKey != null && message.hasOwnProperty("prehashKey"))
@@ -819,6 +825,8 @@ $root.proofs = (function() {
                 case 1:
                 case 2:
                 case 3:
+                case 4:
+                case 5:
                     break;
                 }
             if (message.prehashValue != null && message.hasOwnProperty("prehashValue"))
@@ -829,6 +837,8 @@ $root.proofs = (function() {
                 case 1:
                 case 2:
                 case 3:
+                case 4:
+                case 5:
                     break;
                 }
             if (message.length != null && message.hasOwnProperty("length"))
@@ -881,6 +891,14 @@ $root.proofs = (function() {
             case 3:
                 message.hash = 3;
                 break;
+            case "RIPEMD160":
+            case 4:
+                message.hash = 4;
+                break;
+            case "BITCOIN":
+            case 5:
+                message.hash = 5;
+                break;
             }
             switch (object.prehashKey) {
             case "NO_HASH":
@@ -899,6 +917,14 @@ $root.proofs = (function() {
             case 3:
                 message.prehashKey = 3;
                 break;
+            case "RIPEMD160":
+            case 4:
+                message.prehashKey = 4;
+                break;
+            case "BITCOIN":
+            case 5:
+                message.prehashKey = 5;
+                break;
             }
             switch (object.prehashValue) {
             case "NO_HASH":
@@ -916,6 +942,14 @@ $root.proofs = (function() {
             case "KECCAK":
             case 3:
                 message.prehashValue = 3;
+                break;
+            case "RIPEMD160":
+            case 4:
+                message.prehashValue = 4;
+                break;
+            case "BITCOIN":
+            case 5:
+                message.prehashValue = 5;
                 break;
             }
             switch (object.length) {
@@ -1197,6 +1231,8 @@ $root.proofs = (function() {
                 case 1:
                 case 2:
                 case 3:
+                case 4:
+                case 5:
                     break;
                 }
             if (message.prefix != null && message.hasOwnProperty("prefix"))
@@ -1236,6 +1272,14 @@ $root.proofs = (function() {
             case "KECCAK":
             case 3:
                 message.hash = 3;
+                break;
+            case "RIPEMD160":
+            case 4:
+                message.hash = 4;
+                break;
+            case "BITCOIN":
+            case 5:
+                message.hash = 5;
                 break;
             }
             if (object.prefix != null)
@@ -1324,7 +1368,8 @@ $root.proofs = (function() {
          * 
          * verify(ProofSpec, Proof) -> Proof | Error
          * 
-         * -> Must specify the LeafOp for a given tree type... all LeafOps must use this format!
+         * This verify function could (as an optimization) fill in "ANY" HashOps with
+         * the externally provided one from the spec.
          * @implements IProofSpec
          * @constructor
          * @param {proofs.IProofSpec=} [properties] Properties to set
@@ -1489,6 +1534,8 @@ $root.proofs = (function() {
                 case 1:
                 case 2:
                 case 3:
+                case 4:
+                case 5:
                     break;
                 }
             if (message.innerHash != null && message.hasOwnProperty("innerHash"))
@@ -1499,6 +1546,8 @@ $root.proofs = (function() {
                 case 1:
                 case 2:
                 case 3:
+                case 4:
+                case 5:
                     break;
                 }
             if (message.leafPrefixEqual != null && message.hasOwnProperty("leafPrefixEqual"))
@@ -1539,6 +1588,14 @@ $root.proofs = (function() {
             case 3:
                 message.leafHash = 3;
                 break;
+            case "RIPEMD160":
+            case 4:
+                message.leafHash = 4;
+                break;
+            case "BITCOIN":
+            case 5:
+                message.leafHash = 5;
+                break;
             }
             switch (object.innerHash) {
             case "NO_HASH":
@@ -1556,6 +1613,14 @@ $root.proofs = (function() {
             case "KECCAK":
             case 3:
                 message.innerHash = 3;
+                break;
+            case "RIPEMD160":
+            case 4:
+                message.innerHash = 4;
+                break;
+            case "BITCOIN":
+            case 5:
+                message.innerHash = 5;
                 break;
             }
             if (object.leafPrefixEqual != null)

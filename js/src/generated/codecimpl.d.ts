@@ -6,7 +6,9 @@ export namespace proofs {
     NO_HASH = 0,
     SHA256 = 1,
     SHA512 = 2,
-    KECCAK = 3
+    KECCAK = 3,
+    RIPEMD160 = 4,
+    BITCOIN = 5
   }
 
   /**
@@ -568,7 +570,8 @@ export namespace proofs {
    *
    * verify(ProofSpec, Proof) -> Proof | Error
    *
-   * -> Must specify the LeafOp for a given tree type... all LeafOps must use this format!
+   * This verify function could (as an optimization) fill in "ANY" HashOps with
+   * the externally provided one from the spec.
    */
   class ProofSpec implements IProofSpec {
     /**
