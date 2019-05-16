@@ -23,11 +23,9 @@ func TestExistenceProof(t *testing.T) {
 			proof: &ExistenceProof{
 				Key:   []byte("food"),
 				Value: []byte("some longer text"),
-				Steps: []*ProofOp{
-					WrapLeaf(&LeafOp{
-						Hash:   HashOp_SHA256,
-						Length: LengthOp_VAR_PROTO,
-					}),
+				Leaf: &LeafOp{
+					Hash:   HashOp_SHA256,
+					Length: LengthOp_VAR_PROTO,
 				},
 			},
 			expected: fromHex("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"),
@@ -38,10 +36,8 @@ func TestExistenceProof(t *testing.T) {
 			proof: &ExistenceProof{
 				Key:   append([]byte{4}, []byte("food")...),
 				Value: append([]byte{16}, []byte("some longer text")...),
-				Steps: []*ProofOp{
-					WrapLeaf(&LeafOp{
-						Hash: HashOp_SHA256,
-					}),
+				Leaf: &LeafOp{
+					Hash: HashOp_SHA256,
 				},
 			},
 			expected: fromHex("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"),
@@ -50,59 +46,40 @@ func TestExistenceProof(t *testing.T) {
 			proof: &ExistenceProof{
 				Key:   append([]byte("od"), byte(16)),
 				Value: []byte("some longer text"),
-				Steps: []*ProofOp{
-					WrapLeaf(&LeafOp{
-						Prefix: []byte{4, 'f', 'o'},
-						Hash:   HashOp_SHA256,
-					}),
+				Leaf: &LeafOp{
+					Prefix: []byte{4, 'f', 'o'},
+					Hash:   HashOp_SHA256,
 				},
 			},
 			expected: fromHex("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"),
-		},
-		"cannot execute two leafs": {
-			proof: &ExistenceProof{
-				Key:   []byte("food"),
-				Value: []byte("some longer text"),
-				Steps: []*ProofOp{
-					WrapLeaf(&LeafOp{
-						Hash:   HashOp_SHA256,
-						Length: LengthOp_VAR_PROTO,
-					}),
-					WrapLeaf(&LeafOp{
-						Hash:   HashOp_SHA256,
-						Length: LengthOp_VAR_PROTO,
-					}),
-				},
-			},
-			isErr: true,
 		},
 		"cannot execute inner first": {
 			proof: &ExistenceProof{
 				Key:   []byte("food"),
 				Value: []byte("some longer text"),
-				Steps: []*ProofOp{
-					WrapInner(&InnerOp{
+				Path: []*InnerOp{
+					&InnerOp{
 						Hash:   HashOp_SHA256,
 						Prefix: fromHex("deadbeef00cafe00"),
-					}),
+					},
 				},
 			},
 			isErr: true,
 		},
-		"executes lead then inner op": {
+		"executes leaf then inner op": {
 			proof: &ExistenceProof{
 				Key:   []byte("food"),
 				Value: []byte("some longer text"),
-				Steps: []*ProofOp{
-					WrapLeaf(&LeafOp{
-						Hash:   HashOp_SHA256,
-						Length: LengthOp_VAR_PROTO,
-					}),
-					// output: b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265
-					WrapInner(&InnerOp{
+				Leaf: &LeafOp{
+					Hash:   HashOp_SHA256,
+					Length: LengthOp_VAR_PROTO,
+				},
+				// output: b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265
+				Path: []*InnerOp{
+					&InnerOp{
 						Hash:   HashOp_SHA256,
 						Prefix: fromHex("deadbeef00cafe00"),
-					}),
+					},
 					// echo -n deadbeef00cafe00b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265 | xxd -r -p | sha256sum
 				},
 			},
@@ -259,13 +236,13 @@ func TestCheckLeaf(t *testing.T) {
 }
 
 func TestCheckAgainstSpec(t *testing.T) {
-	validInner := WrapInner(&InnerOp{
+	validInner := &InnerOp{
 		Prefix: fromHex("aa"),
-	})
-	invalidInner := WrapInner(&InnerOp{
+	}
+	invalidInner := &InnerOp{
 		Prefix: fromHex("00aa"),
 		Suffix: fromHex("bb"),
-	})
+	}
 
 	cases := map[string]struct {
 		proof *ExistenceProof
@@ -284,9 +261,7 @@ func TestCheckAgainstSpec(t *testing.T) {
 			proof: &ExistenceProof{
 				Key:   []byte("food"),
 				Value: []byte("bar"),
-				Steps: []*ProofOp{
-					WrapLeaf(IavlSpec.LeafSpec),
-				},
+				Leaf:  IavlSpec.LeafSpec,
 			},
 			spec: IavlSpec,
 		},
@@ -294,12 +269,10 @@ func TestCheckAgainstSpec(t *testing.T) {
 			proof: &ExistenceProof{
 				Key:   []byte("food"),
 				Value: []byte("bar"),
-				Steps: []*ProofOp{
-					WrapLeaf(&LeafOp{
-						Prefix: []byte{0},
-						Hash:   HashOp_SHA256,
-						Length: LengthOp_VAR_PROTO,
-					}),
+				Leaf: &LeafOp{
+					Prefix: []byte{0},
+					Hash:   HashOp_SHA256,
+					Length: LengthOp_VAR_PROTO,
 				},
 			},
 			spec:  IavlSpec,
@@ -309,7 +282,7 @@ func TestCheckAgainstSpec(t *testing.T) {
 			proof: &ExistenceProof{
 				Key:   []byte("food"),
 				Value: []byte("bar"),
-				Steps: []*ProofOp{
+				Path: []*InnerOp{
 					validInner,
 				},
 			},
@@ -320,8 +293,8 @@ func TestCheckAgainstSpec(t *testing.T) {
 			proof: &ExistenceProof{
 				Key:   []byte("food"),
 				Value: []byte("bar"),
-				Steps: []*ProofOp{
-					WrapLeaf(IavlSpec.LeafSpec),
+				Leaf:  IavlSpec.LeafSpec,
+				Path: []*InnerOp{
 					validInner,
 					validInner,
 				},
@@ -332,8 +305,8 @@ func TestCheckAgainstSpec(t *testing.T) {
 			proof: &ExistenceProof{
 				Key:   []byte("food"),
 				Value: []byte("bar"),
-				Steps: []*ProofOp{
-					WrapLeaf(IavlSpec.LeafSpec),
+				Leaf:  IavlSpec.LeafSpec,
+				Path: []*InnerOp{
 					validInner,
 					invalidInner,
 					validInner,
