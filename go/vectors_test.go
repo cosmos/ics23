@@ -18,11 +18,10 @@ func TestIavlVectors(t *testing.T) {
 	cases := []struct {
 		filename string
 	}{
-		// TODO: re-generate with new format
-		// {filename: "existence1.json"},
-		// {filename: "existence2.json"},
-		// {filename: "existence3.json"},
-		// {filename: "existence4.json"},
+		{filename: "existence1.json"},
+		{filename: "existence2.json"},
+		{filename: "existence3.json"},
+		{filename: "existence4.json"},
 	}
 	dir := filepath.Join("..", "testdata", "iavl")
 
