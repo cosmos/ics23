@@ -15,51 +15,24 @@ describe("calculateExistenceRoot", () => {
     const proof: proofs.IExistenceProof = {
       key: toAscii("food"),
       value: toAscii("some longer text"),
-      steps: [
-        {
-          leaf: {
-            hash: proofs.HashOp.SHA256,
-            length: proofs.LengthOp.VAR_PROTO
-          }
-        }
-      ]
+      leaf: {
+        hash: proofs.HashOp.SHA256,
+        length: proofs.LengthOp.VAR_PROTO
+      }
     };
     const expected = fromHex(
       "b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"
     );
     expect(calculateExistenceRoot(proof)).toEqual(expected);
   });
-  it("cannot execute two leaves", () => {
-    const proof: proofs.IExistenceProof = {
-      key: toAscii("food"),
-      value: toAscii("some longer text"),
-      steps: [
-        {
-          leaf: {
-            hash: proofs.HashOp.SHA256,
-            length: proofs.LengthOp.VAR_PROTO
-          }
-        },
-        {
-          leaf: {
-            hash: proofs.HashOp.SHA256,
-            length: proofs.LengthOp.VAR_PROTO
-          }
-        }
-      ]
-    };
-    expect(() => calculateExistenceRoot(proof)).toThrow();
-  });
   it("cannot execute inner first", () => {
     const proof: proofs.IExistenceProof = {
       key: toAscii("food"),
       value: toAscii("some longer text"),
-      steps: [
+      path: [
         {
-          inner: {
-            hash: proofs.HashOp.SHA256,
-            prefix: fromHex("deadbeef00cafe00")
-          }
+          hash: proofs.HashOp.SHA256,
+          prefix: fromHex("deadbeef00cafe00")
         }
       ]
     };
@@ -69,19 +42,15 @@ describe("calculateExistenceRoot", () => {
     const proof: proofs.IExistenceProof = {
       key: toAscii("food"),
       value: toAscii("some longer text"),
-      steps: [
+      leaf: {
+        hash: proofs.HashOp.SHA256,
+        length: proofs.LengthOp.VAR_PROTO
+      },
+      // output: b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265
+      path: [
         {
-          leaf: {
-            hash: proofs.HashOp.SHA256,
-            length: proofs.LengthOp.VAR_PROTO
-          }
-        },
-        // output: b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265
-        {
-          inner: {
-            hash: proofs.HashOp.SHA256,
-            prefix: fromHex("deadbeef00cafe00")
-          }
+          hash: proofs.HashOp.SHA256,
+          prefix: fromHex("deadbeef00cafe00")
         }
         // echo -n deadbeef00cafe00b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265 | xxd -r -p | sha256sum
       ]
