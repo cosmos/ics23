@@ -63,17 +63,8 @@ length-prefix the data before hashing it.
 message ExistenceProof {
     bytes key = 1;
     bytes value = 2;
-    repeated ProofOp steps = 3;    
-}
-
-/**
-ProofOp is directions to peform one step of the merkle proof
-*/
-message ProofOp {
-    oneof op {
-        LeafOp leaf = 1;
-        InnerOp inner = 2;
-    }
+    LeafOp leaf = 3;
+    repeated InnerOp path = 4;    
 }
 
 /**

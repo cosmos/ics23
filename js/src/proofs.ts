@@ -10,22 +10,14 @@ export function calculateExistenceRoot(
   if (!proof.key || !proof.value) {
     throw new Error("Existence proof needs key and value set");
   }
-  if (!proof.steps || proof.steps.length === 0) {
-    throw new Error("Existence Proof needs at least one step");
-  }
-
-  const [{ leaf }, ...rem] = proof.steps;
-  if (!leaf) {
+  if (!proof.leaf) {
     throw new Error("Existence proof must start with a leaf operation");
   }
-  let res = applyLeaf(leaf, proof.key, proof.value);
+  const path = proof.path || [];
 
-  for (const { inner } of rem) {
-    if (!inner) {
-      throw new Error("All subsequent steps must be inner ops");
-    }
+  let res = applyLeaf(proof.leaf, proof.key, proof.value);
+  for (const inner of path) {
     res = applyInner(inner, res);
   }
-
   return res;
 }

@@ -7,41 +7,10 @@ import (
 	// adds sha512 capability to crypto.SHA512
 	_ "crypto/sha512"
 	fmt "fmt"
+
 	// adds ripemd160 capability to crypto.RIPEMD160
 	_ "golang.org/x/crypto/ripemd160"
 )
-
-func WrapLeaf(leaf *LeafOp) *ProofOp {
-	return &ProofOp{
-		Op: &ProofOp_Leaf{
-			Leaf: leaf,
-		},
-	}
-}
-
-func WrapInner(inner *InnerOp) *ProofOp {
-	return &ProofOp{
-		Op: &ProofOp_Inner{
-			Inner: inner,
-		},
-	}
-}
-
-func asLeaf(op *ProofOp) (*LeafOp, error) {
-	leaf, ok := op.Op.(*ProofOp_Leaf)
-	if !ok {
-		return nil, fmt.Errorf("op is not leaf")
-	}
-	return leaf.Leaf, nil
-}
-
-func asInner(op *ProofOp) (*InnerOp, error) {
-	inner, ok := op.Op.(*ProofOp_Inner)
-	if !ok {
-		return nil, fmt.Errorf("op is not inner")
-	}
-	return inner.Inner, nil
-}
 
 func (op *LeafOp) Apply(key []byte, value []byte) ([]byte, error) {
 	if len(key) == 0 {

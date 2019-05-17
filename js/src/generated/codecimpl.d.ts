@@ -37,8 +37,11 @@ export namespace proofs {
     /** ExistenceProof value */
     value?: Uint8Array | null;
 
-    /** ExistenceProof steps */
-    steps?: proofs.IProofOp[] | null;
+    /** ExistenceProof leaf */
+    leaf?: proofs.ILeafOp | null;
+
+    /** ExistenceProof path */
+    path?: proofs.IInnerOp[] | null;
   }
 
   /**
@@ -75,8 +78,11 @@ export namespace proofs {
     /** ExistenceProof value. */
     public value: Uint8Array;
 
-    /** ExistenceProof steps. */
-    public steps: proofs.IProofOp[];
+    /** ExistenceProof leaf. */
+    public leaf?: proofs.ILeafOp | null;
+
+    /** ExistenceProof path. */
+    public path: proofs.IInnerOp[];
 
     /**
      * Creates a new ExistenceProof instance using the specified properties.
@@ -162,117 +168,6 @@ export namespace proofs {
 
     /**
      * Converts this ExistenceProof to JSON.
-     * @returns JSON object
-     */
-    public toJSON(): { [k: string]: any };
-  }
-
-  /** Properties of a ProofOp. */
-  interface IProofOp {
-    /** ProofOp leaf */
-    leaf?: proofs.ILeafOp | null;
-
-    /** ProofOp inner */
-    inner?: proofs.IInnerOp | null;
-  }
-
-  /** ProofOp is directions to peform one step of the merkle proof */
-  class ProofOp implements IProofOp {
-    /**
-     * Constructs a new ProofOp.
-     * @param [properties] Properties to set
-     */
-    constructor(properties?: proofs.IProofOp);
-
-    /** ProofOp leaf. */
-    public leaf?: proofs.ILeafOp | null;
-
-    /** ProofOp inner. */
-    public inner?: proofs.IInnerOp | null;
-
-    /** ProofOp op. */
-    public op?: "leaf" | "inner";
-
-    /**
-     * Creates a new ProofOp instance using the specified properties.
-     * @param [properties] Properties to set
-     * @returns ProofOp instance
-     */
-    public static create(properties?: proofs.IProofOp): proofs.ProofOp;
-
-    /**
-     * Encodes the specified ProofOp message. Does not implicitly {@link proofs.ProofOp.verify|verify} messages.
-     * @param message ProofOp message or plain object to encode
-     * @param [writer] Writer to encode to
-     * @returns Writer
-     */
-    public static encode(
-      message: proofs.IProofOp,
-      writer?: $protobuf.Writer
-    ): $protobuf.Writer;
-
-    /**
-     * Encodes the specified ProofOp message, length delimited. Does not implicitly {@link proofs.ProofOp.verify|verify} messages.
-     * @param message ProofOp message or plain object to encode
-     * @param [writer] Writer to encode to
-     * @returns Writer
-     */
-    public static encodeDelimited(
-      message: proofs.IProofOp,
-      writer?: $protobuf.Writer
-    ): $protobuf.Writer;
-
-    /**
-     * Decodes a ProofOp message from the specified reader or buffer.
-     * @param reader Reader or buffer to decode from
-     * @param [length] Message length if known beforehand
-     * @returns ProofOp
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    public static decode(
-      reader: $protobuf.Reader | Uint8Array,
-      length?: number
-    ): proofs.ProofOp;
-
-    /**
-     * Decodes a ProofOp message from the specified reader or buffer, length delimited.
-     * @param reader Reader or buffer to decode from
-     * @returns ProofOp
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    public static decodeDelimited(
-      reader: $protobuf.Reader | Uint8Array
-    ): proofs.ProofOp;
-
-    /**
-     * Verifies a ProofOp message.
-     * @param message Plain object to verify
-     * @returns `null` if valid, otherwise the reason why it is not
-     */
-    public static verify(message: { [k: string]: any }): string | null;
-
-    /**
-     * Creates a ProofOp message from a plain object. Also converts values to their respective internal types.
-     * @param object Plain object
-     * @returns ProofOp
-     */
-    public static fromObject(object: { [k: string]: any }): proofs.ProofOp;
-
-    /**
-     * Creates a plain object from a ProofOp message. Also converts values to other types if specified.
-     * @param message ProofOp
-     * @param [options] Conversion options
-     * @returns Plain object
-     */
-    public static toObject(
-      message: proofs.ProofOp,
-      options?: $protobuf.IConversionOptions
-    ): { [k: string]: any };
-
-    /**
-     * Converts this ProofOp to JSON.
      * @returns JSON object
      */
     public toJSON(): { [k: string]: any };
@@ -551,17 +446,8 @@ export namespace proofs {
 
   /** Properties of a ProofSpec. */
   interface IProofSpec {
-    /** ProofSpec leafHash */
-    leafHash?: proofs.HashOp | null;
-
-    /** ProofSpec innerHash */
-    innerHash?: proofs.HashOp | null;
-
-    /** ProofSpec leafPrefixEqual */
-    leafPrefixEqual?: Uint8Array | null;
-
-    /** ProofSpec innerPrefixStartsWith */
-    innerPrefixStartsWith?: Uint8Array | null;
+    /** ProofSpec leafSpec */
+    leafSpec?: proofs.ILeafOp | null;
   }
 
   /**
@@ -570,8 +456,11 @@ export namespace proofs {
    *
    * verify(ProofSpec, Proof) -> Proof | Error
    *
-   * This verify function could (as an optimization) fill in "ANY" HashOps with
-   * the externally provided one from the spec.
+   * As demonstrated in tests, if we don't fix the algorithm used to calculate the
+   * LeafHash for a given tree, there are many possible key-value pairs that can
+   * generate a given hash (by interpretting the preimage differently).
+   * We need this for proper security, requires client knows a priori what
+   * tree format server uses. But not in code, rather a configuration object.
    */
   class ProofSpec implements IProofSpec {
     /**
@@ -580,17 +469,8 @@ export namespace proofs {
      */
     constructor(properties?: proofs.IProofSpec);
 
-    /** ProofSpec leafHash. */
-    public leafHash: proofs.HashOp;
-
-    /** ProofSpec innerHash. */
-    public innerHash: proofs.HashOp;
-
-    /** ProofSpec leafPrefixEqual. */
-    public leafPrefixEqual: Uint8Array;
-
-    /** ProofSpec innerPrefixStartsWith. */
-    public innerPrefixStartsWith: Uint8Array;
+    /** ProofSpec leafSpec. */
+    public leafSpec?: proofs.ILeafOp | null;
 
     /**
      * Creates a new ProofSpec instance using the specified properties.

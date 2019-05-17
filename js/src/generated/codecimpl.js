@@ -79,7 +79,8 @@ $root.proofs = (function() {
          * @interface IExistenceProof
          * @property {Uint8Array|null} [key] ExistenceProof key
          * @property {Uint8Array|null} [value] ExistenceProof value
-         * @property {Array.<proofs.IProofOp>|null} [steps] ExistenceProof steps
+         * @property {proofs.ILeafOp|null} [leaf] ExistenceProof leaf
+         * @property {Array.<proofs.IInnerOp>|null} [path] ExistenceProof path
          */
 
         /**
@@ -109,7 +110,7 @@ $root.proofs = (function() {
          * @param {proofs.IExistenceProof=} [properties] Properties to set
          */
         function ExistenceProof(properties) {
-            this.steps = [];
+            this.path = [];
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -133,12 +134,20 @@ $root.proofs = (function() {
         ExistenceProof.prototype.value = $util.newBuffer([]);
 
         /**
-         * ExistenceProof steps.
-         * @member {Array.<proofs.IProofOp>} steps
+         * ExistenceProof leaf.
+         * @member {proofs.ILeafOp|null|undefined} leaf
          * @memberof proofs.ExistenceProof
          * @instance
          */
-        ExistenceProof.prototype.steps = $util.emptyArray;
+        ExistenceProof.prototype.leaf = null;
+
+        /**
+         * ExistenceProof path.
+         * @member {Array.<proofs.IInnerOp>} path
+         * @memberof proofs.ExistenceProof
+         * @instance
+         */
+        ExistenceProof.prototype.path = $util.emptyArray;
 
         /**
          * Creates a new ExistenceProof instance using the specified properties.
@@ -168,9 +177,11 @@ $root.proofs = (function() {
                 writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.key);
             if (message.value != null && message.hasOwnProperty("value"))
                 writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.value);
-            if (message.steps != null && message.steps.length)
-                for (var i = 0; i < message.steps.length; ++i)
-                    $root.proofs.ProofOp.encode(message.steps[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            if (message.leaf != null && message.hasOwnProperty("leaf"))
+                $root.proofs.LeafOp.encode(message.leaf, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            if (message.path != null && message.path.length)
+                for (var i = 0; i < message.path.length; ++i)
+                    $root.proofs.InnerOp.encode(message.path[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
             return writer;
         };
 
@@ -212,9 +223,12 @@ $root.proofs = (function() {
                     message.value = reader.bytes();
                     break;
                 case 3:
-                    if (!(message.steps && message.steps.length))
-                        message.steps = [];
-                    message.steps.push($root.proofs.ProofOp.decode(reader, reader.uint32()));
+                    message.leaf = $root.proofs.LeafOp.decode(reader, reader.uint32());
+                    break;
+                case 4:
+                    if (!(message.path && message.path.length))
+                        message.path = [];
+                    message.path.push($root.proofs.InnerOp.decode(reader, reader.uint32()));
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -257,13 +271,18 @@ $root.proofs = (function() {
             if (message.value != null && message.hasOwnProperty("value"))
                 if (!(message.value && typeof message.value.length === "number" || $util.isString(message.value)))
                     return "value: buffer expected";
-            if (message.steps != null && message.hasOwnProperty("steps")) {
-                if (!Array.isArray(message.steps))
-                    return "steps: array expected";
-                for (var i = 0; i < message.steps.length; ++i) {
-                    var error = $root.proofs.ProofOp.verify(message.steps[i]);
+            if (message.leaf != null && message.hasOwnProperty("leaf")) {
+                var error = $root.proofs.LeafOp.verify(message.leaf);
+                if (error)
+                    return "leaf." + error;
+            }
+            if (message.path != null && message.hasOwnProperty("path")) {
+                if (!Array.isArray(message.path))
+                    return "path: array expected";
+                for (var i = 0; i < message.path.length; ++i) {
+                    var error = $root.proofs.InnerOp.verify(message.path[i]);
                     if (error)
-                        return "steps." + error;
+                        return "path." + error;
                 }
             }
             return null;
@@ -291,14 +310,19 @@ $root.proofs = (function() {
                     $util.base64.decode(object.value, message.value = $util.newBuffer($util.base64.length(object.value)), 0);
                 else if (object.value.length)
                     message.value = object.value;
-            if (object.steps) {
-                if (!Array.isArray(object.steps))
-                    throw TypeError(".proofs.ExistenceProof.steps: array expected");
-                message.steps = [];
-                for (var i = 0; i < object.steps.length; ++i) {
-                    if (typeof object.steps[i] !== "object")
-                        throw TypeError(".proofs.ExistenceProof.steps: object expected");
-                    message.steps[i] = $root.proofs.ProofOp.fromObject(object.steps[i]);
+            if (object.leaf != null) {
+                if (typeof object.leaf !== "object")
+                    throw TypeError(".proofs.ExistenceProof.leaf: object expected");
+                message.leaf = $root.proofs.LeafOp.fromObject(object.leaf);
+            }
+            if (object.path) {
+                if (!Array.isArray(object.path))
+                    throw TypeError(".proofs.ExistenceProof.path: array expected");
+                message.path = [];
+                for (var i = 0; i < object.path.length; ++i) {
+                    if (typeof object.path[i] !== "object")
+                        throw TypeError(".proofs.ExistenceProof.path: object expected");
+                    message.path[i] = $root.proofs.InnerOp.fromObject(object.path[i]);
                 }
             }
             return message;
@@ -318,7 +342,7 @@ $root.proofs = (function() {
                 options = {};
             var object = {};
             if (options.arrays || options.defaults)
-                object.steps = [];
+                object.path = [];
             if (options.defaults) {
                 if (options.bytes === String)
                     object.key = "";
@@ -334,15 +358,18 @@ $root.proofs = (function() {
                     if (options.bytes !== Array)
                         object.value = $util.newBuffer(object.value);
                 }
+                object.leaf = null;
             }
             if (message.key != null && message.hasOwnProperty("key"))
                 object.key = options.bytes === String ? $util.base64.encode(message.key, 0, message.key.length) : options.bytes === Array ? Array.prototype.slice.call(message.key) : message.key;
             if (message.value != null && message.hasOwnProperty("value"))
                 object.value = options.bytes === String ? $util.base64.encode(message.value, 0, message.value.length) : options.bytes === Array ? Array.prototype.slice.call(message.value) : message.value;
-            if (message.steps && message.steps.length) {
-                object.steps = [];
-                for (var j = 0; j < message.steps.length; ++j)
-                    object.steps[j] = $root.proofs.ProofOp.toObject(message.steps[j], options);
+            if (message.leaf != null && message.hasOwnProperty("leaf"))
+                object.leaf = $root.proofs.LeafOp.toObject(message.leaf, options);
+            if (message.path && message.path.length) {
+                object.path = [];
+                for (var j = 0; j < message.path.length; ++j)
+                    object.path[j] = $root.proofs.InnerOp.toObject(message.path[j], options);
             }
             return object;
         };
@@ -359,251 +386,6 @@ $root.proofs = (function() {
         };
 
         return ExistenceProof;
-    })();
-
-    proofs.ProofOp = (function() {
-
-        /**
-         * Properties of a ProofOp.
-         * @memberof proofs
-         * @interface IProofOp
-         * @property {proofs.ILeafOp|null} [leaf] ProofOp leaf
-         * @property {proofs.IInnerOp|null} [inner] ProofOp inner
-         */
-
-        /**
-         * Constructs a new ProofOp.
-         * @memberof proofs
-         * @classdesc ProofOp is directions to peform one step of the merkle proof
-         * @implements IProofOp
-         * @constructor
-         * @param {proofs.IProofOp=} [properties] Properties to set
-         */
-        function ProofOp(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * ProofOp leaf.
-         * @member {proofs.ILeafOp|null|undefined} leaf
-         * @memberof proofs.ProofOp
-         * @instance
-         */
-        ProofOp.prototype.leaf = null;
-
-        /**
-         * ProofOp inner.
-         * @member {proofs.IInnerOp|null|undefined} inner
-         * @memberof proofs.ProofOp
-         * @instance
-         */
-        ProofOp.prototype.inner = null;
-
-        // OneOf field names bound to virtual getters and setters
-        var $oneOfFields;
-
-        /**
-         * ProofOp op.
-         * @member {"leaf"|"inner"|undefined} op
-         * @memberof proofs.ProofOp
-         * @instance
-         */
-        Object.defineProperty(ProofOp.prototype, "op", {
-            get: $util.oneOfGetter($oneOfFields = ["leaf", "inner"]),
-            set: $util.oneOfSetter($oneOfFields)
-        });
-
-        /**
-         * Creates a new ProofOp instance using the specified properties.
-         * @function create
-         * @memberof proofs.ProofOp
-         * @static
-         * @param {proofs.IProofOp=} [properties] Properties to set
-         * @returns {proofs.ProofOp} ProofOp instance
-         */
-        ProofOp.create = function create(properties) {
-            return new ProofOp(properties);
-        };
-
-        /**
-         * Encodes the specified ProofOp message. Does not implicitly {@link proofs.ProofOp.verify|verify} messages.
-         * @function encode
-         * @memberof proofs.ProofOp
-         * @static
-         * @param {proofs.IProofOp} message ProofOp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        ProofOp.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.leaf != null && message.hasOwnProperty("leaf"))
-                $root.proofs.LeafOp.encode(message.leaf, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.inner != null && message.hasOwnProperty("inner"))
-                $root.proofs.InnerOp.encode(message.inner, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            return writer;
-        };
-
-        /**
-         * Encodes the specified ProofOp message, length delimited. Does not implicitly {@link proofs.ProofOp.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof proofs.ProofOp
-         * @static
-         * @param {proofs.IProofOp} message ProofOp message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        ProofOp.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a ProofOp message from the specified reader or buffer.
-         * @function decode
-         * @memberof proofs.ProofOp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {proofs.ProofOp} ProofOp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        ProofOp.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.proofs.ProofOp();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                switch (tag >>> 3) {
-                case 1:
-                    message.leaf = $root.proofs.LeafOp.decode(reader, reader.uint32());
-                    break;
-                case 2:
-                    message.inner = $root.proofs.InnerOp.decode(reader, reader.uint32());
-                    break;
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a ProofOp message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof proofs.ProofOp
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {proofs.ProofOp} ProofOp
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        ProofOp.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a ProofOp message.
-         * @function verify
-         * @memberof proofs.ProofOp
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        ProofOp.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            var properties = {};
-            if (message.leaf != null && message.hasOwnProperty("leaf")) {
-                properties.op = 1;
-                {
-                    var error = $root.proofs.LeafOp.verify(message.leaf);
-                    if (error)
-                        return "leaf." + error;
-                }
-            }
-            if (message.inner != null && message.hasOwnProperty("inner")) {
-                if (properties.op === 1)
-                    return "op: multiple values";
-                properties.op = 1;
-                {
-                    var error = $root.proofs.InnerOp.verify(message.inner);
-                    if (error)
-                        return "inner." + error;
-                }
-            }
-            return null;
-        };
-
-        /**
-         * Creates a ProofOp message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof proofs.ProofOp
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {proofs.ProofOp} ProofOp
-         */
-        ProofOp.fromObject = function fromObject(object) {
-            if (object instanceof $root.proofs.ProofOp)
-                return object;
-            var message = new $root.proofs.ProofOp();
-            if (object.leaf != null) {
-                if (typeof object.leaf !== "object")
-                    throw TypeError(".proofs.ProofOp.leaf: object expected");
-                message.leaf = $root.proofs.LeafOp.fromObject(object.leaf);
-            }
-            if (object.inner != null) {
-                if (typeof object.inner !== "object")
-                    throw TypeError(".proofs.ProofOp.inner: object expected");
-                message.inner = $root.proofs.InnerOp.fromObject(object.inner);
-            }
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a ProofOp message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof proofs.ProofOp
-         * @static
-         * @param {proofs.ProofOp} message ProofOp
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        ProofOp.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (message.leaf != null && message.hasOwnProperty("leaf")) {
-                object.leaf = $root.proofs.LeafOp.toObject(message.leaf, options);
-                if (options.oneofs)
-                    object.op = "leaf";
-            }
-            if (message.inner != null && message.hasOwnProperty("inner")) {
-                object.inner = $root.proofs.InnerOp.toObject(message.inner, options);
-                if (options.oneofs)
-                    object.op = "inner";
-            }
-            return object;
-        };
-
-        /**
-         * Converts this ProofOp to JSON.
-         * @function toJSON
-         * @memberof proofs.ProofOp
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        ProofOp.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        return ProofOp;
     })();
 
     proofs.LeafOp = (function() {
@@ -1354,10 +1136,7 @@ $root.proofs = (function() {
          * Properties of a ProofSpec.
          * @memberof proofs
          * @interface IProofSpec
-         * @property {proofs.HashOp|null} [leafHash] ProofSpec leafHash
-         * @property {proofs.HashOp|null} [innerHash] ProofSpec innerHash
-         * @property {Uint8Array|null} [leafPrefixEqual] ProofSpec leafPrefixEqual
-         * @property {Uint8Array|null} [innerPrefixStartsWith] ProofSpec innerPrefixStartsWith
+         * @property {proofs.ILeafOp|null} [leafSpec] ProofSpec leafSpec
          */
 
         /**
@@ -1368,8 +1147,11 @@ $root.proofs = (function() {
          * 
          * verify(ProofSpec, Proof) -> Proof | Error
          * 
-         * This verify function could (as an optimization) fill in "ANY" HashOps with
-         * the externally provided one from the spec.
+         * As demonstrated in tests, if we don't fix the algorithm used to calculate the
+         * LeafHash for a given tree, there are many possible key-value pairs that can
+         * generate a given hash (by interpretting the preimage differently).
+         * We need this for proper security, requires client knows a priori what
+         * tree format server uses. But not in code, rather a configuration object.
          * @implements IProofSpec
          * @constructor
          * @param {proofs.IProofSpec=} [properties] Properties to set
@@ -1382,36 +1164,12 @@ $root.proofs = (function() {
         }
 
         /**
-         * ProofSpec leafHash.
-         * @member {proofs.HashOp} leafHash
+         * ProofSpec leafSpec.
+         * @member {proofs.ILeafOp|null|undefined} leafSpec
          * @memberof proofs.ProofSpec
          * @instance
          */
-        ProofSpec.prototype.leafHash = 0;
-
-        /**
-         * ProofSpec innerHash.
-         * @member {proofs.HashOp} innerHash
-         * @memberof proofs.ProofSpec
-         * @instance
-         */
-        ProofSpec.prototype.innerHash = 0;
-
-        /**
-         * ProofSpec leafPrefixEqual.
-         * @member {Uint8Array} leafPrefixEqual
-         * @memberof proofs.ProofSpec
-         * @instance
-         */
-        ProofSpec.prototype.leafPrefixEqual = $util.newBuffer([]);
-
-        /**
-         * ProofSpec innerPrefixStartsWith.
-         * @member {Uint8Array} innerPrefixStartsWith
-         * @memberof proofs.ProofSpec
-         * @instance
-         */
-        ProofSpec.prototype.innerPrefixStartsWith = $util.newBuffer([]);
+        ProofSpec.prototype.leafSpec = null;
 
         /**
          * Creates a new ProofSpec instance using the specified properties.
@@ -1437,14 +1195,8 @@ $root.proofs = (function() {
         ProofSpec.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.leafHash != null && message.hasOwnProperty("leafHash"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.leafHash);
-            if (message.innerHash != null && message.hasOwnProperty("innerHash"))
-                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.innerHash);
-            if (message.leafPrefixEqual != null && message.hasOwnProperty("leafPrefixEqual"))
-                writer.uint32(/* id 3, wireType 2 =*/26).bytes(message.leafPrefixEqual);
-            if (message.innerPrefixStartsWith != null && message.hasOwnProperty("innerPrefixStartsWith"))
-                writer.uint32(/* id 4, wireType 2 =*/34).bytes(message.innerPrefixStartsWith);
+            if (message.leafSpec != null && message.hasOwnProperty("leafSpec"))
+                $root.proofs.LeafOp.encode(message.leafSpec, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             return writer;
         };
 
@@ -1480,16 +1232,7 @@ $root.proofs = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.leafHash = reader.int32();
-                    break;
-                case 2:
-                    message.innerHash = reader.int32();
-                    break;
-                case 3:
-                    message.leafPrefixEqual = reader.bytes();
-                    break;
-                case 4:
-                    message.innerPrefixStartsWith = reader.bytes();
+                    message.leafSpec = $root.proofs.LeafOp.decode(reader, reader.uint32());
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1526,36 +1269,11 @@ $root.proofs = (function() {
         ProofSpec.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.leafHash != null && message.hasOwnProperty("leafHash"))
-                switch (message.leafHash) {
-                default:
-                    return "leafHash: enum value expected";
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                    break;
-                }
-            if (message.innerHash != null && message.hasOwnProperty("innerHash"))
-                switch (message.innerHash) {
-                default:
-                    return "innerHash: enum value expected";
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                    break;
-                }
-            if (message.leafPrefixEqual != null && message.hasOwnProperty("leafPrefixEqual"))
-                if (!(message.leafPrefixEqual && typeof message.leafPrefixEqual.length === "number" || $util.isString(message.leafPrefixEqual)))
-                    return "leafPrefixEqual: buffer expected";
-            if (message.innerPrefixStartsWith != null && message.hasOwnProperty("innerPrefixStartsWith"))
-                if (!(message.innerPrefixStartsWith && typeof message.innerPrefixStartsWith.length === "number" || $util.isString(message.innerPrefixStartsWith)))
-                    return "innerPrefixStartsWith: buffer expected";
+            if (message.leafSpec != null && message.hasOwnProperty("leafSpec")) {
+                var error = $root.proofs.LeafOp.verify(message.leafSpec);
+                if (error)
+                    return "leafSpec." + error;
+            }
             return null;
         };
 
@@ -1571,68 +1289,11 @@ $root.proofs = (function() {
             if (object instanceof $root.proofs.ProofSpec)
                 return object;
             var message = new $root.proofs.ProofSpec();
-            switch (object.leafHash) {
-            case "NO_HASH":
-            case 0:
-                message.leafHash = 0;
-                break;
-            case "SHA256":
-            case 1:
-                message.leafHash = 1;
-                break;
-            case "SHA512":
-            case 2:
-                message.leafHash = 2;
-                break;
-            case "KECCAK":
-            case 3:
-                message.leafHash = 3;
-                break;
-            case "RIPEMD160":
-            case 4:
-                message.leafHash = 4;
-                break;
-            case "BITCOIN":
-            case 5:
-                message.leafHash = 5;
-                break;
+            if (object.leafSpec != null) {
+                if (typeof object.leafSpec !== "object")
+                    throw TypeError(".proofs.ProofSpec.leafSpec: object expected");
+                message.leafSpec = $root.proofs.LeafOp.fromObject(object.leafSpec);
             }
-            switch (object.innerHash) {
-            case "NO_HASH":
-            case 0:
-                message.innerHash = 0;
-                break;
-            case "SHA256":
-            case 1:
-                message.innerHash = 1;
-                break;
-            case "SHA512":
-            case 2:
-                message.innerHash = 2;
-                break;
-            case "KECCAK":
-            case 3:
-                message.innerHash = 3;
-                break;
-            case "RIPEMD160":
-            case 4:
-                message.innerHash = 4;
-                break;
-            case "BITCOIN":
-            case 5:
-                message.innerHash = 5;
-                break;
-            }
-            if (object.leafPrefixEqual != null)
-                if (typeof object.leafPrefixEqual === "string")
-                    $util.base64.decode(object.leafPrefixEqual, message.leafPrefixEqual = $util.newBuffer($util.base64.length(object.leafPrefixEqual)), 0);
-                else if (object.leafPrefixEqual.length)
-                    message.leafPrefixEqual = object.leafPrefixEqual;
-            if (object.innerPrefixStartsWith != null)
-                if (typeof object.innerPrefixStartsWith === "string")
-                    $util.base64.decode(object.innerPrefixStartsWith, message.innerPrefixStartsWith = $util.newBuffer($util.base64.length(object.innerPrefixStartsWith)), 0);
-                else if (object.innerPrefixStartsWith.length)
-                    message.innerPrefixStartsWith = object.innerPrefixStartsWith;
             return message;
         };
 
@@ -1649,32 +1310,10 @@ $root.proofs = (function() {
             if (!options)
                 options = {};
             var object = {};
-            if (options.defaults) {
-                object.leafHash = options.enums === String ? "NO_HASH" : 0;
-                object.innerHash = options.enums === String ? "NO_HASH" : 0;
-                if (options.bytes === String)
-                    object.leafPrefixEqual = "";
-                else {
-                    object.leafPrefixEqual = [];
-                    if (options.bytes !== Array)
-                        object.leafPrefixEqual = $util.newBuffer(object.leafPrefixEqual);
-                }
-                if (options.bytes === String)
-                    object.innerPrefixStartsWith = "";
-                else {
-                    object.innerPrefixStartsWith = [];
-                    if (options.bytes !== Array)
-                        object.innerPrefixStartsWith = $util.newBuffer(object.innerPrefixStartsWith);
-                }
-            }
-            if (message.leafHash != null && message.hasOwnProperty("leafHash"))
-                object.leafHash = options.enums === String ? $root.proofs.HashOp[message.leafHash] : message.leafHash;
-            if (message.innerHash != null && message.hasOwnProperty("innerHash"))
-                object.innerHash = options.enums === String ? $root.proofs.HashOp[message.innerHash] : message.innerHash;
-            if (message.leafPrefixEqual != null && message.hasOwnProperty("leafPrefixEqual"))
-                object.leafPrefixEqual = options.bytes === String ? $util.base64.encode(message.leafPrefixEqual, 0, message.leafPrefixEqual.length) : options.bytes === Array ? Array.prototype.slice.call(message.leafPrefixEqual) : message.leafPrefixEqual;
-            if (message.innerPrefixStartsWith != null && message.hasOwnProperty("innerPrefixStartsWith"))
-                object.innerPrefixStartsWith = options.bytes === String ? $util.base64.encode(message.innerPrefixStartsWith, 0, message.innerPrefixStartsWith.length) : options.bytes === Array ? Array.prototype.slice.call(message.innerPrefixStartsWith) : message.innerPrefixStartsWith;
+            if (options.defaults)
+                object.leafSpec = null;
+            if (message.leafSpec != null && message.hasOwnProperty("leafSpec"))
+                object.leafSpec = $root.proofs.LeafOp.toObject(message.leafSpec, options);
             return object;
         };
 
