@@ -46,6 +46,12 @@ func TestIavlVectors(t *testing.T) {
 				t.Fatalf("Unmarshal protobuf: %s", err)
 			}
 
+			// ensure the proof is valid
+			err = proof.CheckAgainstSpec(IavlSpec)
+			if err != nil {
+				t.Fatalf("Failed Iavl check spec: %s", err)
+			}
+
 			calc, err := proof.Calculate()
 			if err != nil {
 				t.Fatalf("Calculating root hash: %s", err)

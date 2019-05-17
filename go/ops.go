@@ -27,22 +27,20 @@ func WrapInner(inner *InnerOp) *ProofOp {
 	}
 }
 
-func (op *ProofOp) Apply(args ...[]byte) ([]byte, error) {
-	o := op.Op
-	switch o.(type) {
-	case *ProofOp_Leaf:
-		if len(args) != 2 {
-			return nil, fmt.Errorf("Need key and value args, got %d", len(args))
-		}
-		return op.GetLeaf().Apply(args[0], args[1])
-	case *ProofOp_Inner:
-		if len(args) != 1 {
-			return nil, fmt.Errorf("Need one child hash, got %d", len(args))
-		}
-		return op.GetInner().Apply(args[0])
-	default:
-		panic("Unknown proof op")
+func asLeaf(op *ProofOp) (*LeafOp, error) {
+	leaf, ok := op.Op.(*ProofOp_Leaf)
+	if !ok {
+		return nil, fmt.Errorf("op is not leaf")
 	}
+	return leaf.Leaf, nil
+}
+
+func asInner(op *ProofOp) (*InnerOp, error) {
+	inner, ok := op.Op.(*ProofOp_Inner)
+	if !ok {
+		return nil, fmt.Errorf("op is not inner")
+	}
+	return inner.Inner, nil
 }
 
 func (op *LeafOp) Apply(key []byte, value []byte) ([]byte, error) {
