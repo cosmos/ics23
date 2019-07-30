@@ -5,11 +5,13 @@ import (
 	"math/big"
 	"math/rand"
 	"testing"
+	"fmt"
 
 	"golang.org/x/crypto/ripemd160"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/common"
@@ -85,4 +87,53 @@ func TestHelperFunctions(t *testing.T) {
 	sim.Commit()
 
 	testDoHash(t, session)
+}
+
+func TestABIEncoding(t *testing.T) {
+	ty := new(abi.Argument)
+	err := ty.UnmarshalJSON([]byte(`
+{
+	"Name": "LeafOp",
+	"Type": "tuple",
+	"Components": [
+		{
+			"Name": "hash",
+			"Type": "uint8"
+		},
+		{
+			"Name": "prehash_key",
+			"Type": "uint8"
+		},
+		{
+			"Name": "prehash_value",
+			"Type": "uint8"
+		},
+		{
+			"Name": "len",
+			"Type": "uint8"
+		},
+		{
+			"Name": "prefix",
+			"Type": "bytes"
+		}
+	]
+}`))
+	require.NoError(t, err)
+
+	tys := abi.Arguments{*ty}
+	bz, err := tys.Pack(struct {
+		Hash uint8
+		PrehashKey uint8
+		PrehashValue uint8
+		Len uint8
+		Prefix []byte
+	}{
+		1,
+		1,
+		1,
+		0,
+		[]byte{0x00},
+	})
+	require.NoError(t, err)
+	fmt.Println(bz)
 }
