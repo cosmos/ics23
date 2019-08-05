@@ -8,9 +8,67 @@ The end goal is to provide a standard representation not only for light-client
 proofs of blockchains, but more specifically for proofs that accompany IBC
 (inter-blockchain communication) packets as defined in the cosmos specification.
 
+## Feature Set
+
+* Proof of Existence (key-value pair linked to root hash)
+* Hold Existence Proof to db-specific spec (avoid reinterpretation of bytes to different key-value pair)
+
+### Planned Features
+
+* Proof of Non-Existence (key proven not to be inside tree with given root hash)
+* Batch Proof or Range Proof (prove many keys at once, more efficiently than separate proofs)
+
 ## Organization
 
 The top level package will provide language-agnostic documentation and protobuf specifications.
 Every language should have a sub-folder, containing both protobuf generated code,
 as well as client-side code for validating such proofs. The server-side code should
 live alongside the various merkle tree representations (eg. not in this repository)
+
+### Client Languages Supported
+
+* [Go](./go)
+* [TypeScript](./js)
+
+### Planned Support
+
+* Rust
+* Solidity - [thanks to Mossid](https://github.com/confio/proofs/pull/12)
+
+## Supported Merkle Stores
+
+* [tendermint/iavl](https://github.com/confio/proofs-iavl) - this is the reference implementation
+
+### Planned
+
+* tendermint/tendermint SimpleMerkleProof
+* merk.js
+
+### Unsupported
+
+* [go-ethereum Patricia Trie](https://github.com/confio/proofs-ethereum)
+
+I spent quite some time to wrestle out a well-defined serialization and a validation logic that didn't
+involve importing too much code from go-ethereum (copying parts and stripping it down to the minimum).
+At the end, I realized the key is only present from parsing the entire path and is quite a painstaking
+process, even with go code that imports rlp and has the custom patricia key encodings. After a long time
+reflecting, I cannot see any way to implement this that doesn't either: (A) allow the provider to forge
+a different key that cannot be detected by the verifier or (B) include a huge amount of custom code
+in the client side.
+
+If anyone has a solution to this, please open an issue in the
+[proofs-ethereum repo](https://github.com/confio/proofs-ethereum).
+
+## Known Limitations
+
+This format is designed to support any merklized data store that encodes key-value pairs into
+a node, and computes a root hash by repeatedly concatenating hashes and re-hashing them.
+
+Notably, this requires the *key* to be present in the leaf node in order to enforce the structure properly
+and prove the *key* provided matches the proof without extensive db-dependent code. Since some
+tries (such as Ethereum's Patricia Trie) do not store the key in the leaf, but require precise analysis of
+every step along the path in order to reconstruct the path, these are not supported. Doing so would
+require a much more complex format and most likely custom code for each such database. The design goal
+was to be able to add new data sources with only configuration (spec object), rather than custom code.
+
+
