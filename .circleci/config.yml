@@ -1,4 +1,12 @@
+# This is a bit complex with multiple jobs.
+# https://circleci.com/docs/2.0/local-cli/ will let you test this locally
 version: 2
+workflows:
+  version: 2
+  test:
+    jobs:
+      - typescript
+      - golang
 jobs:
   typescript:
     docker:
@@ -7,7 +15,7 @@ jobs:
     steps:
       # we checkout here, all other code runs in js subdir
       - checkout:
-        - path: ~/proofs
+          path: ~/proofs
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
@@ -29,11 +37,5 @@ jobs:
     steps:
       # we checkout here, all other code runs in go subdir
       - checkout:
-        - path: ~/proofs
+          path: ~/proofs
       - run: make test
-workflows:
-  version: 2
-  test_all_languages:
-    jobs:
-      - typescript
-      - golang
