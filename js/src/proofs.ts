@@ -1,6 +1,16 @@
 import { proofs } from "./generated/codecimpl";
 import { applyInner, applyLeaf } from "./ops";
 
+export const IavlSpec: proofs.IProofSpec = {
+  leafSpec: {
+    prefix: Uint8Array.from([0]),
+    hash: proofs.HashOp.SHA256,
+    prehashValue: proofs.HashOp.SHA256,
+    prehashKey: proofs.HashOp.NO_HASH,
+    length: proofs.LengthOp.VAR_PROTO
+  }
+};
+
 // Calculate determines the root hash that matches the given proof.
 // You must validate the result is what you have in a header.
 // Returns error if the calculations cannot be performed.
@@ -57,7 +67,9 @@ function ensureLeaf(leaf: proofs.ILeafOp, spec: proofs.ILeafOp): void {
 }
 
 function ensureInner(inner: proofs.IInnerOp, prefix?: Uint8Array | null): void {
-  ensurePrefix(inner.prefix, prefix);
+  if (hasPrefix(inner.prefix, prefix)) {
+    throw new Error(`Inner node has leaf prefix`);
+  }
 }
 
 function ensurePrefix(
@@ -84,4 +96,26 @@ function ensureBytesEqual(a: Uint8Array, b: Uint8Array): void {
       throw new Error(`Arrays differ at index ${i}: ${a[i]} vs ${b[i]}`);
     }
   }
+}
+
+function hasPrefix(
+  check?: Uint8Array | null,
+  prefix?: Uint8Array | null
+): boolean {
+  // no prefix supplied, means everything passes
+  if (!prefix || prefix.length === 0) {
+    return false;
+  }
+  if (!check) {
+    return false;
+  }
+  if (check.length <= prefix.length) {
+    return false;
+  }
+  for (let i = 0; i < prefix.length; i++) {
+    if (check[i] !== prefix[i]) {
+      return false;
+    }
+  }
+  throw true;
 }
