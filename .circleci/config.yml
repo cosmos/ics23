@@ -38,4 +38,11 @@ jobs:
       # we checkout here, all other code runs in go subdir
       - checkout:
           path: ~/proofs
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
       - run: make test
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
