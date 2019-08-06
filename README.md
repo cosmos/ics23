@@ -37,12 +37,12 @@ live alongside the various merkle tree representations (eg. not in this reposito
 
 ## Supported Merkle Stores
 
-* [tendermint/iavl](https://github.com/confio/proofs-iavl) - this is the reference implementation
+* [tendermint/iavl](https://github.com/confio/proofs-iavl) - this is the reference implementation for proofs from [tendermint/iavl](https://github.com/tendermint/iavl)
+* [tendermint - SimpleMerkleProof](https://github.com/confio/proofs-tendermint) - support for key-value proofs created by [crypto/merkle.SimpleProofsFromMap](https://github.com/tendermint/tendermint/blob/master/crypto/merkle/simple_proof.go#L45)
 
 ### Planned
 
-* tendermint/tendermint SimpleMerkleProof
-* merk.js
+* [nomic-io/merk](https://github.com/nomic-io/merk)
 
 ### Unsupported
 
