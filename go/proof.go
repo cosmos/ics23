@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// IavlSpec constrains the format from proofs-iavl (iavl merkle proofs)
 var IavlSpec = &ProofSpec{
 	LeafSpec: &LeafOp{
 		Prefix:       []byte{0},
@@ -13,6 +14,17 @@ var IavlSpec = &ProofSpec{
 		Length:       LengthOp_VAR_PROTO,
 	},
 }
+
+// TendermintSpec constrains the format from proofs-tendermint (crypto/merkle SimpleProof)
+var TendermintSpec = &ProofSpec{
+	LeafSpec: &LeafOp{
+		Prefix:       []byte{0},
+		Hash:         HashOp_SHA256,
+		PrehashValue: HashOp_SHA256,
+		Length:       LengthOp_VAR_PROTO,
+	},
+}
+
 
 // Calculate determines the root hash that matches the given proof.
 // You must validate the result is what you have in a header.
