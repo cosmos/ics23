@@ -11,6 +11,16 @@ export const IavlSpec: proofs.IProofSpec = {
   }
 };
 
+export const TendermintSpec: proofs.IProofSpec = {
+  leafSpec: {
+    prefix: Uint8Array.from([0]),
+    hash: proofs.HashOp.SHA256,
+    prehashValue: proofs.HashOp.SHA256,
+    prehashKey: proofs.HashOp.NO_HASH,
+    length: proofs.LengthOp.VAR_PROTO
+  }
+};
+
 // Calculate determines the root hash that matches the given proof.
 // You must validate the result is what you have in a header.
 // Returns error if the calculations cannot be performed.

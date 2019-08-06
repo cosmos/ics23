@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
@@ -15,20 +16,28 @@ func TestIavlVectors(t *testing.T) {
 		Proof    string `json:"existence"`
 	}
 
+	iavl := filepath.Join("..", "testdata", "iavl")
+	tendermint := filepath.Join("..", "testdata", "tendermint")
 	cases := []struct {
+		dir      string
 		filename string
+		spec     *ProofSpec
 	}{
-		{filename: "existence1.json"},
-		{filename: "existence2.json"},
-		{filename: "existence3.json"},
-		{filename: "existence4.json"},
+		{dir: iavl, filename: "existence1.json", spec: IavlSpec},
+		{dir: iavl, filename: "existence2.json", spec: IavlSpec},
+		{dir: iavl, filename: "existence3.json", spec: IavlSpec},
+		{dir: iavl, filename: "existence4.json", spec: IavlSpec},
+		{dir: tendermint, filename: "existence1.json", spec: TendermintSpec},
+		{dir: tendermint, filename: "existence2.json", spec: TendermintSpec},
+		{dir: tendermint, filename: "existence3.json", spec: TendermintSpec},
+		{dir: tendermint, filename: "existence4.json", spec: TendermintSpec},
 	}
-	dir := filepath.Join("..", "testdata", "iavl")
 
 	for _, tc := range cases {
-		t.Run(tc.filename, func(t *testing.T) {
+		name := fmt.Sprintf("%s/%s", tc.dir, tc.filename)
+		t.Run(name, func(t *testing.T) {
 			// load the file into a json struct
-			name := filepath.Join(dir, tc.filename)
+			name := filepath.Join(tc.dir, tc.filename)
 			bz, err := ioutil.ReadFile(name)
 			if err != nil {
 				t.Fatalf("Read file: %s", err)
@@ -47,7 +56,7 @@ func TestIavlVectors(t *testing.T) {
 			}
 
 			// ensure the proof is valid
-			err = proof.CheckAgainstSpec(IavlSpec)
+			err = proof.CheckAgainstSpec(tc.spec)
 			if err != nil {
 				t.Fatalf("Failed Iavl check spec: %s", err)
 			}
