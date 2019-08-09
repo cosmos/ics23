@@ -166,4 +166,24 @@ message ProofSpec {
   // any field in the ExistenceProof must be the same as in this spec.
   // except Prefix, which is just the first bytes of prefix (spec can be longer) 
   LeafOp leaf_spec = 1;
+  InnerSpec inner_spec = 2;
+}
+
+/*
+InnerSpec contains all store-specific structure info to determine if two proofs from a
+given store are neighbors.
+
+This enables:
+
+  isLeftMost(spec: InnerSpec, op: InnerOp)
+  isRightMost(spec: InnerSpec, op: InnerOp)
+  isLeftNeighbor(spec: InnerSpec, left: InnerOp, right: InnerOp)
+*/
+message InnerSpec {
+    // TODO
+    repeated int32 child_order = 1;
+    int32 child_size = 2;
+    int32 min_prefix_length = 3;
+    int32 max_prefix_length = 4;
+    bytes empty_child = 5;
 }
