@@ -67,9 +67,6 @@ mod tests {
         assert_eq!(vec![66, 69], parsed.get_key());
         assert_eq!(1, parsed.get_path().len());
         assert_eq!(vec![5, 6, 7, 1, 2, 3, 0, 0, 77], parsed.get_path()[0].get_prefix());
-
-
     }
-
 }
 
