@@ -1,5 +1,5 @@
 import { proofs } from "./generated/codecimpl";
-import { CommitmentRoot, verifyExistence } from "./proofs";
+import { CommitmentRoot, verifyExistence, verifyNonExistence } from "./proofs";
 
 /*
 This implements the client side functions as specified in
@@ -41,6 +41,28 @@ export function verifyMembership(
   }
   try {
     verifyExistence(exist, spec, root, key, value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * verifyNonMembership ensures proof is (contains) a valid non-existence proof for the given key
+ */
+export function verifyNonMembership(
+  proof: proofs.ICommitmentProof,
+  spec: proofs.IProofSpec,
+  root: CommitmentRoot,
+  key: Uint8Array
+): boolean {
+  // TODO: handle batch
+  const nonexist = proof.nonexist;
+  if (!nonexist) {
+    return false;
+  }
+  try {
+    verifyNonExistence(nonexist, spec, root, key);
     return true;
   } catch {
     return false;

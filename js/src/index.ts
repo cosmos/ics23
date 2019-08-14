@@ -1,3 +1,8 @@
 export { proofs } from "./generated/codecimpl";
-export { applyInner, applyLeaf } from "./ops";
-export { calculateExistenceRoot } from "./proofs";
+export { verifyMembership, verifyNonMembership } from "./ics23";
+export {
+  calculateExistenceRoot,
+  CommitmentRoot,
+  verifyExistence,
+  verifyNonExistence
+} from "./proofs";
