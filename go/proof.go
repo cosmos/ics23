@@ -93,8 +93,8 @@ func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
 	return nil
 }
 
-// Verify does all checks to ensure this proof proves this key, value -> root
-// and matches the spec.
+// Verify does all checks to ensure the proof has valid non-existence proofs,
+// and they ensure the given key is not in the CommitmentState
 func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte) error {
 	// ensure the existence proofs are valid
 	var leftKey, rightKey []byte
