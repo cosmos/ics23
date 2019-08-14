@@ -344,6 +344,833 @@ impl ::protobuf::reflect::ProtobufValue for ExistenceProof {
 }
 
 #[derive(PartialEq,Clone,Default)]
+pub struct NonExistenceProof {
+    // message fields
+    pub key: ::std::vec::Vec<u8>,
+    pub left: ::protobuf::SingularPtrField<ExistenceProof>,
+    pub right: ::protobuf::SingularPtrField<ExistenceProof>,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a NonExistenceProof {
+    fn default() -> &'a NonExistenceProof {
+        <NonExistenceProof as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl NonExistenceProof {
+    pub fn new() -> NonExistenceProof {
+        ::std::default::Default::default()
+    }
+
+    // bytes key = 1;
+
+
+    pub fn get_key(&self) -> &[u8] {
+        &self.key
+    }
+    pub fn clear_key(&mut self) {
+        self.key.clear();
+    }
+
+    // Param is passed by value, moved
+    pub fn set_key(&mut self, v: ::std::vec::Vec<u8>) {
+        self.key = v;
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_key(&mut self) -> &mut ::std::vec::Vec<u8> {
+        &mut self.key
+    }
+
+    // Take field
+    pub fn take_key(&mut self) -> ::std::vec::Vec<u8> {
+        ::std::mem::replace(&mut self.key, ::std::vec::Vec::new())
+    }
+
+    // .proofs.ExistenceProof left = 2;
+
+
+    pub fn get_left(&self) -> &ExistenceProof {
+        self.left.as_ref().unwrap_or_else(|| ExistenceProof::default_instance())
+    }
+    pub fn clear_left(&mut self) {
+        self.left.clear();
+    }
+
+    pub fn has_left(&self) -> bool {
+        self.left.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_left(&mut self, v: ExistenceProof) {
+        self.left = ::protobuf::SingularPtrField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_left(&mut self) -> &mut ExistenceProof {
+        if self.left.is_none() {
+            self.left.set_default();
+        }
+        self.left.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_left(&mut self) -> ExistenceProof {
+        self.left.take().unwrap_or_else(|| ExistenceProof::new())
+    }
+
+    // .proofs.ExistenceProof right = 3;
+
+
+    pub fn get_right(&self) -> &ExistenceProof {
+        self.right.as_ref().unwrap_or_else(|| ExistenceProof::default_instance())
+    }
+    pub fn clear_right(&mut self) {
+        self.right.clear();
+    }
+
+    pub fn has_right(&self) -> bool {
+        self.right.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_right(&mut self, v: ExistenceProof) {
+        self.right = ::protobuf::SingularPtrField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_right(&mut self) -> &mut ExistenceProof {
+        if self.right.is_none() {
+            self.right.set_default();
+        }
+        self.right.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_right(&mut self) -> ExistenceProof {
+        self.right.take().unwrap_or_else(|| ExistenceProof::new())
+    }
+}
+
+impl ::protobuf::Message for NonExistenceProof {
+    fn is_initialized(&self) -> bool {
+        for v in &self.left {
+            if !v.is_initialized() {
+                return false;
+            }
+        };
+        for v in &self.right {
+            if !v.is_initialized() {
+                return false;
+            }
+        };
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    ::protobuf::rt::read_singular_proto3_bytes_into(wire_type, is, &mut self.key)?;
+                },
+                2 => {
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.left)?;
+                },
+                3 => {
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.right)?;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if !self.key.is_empty() {
+            my_size += ::protobuf::rt::bytes_size(1, &self.key);
+        }
+        if let Some(ref v) = self.left.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        }
+        if let Some(ref v) = self.right.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        if !self.key.is_empty() {
+            os.write_bytes(1, &self.key)?;
+        }
+        if let Some(ref v) = self.left.as_ref() {
+            os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_raw_varint32(v.get_cached_size())?;
+            v.write_to_with_cached_sizes(os)?;
+        }
+        if let Some(ref v) = self.right.as_ref() {
+            os.write_tag(3, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_raw_varint32(v.get_cached_size())?;
+            v.write_to_with_cached_sizes(os)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &dyn (::std::any::Any) {
+        self as &dyn (::std::any::Any)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn (::std::any::Any) {
+        self as &mut dyn (::std::any::Any)
+    }
+    fn into_any(self: Box<Self>) -> ::std::boxed::Box<dyn (::std::any::Any)> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> NonExistenceProof {
+        NonExistenceProof::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
+        };
+        unsafe {
+            descriptor.get(|| {
+                let mut fields = ::std::vec::Vec::new();
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeBytes>(
+                    "key",
+                    |m: &NonExistenceProof| { &m.key },
+                    |m: &mut NonExistenceProof| { &mut m.key },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<ExistenceProof>>(
+                    "left",
+                    |m: &NonExistenceProof| { &m.left },
+                    |m: &mut NonExistenceProof| { &mut m.left },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<ExistenceProof>>(
+                    "right",
+                    |m: &NonExistenceProof| { &m.right },
+                    |m: &mut NonExistenceProof| { &mut m.right },
+                ));
+                ::protobuf::reflect::MessageDescriptor::new::<NonExistenceProof>(
+                    "NonExistenceProof",
+                    fields,
+                    file_descriptor_proto()
+                )
+            })
+        }
+    }
+
+    fn default_instance() -> &'static NonExistenceProof {
+        static mut instance: ::protobuf::lazy::Lazy<NonExistenceProof> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const NonExistenceProof,
+        };
+        unsafe {
+            instance.get(NonExistenceProof::new)
+        }
+    }
+}
+
+impl ::protobuf::Clear for NonExistenceProof {
+    fn clear(&mut self) {
+        self.key.clear();
+        self.left.clear();
+        self.right.clear();
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for NonExistenceProof {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for NonExistenceProof {
+    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
+        ::protobuf::reflect::ProtobufValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
+pub struct CommitmentProof {
+    // message oneof groups
+    pub proof: ::std::option::Option<CommitmentProof_oneof_proof>,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a CommitmentProof {
+    fn default() -> &'a CommitmentProof {
+        <CommitmentProof as ::protobuf::Message>::default_instance()
+    }
+}
+
+#[derive(Clone,PartialEq,Debug)]
+pub enum CommitmentProof_oneof_proof {
+    exist(ExistenceProof),
+    nonexist(NonExistenceProof),
+    batch(BatchProof),
+}
+
+impl CommitmentProof {
+    pub fn new() -> CommitmentProof {
+        ::std::default::Default::default()
+    }
+
+    // .proofs.ExistenceProof exist = 1;
+
+
+    pub fn get_exist(&self) -> &ExistenceProof {
+        match self.proof {
+            ::std::option::Option::Some(CommitmentProof_oneof_proof::exist(ref v)) => v,
+            _ => ExistenceProof::default_instance(),
+        }
+    }
+    pub fn clear_exist(&mut self) {
+        self.proof = ::std::option::Option::None;
+    }
+
+    pub fn has_exist(&self) -> bool {
+        match self.proof {
+            ::std::option::Option::Some(CommitmentProof_oneof_proof::exist(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_exist(&mut self, v: ExistenceProof) {
+        self.proof = ::std::option::Option::Some(CommitmentProof_oneof_proof::exist(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_exist(&mut self) -> &mut ExistenceProof {
+        if let ::std::option::Option::Some(CommitmentProof_oneof_proof::exist(_)) = self.proof {
+        } else {
+            self.proof = ::std::option::Option::Some(CommitmentProof_oneof_proof::exist(ExistenceProof::new()));
+        }
+        match self.proof {
+            ::std::option::Option::Some(CommitmentProof_oneof_proof::exist(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_exist(&mut self) -> ExistenceProof {
+        if self.has_exist() {
+            match self.proof.take() {
+                ::std::option::Option::Some(CommitmentProof_oneof_proof::exist(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            ExistenceProof::new()
+        }
+    }
+
+    // .proofs.NonExistenceProof nonexist = 2;
+
+
+    pub fn get_nonexist(&self) -> &NonExistenceProof {
+        match self.proof {
+            ::std::option::Option::Some(CommitmentProof_oneof_proof::nonexist(ref v)) => v,
+            _ => NonExistenceProof::default_instance(),
+        }
+    }
+    pub fn clear_nonexist(&mut self) {
+        self.proof = ::std::option::Option::None;
+    }
+
+    pub fn has_nonexist(&self) -> bool {
+        match self.proof {
+            ::std::option::Option::Some(CommitmentProof_oneof_proof::nonexist(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_nonexist(&mut self, v: NonExistenceProof) {
+        self.proof = ::std::option::Option::Some(CommitmentProof_oneof_proof::nonexist(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_nonexist(&mut self) -> &mut NonExistenceProof {
+        if let ::std::option::Option::Some(CommitmentProof_oneof_proof::nonexist(_)) = self.proof {
+        } else {
+            self.proof = ::std::option::Option::Some(CommitmentProof_oneof_proof::nonexist(NonExistenceProof::new()));
+        }
+        match self.proof {
+            ::std::option::Option::Some(CommitmentProof_oneof_proof::nonexist(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_nonexist(&mut self) -> NonExistenceProof {
+        if self.has_nonexist() {
+            match self.proof.take() {
+                ::std::option::Option::Some(CommitmentProof_oneof_proof::nonexist(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            NonExistenceProof::new()
+        }
+    }
+
+    // .proofs.BatchProof batch = 3;
+
+
+    pub fn get_batch(&self) -> &BatchProof {
+        match self.proof {
+            ::std::option::Option::Some(CommitmentProof_oneof_proof::batch(ref v)) => v,
+            _ => BatchProof::default_instance(),
+        }
+    }
+    pub fn clear_batch(&mut self) {
+        self.proof = ::std::option::Option::None;
+    }
+
+    pub fn has_batch(&self) -> bool {
+        match self.proof {
+            ::std::option::Option::Some(CommitmentProof_oneof_proof::batch(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_batch(&mut self, v: BatchProof) {
+        self.proof = ::std::option::Option::Some(CommitmentProof_oneof_proof::batch(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_batch(&mut self) -> &mut BatchProof {
+        if let ::std::option::Option::Some(CommitmentProof_oneof_proof::batch(_)) = self.proof {
+        } else {
+            self.proof = ::std::option::Option::Some(CommitmentProof_oneof_proof::batch(BatchProof::new()));
+        }
+        match self.proof {
+            ::std::option::Option::Some(CommitmentProof_oneof_proof::batch(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_batch(&mut self) -> BatchProof {
+        if self.has_batch() {
+            match self.proof.take() {
+                ::std::option::Option::Some(CommitmentProof_oneof_proof::batch(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            BatchProof::new()
+        }
+    }
+}
+
+impl ::protobuf::Message for CommitmentProof {
+    fn is_initialized(&self) -> bool {
+        if let Some(CommitmentProof_oneof_proof::exist(ref v)) = self.proof {
+            if !v.is_initialized() {
+                return false;
+            }
+        }
+        if let Some(CommitmentProof_oneof_proof::nonexist(ref v)) = self.proof {
+            if !v.is_initialized() {
+                return false;
+            }
+        }
+        if let Some(CommitmentProof_oneof_proof::batch(ref v)) = self.proof {
+            if !v.is_initialized() {
+                return false;
+            }
+        }
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    self.proof = ::std::option::Option::Some(CommitmentProof_oneof_proof::exist(is.read_message()?));
+                },
+                2 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    self.proof = ::std::option::Option::Some(CommitmentProof_oneof_proof::nonexist(is.read_message()?));
+                },
+                3 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    self.proof = ::std::option::Option::Some(CommitmentProof_oneof_proof::batch(is.read_message()?));
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if let ::std::option::Option::Some(ref v) = self.proof {
+            match v {
+                &CommitmentProof_oneof_proof::exist(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+                },
+                &CommitmentProof_oneof_proof::nonexist(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+                },
+                &CommitmentProof_oneof_proof::batch(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+                },
+            };
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        if let ::std::option::Option::Some(ref v) = self.proof {
+            match v {
+                &CommitmentProof_oneof_proof::exist(ref v) => {
+                    os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+                    os.write_raw_varint32(v.get_cached_size())?;
+                    v.write_to_with_cached_sizes(os)?;
+                },
+                &CommitmentProof_oneof_proof::nonexist(ref v) => {
+                    os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+                    os.write_raw_varint32(v.get_cached_size())?;
+                    v.write_to_with_cached_sizes(os)?;
+                },
+                &CommitmentProof_oneof_proof::batch(ref v) => {
+                    os.write_tag(3, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+                    os.write_raw_varint32(v.get_cached_size())?;
+                    v.write_to_with_cached_sizes(os)?;
+                },
+            };
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &dyn (::std::any::Any) {
+        self as &dyn (::std::any::Any)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn (::std::any::Any) {
+        self as &mut dyn (::std::any::Any)
+    }
+    fn into_any(self: Box<Self>) -> ::std::boxed::Box<dyn (::std::any::Any)> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> CommitmentProof {
+        CommitmentProof::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
+        };
+        unsafe {
+            descriptor.get(|| {
+                let mut fields = ::std::vec::Vec::new();
+                fields.push(::protobuf::reflect::accessor::make_singular_message_accessor::<_, ExistenceProof>(
+                    "exist",
+                    CommitmentProof::has_exist,
+                    CommitmentProof::get_exist,
+                ));
+                fields.push(::protobuf::reflect::accessor::make_singular_message_accessor::<_, NonExistenceProof>(
+                    "nonexist",
+                    CommitmentProof::has_nonexist,
+                    CommitmentProof::get_nonexist,
+                ));
+                fields.push(::protobuf::reflect::accessor::make_singular_message_accessor::<_, BatchProof>(
+                    "batch",
+                    CommitmentProof::has_batch,
+                    CommitmentProof::get_batch,
+                ));
+                ::protobuf::reflect::MessageDescriptor::new::<CommitmentProof>(
+                    "CommitmentProof",
+                    fields,
+                    file_descriptor_proto()
+                )
+            })
+        }
+    }
+
+    fn default_instance() -> &'static CommitmentProof {
+        static mut instance: ::protobuf::lazy::Lazy<CommitmentProof> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const CommitmentProof,
+        };
+        unsafe {
+            instance.get(CommitmentProof::new)
+        }
+    }
+}
+
+impl ::protobuf::Clear for CommitmentProof {
+    fn clear(&mut self) {
+        self.proof = ::std::option::Option::None;
+        self.proof = ::std::option::Option::None;
+        self.proof = ::std::option::Option::None;
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for CommitmentProof {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for CommitmentProof {
+    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
+        ::protobuf::reflect::ProtobufValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
+pub struct BatchProof {
+    // message fields
+    pub proofs: ::protobuf::RepeatedField<CommitmentProof>,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a BatchProof {
+    fn default() -> &'a BatchProof {
+        <BatchProof as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl BatchProof {
+    pub fn new() -> BatchProof {
+        ::std::default::Default::default()
+    }
+
+    // repeated .proofs.CommitmentProof proofs = 1;
+
+
+    pub fn get_proofs(&self) -> &[CommitmentProof] {
+        &self.proofs
+    }
+    pub fn clear_proofs(&mut self) {
+        self.proofs.clear();
+    }
+
+    // Param is passed by value, moved
+    pub fn set_proofs(&mut self, v: ::protobuf::RepeatedField<CommitmentProof>) {
+        self.proofs = v;
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_proofs(&mut self) -> &mut ::protobuf::RepeatedField<CommitmentProof> {
+        &mut self.proofs
+    }
+
+    // Take field
+    pub fn take_proofs(&mut self) -> ::protobuf::RepeatedField<CommitmentProof> {
+        ::std::mem::replace(&mut self.proofs, ::protobuf::RepeatedField::new())
+    }
+}
+
+impl ::protobuf::Message for BatchProof {
+    fn is_initialized(&self) -> bool {
+        for v in &self.proofs {
+            if !v.is_initialized() {
+                return false;
+            }
+        };
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.proofs)?;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        for value in &self.proofs {
+            let len = value.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        };
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        for v in &self.proofs {
+            os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_raw_varint32(v.get_cached_size())?;
+            v.write_to_with_cached_sizes(os)?;
+        };
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &dyn (::std::any::Any) {
+        self as &dyn (::std::any::Any)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn (::std::any::Any) {
+        self as &mut dyn (::std::any::Any)
+    }
+    fn into_any(self: Box<Self>) -> ::std::boxed::Box<dyn (::std::any::Any)> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> BatchProof {
+        BatchProof::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
+        };
+        unsafe {
+            descriptor.get(|| {
+                let mut fields = ::std::vec::Vec::new();
+                fields.push(::protobuf::reflect::accessor::make_repeated_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<CommitmentProof>>(
+                    "proofs",
+                    |m: &BatchProof| { &m.proofs },
+                    |m: &mut BatchProof| { &mut m.proofs },
+                ));
+                ::protobuf::reflect::MessageDescriptor::new::<BatchProof>(
+                    "BatchProof",
+                    fields,
+                    file_descriptor_proto()
+                )
+            })
+        }
+    }
+
+    fn default_instance() -> &'static BatchProof {
+        static mut instance: ::protobuf::lazy::Lazy<BatchProof> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const BatchProof,
+        };
+        unsafe {
+            instance.get(BatchProof::new)
+        }
+    }
+}
+
+impl ::protobuf::Clear for BatchProof {
+    fn clear(&mut self) {
+        self.proofs.clear();
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for BatchProof {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for BatchProof {
+    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
+        ::protobuf::reflect::ProtobufValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
 pub struct LeafOp {
     // message fields
     pub hash: HashOp,
@@ -882,6 +1709,7 @@ impl ::protobuf::reflect::ProtobufValue for InnerOp {
 pub struct ProofSpec {
     // message fields
     pub leaf_spec: ::protobuf::SingularPtrField<LeafOp>,
+    pub inner_spec: ::protobuf::SingularPtrField<InnerSpec>,
     // special fields
     pub unknown_fields: ::protobuf::UnknownFields,
     pub cached_size: ::protobuf::CachedSize,
@@ -930,11 +1758,49 @@ impl ProofSpec {
     pub fn take_leaf_spec(&mut self) -> LeafOp {
         self.leaf_spec.take().unwrap_or_else(|| LeafOp::new())
     }
+
+    // .proofs.InnerSpec inner_spec = 2;
+
+
+    pub fn get_inner_spec(&self) -> &InnerSpec {
+        self.inner_spec.as_ref().unwrap_or_else(|| InnerSpec::default_instance())
+    }
+    pub fn clear_inner_spec(&mut self) {
+        self.inner_spec.clear();
+    }
+
+    pub fn has_inner_spec(&self) -> bool {
+        self.inner_spec.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_inner_spec(&mut self, v: InnerSpec) {
+        self.inner_spec = ::protobuf::SingularPtrField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_inner_spec(&mut self) -> &mut InnerSpec {
+        if self.inner_spec.is_none() {
+            self.inner_spec.set_default();
+        }
+        self.inner_spec.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_inner_spec(&mut self) -> InnerSpec {
+        self.inner_spec.take().unwrap_or_else(|| InnerSpec::new())
+    }
 }
 
 impl ::protobuf::Message for ProofSpec {
     fn is_initialized(&self) -> bool {
         for v in &self.leaf_spec {
+            if !v.is_initialized() {
+                return false;
+            }
+        };
+        for v in &self.inner_spec {
             if !v.is_initialized() {
                 return false;
             }
@@ -948,6 +1814,9 @@ impl ::protobuf::Message for ProofSpec {
             match field_number {
                 1 => {
                     ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.leaf_spec)?;
+                },
+                2 => {
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.inner_spec)?;
                 },
                 _ => {
                     ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
@@ -965,6 +1834,10 @@ impl ::protobuf::Message for ProofSpec {
             let len = v.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         }
+        if let Some(ref v) = self.inner_spec.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
         self.cached_size.set(my_size);
         my_size
@@ -973,6 +1846,11 @@ impl ::protobuf::Message for ProofSpec {
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         if let Some(ref v) = self.leaf_spec.as_ref() {
             os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_raw_varint32(v.get_cached_size())?;
+            v.write_to_with_cached_sizes(os)?;
+        }
+        if let Some(ref v) = self.inner_spec.as_ref() {
+            os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
         }
@@ -1023,6 +1901,11 @@ impl ::protobuf::Message for ProofSpec {
                     |m: &ProofSpec| { &m.leaf_spec },
                     |m: &mut ProofSpec| { &mut m.leaf_spec },
                 ));
+                fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<InnerSpec>>(
+                    "inner_spec",
+                    |m: &ProofSpec| { &m.inner_spec },
+                    |m: &mut ProofSpec| { &mut m.inner_spec },
+                ));
                 ::protobuf::reflect::MessageDescriptor::new::<ProofSpec>(
                     "ProofSpec",
                     fields,
@@ -1046,6 +1929,7 @@ impl ::protobuf::Message for ProofSpec {
 impl ::protobuf::Clear for ProofSpec {
     fn clear(&mut self) {
         self.leaf_spec.clear();
+        self.inner_spec.clear();
         self.unknown_fields.clear();
     }
 }
@@ -1057,6 +1941,321 @@ impl ::std::fmt::Debug for ProofSpec {
 }
 
 impl ::protobuf::reflect::ProtobufValue for ProofSpec {
+    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
+        ::protobuf::reflect::ProtobufValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
+pub struct InnerSpec {
+    // message fields
+    pub child_order: ::std::vec::Vec<i32>,
+    pub child_size: i32,
+    pub min_prefix_length: i32,
+    pub max_prefix_length: i32,
+    pub empty_child: ::std::vec::Vec<u8>,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a InnerSpec {
+    fn default() -> &'a InnerSpec {
+        <InnerSpec as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl InnerSpec {
+    pub fn new() -> InnerSpec {
+        ::std::default::Default::default()
+    }
+
+    // repeated int32 child_order = 1;
+
+
+    pub fn get_child_order(&self) -> &[i32] {
+        &self.child_order
+    }
+    pub fn clear_child_order(&mut self) {
+        self.child_order.clear();
+    }
+
+    // Param is passed by value, moved
+    pub fn set_child_order(&mut self, v: ::std::vec::Vec<i32>) {
+        self.child_order = v;
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_child_order(&mut self) -> &mut ::std::vec::Vec<i32> {
+        &mut self.child_order
+    }
+
+    // Take field
+    pub fn take_child_order(&mut self) -> ::std::vec::Vec<i32> {
+        ::std::mem::replace(&mut self.child_order, ::std::vec::Vec::new())
+    }
+
+    // int32 child_size = 2;
+
+
+    pub fn get_child_size(&self) -> i32 {
+        self.child_size
+    }
+    pub fn clear_child_size(&mut self) {
+        self.child_size = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_child_size(&mut self, v: i32) {
+        self.child_size = v;
+    }
+
+    // int32 min_prefix_length = 3;
+
+
+    pub fn get_min_prefix_length(&self) -> i32 {
+        self.min_prefix_length
+    }
+    pub fn clear_min_prefix_length(&mut self) {
+        self.min_prefix_length = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_min_prefix_length(&mut self, v: i32) {
+        self.min_prefix_length = v;
+    }
+
+    // int32 max_prefix_length = 4;
+
+
+    pub fn get_max_prefix_length(&self) -> i32 {
+        self.max_prefix_length
+    }
+    pub fn clear_max_prefix_length(&mut self) {
+        self.max_prefix_length = 0;
+    }
+
+    // Param is passed by value, moved
+    pub fn set_max_prefix_length(&mut self, v: i32) {
+        self.max_prefix_length = v;
+    }
+
+    // bytes empty_child = 5;
+
+
+    pub fn get_empty_child(&self) -> &[u8] {
+        &self.empty_child
+    }
+    pub fn clear_empty_child(&mut self) {
+        self.empty_child.clear();
+    }
+
+    // Param is passed by value, moved
+    pub fn set_empty_child(&mut self, v: ::std::vec::Vec<u8>) {
+        self.empty_child = v;
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_empty_child(&mut self) -> &mut ::std::vec::Vec<u8> {
+        &mut self.empty_child
+    }
+
+    // Take field
+    pub fn take_empty_child(&mut self) -> ::std::vec::Vec<u8> {
+        ::std::mem::replace(&mut self.empty_child, ::std::vec::Vec::new())
+    }
+}
+
+impl ::protobuf::Message for InnerSpec {
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    ::protobuf::rt::read_repeated_int32_into(wire_type, is, &mut self.child_order)?;
+                },
+                2 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_int32()?;
+                    self.child_size = tmp;
+                },
+                3 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_int32()?;
+                    self.min_prefix_length = tmp;
+                },
+                4 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_int32()?;
+                    self.max_prefix_length = tmp;
+                },
+                5 => {
+                    ::protobuf::rt::read_singular_proto3_bytes_into(wire_type, is, &mut self.empty_child)?;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        for value in &self.child_order {
+            my_size += ::protobuf::rt::value_size(1, *value, ::protobuf::wire_format::WireTypeVarint);
+        };
+        if self.child_size != 0 {
+            my_size += ::protobuf::rt::value_size(2, self.child_size, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if self.min_prefix_length != 0 {
+            my_size += ::protobuf::rt::value_size(3, self.min_prefix_length, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if self.max_prefix_length != 0 {
+            my_size += ::protobuf::rt::value_size(4, self.max_prefix_length, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if !self.empty_child.is_empty() {
+            my_size += ::protobuf::rt::bytes_size(5, &self.empty_child);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        for v in &self.child_order {
+            os.write_int32(1, *v)?;
+        };
+        if self.child_size != 0 {
+            os.write_int32(2, self.child_size)?;
+        }
+        if self.min_prefix_length != 0 {
+            os.write_int32(3, self.min_prefix_length)?;
+        }
+        if self.max_prefix_length != 0 {
+            os.write_int32(4, self.max_prefix_length)?;
+        }
+        if !self.empty_child.is_empty() {
+            os.write_bytes(5, &self.empty_child)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &dyn (::std::any::Any) {
+        self as &dyn (::std::any::Any)
+    }
+    fn as_any_mut(&mut self) -> &mut dyn (::std::any::Any) {
+        self as &mut dyn (::std::any::Any)
+    }
+    fn into_any(self: Box<Self>) -> ::std::boxed::Box<dyn (::std::any::Any)> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> InnerSpec {
+        InnerSpec::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
+        };
+        unsafe {
+            descriptor.get(|| {
+                let mut fields = ::std::vec::Vec::new();
+                fields.push(::protobuf::reflect::accessor::make_vec_accessor::<_, ::protobuf::types::ProtobufTypeInt32>(
+                    "child_order",
+                    |m: &InnerSpec| { &m.child_order },
+                    |m: &mut InnerSpec| { &mut m.child_order },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeInt32>(
+                    "child_size",
+                    |m: &InnerSpec| { &m.child_size },
+                    |m: &mut InnerSpec| { &mut m.child_size },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeInt32>(
+                    "min_prefix_length",
+                    |m: &InnerSpec| { &m.min_prefix_length },
+                    |m: &mut InnerSpec| { &mut m.min_prefix_length },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeInt32>(
+                    "max_prefix_length",
+                    |m: &InnerSpec| { &m.max_prefix_length },
+                    |m: &mut InnerSpec| { &mut m.max_prefix_length },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeBytes>(
+                    "empty_child",
+                    |m: &InnerSpec| { &m.empty_child },
+                    |m: &mut InnerSpec| { &mut m.empty_child },
+                ));
+                ::protobuf::reflect::MessageDescriptor::new::<InnerSpec>(
+                    "InnerSpec",
+                    fields,
+                    file_descriptor_proto()
+                )
+            })
+        }
+    }
+
+    fn default_instance() -> &'static InnerSpec {
+        static mut instance: ::protobuf::lazy::Lazy<InnerSpec> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const InnerSpec,
+        };
+        unsafe {
+            instance.get(InnerSpec::new)
+        }
+    }
+}
+
+impl ::protobuf::Clear for InnerSpec {
+    fn clear(&mut self) {
+        self.child_order.clear();
+        self.child_size = 0;
+        self.min_prefix_length = 0;
+        self.max_prefix_length = 0;
+        self.empty_child.clear();
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for InnerSpec {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for InnerSpec {
     fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
         ::protobuf::reflect::ProtobufValueRef::Message(self)
     }
@@ -1210,22 +2409,37 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x03key\x18\x01\x20\x01(\x0cR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\
     \x0cR\x05value\x12\"\n\x04leaf\x18\x03\x20\x01(\x0b2\x0e.proofs.LeafOpR\
     \x04leaf\x12#\n\x04path\x18\x04\x20\x03(\x0b2\x0f.proofs.InnerOpR\x04pat\
-    h\"\xd4\x01\n\x06LeafOp\x12\"\n\x04hash\x18\x01\x20\x01(\x0e2\x0e.proofs\
-    .HashOpR\x04hash\x12/\n\x0bprehash_key\x18\x02\x20\x01(\x0e2\x0e.proofs.\
-    HashOpR\nprehashKey\x123\n\rprehash_value\x18\x03\x20\x01(\x0e2\x0e.proo\
-    fs.HashOpR\x0cprehashValue\x12(\n\x06length\x18\x04\x20\x01(\x0e2\x10.pr\
-    oofs.LengthOpR\x06length\x12\x16\n\x06prefix\x18\x05\x20\x01(\x0cR\x06pr\
-    efix\"]\n\x07InnerOp\x12\"\n\x04hash\x18\x01\x20\x01(\x0e2\x0e.proofs.Ha\
-    shOpR\x04hash\x12\x16\n\x06prefix\x18\x02\x20\x01(\x0cR\x06prefix\x12\
-    \x16\n\x06suffix\x18\x03\x20\x01(\x0cR\x06suffix\"8\n\tProofSpec\x12+\n\
-    \tleaf_spec\x18\x01\x20\x01(\x0b2\x0e.proofs.LeafOpR\x08leafSpec*U\n\x06\
-    HashOp\x12\x0b\n\x07NO_HASH\x10\0\x12\n\n\x06SHA256\x10\x01\x12\n\n\x06S\
-    HA512\x10\x02\x12\n\n\x06KECCAK\x10\x03\x12\r\n\tRIPEMD160\x10\x04\x12\
-    \x0b\n\x07BITCOIN\x10\x05*\xab\x01\n\x08LengthOp\x12\r\n\tNO_PREFIX\x10\
-    \0\x12\r\n\tVAR_PROTO\x10\x01\x12\x0b\n\x07VAR_RLP\x10\x02\x12\x0f\n\x0b\
-    FIXED32_BIG\x10\x03\x12\x12\n\x0eFIXED32_LITTLE\x10\x04\x12\x0f\n\x0bFIX\
-    ED64_BIG\x10\x05\x12\x12\n\x0eFIXED64_LITTLE\x10\x06\x12\x14\n\x10REQUIR\
-    E_32_BYTES\x10\x07\x12\x14\n\x10REQUIRE_64_BYTES\x10\x08b\x06proto3\
+    h\"\x7f\n\x11NonExistenceProof\x12\x10\n\x03key\x18\x01\x20\x01(\x0cR\
+    \x03key\x12*\n\x04left\x18\x02\x20\x01(\x0b2\x16.proofs.ExistenceProofR\
+    \x04left\x12,\n\x05right\x18\x03\x20\x01(\x0b2\x16.proofs.ExistenceProof\
+    R\x05right\"\xaf\x01\n\x0fCommitmentProof\x12.\n\x05exist\x18\x01\x20\
+    \x01(\x0b2\x16.proofs.ExistenceProofH\0R\x05exist\x127\n\x08nonexist\x18\
+    \x02\x20\x01(\x0b2\x19.proofs.NonExistenceProofH\0R\x08nonexist\x12*\n\
+    \x05batch\x18\x03\x20\x01(\x0b2\x12.proofs.BatchProofH\0R\x05batchB\x07\
+    \n\x05proof\"=\n\nBatchProof\x12/\n\x06proofs\x18\x01\x20\x03(\x0b2\x17.\
+    proofs.CommitmentProofR\x06proofs\"\xd4\x01\n\x06LeafOp\x12\"\n\x04hash\
+    \x18\x01\x20\x01(\x0e2\x0e.proofs.HashOpR\x04hash\x12/\n\x0bprehash_key\
+    \x18\x02\x20\x01(\x0e2\x0e.proofs.HashOpR\nprehashKey\x123\n\rprehash_va\
+    lue\x18\x03\x20\x01(\x0e2\x0e.proofs.HashOpR\x0cprehashValue\x12(\n\x06l\
+    ength\x18\x04\x20\x01(\x0e2\x10.proofs.LengthOpR\x06length\x12\x16\n\x06\
+    prefix\x18\x05\x20\x01(\x0cR\x06prefix\"]\n\x07InnerOp\x12\"\n\x04hash\
+    \x18\x01\x20\x01(\x0e2\x0e.proofs.HashOpR\x04hash\x12\x16\n\x06prefix\
+    \x18\x02\x20\x01(\x0cR\x06prefix\x12\x16\n\x06suffix\x18\x03\x20\x01(\
+    \x0cR\x06suffix\"j\n\tProofSpec\x12+\n\tleaf_spec\x18\x01\x20\x01(\x0b2\
+    \x0e.proofs.LeafOpR\x08leafSpec\x120\n\ninner_spec\x18\x02\x20\x01(\x0b2\
+    \x11.proofs.InnerSpecR\tinnerSpec\"\xc4\x01\n\tInnerSpec\x12\x1f\n\x0bch\
+    ild_order\x18\x01\x20\x03(\x05R\nchildOrder\x12\x1d\n\nchild_size\x18\
+    \x02\x20\x01(\x05R\tchildSize\x12*\n\x11min_prefix_length\x18\x03\x20\
+    \x01(\x05R\x0fminPrefixLength\x12*\n\x11max_prefix_length\x18\x04\x20\
+    \x01(\x05R\x0fmaxPrefixLength\x12\x1f\n\x0bempty_child\x18\x05\x20\x01(\
+    \x0cR\nemptyChild*U\n\x06HashOp\x12\x0b\n\x07NO_HASH\x10\0\x12\n\n\x06SH\
+    A256\x10\x01\x12\n\n\x06SHA512\x10\x02\x12\n\n\x06KECCAK\x10\x03\x12\r\n\
+    \tRIPEMD160\x10\x04\x12\x0b\n\x07BITCOIN\x10\x05*\xab\x01\n\x08LengthOp\
+    \x12\r\n\tNO_PREFIX\x10\0\x12\r\n\tVAR_PROTO\x10\x01\x12\x0b\n\x07VAR_RL\
+    P\x10\x02\x12\x0f\n\x0bFIXED32_BIG\x10\x03\x12\x12\n\x0eFIXED32_LITTLE\
+    \x10\x04\x12\x0f\n\x0bFIXED64_BIG\x10\x05\x12\x12\n\x0eFIXED64_LITTLE\
+    \x10\x06\x12\x14\n\x10REQUIRE_32_BYTES\x10\x07\x12\x14\n\x10REQUIRE_64_B\
+    YTES\x10\x08b\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {
