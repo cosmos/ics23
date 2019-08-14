@@ -10,3 +10,4 @@ members = ["codegen"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 protobuf = "2.8.0"
+hex = "0.3.2"

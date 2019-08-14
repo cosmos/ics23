@@ -1,5 +1,6 @@
 extern crate protobuf;
 
+mod ops;
 mod proofs;
 
 #[cfg(test)]
