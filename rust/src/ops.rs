@@ -16,7 +16,7 @@ use crate::proofs::{HashOp, InnerOp, LengthOp, LeafOp};
 pub type Result<T> = result::Result<T, &'static str>;
 pub type Hash = Vec<u8>;
 
-pub fn apply_inner(inner: &InnerOp, child: Hash) -> Result<Hash> {
+pub fn apply_inner(inner: &InnerOp, child: &[u8]) -> Result<Hash> {
     if child.len() == 0 {
         return Err("Missing child hash");
     }
@@ -86,28 +86,28 @@ mod tests {
 
     #[test]
     fn hashing_food() {
-        let hash = do_hash(HashOp::NO_HASH, &"food".as_bytes()).unwrap();
+        let hash = do_hash(HashOp::NO_HASH, b"food").unwrap();
         assert_eq!(hash, hex::decode("666f6f64").unwrap());
 
-        let hash = do_hash(HashOp::SHA256, &"food".as_bytes()).unwrap();
+        let hash = do_hash(HashOp::SHA256, b"food").unwrap();
         assert_eq!(hash, hex::decode("c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b").unwrap());
 
-        let hash = do_hash(HashOp::SHA512, &"food".as_bytes()).unwrap();
+        let hash = do_hash(HashOp::SHA512, b"food").unwrap();
         assert_eq!(hash, hex::decode("c235548cfe84fc87678ff04c9134e060cdcd7512d09ed726192151a995541ed8db9fda5204e72e7ac268214c322c17787c70530513c59faede52b7dd9ce64331").unwrap());
 
-        let hash = do_hash(HashOp::RIPEMD160, &"food".as_bytes()).unwrap();
+        let hash = do_hash(HashOp::RIPEMD160, b"food").unwrap();
         assert_eq!(hash, hex::decode("b1ab9988c7c7c5ec4b2b291adfeeee10e77cdd46").unwrap());
 
-        let hash = do_hash(HashOp::BITCOIN, &"food".as_bytes()).unwrap();
+        let hash = do_hash(HashOp::BITCOIN, b"food").unwrap();
         assert_eq!(hash, hex::decode("0bcb587dfb4fc10b36d57f2bba1878f139b75d24").unwrap());
     }
 
     #[test]
     fn length_prefix() {
-        let prefixed = do_length(LengthOp::NO_PREFIX, &"food".as_bytes()).unwrap();
+        let prefixed = do_length(LengthOp::NO_PREFIX, b"food").unwrap();
         assert_eq!(prefixed, hex::decode("666f6f64").unwrap());
 
-        let prefixed = do_length(LengthOp::VAR_PROTO, &"food".as_bytes()).unwrap();
+        let prefixed = do_length(LengthOp::VAR_PROTO, b"food").unwrap();
         assert_eq!(prefixed, hex::decode("04666f6f64").unwrap());
     }
 
@@ -115,8 +115,8 @@ mod tests {
     fn apply_leaf_hash() {
         let mut leaf = LeafOp::new();
         leaf.set_hash(HashOp::SHA256);
-        let key = &"foo".as_bytes();
-        let val = &"bar".as_bytes();
+        let key = b"foo";
+        let val = b"bar";
         let hash = hex::decode("c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2").unwrap();
         assert_eq!(hash, apply_leaf(&leaf, key, val).unwrap());
     }
@@ -125,8 +125,8 @@ mod tests {
     fn apply_leaf_hash_512() {
         let mut leaf = LeafOp::new();
         leaf.set_hash(HashOp::SHA512);
-        let key = &"f".as_bytes();
-        let val = &"oobaz".as_bytes();
+        let key = b"f";
+        let val = b"oobaz";
         let hash = hex::decode("4f79f191298ec7461d60136c60f77c2ae8ddd85dbf6168bb925092d51bfb39b559219b39ae5385ba04946c87f64741385bef90578ea6fe6dac85dbf7ad3f79e1").unwrap();
         assert_eq!(hash, apply_leaf(&leaf, key, val).unwrap());
     }
@@ -136,8 +136,8 @@ mod tests {
         let mut leaf = LeafOp::new();
         leaf.set_hash(HashOp::SHA256);
         leaf.set_length(LengthOp::VAR_PROTO);
-        let key = &"food".as_bytes();
-        let val = &"some longer text".as_bytes();
+        let key = b"food";
+        let val = b"some longer text";
         let hash = hex::decode("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265").unwrap();
         assert_eq!(hash, apply_leaf(&leaf, key, val).unwrap());
     }
@@ -148,8 +148,8 @@ mod tests {
         leaf.set_hash(HashOp::SHA256);
         leaf.set_prehash_value(HashOp::SHA256);
         leaf.set_length(LengthOp::VAR_PROTO);
-        let key = &"food".as_bytes();
-        let val = &"yet another long string".as_bytes();
+        let key = b"food";
+        let val = b"yet another long string";
         let hash = hex::decode("87e0483e8fb624aef2e2f7b13f4166cda485baa8e39f437c83d74c94bedb148f").unwrap();
         assert_eq!(hash, apply_leaf(&leaf, key, val).unwrap());
     }
@@ -164,7 +164,7 @@ mod tests {
 
         // echo -n 012345678900cafe00deadbeef | xxd -r -p | sha256sum
         let expected = hex::decode("0339f76086684506a6d42a60da4b5a719febd4d96d8b8d85ae92849e3a849a5e").unwrap();
-        assert_eq!(expected, apply_inner(&inner, child).unwrap());
+        assert_eq!(expected, apply_inner(&inner, &child).unwrap());
     }
 
     #[test]
@@ -176,7 +176,7 @@ mod tests {
 
         // echo -n 00204080a0c0e0ffccbb997755331100 | xxd -r -p | sha256sum
         let expected = hex::decode("45bece1678cf2e9f4f2ae033e546fc35a2081b2415edcb13121a0e908dca1927").unwrap();
-        assert_eq!(expected, apply_inner(&inner, child).unwrap());
+        assert_eq!(expected, apply_inner(&inner, &child).unwrap());
     }
 
 
@@ -184,11 +184,11 @@ mod tests {
     fn apply_inner_suffix_only() {
         let mut inner = InnerOp::new();
         inner.set_hash(HashOp::SHA256);
-        inner.set_suffix(Hash::from(" just kidding!"));
-        let child = Hash::from("this is a sha256 hash, really....");
+        inner.set_suffix(b" just kidding!".to_vec());
+        let child = b"this is a sha256 hash, really....".to_vec();
 
         // echo -n 'this is a sha256 hash, really.... just kidding!'  | sha256sum
         let expected = hex::decode("79ef671d27e42a53fba2201c1bbc529a099af578ee8a38df140795db0ae2184b").unwrap();
-        assert_eq!(expected, apply_inner(&inner, child).unwrap());
+        assert_eq!(expected, apply_inner(&inner, &child).unwrap());
     }
 }

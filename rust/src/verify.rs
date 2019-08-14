@@ -44,10 +44,10 @@ pub fn calculate_existence_root(proof: &proofs::ExistenceProof) -> Result<Commit
     if proof.leaf.is_none() {
         return Err("No leaf operation set");
     }
-    let mut hash = apply_leaf(proof.leaf.get_ref(), &proof.key, &proof.value)?;
 
+    let mut hash = apply_leaf(proof.leaf.get_ref(), &proof.key, &proof.value)?;
     for step in proof.path.iter() {
-        hash = apply_inner(step, hash)?;
+        hash = apply_inner(step, &hash)?;
     }
     Ok(hash)
 }
