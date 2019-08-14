@@ -73,7 +73,7 @@ one right of the desired key. If both proofs are valid AND they are neighbors,
 then there is no valid proof for the given key.
 */
 message NonExistenceProof {
-    bytes key = 1;
+    bytes key = 1; // TODO: remove this as unnecessary??? we prove a range
     ExistenceProof left = 2;
     ExistenceProof right = 3;
 }

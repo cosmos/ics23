@@ -25,11 +25,37 @@ var TendermintSpec = &ProofSpec{
 	},
 }
 
+// Verify does all checks to ensure this proof proves this key, value -> root
+// and matches the spec.
+func (p *ExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte, value []byte) error {
+	if err := exist.CheckAgainstSpec(spec); err != nil {
+		return err
+	}
+
+	if !bytes.Equal(key, exist.Key) {
+		return fmt.Errorf("Provided key doesn't match proof")
+	}
+	if !bytes.Equal(value, exist.Value) {
+		return fmt.Errorf("Provided value doesn't match proof")
+	}
+
+	calc, err := exist.Calculate()
+	if err != nil {
+		return fmt.Errorf("Error calculating root: %s", err)
+	}
+	if !bytes.Equal(root, calc) {
+		return fmt.Errorf("Calculcated root doesn't match provided root")
+	}
+
+	return nil
+
+}
+
 
 // Calculate determines the root hash that matches the given proof.
 // You must validate the result is what you have in a header.
 // Returns error if the calculations cannot be performed.
-func (p *ExistenceProof) Calculate() ([]byte, error) {
+func (p *ExistenceProof) Calculate() (CommitmentRoot, error) {
 	if p.GetLeaf() == nil {
 		return nil, fmt.Errorf("Existence Proof needs defined LeafOp")
 	}
