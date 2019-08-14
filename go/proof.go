@@ -97,7 +97,7 @@ func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
 // and matches the spec.
 func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte) error {
 	// ensure the existence proofs are valid
-	var leftKey, rightKey []byte 
+	var leftKey, rightKey []byte
 	if p.Left != nil {
 		if err := p.Left.Verify(spec, root, p.Left.Key, p.Left.Value); err != nil {
 			return errors.Wrap(err, "left proof")

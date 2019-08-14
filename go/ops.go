@@ -10,7 +10,7 @@ import (
 
 	// adds ripemd160 capability to crypto.RIPEMD160
 	_ "golang.org/x/crypto/ripemd160"
-	
+
 	"github.com/pkg/errors"
 )
 
@@ -36,7 +36,7 @@ func (op *LeafOp) Apply(key []byte, value []byte) ([]byte, error) {
 }
 
 // CheckAgainstSpec will verify the LeafOp is in the format defined in spec
-func (op *LeafOp)CheckAgainstSpec(spec *ProofSpec) error {
+func (op *LeafOp) CheckAgainstSpec(spec *ProofSpec) error {
 	lspec := spec.LeafSpec
 
 	if op.Hash != lspec.Hash {
@@ -68,14 +68,13 @@ func (op *InnerOp) Apply(child []byte) ([]byte, error) {
 }
 
 // CheckAgainstSpec will verify the InnerOp is in the format defined in spec
-func (op *InnerOp)CheckAgainstSpec(spec *ProofSpec) error {
+func (op *InnerOp) CheckAgainstSpec(spec *ProofSpec) error {
 	leafPrefix := spec.LeafSpec.Prefix
 	if bytes.HasPrefix(op.Prefix, leafPrefix) {
 		return errors.Errorf("Inner Prefix starts with %X", leafPrefix)
 	}
 	return nil
 }
-
 
 func prepareLeafData(hashOp HashOp, lengthOp LengthOp, data []byte) ([]byte, error) {
 	// TODO: lengthop before or after hash ???
