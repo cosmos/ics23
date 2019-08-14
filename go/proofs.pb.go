@@ -207,6 +207,300 @@ func (m *ExistenceProof) GetPath() []*InnerOp {
 	return nil
 }
 
+//
+//NonExistenceProof takes a proof of two neighbors, one left of the desired key,
+//one right of the desired key. If both proofs are valid AND they are neighbors,
+//then there is no valid proof for the given key.
+type NonExistenceProof struct {
+	Key   []byte          `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Left  *ExistenceProof `protobuf:"bytes,2,opt,name=left,proto3" json:"left,omitempty"`
+	Right *ExistenceProof `protobuf:"bytes,3,opt,name=right,proto3" json:"right,omitempty"`
+}
+
+func (m *NonExistenceProof) Reset()         { *m = NonExistenceProof{} }
+func (m *NonExistenceProof) String() string { return proto.CompactTextString(m) }
+func (*NonExistenceProof) ProtoMessage()    {}
+func (*NonExistenceProof) Descriptor() ([]byte, []int) {
+	return fileDescriptor_855156e15e7b8e99, []int{1}
+}
+func (m *NonExistenceProof) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *NonExistenceProof) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_NonExistenceProof.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *NonExistenceProof) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_NonExistenceProof.Merge(m, src)
+}
+func (m *NonExistenceProof) XXX_Size() int {
+	return m.Size()
+}
+func (m *NonExistenceProof) XXX_DiscardUnknown() {
+	xxx_messageInfo_NonExistenceProof.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_NonExistenceProof proto.InternalMessageInfo
+
+func (m *NonExistenceProof) GetKey() []byte {
+	if m != nil {
+		return m.Key
+	}
+	return nil
+}
+
+func (m *NonExistenceProof) GetLeft() *ExistenceProof {
+	if m != nil {
+		return m.Left
+	}
+	return nil
+}
+
+func (m *NonExistenceProof) GetRight() *ExistenceProof {
+	if m != nil {
+		return m.Right
+	}
+	return nil
+}
+
+//
+//CommitmentProof is either an ExistenceProof or a NonExistenceProof, or a Batch of such messages
+type CommitmentProof struct {
+	// Types that are valid to be assigned to Proof:
+	//	*CommitmentProof_Exist
+	//	*CommitmentProof_Nonexist
+	//	*CommitmentProof_Batch
+	Proof isCommitmentProof_Proof `protobuf_oneof:"proof"`
+}
+
+func (m *CommitmentProof) Reset()         { *m = CommitmentProof{} }
+func (m *CommitmentProof) String() string { return proto.CompactTextString(m) }
+func (*CommitmentProof) ProtoMessage()    {}
+func (*CommitmentProof) Descriptor() ([]byte, []int) {
+	return fileDescriptor_855156e15e7b8e99, []int{2}
+}
+func (m *CommitmentProof) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *CommitmentProof) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_CommitmentProof.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *CommitmentProof) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CommitmentProof.Merge(m, src)
+}
+func (m *CommitmentProof) XXX_Size() int {
+	return m.Size()
+}
+func (m *CommitmentProof) XXX_DiscardUnknown() {
+	xxx_messageInfo_CommitmentProof.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CommitmentProof proto.InternalMessageInfo
+
+type isCommitmentProof_Proof interface {
+	isCommitmentProof_Proof()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type CommitmentProof_Exist struct {
+	Exist *ExistenceProof `protobuf:"bytes,1,opt,name=exist,proto3,oneof"`
+}
+type CommitmentProof_Nonexist struct {
+	Nonexist *NonExistenceProof `protobuf:"bytes,2,opt,name=nonexist,proto3,oneof"`
+}
+type CommitmentProof_Batch struct {
+	Batch *BatchProof `protobuf:"bytes,3,opt,name=batch,proto3,oneof"`
+}
+
+func (*CommitmentProof_Exist) isCommitmentProof_Proof()    {}
+func (*CommitmentProof_Nonexist) isCommitmentProof_Proof() {}
+func (*CommitmentProof_Batch) isCommitmentProof_Proof()    {}
+
+func (m *CommitmentProof) GetProof() isCommitmentProof_Proof {
+	if m != nil {
+		return m.Proof
+	}
+	return nil
+}
+
+func (m *CommitmentProof) GetExist() *ExistenceProof {
+	if x, ok := m.GetProof().(*CommitmentProof_Exist); ok {
+		return x.Exist
+	}
+	return nil
+}
+
+func (m *CommitmentProof) GetNonexist() *NonExistenceProof {
+	if x, ok := m.GetProof().(*CommitmentProof_Nonexist); ok {
+		return x.Nonexist
+	}
+	return nil
+}
+
+func (m *CommitmentProof) GetBatch() *BatchProof {
+	if x, ok := m.GetProof().(*CommitmentProof_Batch); ok {
+		return x.Batch
+	}
+	return nil
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*CommitmentProof) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _CommitmentProof_OneofMarshaler, _CommitmentProof_OneofUnmarshaler, _CommitmentProof_OneofSizer, []interface{}{
+		(*CommitmentProof_Exist)(nil),
+		(*CommitmentProof_Nonexist)(nil),
+		(*CommitmentProof_Batch)(nil),
+	}
+}
+
+func _CommitmentProof_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*CommitmentProof)
+	// proof
+	switch x := m.Proof.(type) {
+	case *CommitmentProof_Exist:
+		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Exist); err != nil {
+			return err
+		}
+	case *CommitmentProof_Nonexist:
+		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Nonexist); err != nil {
+			return err
+		}
+	case *CommitmentProof_Batch:
+		_ = b.EncodeVarint(3<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Batch); err != nil {
+			return err
+		}
+	case nil:
+	default:
+		return fmt.Errorf("CommitmentProof.Proof has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _CommitmentProof_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*CommitmentProof)
+	switch tag {
+	case 1: // proof.exist
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(ExistenceProof)
+		err := b.DecodeMessage(msg)
+		m.Proof = &CommitmentProof_Exist{msg}
+		return true, err
+	case 2: // proof.nonexist
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(NonExistenceProof)
+		err := b.DecodeMessage(msg)
+		m.Proof = &CommitmentProof_Nonexist{msg}
+		return true, err
+	case 3: // proof.batch
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(BatchProof)
+		err := b.DecodeMessage(msg)
+		m.Proof = &CommitmentProof_Batch{msg}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _CommitmentProof_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*CommitmentProof)
+	// proof
+	switch x := m.Proof.(type) {
+	case *CommitmentProof_Exist:
+		s := proto.Size(x.Exist)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *CommitmentProof_Nonexist:
+		s := proto.Size(x.Nonexist)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *CommitmentProof_Batch:
+		s := proto.Size(x.Batch)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
+}
+
+//
+//BatchProof is a group of multiple proof types than can be compressed
+type BatchProof struct {
+	Proofs []*CommitmentProof `protobuf:"bytes,1,rep,name=proofs,proto3" json:"proofs,omitempty"`
+}
+
+func (m *BatchProof) Reset()         { *m = BatchProof{} }
+func (m *BatchProof) String() string { return proto.CompactTextString(m) }
+func (*BatchProof) ProtoMessage()    {}
+func (*BatchProof) Descriptor() ([]byte, []int) {
+	return fileDescriptor_855156e15e7b8e99, []int{3}
+}
+func (m *BatchProof) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *BatchProof) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_BatchProof.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *BatchProof) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BatchProof.Merge(m, src)
+}
+func (m *BatchProof) XXX_Size() int {
+	return m.Size()
+}
+func (m *BatchProof) XXX_DiscardUnknown() {
+	xxx_messageInfo_BatchProof.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BatchProof proto.InternalMessageInfo
+
+func (m *BatchProof) GetProofs() []*CommitmentProof {
+	if m != nil {
+		return m.Proofs
+	}
+	return nil
+}
+
 //*
 //LeafOp represents the raw key-value data we wish to prove, and
 //must be flexible to represent the internal transformation from
@@ -236,7 +530,7 @@ func (m *LeafOp) Reset()         { *m = LeafOp{} }
 func (m *LeafOp) String() string { return proto.CompactTextString(m) }
 func (*LeafOp) ProtoMessage()    {}
 func (*LeafOp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_855156e15e7b8e99, []int{1}
+	return fileDescriptor_855156e15e7b8e99, []int{4}
 }
 func (m *LeafOp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -326,7 +620,7 @@ func (m *InnerOp) Reset()         { *m = InnerOp{} }
 func (m *InnerOp) String() string { return proto.CompactTextString(m) }
 func (*InnerOp) ProtoMessage()    {}
 func (*InnerOp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_855156e15e7b8e99, []int{2}
+	return fileDescriptor_855156e15e7b8e99, []int{5}
 }
 func (m *InnerOp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -390,14 +684,15 @@ func (m *InnerOp) GetSuffix() []byte {
 type ProofSpec struct {
 	// any field in the ExistenceProof must be the same as in this spec.
 	// except Prefix, which is just the first bytes of prefix (spec can be longer)
-	LeafSpec *LeafOp `protobuf:"bytes,1,opt,name=leaf_spec,json=leafSpec,proto3" json:"leaf_spec,omitempty"`
+	LeafSpec  *LeafOp    `protobuf:"bytes,1,opt,name=leaf_spec,json=leafSpec,proto3" json:"leaf_spec,omitempty"`
+	InnerSpec *InnerSpec `protobuf:"bytes,2,opt,name=inner_spec,json=innerSpec,proto3" json:"inner_spec,omitempty"`
 }
 
 func (m *ProofSpec) Reset()         { *m = ProofSpec{} }
 func (m *ProofSpec) String() string { return proto.CompactTextString(m) }
 func (*ProofSpec) ProtoMessage()    {}
 func (*ProofSpec) Descriptor() ([]byte, []int) {
-	return fileDescriptor_855156e15e7b8e99, []int{3}
+	return fileDescriptor_855156e15e7b8e99, []int{6}
 }
 func (m *ProofSpec) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -433,51 +728,163 @@ func (m *ProofSpec) GetLeafSpec() *LeafOp {
 	return nil
 }
 
+func (m *ProofSpec) GetInnerSpec() *InnerSpec {
+	if m != nil {
+		return m.InnerSpec
+	}
+	return nil
+}
+
+//
+//InnerSpec contains all store-specific structure info to determine if two proofs from a
+//given store are neighbors.
+//
+//This enables:
+//
+//isLeftMost(spec: InnerSpec, op: InnerOp)
+//isRightMost(spec: InnerSpec, op: InnerOp)
+//isLeftNeighbor(spec: InnerSpec, left: InnerOp, right: InnerOp)
+type InnerSpec struct {
+	// TODO
+	ChildOrder      []int32 `protobuf:"varint,1,rep,packed,name=child_order,json=childOrder,proto3" json:"child_order,omitempty"`
+	ChildSize       int32   `protobuf:"varint,2,opt,name=child_size,json=childSize,proto3" json:"child_size,omitempty"`
+	MinPrefixLength int32   `protobuf:"varint,3,opt,name=min_prefix_length,json=minPrefixLength,proto3" json:"min_prefix_length,omitempty"`
+	MaxPrefixLength int32   `protobuf:"varint,4,opt,name=max_prefix_length,json=maxPrefixLength,proto3" json:"max_prefix_length,omitempty"`
+	EmptyChild      []byte  `protobuf:"bytes,5,opt,name=empty_child,json=emptyChild,proto3" json:"empty_child,omitempty"`
+}
+
+func (m *InnerSpec) Reset()         { *m = InnerSpec{} }
+func (m *InnerSpec) String() string { return proto.CompactTextString(m) }
+func (*InnerSpec) ProtoMessage()    {}
+func (*InnerSpec) Descriptor() ([]byte, []int) {
+	return fileDescriptor_855156e15e7b8e99, []int{7}
+}
+func (m *InnerSpec) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *InnerSpec) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_InnerSpec.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *InnerSpec) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InnerSpec.Merge(m, src)
+}
+func (m *InnerSpec) XXX_Size() int {
+	return m.Size()
+}
+func (m *InnerSpec) XXX_DiscardUnknown() {
+	xxx_messageInfo_InnerSpec.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_InnerSpec proto.InternalMessageInfo
+
+func (m *InnerSpec) GetChildOrder() []int32 {
+	if m != nil {
+		return m.ChildOrder
+	}
+	return nil
+}
+
+func (m *InnerSpec) GetChildSize() int32 {
+	if m != nil {
+		return m.ChildSize
+	}
+	return 0
+}
+
+func (m *InnerSpec) GetMinPrefixLength() int32 {
+	if m != nil {
+		return m.MinPrefixLength
+	}
+	return 0
+}
+
+func (m *InnerSpec) GetMaxPrefixLength() int32 {
+	if m != nil {
+		return m.MaxPrefixLength
+	}
+	return 0
+}
+
+func (m *InnerSpec) GetEmptyChild() []byte {
+	if m != nil {
+		return m.EmptyChild
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterEnum("proofs.HashOp", HashOp_name, HashOp_value)
 	proto.RegisterEnum("proofs.LengthOp", LengthOp_name, LengthOp_value)
 	proto.RegisterType((*ExistenceProof)(nil), "proofs.ExistenceProof")
+	proto.RegisterType((*NonExistenceProof)(nil), "proofs.NonExistenceProof")
+	proto.RegisterType((*CommitmentProof)(nil), "proofs.CommitmentProof")
+	proto.RegisterType((*BatchProof)(nil), "proofs.BatchProof")
 	proto.RegisterType((*LeafOp)(nil), "proofs.LeafOp")
 	proto.RegisterType((*InnerOp)(nil), "proofs.InnerOp")
 	proto.RegisterType((*ProofSpec)(nil), "proofs.ProofSpec")
+	proto.RegisterType((*InnerSpec)(nil), "proofs.InnerSpec")
 }
 
 func init() { proto.RegisterFile("proofs.proto", fileDescriptor_855156e15e7b8e99) }
 
 var fileDescriptor_855156e15e7b8e99 = []byte{
-	// 499 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x93, 0xc1, 0x6e, 0xda, 0x40,
-	0x10, 0x86, 0x59, 0x0c, 0x06, 0x06, 0x42, 0x56, 0xab, 0xa8, 0xf2, 0xc9, 0x42, 0xee, 0x05, 0xa5,
-	0x52, 0xda, 0x98, 0x04, 0xf5, 0x0a, 0xc4, 0x29, 0x16, 0x14, 0xbb, 0x8b, 0x13, 0xa5, 0x87, 0xca,
-	0x72, 0xd1, 0xba, 0x44, 0x45, 0x60, 0xd9, 0xa4, 0x4a, 0x8e, 0x7d, 0x83, 0xbe, 0x47, 0x5f, 0xa4,
-	0xc7, 0x1c, 0x7a, 0xe8, 0xb1, 0x82, 0x17, 0xa9, 0x66, 0x6d, 0x87, 0x48, 0xcd, 0x21, 0xb7, 0x99,
-	0x7f, 0xbe, 0xff, 0x5f, 0xcf, 0xae, 0x0c, 0x8d, 0x28, 0x5e, 0xad, 0xc2, 0xe4, 0x28, 0x8a, 0x57,
-	0xeb, 0x15, 0x53, 0xd3, 0xce, 0xf8, 0x4e, 0xa0, 0x69, 0xdd, 0x5e, 0x27, 0x6b, 0xb1, 0x9c, 0x09,
-	0x17, 0x35, 0x46, 0x41, 0xf9, 0x2a, 0xee, 0x34, 0xd2, 0x22, 0xed, 0x06, 0xc7, 0x92, 0x1d, 0x40,
-	0xf9, 0x5b, 0xb0, 0xb8, 0x11, 0x5a, 0x51, 0x6a, 0x69, 0xc3, 0x0c, 0x28, 0x2d, 0x44, 0x10, 0x6a,
-	0x4a, 0x8b, 0xb4, 0xeb, 0x66, 0xf3, 0x28, 0xcb, 0x1f, 0x8b, 0x20, 0x74, 0x22, 0x2e, 0x67, 0xec,
-	0x25, 0x94, 0xa2, 0x60, 0x3d, 0xd7, 0x4a, 0x2d, 0xa5, 0x5d, 0x37, 0xf7, 0x73, 0xc6, 0x5e, 0x2e,
-	0x45, 0x8c, 0x10, 0x0e, 0x8d, 0xdf, 0x04, 0xd4, 0xd4, 0x85, 0x99, 0xf3, 0x20, 0x99, 0xcb, 0xc3,
-	0x9b, 0xbb, 0xcc, 0x61, 0x90, 0xcc, 0x11, 0xc7, 0x19, 0x7b, 0x0d, 0xf5, 0x28, 0x16, 0x58, 0xfa,
-	0xf8, 0x9d, 0xc5, 0x27, 0x51, 0xc8, 0x90, 0x91, 0xb8, 0x63, 0x1d, 0xd8, 0xcb, 0x0d, 0xe9, 0x1a,
-	0xca, 0x93, 0x96, 0x46, 0x06, 0x5d, 0xca, 0xed, 0xda, 0xa0, 0x2e, 0xc4, 0xf2, 0x8b, 0xfc, 0x76,
-	0xa4, 0xe9, 0x6e, 0x3f, 0x54, 0x9d, 0x88, 0x67, 0x73, 0xf6, 0x02, 0xd4, 0x28, 0x16, 0xe1, 0xf5,
-	0xad, 0x56, 0x96, 0xd7, 0x93, 0x75, 0xc6, 0x27, 0xa8, 0x64, 0x7b, 0x3e, 0x6b, 0xad, 0x5d, 0x4c,
-	0xf1, 0x71, 0x0c, 0xea, 0xc9, 0x4d, 0x88, 0xba, 0x92, 0xea, 0x69, 0x67, 0xbc, 0x85, 0x9a, 0x7c,
-	0xaf, 0x69, 0x24, 0x66, 0xec, 0x15, 0xd4, 0xf0, 0xbe, 0xfd, 0x24, 0x12, 0x33, 0x79, 0xca, 0xff,
-	0x0f, 0x52, 0x45, 0x00, 0xe1, 0xc3, 0x0b, 0x50, 0xd3, 0x93, 0x59, 0x1d, 0x2a, 0x13, 0xc7, 0x1f,
-	0xf6, 0xa6, 0x43, 0x5a, 0x60, 0x00, 0xea, 0x74, 0xd8, 0x33, 0x4f, 0xbb, 0x94, 0x64, 0xf5, 0xe9,
-	0xb1, 0x49, 0x8b, 0x58, 0x8f, 0xac, 0xc1, 0xa0, 0x37, 0xa2, 0x0a, 0xdb, 0x83, 0x1a, 0xb7, 0x5d,
-	0xeb, 0xfd, 0xd9, 0x71, 0xf7, 0x0d, 0x2d, 0xa1, 0xbf, 0x6f, 0x7b, 0x03, 0xc7, 0x9e, 0xd0, 0xf2,
-	0xe1, 0x4f, 0x02, 0xd5, 0xfc, 0x72, 0x10, 0x9c, 0x38, 0xbe, 0xcb, 0xad, 0x73, 0xfb, 0x8a, 0x16,
-	0xb0, 0xbd, 0xec, 0x71, 0xdf, 0xe5, 0x8e, 0xe7, 0x50, 0x82, 0x3e, 0x6c, 0xf9, 0xd8, 0xa5, 0x45,
-	0xb6, 0x0f, 0xf5, 0x73, 0xfb, 0xca, 0x3a, 0xeb, 0x98, 0x7e, 0xdf, 0x7e, 0x47, 0x15, 0xc6, 0xa0,
-	0x99, 0x0b, 0x63, 0xdb, 0xf3, 0xc6, 0x16, 0x2d, 0x3d, 0x40, 0xdd, 0x13, 0x09, 0x95, 0x1f, 0xa0,
-	0xee, 0x49, 0x0e, 0xa9, 0xec, 0x00, 0x28, 0xb7, 0x3e, 0x5c, 0xd8, 0xdc, 0xf2, 0x31, 0xec, 0xa3,
-	0x67, 0x4d, 0x69, 0xe5, 0xb1, 0x8a, 0x6e, 0xa9, 0x56, 0xfb, 0xda, 0xaf, 0x8d, 0x4e, 0xee, 0x37,
-	0x3a, 0xf9, 0xbb, 0xd1, 0xc9, 0x8f, 0xad, 0x5e, 0xb8, 0xdf, 0xea, 0x85, 0x3f, 0x5b, 0xbd, 0xf0,
-	0x59, 0x95, 0x7f, 0x48, 0xe7, 0x5f, 0x00, 0x00, 0x00, 0xff, 0xff, 0xb0, 0x18, 0x77, 0xeb, 0x31,
-	0x03, 0x00, 0x00,
+	// 747 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x94, 0xcd, 0x52, 0xe3, 0x46,
+	0x10, 0xc7, 0x2d, 0xcb, 0xf2, 0x47, 0x0b, 0x6c, 0x31, 0x45, 0x11, 0xe7, 0x10, 0x43, 0x29, 0x17,
+	0x97, 0x93, 0xe2, 0xc3, 0x80, 0x73, 0xca, 0xc1, 0x36, 0x22, 0x56, 0xe1, 0x58, 0xce, 0xd8, 0x50,
+	0xe4, 0x90, 0x52, 0x09, 0x33, 0xc6, 0x4a, 0x6c, 0x49, 0x65, 0x8b, 0x94, 0xe1, 0x92, 0xca, 0x1b,
+	0xe4, 0x3d, 0x72, 0xd8, 0x97, 0xd8, 0xc3, 0x1e, 0x39, 0xec, 0x61, 0x8f, 0x5b, 0xf0, 0x22, 0x5b,
+	0x3d, 0x23, 0xd9, 0xc0, 0x42, 0xed, 0xde, 0xa6, 0xff, 0xfd, 0xeb, 0x9e, 0xee, 0xe9, 0x96, 0x60,
+	0x25, 0x98, 0xfa, 0xfe, 0x70, 0xb6, 0x1d, 0x4c, 0xfd, 0xd0, 0x27, 0x69, 0x61, 0xe9, 0xff, 0x4a,
+	0x90, 0x37, 0xe6, 0xee, 0x2c, 0x64, 0xde, 0x80, 0x75, 0x51, 0x23, 0x1a, 0xc8, 0x7f, 0xb1, 0x9b,
+	0xa2, 0xb4, 0x25, 0x95, 0x57, 0x28, 0x1e, 0xc9, 0x3a, 0x28, 0x7f, 0x3b, 0xe3, 0x6b, 0x56, 0x4c,
+	0x72, 0x4d, 0x18, 0x44, 0x87, 0xd4, 0x98, 0x39, 0xc3, 0xa2, 0xbc, 0x25, 0x95, 0xd5, 0x6a, 0x7e,
+	0x3b, 0xca, 0xdf, 0x66, 0xce, 0xd0, 0x0a, 0x28, 0xf7, 0x91, 0xef, 0x21, 0x15, 0x38, 0xe1, 0xa8,
+	0x98, 0xda, 0x92, 0xcb, 0x6a, 0xb5, 0x10, 0x33, 0xa6, 0xe7, 0xb1, 0x29, 0x42, 0xe8, 0xd4, 0xff,
+	0x81, 0xb5, 0x8e, 0xef, 0x7d, 0xb1, 0x8a, 0x0a, 0xde, 0x37, 0x0c, 0x79, 0x11, 0x6a, 0x75, 0x23,
+	0xce, 0xf5, 0x34, 0x8e, 0x72, 0x86, 0xfc, 0x08, 0xca, 0xd4, 0xbd, 0x1a, 0x85, 0x51, 0x71, 0xaf,
+	0xc1, 0x02, 0xd2, 0xdf, 0x48, 0x50, 0x68, 0xfa, 0x93, 0x89, 0x1b, 0x4e, 0x98, 0x17, 0x8a, 0xfb,
+	0xb7, 0x41, 0x61, 0x08, 0xf3, 0x0a, 0x5e, 0xcd, 0xd0, 0x4a, 0x50, 0x81, 0x91, 0x9f, 0x20, 0xeb,
+	0xf9, 0x9e, 0x08, 0x11, 0x15, 0x7e, 0x1b, 0x87, 0x7c, 0xd6, 0x5c, 0x2b, 0x41, 0x17, 0x30, 0xa9,
+	0x80, 0x72, 0xe1, 0x84, 0x83, 0x51, 0x54, 0x2a, 0x89, 0xa3, 0x1a, 0x28, 0x2e, 0x2e, 0xe1, 0x48,
+	0x23, 0x03, 0x0a, 0xf7, 0xea, 0x3f, 0x03, 0x2c, 0xfd, 0x64, 0x07, 0xa2, 0x71, 0x16, 0x25, 0xfe,
+	0xce, 0xdf, 0xc4, 0x39, 0x9e, 0x35, 0x45, 0xe3, 0xa9, 0xbf, 0x97, 0x20, 0x2d, 0xe6, 0x84, 0x53,
+	0x1c, 0x39, 0xb3, 0x11, 0x6f, 0x33, 0xbf, 0x9c, 0x62, 0xcb, 0x99, 0x8d, 0x70, 0x40, 0xe8, 0x23,
+	0x3b, 0xa0, 0x06, 0x53, 0x86, 0x47, 0x1b, 0x67, 0x92, 0x7c, 0x11, 0x85, 0x08, 0x39, 0x61, 0x37,
+	0x64, 0x1f, 0x56, 0xe3, 0x00, 0xb1, 0x38, 0xf2, 0x8b, 0x21, 0x2b, 0x11, 0x74, 0xc6, 0xf7, 0xa9,
+	0x0c, 0xe9, 0x31, 0xf3, 0xae, 0xf8, 0xb6, 0x20, 0xad, 0x2d, 0x37, 0x0a, 0x55, 0x2b, 0xa0, 0x91,
+	0x9f, 0x6c, 0x60, 0xbf, 0x6c, 0xe8, 0xce, 0x8b, 0x0a, 0x5f, 0x8f, 0xc8, 0xd2, 0xff, 0x80, 0x4c,
+	0xb4, 0x59, 0x5f, 0xd5, 0xd6, 0x32, 0x4d, 0xf2, 0x71, 0x1a, 0xd4, 0x67, 0xd7, 0x43, 0xd4, 0x65,
+	0xa1, 0x0b, 0x4b, 0xff, 0x13, 0x72, 0xfc, 0x19, 0x7b, 0x01, 0x1b, 0x90, 0x1f, 0x20, 0x87, 0x1b,
+	0x6e, 0xcf, 0x02, 0x36, 0x88, 0x76, 0xe4, 0xf9, 0x27, 0x90, 0x45, 0x80, 0xc3, 0xbb, 0x00, 0x2e,
+	0x16, 0x26, 0x68, 0xb1, 0x1e, 0x6b, 0x4f, 0x3e, 0x06, 0xc4, 0x68, 0xce, 0x8d, 0x8f, 0xfa, 0x5b,
+	0x09, 0x72, 0x0b, 0x07, 0xd9, 0x04, 0x75, 0x30, 0x72, 0xc7, 0x97, 0xb6, 0x3f, 0xbd, 0x64, 0x53,
+	0x3e, 0x65, 0x85, 0x02, 0x97, 0x2c, 0x54, 0xc8, 0x77, 0x20, 0x2c, 0x7b, 0xe6, 0xde, 0x8a, 0xcf,
+	0x54, 0xa1, 0x39, 0xae, 0xf4, 0xdc, 0x5b, 0x46, 0x2a, 0xb0, 0x36, 0x71, 0x3d, 0x5b, 0xf4, 0x67,
+	0x47, 0xaf, 0x2c, 0x73, 0xaa, 0x30, 0x71, 0xbd, 0x2e, 0xd7, 0xc5, 0x33, 0x73, 0xd6, 0x99, 0x3f,
+	0x63, 0x53, 0x11, 0xeb, 0xcc, 0x9f, 0xb0, 0x9b, 0xa0, 0xb2, 0x49, 0x10, 0xde, 0xd8, 0xfc, 0xaa,
+	0x68, 0x1a, 0xc0, 0xa5, 0x26, 0x2a, 0x95, 0x53, 0x48, 0x8b, 0x27, 0x27, 0x2a, 0x64, 0x3a, 0x96,
+	0xdd, 0xaa, 0xf7, 0x5a, 0x5a, 0x82, 0x00, 0xa4, 0x7b, 0xad, 0x7a, 0xf5, 0xb0, 0xa6, 0x49, 0xd1,
+	0xf9, 0x70, 0xaf, 0xaa, 0x25, 0xf1, 0x7c, 0x62, 0x34, 0x9b, 0xf5, 0x13, 0x4d, 0x26, 0xab, 0x90,
+	0xa3, 0x66, 0xd7, 0xf8, 0xf5, 0x68, 0xaf, 0xb6, 0xab, 0xa5, 0x30, 0xbe, 0x61, 0xf6, 0x9b, 0x96,
+	0xd9, 0xd1, 0x94, 0xca, 0xff, 0x12, 0x64, 0xe3, 0xad, 0x40, 0xb0, 0x63, 0xd9, 0x5d, 0x6a, 0x1c,
+	0x9b, 0xe7, 0x5a, 0x02, 0xcd, 0xb3, 0x3a, 0xb5, 0xbb, 0xd4, 0xea, 0x5b, 0x9a, 0x84, 0x71, 0x68,
+	0xd2, 0x76, 0x57, 0x4b, 0x92, 0x02, 0xa8, 0xc7, 0xe6, 0xb9, 0x71, 0xb4, 0x5f, 0xb5, 0x1b, 0xe6,
+	0x2f, 0x9a, 0x4c, 0x08, 0xe4, 0x63, 0xa1, 0x6d, 0xf6, 0xfb, 0x6d, 0x43, 0x4b, 0x2d, 0xa0, 0xda,
+	0x01, 0x87, 0x94, 0x05, 0x54, 0x3b, 0x88, 0xa1, 0x34, 0x59, 0x07, 0x8d, 0x1a, 0xbf, 0x9d, 0x9a,
+	0xd4, 0xb0, 0x31, 0xd9, 0xef, 0x7d, 0xa3, 0xa7, 0x65, 0x1e, 0xab, 0x18, 0xcd, 0xd5, 0x6c, 0xa3,
+	0xf8, 0xee, 0xbe, 0x24, 0xdd, 0xdd, 0x97, 0xa4, 0x8f, 0xf7, 0x25, 0xe9, 0xbf, 0x87, 0x52, 0xe2,
+	0xee, 0xa1, 0x94, 0xf8, 0xf0, 0x50, 0x4a, 0x5c, 0xa4, 0xf9, 0xcf, 0x78, 0xff, 0x53, 0x00, 0x00,
+	0x00, 0xff, 0xff, 0xe7, 0xea, 0xe1, 0xff, 0x9c, 0x05, 0x00, 0x00,
 }
 
 func (m *ExistenceProof) Marshal() (dAtA []byte, err error) {
@@ -520,6 +927,147 @@ func (m *ExistenceProof) MarshalTo(dAtA []byte) (int, error) {
 	if len(m.Path) > 0 {
 		for _, msg := range m.Path {
 			dAtA[i] = 0x22
+			i++
+			i = encodeVarintProofs(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *NonExistenceProof) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *NonExistenceProof) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Key) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.Key)))
+		i += copy(dAtA[i:], m.Key)
+	}
+	if m.Left != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintProofs(dAtA, i, uint64(m.Left.Size()))
+		n2, err := m.Left.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n2
+	}
+	if m.Right != nil {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintProofs(dAtA, i, uint64(m.Right.Size()))
+		n3, err := m.Right.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n3
+	}
+	return i, nil
+}
+
+func (m *CommitmentProof) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CommitmentProof) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Proof != nil {
+		nn4, err := m.Proof.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += nn4
+	}
+	return i, nil
+}
+
+func (m *CommitmentProof_Exist) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	if m.Exist != nil {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintProofs(dAtA, i, uint64(m.Exist.Size()))
+		n5, err := m.Exist.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n5
+	}
+	return i, nil
+}
+func (m *CommitmentProof_Nonexist) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	if m.Nonexist != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintProofs(dAtA, i, uint64(m.Nonexist.Size()))
+		n6, err := m.Nonexist.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n6
+	}
+	return i, nil
+}
+func (m *CommitmentProof_Batch) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	if m.Batch != nil {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintProofs(dAtA, i, uint64(m.Batch.Size()))
+		n7, err := m.Batch.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n7
+	}
+	return i, nil
+}
+func (m *BatchProof) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *BatchProof) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Proofs) > 0 {
+		for _, msg := range m.Proofs {
+			dAtA[i] = 0xa
 			i++
 			i = encodeVarintProofs(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
@@ -630,11 +1178,78 @@ func (m *ProofSpec) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintProofs(dAtA, i, uint64(m.LeafSpec.Size()))
-		n2, err := m.LeafSpec.MarshalTo(dAtA[i:])
+		n8, err := m.LeafSpec.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n2
+		i += n8
+	}
+	if m.InnerSpec != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintProofs(dAtA, i, uint64(m.InnerSpec.Size()))
+		n9, err := m.InnerSpec.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n9
+	}
+	return i, nil
+}
+
+func (m *InnerSpec) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *InnerSpec) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.ChildOrder) > 0 {
+		dAtA11 := make([]byte, len(m.ChildOrder)*10)
+		var j10 int
+		for _, num1 := range m.ChildOrder {
+			num := uint64(num1)
+			for num >= 1<<7 {
+				dAtA11[j10] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j10++
+			}
+			dAtA11[j10] = uint8(num)
+			j10++
+		}
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintProofs(dAtA, i, uint64(j10))
+		i += copy(dAtA[i:], dAtA11[:j10])
+	}
+	if m.ChildSize != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintProofs(dAtA, i, uint64(m.ChildSize))
+	}
+	if m.MinPrefixLength != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintProofs(dAtA, i, uint64(m.MinPrefixLength))
+	}
+	if m.MaxPrefixLength != 0 {
+		dAtA[i] = 0x20
+		i++
+		i = encodeVarintProofs(dAtA, i, uint64(m.MaxPrefixLength))
+	}
+	if len(m.EmptyChild) > 0 {
+		dAtA[i] = 0x2a
+		i++
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.EmptyChild)))
+		i += copy(dAtA[i:], m.EmptyChild)
 	}
 	return i, nil
 }
@@ -668,6 +1283,90 @@ func (m *ExistenceProof) Size() (n int) {
 	}
 	if len(m.Path) > 0 {
 		for _, e := range m.Path {
+			l = e.Size()
+			n += 1 + l + sovProofs(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *NonExistenceProof) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Key)
+	if l > 0 {
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	if m.Left != nil {
+		l = m.Left.Size()
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	if m.Right != nil {
+		l = m.Right.Size()
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	return n
+}
+
+func (m *CommitmentProof) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Proof != nil {
+		n += m.Proof.Size()
+	}
+	return n
+}
+
+func (m *CommitmentProof_Exist) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Exist != nil {
+		l = m.Exist.Size()
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	return n
+}
+func (m *CommitmentProof_Nonexist) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Nonexist != nil {
+		l = m.Nonexist.Size()
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	return n
+}
+func (m *CommitmentProof_Batch) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Batch != nil {
+		l = m.Batch.Size()
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	return n
+}
+func (m *BatchProof) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Proofs) > 0 {
+		for _, e := range m.Proofs {
 			l = e.Size()
 			n += 1 + l + sovProofs(uint64(l))
 		}
@@ -728,6 +1427,39 @@ func (m *ProofSpec) Size() (n int) {
 	_ = l
 	if m.LeafSpec != nil {
 		l = m.LeafSpec.Size()
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	if m.InnerSpec != nil {
+		l = m.InnerSpec.Size()
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	return n
+}
+
+func (m *InnerSpec) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.ChildOrder) > 0 {
+		l = 0
+		for _, e := range m.ChildOrder {
+			l += sovProofs(uint64(e))
+		}
+		n += 1 + sovProofs(uint64(l)) + l
+	}
+	if m.ChildSize != 0 {
+		n += 1 + sovProofs(uint64(m.ChildSize))
+	}
+	if m.MinPrefixLength != 0 {
+		n += 1 + sovProofs(uint64(m.MinPrefixLength))
+	}
+	if m.MaxPrefixLength != 0 {
+		n += 1 + sovProofs(uint64(m.MaxPrefixLength))
+	}
+	l = len(m.EmptyChild)
+	if l > 0 {
 		n += 1 + l + sovProofs(uint64(l))
 	}
 	return n
@@ -910,6 +1642,410 @@ func (m *ExistenceProof) Unmarshal(dAtA []byte) error {
 			}
 			m.Path = append(m.Path, &InnerOp{})
 			if err := m.Path[len(m.Path)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProofs(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *NonExistenceProof) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProofs
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: NonExistenceProof: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: NonExistenceProof: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Key = append(m.Key[:0], dAtA[iNdEx:postIndex]...)
+			if m.Key == nil {
+				m.Key = []byte{}
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Left", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Left == nil {
+				m.Left = &ExistenceProof{}
+			}
+			if err := m.Left.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Right", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Right == nil {
+				m.Right = &ExistenceProof{}
+			}
+			if err := m.Right.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProofs(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CommitmentProof) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProofs
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CommitmentProof: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CommitmentProof: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Exist", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &ExistenceProof{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Proof = &CommitmentProof_Exist{v}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Nonexist", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &NonExistenceProof{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Proof = &CommitmentProof_Nonexist{v}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Batch", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &BatchProof{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Proof = &CommitmentProof_Batch{v}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProofs(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *BatchProof) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProofs
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: BatchProof: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: BatchProof: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Proofs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Proofs = append(m.Proofs, &CommitmentProof{})
+			if err := m.Proofs[len(m.Proofs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1303,6 +2439,262 @@ func (m *ProofSpec) Unmarshal(dAtA []byte) error {
 			}
 			if err := m.LeafSpec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field InnerSpec", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.InnerSpec == nil {
+				m.InnerSpec = &InnerSpec{}
+			}
+			if err := m.InnerSpec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProofs(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *InnerSpec) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProofs
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: InnerSpec: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: InnerSpec: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType == 0 {
+				var v int32
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowProofs
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= int32(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.ChildOrder = append(m.ChildOrder, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowProofs
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthProofs
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex < 0 {
+					return ErrInvalidLengthProofs
+				}
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				var count int
+				for _, integer := range dAtA[iNdEx:postIndex] {
+					if integer < 128 {
+						count++
+					}
+				}
+				elementCount = count
+				if elementCount != 0 && len(m.ChildOrder) == 0 {
+					m.ChildOrder = make([]int32, 0, elementCount)
+				}
+				for iNdEx < postIndex {
+					var v int32
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowProofs
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= int32(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.ChildOrder = append(m.ChildOrder, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field ChildOrder", wireType)
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ChildSize", wireType)
+			}
+			m.ChildSize = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ChildSize |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinPrefixLength", wireType)
+			}
+			m.MinPrefixLength = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MinPrefixLength |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxPrefixLength", wireType)
+			}
+			m.MaxPrefixLength = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxPrefixLength |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EmptyChild", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.EmptyChild = append(m.EmptyChild[:0], dAtA[iNdEx:postIndex]...)
+			if m.EmptyChild == nil {
+				m.EmptyChild = []byte{}
 			}
 			iNdEx = postIndex
 		default:
