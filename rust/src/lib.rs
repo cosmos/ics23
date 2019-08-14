@@ -2,6 +2,7 @@ extern crate protobuf;
 
 mod ops;
 mod proofs;
+mod verify;
 
 #[cfg(test)]
 mod tests {

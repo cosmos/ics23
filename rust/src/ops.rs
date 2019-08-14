@@ -13,21 +13,21 @@ use ripemd160::{Ripemd160};
 
 use crate::proofs::{HashOp, InnerOp, LengthOp, LeafOp};
 
-type Result<T> = result::Result<T, &'static str>;
-type Hash = Vec<u8>;
+pub type Result<T> = result::Result<T, &'static str>;
+pub type Hash = Vec<u8>;
 
-pub fn apply_inner(inner: InnerOp, child: Hash) -> Result<Hash> {
+pub fn apply_inner(inner: &InnerOp, child: Hash) -> Result<Hash> {
     if child.len() == 0 {
         return Err("Missing child hash");
     }
     let mut image = inner.prefix.clone();
     image.extend(child);
-    image.extend(inner.suffix);
+    image.extend(&inner.suffix);
     return do_hash(inner.hash, &image);
 }
 
 // apply_leaf will take a key, value pair and a LeafOp and return a LeafHash
-pub fn apply_leaf(leaf: LeafOp, key: &[u8], value: &[u8]) -> Result<Hash> {
+pub fn apply_leaf(leaf: &LeafOp, key: &[u8], value: &[u8]) -> Result<Hash> {
     let pkey = prepare_leaf_data(leaf.prehash_key, leaf.length, key)?;
     let pval = prepare_leaf_data(leaf.prehash_value, leaf.length, value)?;
     let mut hash = leaf.prefix.clone();
@@ -123,7 +123,7 @@ mod tests {
         let key = &"foo".as_bytes();
         let val = &"bar".as_bytes();
         let hash = hex::decode("c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2").unwrap();
-        assert_eq!(hash, apply_leaf(leaf, key, val).unwrap());
+        assert_eq!(hash, apply_leaf(&leaf, key, val).unwrap());
     }
 
     #[test]
@@ -133,7 +133,7 @@ mod tests {
         let key = &"f".as_bytes();
         let val = &"oobaz".as_bytes();
         let hash = hex::decode("4f79f191298ec7461d60136c60f77c2ae8ddd85dbf6168bb925092d51bfb39b559219b39ae5385ba04946c87f64741385bef90578ea6fe6dac85dbf7ad3f79e1").unwrap();
-        assert_eq!(hash, apply_leaf(leaf, key, val).unwrap());
+        assert_eq!(hash, apply_leaf(&leaf, key, val).unwrap());
     }
 
     #[test]
@@ -144,7 +144,7 @@ mod tests {
         let key = &"food".as_bytes();
         let val = &"some longer text".as_bytes();
         let hash = hex::decode("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265").unwrap();
-        assert_eq!(hash, apply_leaf(leaf, key, val).unwrap());
+        assert_eq!(hash, apply_leaf(&leaf, key, val).unwrap());
     }
 
     #[test]
@@ -156,7 +156,7 @@ mod tests {
         let key = &"food".as_bytes();
         let val = &"yet another long string".as_bytes();
         let hash = hex::decode("87e0483e8fb624aef2e2f7b13f4166cda485baa8e39f437c83d74c94bedb148f").unwrap();
-        assert_eq!(hash, apply_leaf(leaf, key, val).unwrap());
+        assert_eq!(hash, apply_leaf(&leaf, key, val).unwrap());
     }
 
     #[test]
@@ -169,7 +169,7 @@ mod tests {
 
         // echo -n 012345678900cafe00deadbeef | xxd -r -p | sha256sum
         let expected = hex::decode("0339f76086684506a6d42a60da4b5a719febd4d96d8b8d85ae92849e3a849a5e").unwrap();
-        assert_eq!(expected, apply_inner(inner, child).unwrap());
+        assert_eq!(expected, apply_inner(&inner, child).unwrap());
     }
 
     #[test]
@@ -181,7 +181,7 @@ mod tests {
 
         // echo -n 00204080a0c0e0ffccbb997755331100 | xxd -r -p | sha256sum
         let expected = hex::decode("45bece1678cf2e9f4f2ae033e546fc35a2081b2415edcb13121a0e908dca1927").unwrap();
-        assert_eq!(expected, apply_inner(inner, child).unwrap());
+        assert_eq!(expected, apply_inner(&inner, child).unwrap());
     }
 
 
@@ -194,6 +194,6 @@ mod tests {
 
         // echo -n 'this is a sha256 hash, really.... just kidding!'  | sha256sum
         let expected = hex::decode("79ef671d27e42a53fba2201c1bbc529a099af578ee8a38df140795db0ae2184b").unwrap();
-        assert_eq!(expected, apply_inner(inner, child).unwrap());
+        assert_eq!(expected, apply_inner(&inner, child).unwrap());
     }
 }
