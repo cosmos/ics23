@@ -1,6 +1,7 @@
 package proofs
 
 import (
+	"bytes"
 	"crypto"
 	// adds sha256 capability to crypto.SHA256
 	_ "crypto/sha256"
@@ -32,6 +33,28 @@ func (op *LeafOp) Apply(key []byte, value []byte) ([]byte, error) {
 	return doHash(op.Hash, data)
 }
 
+func (op *LeafOp)CheckAgainstSpec(spec *ProofSpec) error {
+	lspec := spec.LeafSpec
+
+	if op.Hash != lspec.Hash {
+		return fmt.Errorf("Unexpected HashOp: %d", op.Hash)
+	}
+	if op.PrehashKey != lspec.PrehashKey {
+		return fmt.Errorf("Unexpected PrehashKey: %d", op.PrehashKey)
+	}
+	if op.PrehashValue != lspec.PrehashValue {
+		return fmt.Errorf("Unexpected PrehashValue: %d", op.PrehashValue)
+	}
+	if op.Length != lspec.Length {
+		return fmt.Errorf("Unexpected LengthOp: %d", op.Length)
+	}
+	if !bytes.HasPrefix(op.Prefix, lspec.Prefix) {
+		return fmt.Errorf("Leaf Prefix doesn't start with %X", lspec.Prefix)
+	}
+	return nil
+}
+
+
 func (op *InnerOp) Apply(child []byte) ([]byte, error) {
 	if len(child) == 0 {
 		return nil, fmt.Errorf("Inner op needs child value")
@@ -40,6 +63,15 @@ func (op *InnerOp) Apply(child []byte) ([]byte, error) {
 	preimage = append(preimage, op.Suffix...)
 	return doHash(op.Hash, preimage)
 }
+
+func (inner *InnerOp)CheckAgainstSpec(spec *ProofSpec) error {
+	leafPrefix := spec.LeafSpec.Prefix
+	if bytes.HasPrefix(inner.Prefix, leafPrefix) {
+		return fmt.Errorf("Inner Prefix starts with %X", leafPrefix)
+	}
+	return nil
+}
+
 
 func prepareLeafData(hashOp HashOp, lengthOp LengthOp, data []byte) ([]byte, error) {
 	// TODO: lengthop before or after hash ???

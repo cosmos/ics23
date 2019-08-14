@@ -225,7 +225,7 @@ func TestCheckLeaf(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			err := checkLeaf(tc.leaf, tc.spec)
+			err := tc.leaf.CheckAgainstSpec(&ProofSpec{LeafSpec: tc.spec})
 			if tc.isErr && err == nil {
 				t.Fatal("Expected error, but got nil")
 			} else if !tc.isErr && err != nil {

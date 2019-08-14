@@ -82,40 +82,14 @@ func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
 	if p.GetLeaf() == nil {
 		return fmt.Errorf("Existence Proof needs defined LeafOp")
 	}
-	err := checkLeaf(p.Leaf, spec.LeafSpec)
+	err := p.Leaf.CheckAgainstSpec(spec)
 	if err != nil {
 		return err
 	}
 	for _, inner := range p.Path {
-		if err := checkInner(inner, spec.LeafSpec.Prefix); err != nil {
+		if err := inner.CheckAgainstSpec(spec); err != nil {
 			return err
 		}
-	}
-	return nil
-}
-
-func checkLeaf(leaf *LeafOp, spec *LeafOp) error {
-	if leaf.Hash != spec.Hash {
-		return fmt.Errorf("Unexpected HashOp: %d", leaf.Hash)
-	}
-	if leaf.PrehashKey != spec.PrehashKey {
-		return fmt.Errorf("Unexpected PrehashKey: %d", leaf.PrehashKey)
-	}
-	if leaf.PrehashValue != spec.PrehashValue {
-		return fmt.Errorf("Unexpected PrehashValue: %d", leaf.PrehashValue)
-	}
-	if leaf.Length != spec.Length {
-		return fmt.Errorf("Unexpected LengthOp: %d", leaf.Length)
-	}
-	if !bytes.HasPrefix(leaf.Prefix, spec.Prefix) {
-		return fmt.Errorf("Leaf Prefix doesn't start with %X", spec.Prefix)
-	}
-	return nil
-}
-
-func checkInner(inner *InnerOp, leafPrefix []byte) error {
-	if bytes.HasPrefix(inner.Prefix, leafPrefix) {
-		return fmt.Errorf("Inner Prefix starts with %X", leafPrefix)
 	}
 	return nil
 }
