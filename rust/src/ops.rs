@@ -116,4 +116,48 @@ mod tests {
         let prefixed = do_length(LengthOp::VAR_PROTO, &"food".as_bytes()).unwrap();
         assert_eq!(prefixed, hex::decode("04666f6f64").unwrap());
     }
+
+    #[test]
+    fn apply_leaf_hash() {
+        let mut leaf = LeafOp::new();
+        leaf.set_hash(HashOp::SHA256);
+        let key = &"foo".as_bytes();
+        let val = &"bar".as_bytes();
+        let hash = hex::decode("c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2").unwrap();
+        assert_eq!(hash, apply_leaf(leaf, key, val).unwrap());
+    }
+
+    #[test]
+    fn apply_leaf_hash_512() {
+        let mut leaf = LeafOp::new();
+        leaf.set_hash(HashOp::SHA512);
+        let key = &"f".as_bytes();
+        let val = &"oobaz".as_bytes();
+        let hash = hex::decode("4f79f191298ec7461d60136c60f77c2ae8ddd85dbf6168bb925092d51bfb39b559219b39ae5385ba04946c87f64741385bef90578ea6fe6dac85dbf7ad3f79e1").unwrap();
+        assert_eq!(hash, apply_leaf(leaf, key, val).unwrap());
+    }
+
+    #[test]
+    fn apply_leaf_hash_length() {
+        let mut leaf = LeafOp::new();
+        leaf.set_hash(HashOp::SHA256);
+        leaf.set_length(LengthOp::VAR_PROTO);
+        let key = &"food".as_bytes();
+        let val = &"some longer text".as_bytes();
+        let hash = hex::decode("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265").unwrap();
+        assert_eq!(hash, apply_leaf(leaf, key, val).unwrap());
+    }
+
+    #[test]
+    fn apply_leaf_prehash_length() {
+        let mut leaf = LeafOp::new();
+        leaf.set_hash(HashOp::SHA256);
+        leaf.set_prehash_value(HashOp::SHA256);
+        leaf.set_length(LengthOp::VAR_PROTO);
+        let key = &"food".as_bytes();
+        let val = &"yet another long string".as_bytes();
+        let hash = hex::decode("87e0483e8fb624aef2e2f7b13f4166cda485baa8e39f437c83d74c94bedb148f").unwrap();
+        assert_eq!(hash, apply_leaf(leaf, key, val).unwrap());
+    }
+
 }
