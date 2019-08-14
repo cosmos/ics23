@@ -388,6 +388,744 @@ $root.proofs = (function() {
         return ExistenceProof;
     })();
 
+    proofs.NonExistenceProof = (function() {
+
+        /**
+         * Properties of a NonExistenceProof.
+         * @memberof proofs
+         * @interface INonExistenceProof
+         * @property {Uint8Array|null} [key] NonExistenceProof key
+         * @property {proofs.IExistenceProof|null} [left] NonExistenceProof left
+         * @property {proofs.IExistenceProof|null} [right] NonExistenceProof right
+         */
+
+        /**
+         * Constructs a new NonExistenceProof.
+         * @memberof proofs
+         * @classdesc Represents a NonExistenceProof.
+         * @implements INonExistenceProof
+         * @constructor
+         * @param {proofs.INonExistenceProof=} [properties] Properties to set
+         */
+        function NonExistenceProof(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * NonExistenceProof key.
+         * @member {Uint8Array} key
+         * @memberof proofs.NonExistenceProof
+         * @instance
+         */
+        NonExistenceProof.prototype.key = $util.newBuffer([]);
+
+        /**
+         * NonExistenceProof left.
+         * @member {proofs.IExistenceProof|null|undefined} left
+         * @memberof proofs.NonExistenceProof
+         * @instance
+         */
+        NonExistenceProof.prototype.left = null;
+
+        /**
+         * NonExistenceProof right.
+         * @member {proofs.IExistenceProof|null|undefined} right
+         * @memberof proofs.NonExistenceProof
+         * @instance
+         */
+        NonExistenceProof.prototype.right = null;
+
+        /**
+         * Creates a new NonExistenceProof instance using the specified properties.
+         * @function create
+         * @memberof proofs.NonExistenceProof
+         * @static
+         * @param {proofs.INonExistenceProof=} [properties] Properties to set
+         * @returns {proofs.NonExistenceProof} NonExistenceProof instance
+         */
+        NonExistenceProof.create = function create(properties) {
+            return new NonExistenceProof(properties);
+        };
+
+        /**
+         * Encodes the specified NonExistenceProof message. Does not implicitly {@link proofs.NonExistenceProof.verify|verify} messages.
+         * @function encode
+         * @memberof proofs.NonExistenceProof
+         * @static
+         * @param {proofs.INonExistenceProof} message NonExistenceProof message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        NonExistenceProof.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.key != null && message.hasOwnProperty("key"))
+                writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.key);
+            if (message.left != null && message.hasOwnProperty("left"))
+                $root.proofs.ExistenceProof.encode(message.left, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            if (message.right != null && message.hasOwnProperty("right"))
+                $root.proofs.ExistenceProof.encode(message.right, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified NonExistenceProof message, length delimited. Does not implicitly {@link proofs.NonExistenceProof.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof proofs.NonExistenceProof
+         * @static
+         * @param {proofs.INonExistenceProof} message NonExistenceProof message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        NonExistenceProof.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a NonExistenceProof message from the specified reader or buffer.
+         * @function decode
+         * @memberof proofs.NonExistenceProof
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {proofs.NonExistenceProof} NonExistenceProof
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        NonExistenceProof.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.proofs.NonExistenceProof();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.key = reader.bytes();
+                    break;
+                case 2:
+                    message.left = $root.proofs.ExistenceProof.decode(reader, reader.uint32());
+                    break;
+                case 3:
+                    message.right = $root.proofs.ExistenceProof.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a NonExistenceProof message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof proofs.NonExistenceProof
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {proofs.NonExistenceProof} NonExistenceProof
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        NonExistenceProof.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a NonExistenceProof message.
+         * @function verify
+         * @memberof proofs.NonExistenceProof
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        NonExistenceProof.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.key != null && message.hasOwnProperty("key"))
+                if (!(message.key && typeof message.key.length === "number" || $util.isString(message.key)))
+                    return "key: buffer expected";
+            if (message.left != null && message.hasOwnProperty("left")) {
+                var error = $root.proofs.ExistenceProof.verify(message.left);
+                if (error)
+                    return "left." + error;
+            }
+            if (message.right != null && message.hasOwnProperty("right")) {
+                var error = $root.proofs.ExistenceProof.verify(message.right);
+                if (error)
+                    return "right." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates a NonExistenceProof message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof proofs.NonExistenceProof
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {proofs.NonExistenceProof} NonExistenceProof
+         */
+        NonExistenceProof.fromObject = function fromObject(object) {
+            if (object instanceof $root.proofs.NonExistenceProof)
+                return object;
+            var message = new $root.proofs.NonExistenceProof();
+            if (object.key != null)
+                if (typeof object.key === "string")
+                    $util.base64.decode(object.key, message.key = $util.newBuffer($util.base64.length(object.key)), 0);
+                else if (object.key.length)
+                    message.key = object.key;
+            if (object.left != null) {
+                if (typeof object.left !== "object")
+                    throw TypeError(".proofs.NonExistenceProof.left: object expected");
+                message.left = $root.proofs.ExistenceProof.fromObject(object.left);
+            }
+            if (object.right != null) {
+                if (typeof object.right !== "object")
+                    throw TypeError(".proofs.NonExistenceProof.right: object expected");
+                message.right = $root.proofs.ExistenceProof.fromObject(object.right);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a NonExistenceProof message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof proofs.NonExistenceProof
+         * @static
+         * @param {proofs.NonExistenceProof} message NonExistenceProof
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        NonExistenceProof.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                if (options.bytes === String)
+                    object.key = "";
+                else {
+                    object.key = [];
+                    if (options.bytes !== Array)
+                        object.key = $util.newBuffer(object.key);
+                }
+                object.left = null;
+                object.right = null;
+            }
+            if (message.key != null && message.hasOwnProperty("key"))
+                object.key = options.bytes === String ? $util.base64.encode(message.key, 0, message.key.length) : options.bytes === Array ? Array.prototype.slice.call(message.key) : message.key;
+            if (message.left != null && message.hasOwnProperty("left"))
+                object.left = $root.proofs.ExistenceProof.toObject(message.left, options);
+            if (message.right != null && message.hasOwnProperty("right"))
+                object.right = $root.proofs.ExistenceProof.toObject(message.right, options);
+            return object;
+        };
+
+        /**
+         * Converts this NonExistenceProof to JSON.
+         * @function toJSON
+         * @memberof proofs.NonExistenceProof
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        NonExistenceProof.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return NonExistenceProof;
+    })();
+
+    proofs.CommitmentProof = (function() {
+
+        /**
+         * Properties of a CommitmentProof.
+         * @memberof proofs
+         * @interface ICommitmentProof
+         * @property {proofs.IExistenceProof|null} [exist] CommitmentProof exist
+         * @property {proofs.INonExistenceProof|null} [nonexist] CommitmentProof nonexist
+         * @property {proofs.IBatchProof|null} [batch] CommitmentProof batch
+         */
+
+        /**
+         * Constructs a new CommitmentProof.
+         * @memberof proofs
+         * @classdesc Represents a CommitmentProof.
+         * @implements ICommitmentProof
+         * @constructor
+         * @param {proofs.ICommitmentProof=} [properties] Properties to set
+         */
+        function CommitmentProof(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * CommitmentProof exist.
+         * @member {proofs.IExistenceProof|null|undefined} exist
+         * @memberof proofs.CommitmentProof
+         * @instance
+         */
+        CommitmentProof.prototype.exist = null;
+
+        /**
+         * CommitmentProof nonexist.
+         * @member {proofs.INonExistenceProof|null|undefined} nonexist
+         * @memberof proofs.CommitmentProof
+         * @instance
+         */
+        CommitmentProof.prototype.nonexist = null;
+
+        /**
+         * CommitmentProof batch.
+         * @member {proofs.IBatchProof|null|undefined} batch
+         * @memberof proofs.CommitmentProof
+         * @instance
+         */
+        CommitmentProof.prototype.batch = null;
+
+        // OneOf field names bound to virtual getters and setters
+        var $oneOfFields;
+
+        /**
+         * CommitmentProof proof.
+         * @member {"exist"|"nonexist"|"batch"|undefined} proof
+         * @memberof proofs.CommitmentProof
+         * @instance
+         */
+        Object.defineProperty(CommitmentProof.prototype, "proof", {
+            get: $util.oneOfGetter($oneOfFields = ["exist", "nonexist", "batch"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
+
+        /**
+         * Creates a new CommitmentProof instance using the specified properties.
+         * @function create
+         * @memberof proofs.CommitmentProof
+         * @static
+         * @param {proofs.ICommitmentProof=} [properties] Properties to set
+         * @returns {proofs.CommitmentProof} CommitmentProof instance
+         */
+        CommitmentProof.create = function create(properties) {
+            return new CommitmentProof(properties);
+        };
+
+        /**
+         * Encodes the specified CommitmentProof message. Does not implicitly {@link proofs.CommitmentProof.verify|verify} messages.
+         * @function encode
+         * @memberof proofs.CommitmentProof
+         * @static
+         * @param {proofs.ICommitmentProof} message CommitmentProof message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        CommitmentProof.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.exist != null && message.hasOwnProperty("exist"))
+                $root.proofs.ExistenceProof.encode(message.exist, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (message.nonexist != null && message.hasOwnProperty("nonexist"))
+                $root.proofs.NonExistenceProof.encode(message.nonexist, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            if (message.batch != null && message.hasOwnProperty("batch"))
+                $root.proofs.BatchProof.encode(message.batch, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified CommitmentProof message, length delimited. Does not implicitly {@link proofs.CommitmentProof.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof proofs.CommitmentProof
+         * @static
+         * @param {proofs.ICommitmentProof} message CommitmentProof message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        CommitmentProof.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a CommitmentProof message from the specified reader or buffer.
+         * @function decode
+         * @memberof proofs.CommitmentProof
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {proofs.CommitmentProof} CommitmentProof
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        CommitmentProof.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.proofs.CommitmentProof();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.exist = $root.proofs.ExistenceProof.decode(reader, reader.uint32());
+                    break;
+                case 2:
+                    message.nonexist = $root.proofs.NonExistenceProof.decode(reader, reader.uint32());
+                    break;
+                case 3:
+                    message.batch = $root.proofs.BatchProof.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a CommitmentProof message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof proofs.CommitmentProof
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {proofs.CommitmentProof} CommitmentProof
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        CommitmentProof.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a CommitmentProof message.
+         * @function verify
+         * @memberof proofs.CommitmentProof
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        CommitmentProof.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            var properties = {};
+            if (message.exist != null && message.hasOwnProperty("exist")) {
+                properties.proof = 1;
+                {
+                    var error = $root.proofs.ExistenceProof.verify(message.exist);
+                    if (error)
+                        return "exist." + error;
+                }
+            }
+            if (message.nonexist != null && message.hasOwnProperty("nonexist")) {
+                if (properties.proof === 1)
+                    return "proof: multiple values";
+                properties.proof = 1;
+                {
+                    var error = $root.proofs.NonExistenceProof.verify(message.nonexist);
+                    if (error)
+                        return "nonexist." + error;
+                }
+            }
+            if (message.batch != null && message.hasOwnProperty("batch")) {
+                if (properties.proof === 1)
+                    return "proof: multiple values";
+                properties.proof = 1;
+                {
+                    var error = $root.proofs.BatchProof.verify(message.batch);
+                    if (error)
+                        return "batch." + error;
+                }
+            }
+            return null;
+        };
+
+        /**
+         * Creates a CommitmentProof message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof proofs.CommitmentProof
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {proofs.CommitmentProof} CommitmentProof
+         */
+        CommitmentProof.fromObject = function fromObject(object) {
+            if (object instanceof $root.proofs.CommitmentProof)
+                return object;
+            var message = new $root.proofs.CommitmentProof();
+            if (object.exist != null) {
+                if (typeof object.exist !== "object")
+                    throw TypeError(".proofs.CommitmentProof.exist: object expected");
+                message.exist = $root.proofs.ExistenceProof.fromObject(object.exist);
+            }
+            if (object.nonexist != null) {
+                if (typeof object.nonexist !== "object")
+                    throw TypeError(".proofs.CommitmentProof.nonexist: object expected");
+                message.nonexist = $root.proofs.NonExistenceProof.fromObject(object.nonexist);
+            }
+            if (object.batch != null) {
+                if (typeof object.batch !== "object")
+                    throw TypeError(".proofs.CommitmentProof.batch: object expected");
+                message.batch = $root.proofs.BatchProof.fromObject(object.batch);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a CommitmentProof message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof proofs.CommitmentProof
+         * @static
+         * @param {proofs.CommitmentProof} message CommitmentProof
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        CommitmentProof.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (message.exist != null && message.hasOwnProperty("exist")) {
+                object.exist = $root.proofs.ExistenceProof.toObject(message.exist, options);
+                if (options.oneofs)
+                    object.proof = "exist";
+            }
+            if (message.nonexist != null && message.hasOwnProperty("nonexist")) {
+                object.nonexist = $root.proofs.NonExistenceProof.toObject(message.nonexist, options);
+                if (options.oneofs)
+                    object.proof = "nonexist";
+            }
+            if (message.batch != null && message.hasOwnProperty("batch")) {
+                object.batch = $root.proofs.BatchProof.toObject(message.batch, options);
+                if (options.oneofs)
+                    object.proof = "batch";
+            }
+            return object;
+        };
+
+        /**
+         * Converts this CommitmentProof to JSON.
+         * @function toJSON
+         * @memberof proofs.CommitmentProof
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        CommitmentProof.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return CommitmentProof;
+    })();
+
+    proofs.BatchProof = (function() {
+
+        /**
+         * Properties of a BatchProof.
+         * @memberof proofs
+         * @interface IBatchProof
+         * @property {Array.<proofs.ICommitmentProof>|null} [proofs] BatchProof proofs
+         */
+
+        /**
+         * Constructs a new BatchProof.
+         * @memberof proofs
+         * @classdesc Represents a BatchProof.
+         * @implements IBatchProof
+         * @constructor
+         * @param {proofs.IBatchProof=} [properties] Properties to set
+         */
+        function BatchProof(properties) {
+            this.proofs = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * BatchProof proofs.
+         * @member {Array.<proofs.ICommitmentProof>} proofs
+         * @memberof proofs.BatchProof
+         * @instance
+         */
+        BatchProof.prototype.proofs = $util.emptyArray;
+
+        /**
+         * Creates a new BatchProof instance using the specified properties.
+         * @function create
+         * @memberof proofs.BatchProof
+         * @static
+         * @param {proofs.IBatchProof=} [properties] Properties to set
+         * @returns {proofs.BatchProof} BatchProof instance
+         */
+        BatchProof.create = function create(properties) {
+            return new BatchProof(properties);
+        };
+
+        /**
+         * Encodes the specified BatchProof message. Does not implicitly {@link proofs.BatchProof.verify|verify} messages.
+         * @function encode
+         * @memberof proofs.BatchProof
+         * @static
+         * @param {proofs.IBatchProof} message BatchProof message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        BatchProof.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.proofs != null && message.proofs.length)
+                for (var i = 0; i < message.proofs.length; ++i)
+                    $root.proofs.CommitmentProof.encode(message.proofs[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified BatchProof message, length delimited. Does not implicitly {@link proofs.BatchProof.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof proofs.BatchProof
+         * @static
+         * @param {proofs.IBatchProof} message BatchProof message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        BatchProof.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a BatchProof message from the specified reader or buffer.
+         * @function decode
+         * @memberof proofs.BatchProof
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {proofs.BatchProof} BatchProof
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        BatchProof.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.proofs.BatchProof();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    if (!(message.proofs && message.proofs.length))
+                        message.proofs = [];
+                    message.proofs.push($root.proofs.CommitmentProof.decode(reader, reader.uint32()));
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a BatchProof message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof proofs.BatchProof
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {proofs.BatchProof} BatchProof
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        BatchProof.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a BatchProof message.
+         * @function verify
+         * @memberof proofs.BatchProof
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        BatchProof.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.proofs != null && message.hasOwnProperty("proofs")) {
+                if (!Array.isArray(message.proofs))
+                    return "proofs: array expected";
+                for (var i = 0; i < message.proofs.length; ++i) {
+                    var error = $root.proofs.CommitmentProof.verify(message.proofs[i]);
+                    if (error)
+                        return "proofs." + error;
+                }
+            }
+            return null;
+        };
+
+        /**
+         * Creates a BatchProof message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof proofs.BatchProof
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {proofs.BatchProof} BatchProof
+         */
+        BatchProof.fromObject = function fromObject(object) {
+            if (object instanceof $root.proofs.BatchProof)
+                return object;
+            var message = new $root.proofs.BatchProof();
+            if (object.proofs) {
+                if (!Array.isArray(object.proofs))
+                    throw TypeError(".proofs.BatchProof.proofs: array expected");
+                message.proofs = [];
+                for (var i = 0; i < object.proofs.length; ++i) {
+                    if (typeof object.proofs[i] !== "object")
+                        throw TypeError(".proofs.BatchProof.proofs: object expected");
+                    message.proofs[i] = $root.proofs.CommitmentProof.fromObject(object.proofs[i]);
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a BatchProof message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof proofs.BatchProof
+         * @static
+         * @param {proofs.BatchProof} message BatchProof
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        BatchProof.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults)
+                object.proofs = [];
+            if (message.proofs && message.proofs.length) {
+                object.proofs = [];
+                for (var j = 0; j < message.proofs.length; ++j)
+                    object.proofs[j] = $root.proofs.CommitmentProof.toObject(message.proofs[j], options);
+            }
+            return object;
+        };
+
+        /**
+         * Converts this BatchProof to JSON.
+         * @function toJSON
+         * @memberof proofs.BatchProof
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        BatchProof.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return BatchProof;
+    })();
+
     proofs.LeafOp = (function() {
 
         /**
@@ -1137,6 +1875,7 @@ $root.proofs = (function() {
          * @memberof proofs
          * @interface IProofSpec
          * @property {proofs.ILeafOp|null} [leafSpec] ProofSpec leafSpec
+         * @property {proofs.IInnerSpec|null} [innerSpec] ProofSpec innerSpec
          */
 
         /**
@@ -1172,6 +1911,14 @@ $root.proofs = (function() {
         ProofSpec.prototype.leafSpec = null;
 
         /**
+         * ProofSpec innerSpec.
+         * @member {proofs.IInnerSpec|null|undefined} innerSpec
+         * @memberof proofs.ProofSpec
+         * @instance
+         */
+        ProofSpec.prototype.innerSpec = null;
+
+        /**
          * Creates a new ProofSpec instance using the specified properties.
          * @function create
          * @memberof proofs.ProofSpec
@@ -1197,6 +1944,8 @@ $root.proofs = (function() {
                 writer = $Writer.create();
             if (message.leafSpec != null && message.hasOwnProperty("leafSpec"))
                 $root.proofs.LeafOp.encode(message.leafSpec, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (message.innerSpec != null && message.hasOwnProperty("innerSpec"))
+                $root.proofs.InnerSpec.encode(message.innerSpec, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             return writer;
         };
 
@@ -1233,6 +1982,9 @@ $root.proofs = (function() {
                 switch (tag >>> 3) {
                 case 1:
                     message.leafSpec = $root.proofs.LeafOp.decode(reader, reader.uint32());
+                    break;
+                case 2:
+                    message.innerSpec = $root.proofs.InnerSpec.decode(reader, reader.uint32());
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1274,6 +2026,11 @@ $root.proofs = (function() {
                 if (error)
                     return "leafSpec." + error;
             }
+            if (message.innerSpec != null && message.hasOwnProperty("innerSpec")) {
+                var error = $root.proofs.InnerSpec.verify(message.innerSpec);
+                if (error)
+                    return "innerSpec." + error;
+            }
             return null;
         };
 
@@ -1294,6 +2051,11 @@ $root.proofs = (function() {
                     throw TypeError(".proofs.ProofSpec.leafSpec: object expected");
                 message.leafSpec = $root.proofs.LeafOp.fromObject(object.leafSpec);
             }
+            if (object.innerSpec != null) {
+                if (typeof object.innerSpec !== "object")
+                    throw TypeError(".proofs.ProofSpec.innerSpec: object expected");
+                message.innerSpec = $root.proofs.InnerSpec.fromObject(object.innerSpec);
+            }
             return message;
         };
 
@@ -1310,10 +2072,14 @@ $root.proofs = (function() {
             if (!options)
                 options = {};
             var object = {};
-            if (options.defaults)
+            if (options.defaults) {
                 object.leafSpec = null;
+                object.innerSpec = null;
+            }
             if (message.leafSpec != null && message.hasOwnProperty("leafSpec"))
                 object.leafSpec = $root.proofs.LeafOp.toObject(message.leafSpec, options);
+            if (message.innerSpec != null && message.hasOwnProperty("innerSpec"))
+                object.innerSpec = $root.proofs.InnerSpec.toObject(message.innerSpec, options);
             return object;
         };
 
@@ -1329,6 +2095,316 @@ $root.proofs = (function() {
         };
 
         return ProofSpec;
+    })();
+
+    proofs.InnerSpec = (function() {
+
+        /**
+         * Properties of an InnerSpec.
+         * @memberof proofs
+         * @interface IInnerSpec
+         * @property {Array.<number>|null} [childOrder] InnerSpec childOrder
+         * @property {number|null} [childSize] InnerSpec childSize
+         * @property {number|null} [minPrefixLength] InnerSpec minPrefixLength
+         * @property {number|null} [maxPrefixLength] InnerSpec maxPrefixLength
+         * @property {Uint8Array|null} [emptyChild] InnerSpec emptyChild
+         */
+
+        /**
+         * Constructs a new InnerSpec.
+         * @memberof proofs
+         * @classdesc Represents an InnerSpec.
+         * @implements IInnerSpec
+         * @constructor
+         * @param {proofs.IInnerSpec=} [properties] Properties to set
+         */
+        function InnerSpec(properties) {
+            this.childOrder = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * InnerSpec childOrder.
+         * @member {Array.<number>} childOrder
+         * @memberof proofs.InnerSpec
+         * @instance
+         */
+        InnerSpec.prototype.childOrder = $util.emptyArray;
+
+        /**
+         * InnerSpec childSize.
+         * @member {number} childSize
+         * @memberof proofs.InnerSpec
+         * @instance
+         */
+        InnerSpec.prototype.childSize = 0;
+
+        /**
+         * InnerSpec minPrefixLength.
+         * @member {number} minPrefixLength
+         * @memberof proofs.InnerSpec
+         * @instance
+         */
+        InnerSpec.prototype.minPrefixLength = 0;
+
+        /**
+         * InnerSpec maxPrefixLength.
+         * @member {number} maxPrefixLength
+         * @memberof proofs.InnerSpec
+         * @instance
+         */
+        InnerSpec.prototype.maxPrefixLength = 0;
+
+        /**
+         * InnerSpec emptyChild.
+         * @member {Uint8Array} emptyChild
+         * @memberof proofs.InnerSpec
+         * @instance
+         */
+        InnerSpec.prototype.emptyChild = $util.newBuffer([]);
+
+        /**
+         * Creates a new InnerSpec instance using the specified properties.
+         * @function create
+         * @memberof proofs.InnerSpec
+         * @static
+         * @param {proofs.IInnerSpec=} [properties] Properties to set
+         * @returns {proofs.InnerSpec} InnerSpec instance
+         */
+        InnerSpec.create = function create(properties) {
+            return new InnerSpec(properties);
+        };
+
+        /**
+         * Encodes the specified InnerSpec message. Does not implicitly {@link proofs.InnerSpec.verify|verify} messages.
+         * @function encode
+         * @memberof proofs.InnerSpec
+         * @static
+         * @param {proofs.IInnerSpec} message InnerSpec message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        InnerSpec.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.childOrder != null && message.childOrder.length) {
+                writer.uint32(/* id 1, wireType 2 =*/10).fork();
+                for (var i = 0; i < message.childOrder.length; ++i)
+                    writer.int32(message.childOrder[i]);
+                writer.ldelim();
+            }
+            if (message.childSize != null && message.hasOwnProperty("childSize"))
+                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.childSize);
+            if (message.minPrefixLength != null && message.hasOwnProperty("minPrefixLength"))
+                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.minPrefixLength);
+            if (message.maxPrefixLength != null && message.hasOwnProperty("maxPrefixLength"))
+                writer.uint32(/* id 4, wireType 0 =*/32).int32(message.maxPrefixLength);
+            if (message.emptyChild != null && message.hasOwnProperty("emptyChild"))
+                writer.uint32(/* id 5, wireType 2 =*/42).bytes(message.emptyChild);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified InnerSpec message, length delimited. Does not implicitly {@link proofs.InnerSpec.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof proofs.InnerSpec
+         * @static
+         * @param {proofs.IInnerSpec} message InnerSpec message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        InnerSpec.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an InnerSpec message from the specified reader or buffer.
+         * @function decode
+         * @memberof proofs.InnerSpec
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {proofs.InnerSpec} InnerSpec
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        InnerSpec.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.proofs.InnerSpec();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    if (!(message.childOrder && message.childOrder.length))
+                        message.childOrder = [];
+                    if ((tag & 7) === 2) {
+                        var end2 = reader.uint32() + reader.pos;
+                        while (reader.pos < end2)
+                            message.childOrder.push(reader.int32());
+                    } else
+                        message.childOrder.push(reader.int32());
+                    break;
+                case 2:
+                    message.childSize = reader.int32();
+                    break;
+                case 3:
+                    message.minPrefixLength = reader.int32();
+                    break;
+                case 4:
+                    message.maxPrefixLength = reader.int32();
+                    break;
+                case 5:
+                    message.emptyChild = reader.bytes();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an InnerSpec message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof proofs.InnerSpec
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {proofs.InnerSpec} InnerSpec
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        InnerSpec.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an InnerSpec message.
+         * @function verify
+         * @memberof proofs.InnerSpec
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        InnerSpec.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.childOrder != null && message.hasOwnProperty("childOrder")) {
+                if (!Array.isArray(message.childOrder))
+                    return "childOrder: array expected";
+                for (var i = 0; i < message.childOrder.length; ++i)
+                    if (!$util.isInteger(message.childOrder[i]))
+                        return "childOrder: integer[] expected";
+            }
+            if (message.childSize != null && message.hasOwnProperty("childSize"))
+                if (!$util.isInteger(message.childSize))
+                    return "childSize: integer expected";
+            if (message.minPrefixLength != null && message.hasOwnProperty("minPrefixLength"))
+                if (!$util.isInteger(message.minPrefixLength))
+                    return "minPrefixLength: integer expected";
+            if (message.maxPrefixLength != null && message.hasOwnProperty("maxPrefixLength"))
+                if (!$util.isInteger(message.maxPrefixLength))
+                    return "maxPrefixLength: integer expected";
+            if (message.emptyChild != null && message.hasOwnProperty("emptyChild"))
+                if (!(message.emptyChild && typeof message.emptyChild.length === "number" || $util.isString(message.emptyChild)))
+                    return "emptyChild: buffer expected";
+            return null;
+        };
+
+        /**
+         * Creates an InnerSpec message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof proofs.InnerSpec
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {proofs.InnerSpec} InnerSpec
+         */
+        InnerSpec.fromObject = function fromObject(object) {
+            if (object instanceof $root.proofs.InnerSpec)
+                return object;
+            var message = new $root.proofs.InnerSpec();
+            if (object.childOrder) {
+                if (!Array.isArray(object.childOrder))
+                    throw TypeError(".proofs.InnerSpec.childOrder: array expected");
+                message.childOrder = [];
+                for (var i = 0; i < object.childOrder.length; ++i)
+                    message.childOrder[i] = object.childOrder[i] | 0;
+            }
+            if (object.childSize != null)
+                message.childSize = object.childSize | 0;
+            if (object.minPrefixLength != null)
+                message.minPrefixLength = object.minPrefixLength | 0;
+            if (object.maxPrefixLength != null)
+                message.maxPrefixLength = object.maxPrefixLength | 0;
+            if (object.emptyChild != null)
+                if (typeof object.emptyChild === "string")
+                    $util.base64.decode(object.emptyChild, message.emptyChild = $util.newBuffer($util.base64.length(object.emptyChild)), 0);
+                else if (object.emptyChild.length)
+                    message.emptyChild = object.emptyChild;
+            return message;
+        };
+
+        /**
+         * Creates a plain object from an InnerSpec message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof proofs.InnerSpec
+         * @static
+         * @param {proofs.InnerSpec} message InnerSpec
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        InnerSpec.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults)
+                object.childOrder = [];
+            if (options.defaults) {
+                object.childSize = 0;
+                object.minPrefixLength = 0;
+                object.maxPrefixLength = 0;
+                if (options.bytes === String)
+                    object.emptyChild = "";
+                else {
+                    object.emptyChild = [];
+                    if (options.bytes !== Array)
+                        object.emptyChild = $util.newBuffer(object.emptyChild);
+                }
+            }
+            if (message.childOrder && message.childOrder.length) {
+                object.childOrder = [];
+                for (var j = 0; j < message.childOrder.length; ++j)
+                    object.childOrder[j] = message.childOrder[j];
+            }
+            if (message.childSize != null && message.hasOwnProperty("childSize"))
+                object.childSize = message.childSize;
+            if (message.minPrefixLength != null && message.hasOwnProperty("minPrefixLength"))
+                object.minPrefixLength = message.minPrefixLength;
+            if (message.maxPrefixLength != null && message.hasOwnProperty("maxPrefixLength"))
+                object.maxPrefixLength = message.maxPrefixLength;
+            if (message.emptyChild != null && message.hasOwnProperty("emptyChild"))
+                object.emptyChild = options.bytes === String ? $util.base64.encode(message.emptyChild, 0, message.emptyChild.length) : options.bytes === Array ? Array.prototype.slice.call(message.emptyChild) : message.emptyChild;
+            return object;
+        };
+
+        /**
+         * Converts this InnerSpec to JSON.
+         * @function toJSON
+         * @memberof proofs.InnerSpec
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        InnerSpec.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return InnerSpec;
     })();
 
     return proofs;
