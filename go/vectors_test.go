@@ -1,7 +1,6 @@
 package proofs
 
 import (
-	"bytes"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -40,36 +39,25 @@ func TestIavlVectors(t *testing.T) {
 			name := filepath.Join(tc.dir, tc.filename)
 			bz, err := ioutil.ReadFile(name)
 			if err != nil {
-				t.Fatalf("Read file: %s", err)
+				t.Fatalf("Read file: %+v", err)
 			}
 			var data TestData
 			err = json.Unmarshal(bz, &data)
 			if err != nil {
-				t.Fatalf("Unmarshal json: %s", err)
+				t.Fatalf("Unmarshal json: %+v", err)
 			}
 
 			// parse the protobuf object
 			var proof ExistenceProof
 			err = proof.Unmarshal(mustHex(t, data.Proof))
 			if err != nil {
-				t.Fatalf("Unmarshal protobuf: %s", err)
+				t.Fatalf("Unmarshal protobuf: %+v", err)
 			}
 
-			// ensure the proof is valid
-			err = proof.CheckAgainstSpec(tc.spec)
+			root := CommitmentRoot(mustHex(t, data.RootHash))
+			err = proof.Verify(tc.spec, root, proof.Key, proof.Value)
 			if err != nil {
-				t.Fatalf("Failed Iavl check spec: %s", err)
-			}
-
-			calc, err := proof.Calculate()
-			if err != nil {
-				t.Fatalf("Calculating root hash: %s", err)
-			}
-
-			root := mustHex(t, data.RootHash)
-
-			if !bytes.Equal(calc, root) {
-				t.Errorf("Expected root %X calculated %X", root, calc)
+				t.Fatalf("Invalid proof: %+v", err)
 			}
 		})
 	}
