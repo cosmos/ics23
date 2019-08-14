@@ -1,5 +1,6 @@
 import { proofs } from "./generated/codecimpl";
 import { applyInner, applyLeaf } from "./ops";
+import { ensureBytesEqual, ensureInner, ensureLeaf } from "./specs";
 
 export const IavlSpec: proofs.IProofSpec = {
   leafSpec: {
@@ -21,12 +22,30 @@ export const TendermintSpec: proofs.IProofSpec = {
   }
 };
 
+export type CommitmentRoot = Uint8Array;
+
+// verifyExistence will throw an error if the proof doesn't link key, value -> root
+// or if it doesn't fulfill the spec
+export function verifyExistence(
+  proof: proofs.IExistenceProof,
+  spec: proofs.IProofSpec,
+  root: CommitmentRoot,
+  key: Uint8Array,
+  value: Uint8Array
+): void {
+  ensureSpec(proof, spec);
+  const calc = calculateExistenceRoot(proof);
+  ensureBytesEqual(calc, root);
+  ensureBytesEqual(key, proof.key!);
+  ensureBytesEqual(value, proof.value!);
+}
+
 // Calculate determines the root hash that matches the given proof.
 // You must validate the result is what you have in a header.
 // Returns error if the calculations cannot be performed.
 export function calculateExistenceRoot(
   proof: proofs.IExistenceProof
-): Uint8Array {
+): CommitmentRoot {
   if (!proof.key || !proof.value) {
     throw new Error("Existence proof needs key and value set");
   }
@@ -58,74 +77,4 @@ export function ensureSpec(
   for (const inner of path) {
     ensureInner(inner, spec.leafSpec.prefix);
   }
-}
-
-function ensureLeaf(leaf: proofs.ILeafOp, spec: proofs.ILeafOp): void {
-  if (leaf.hash !== spec.hash) {
-    throw new Error(`Unexpected hashOp: ${leaf.hash}`);
-  }
-  if (leaf.prehashKey !== spec.prehashKey) {
-    throw new Error(`Unexpected prehashKey: ${leaf.prehashKey}`);
-  }
-  if (leaf.prehashValue !== spec.prehashValue) {
-    throw new Error(`Unexpected prehashValue: ${leaf.prehashValue}`);
-  }
-  if (leaf.length !== spec.length) {
-    throw new Error(`Unexpected length op: ${leaf.length}`);
-  }
-  ensurePrefix(leaf.prefix, spec.prefix);
-}
-
-function ensureInner(inner: proofs.IInnerOp, prefix?: Uint8Array | null): void {
-  if (hasPrefix(inner.prefix, prefix)) {
-    throw new Error(`Inner node has leaf prefix`);
-  }
-}
-
-function ensurePrefix(
-  check?: Uint8Array | null,
-  prefix?: Uint8Array | null
-): void {
-  // no prefix supplied, means everything passes
-  if (!prefix || prefix.length === 0) {
-    return;
-  }
-  if (!check) {
-    throw new Error(`Target bytes missing`);
-  }
-  ensureBytesEqual(prefix, check.slice(0, prefix.length));
-}
-
-// ensureBytesEqual throws an error if the arrays are different
-function ensureBytesEqual(a: Uint8Array, b: Uint8Array): void {
-  if (a.length !== b.length) {
-    throw new Error(`Different lengths ${a.length} vs ${b.length}`);
-  }
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) {
-      throw new Error(`Arrays differ at index ${i}: ${a[i]} vs ${b[i]}`);
-    }
-  }
-}
-
-function hasPrefix(
-  check?: Uint8Array | null,
-  prefix?: Uint8Array | null
-): boolean {
-  // no prefix supplied, means everything passes
-  if (!prefix || prefix.length === 0) {
-    return false;
-  }
-  if (!check) {
-    return false;
-  }
-  if (check.length <= prefix.length) {
-    return false;
-  }
-  for (let i = 0; i < prefix.length; i++) {
-    if (check[i] !== prefix[i]) {
-      return false;
-    }
-  }
-  throw true;
 }
