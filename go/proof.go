@@ -2,7 +2,6 @@ package proofs
 
 import (
 	"bytes"
-	"fmt"
 
 	"github.com/pkg/errors"
 )
@@ -53,42 +52,42 @@ func (p *ExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte
 
 }
 
-
 // Calculate determines the root hash that matches the given proof.
 // You must validate the result is what you have in a header.
 // Returns error if the calculations cannot be performed.
 func (p *ExistenceProof) Calculate() (CommitmentRoot, error) {
 	if p.GetLeaf() == nil {
-		return nil, fmt.Errorf("Existence Proof needs defined LeafOp")
+		return nil, errors.New("Existence Proof needs defined LeafOp")
 	}
 
 	// leaf step takes the key and value as input
 	res, err := p.Leaf.Apply(p.Key, p.Value)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithMessage(err, "leaf")
 	}
 
 	// the rest just take the output of the last step (reducing it)
 	for _, step := range p.Path {
 		res, err = step.Apply(res)
 		if err != nil {
-			return nil, err
+			return nil, errors.WithMessage(err, "inner")
 		}
 	}
 	return res, nil
 }
 
+// CheckAgainstSpec will verify the leaf and all path steps are in the format defined in spec
 func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
 	if p.GetLeaf() == nil {
-		return fmt.Errorf("Existence Proof needs defined LeafOp")
+		return errors.New("Existence Proof needs defined LeafOp")
 	}
 	err := p.Leaf.CheckAgainstSpec(spec)
 	if err != nil {
-		return err
+		return errors.WithMessage(err, "leaf")
 	}
 	for _, inner := range p.Path {
 		if err := inner.CheckAgainstSpec(spec); err != nil {
-			return err
+			return errors.WithMessage(err, "inner")
 		}
 	}
 	return nil
