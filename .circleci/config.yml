@@ -50,8 +50,10 @@ jobs:
   rust:
     docker:
       - image: rust:1
+    working_directory: ~/proofs/rust
     steps:
-      - checkout
+      - checkout:
+          path: ~/proofs
       - run:
           name: Version information
           command: rustc --version; cargo --version; rustup --version
