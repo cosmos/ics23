@@ -8,8 +8,8 @@ use crate::ops::{apply_inner, apply_leaf, Result};
 pub type CommitmentRoot = Vec<u8>;
 
 pub fn verify_existence(
-  proof: proofs::ExistenceProof,
-  _spec: proofs::ProofSpec,
+  proof: &proofs::ExistenceProof,
+  _spec: &proofs::ProofSpec,
   root: CommitmentRoot,
   key: &[u8],
   value: &[u8],
