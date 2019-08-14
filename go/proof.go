@@ -3,6 +3,8 @@ package proofs
 import (
 	"bytes"
 	"fmt"
+
+	"github.com/pkg/errors"
 )
 
 // IavlSpec constrains the format from proofs-iavl (iavl merkle proofs)
@@ -28,23 +30,23 @@ var TendermintSpec = &ProofSpec{
 // Verify does all checks to ensure this proof proves this key, value -> root
 // and matches the spec.
 func (p *ExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte, value []byte) error {
-	if err := exist.CheckAgainstSpec(spec); err != nil {
+	if err := p.CheckAgainstSpec(spec); err != nil {
 		return err
 	}
 
-	if !bytes.Equal(key, exist.Key) {
-		return fmt.Errorf("Provided key doesn't match proof")
+	if !bytes.Equal(key, p.Key) {
+		return errors.Errorf("Provided key doesn't match proof")
 	}
-	if !bytes.Equal(value, exist.Value) {
-		return fmt.Errorf("Provided value doesn't match proof")
+	if !bytes.Equal(value, p.Value) {
+		return errors.Errorf("Provided value doesn't match proof")
 	}
 
-	calc, err := exist.Calculate()
+	calc, err := p.Calculate()
 	if err != nil {
-		return fmt.Errorf("Error calculating root: %s", err)
+		return errors.Wrap(err, "Error calculating root")
 	}
 	if !bytes.Equal(root, calc) {
-		return fmt.Errorf("Calculcated root doesn't match provided root")
+		return errors.Errorf("Calculcated root doesn't match provided root")
 	}
 
 	return nil
@@ -115,5 +117,54 @@ func checkInner(inner *InnerOp, leafPrefix []byte) error {
 	if bytes.HasPrefix(inner.Prefix, leafPrefix) {
 		return fmt.Errorf("Inner Prefix starts with %X", leafPrefix)
 	}
+	return nil
+}
+
+// Verify does all checks to ensure this proof proves this key, value -> root
+// and matches the spec.
+func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte) error {
+	// ensure the existence proofs are valid
+	var leftKey, rightKey []byte 
+	if p.Left != nil {
+		if err := p.Left.Verify(spec, root, p.Left.Key, p.Left.Value); err != nil {
+			return errors.Wrap(err, "left proof")
+		}
+		leftKey = p.Left.Key
+	}
+	if p.Right != nil {
+		if err := p.Right.Verify(spec, root, p.Right.Key, p.Right.Value); err != nil {
+			return errors.Wrap(err, "right proof")
+		}
+		rightKey = p.Right.Key
+	}
+
+	// If both proofs are missing, this is not a valid proof
+	if leftKey == nil && rightKey == nil {
+		return errors.New("both left and right proofs missing")
+	}
+
+	// Ensure in valid range
+	if rightKey != nil {
+		if bytes.Compare(key, rightKey) >= 0 {
+			return errors.New("key is not left of right proof")
+		}
+	}
+	if leftKey != nil {
+		if bytes.Compare(key, leftKey) <= 0 {
+			return errors.New("key is not right of left proof")
+		}
+	}
+
+	if leftKey == nil {
+		// TODO: enforce left-most
+		return nil
+	}
+
+	if rightKey == nil {
+		// TODO: enforce right-most
+		return nil
+	}
+
+	// TODO: enforce neighbors
 	return nil
 }
