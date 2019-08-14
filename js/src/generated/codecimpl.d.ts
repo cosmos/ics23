@@ -173,6 +173,347 @@ export namespace proofs {
     public toJSON(): { [k: string]: any };
   }
 
+  /** Properties of a NonExistenceProof. */
+  interface INonExistenceProof {
+    /** NonExistenceProof key */
+    key?: Uint8Array | null;
+
+    /** NonExistenceProof left */
+    left?: proofs.IExistenceProof | null;
+
+    /** NonExistenceProof right */
+    right?: proofs.IExistenceProof | null;
+  }
+
+  /** Represents a NonExistenceProof. */
+  class NonExistenceProof implements INonExistenceProof {
+    /**
+     * Constructs a new NonExistenceProof.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: proofs.INonExistenceProof);
+
+    /** NonExistenceProof key. */
+    public key: Uint8Array;
+
+    /** NonExistenceProof left. */
+    public left?: proofs.IExistenceProof | null;
+
+    /** NonExistenceProof right. */
+    public right?: proofs.IExistenceProof | null;
+
+    /**
+     * Creates a new NonExistenceProof instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns NonExistenceProof instance
+     */
+    public static create(
+      properties?: proofs.INonExistenceProof
+    ): proofs.NonExistenceProof;
+
+    /**
+     * Encodes the specified NonExistenceProof message. Does not implicitly {@link proofs.NonExistenceProof.verify|verify} messages.
+     * @param message NonExistenceProof message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(
+      message: proofs.INonExistenceProof,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Encodes the specified NonExistenceProof message, length delimited. Does not implicitly {@link proofs.NonExistenceProof.verify|verify} messages.
+     * @param message NonExistenceProof message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(
+      message: proofs.INonExistenceProof,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Decodes a NonExistenceProof message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns NonExistenceProof
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(
+      reader: $protobuf.Reader | Uint8Array,
+      length?: number
+    ): proofs.NonExistenceProof;
+
+    /**
+     * Decodes a NonExistenceProof message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns NonExistenceProof
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(
+      reader: $protobuf.Reader | Uint8Array
+    ): proofs.NonExistenceProof;
+
+    /**
+     * Verifies a NonExistenceProof message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): string | null;
+
+    /**
+     * Creates a NonExistenceProof message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns NonExistenceProof
+     */
+    public static fromObject(object: {
+      [k: string]: any;
+    }): proofs.NonExistenceProof;
+
+    /**
+     * Creates a plain object from a NonExistenceProof message. Also converts values to other types if specified.
+     * @param message NonExistenceProof
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(
+      message: proofs.NonExistenceProof,
+      options?: $protobuf.IConversionOptions
+    ): { [k: string]: any };
+
+    /**
+     * Converts this NonExistenceProof to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+  }
+
+  /** Properties of a CommitmentProof. */
+  interface ICommitmentProof {
+    /** CommitmentProof exist */
+    exist?: proofs.IExistenceProof | null;
+
+    /** CommitmentProof nonexist */
+    nonexist?: proofs.INonExistenceProof | null;
+
+    /** CommitmentProof batch */
+    batch?: proofs.IBatchProof | null;
+  }
+
+  /** Represents a CommitmentProof. */
+  class CommitmentProof implements ICommitmentProof {
+    /**
+     * Constructs a new CommitmentProof.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: proofs.ICommitmentProof);
+
+    /** CommitmentProof exist. */
+    public exist?: proofs.IExistenceProof | null;
+
+    /** CommitmentProof nonexist. */
+    public nonexist?: proofs.INonExistenceProof | null;
+
+    /** CommitmentProof batch. */
+    public batch?: proofs.IBatchProof | null;
+
+    /** CommitmentProof proof. */
+    public proof?: "exist" | "nonexist" | "batch";
+
+    /**
+     * Creates a new CommitmentProof instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns CommitmentProof instance
+     */
+    public static create(
+      properties?: proofs.ICommitmentProof
+    ): proofs.CommitmentProof;
+
+    /**
+     * Encodes the specified CommitmentProof message. Does not implicitly {@link proofs.CommitmentProof.verify|verify} messages.
+     * @param message CommitmentProof message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(
+      message: proofs.ICommitmentProof,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Encodes the specified CommitmentProof message, length delimited. Does not implicitly {@link proofs.CommitmentProof.verify|verify} messages.
+     * @param message CommitmentProof message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(
+      message: proofs.ICommitmentProof,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Decodes a CommitmentProof message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns CommitmentProof
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(
+      reader: $protobuf.Reader | Uint8Array,
+      length?: number
+    ): proofs.CommitmentProof;
+
+    /**
+     * Decodes a CommitmentProof message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns CommitmentProof
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(
+      reader: $protobuf.Reader | Uint8Array
+    ): proofs.CommitmentProof;
+
+    /**
+     * Verifies a CommitmentProof message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): string | null;
+
+    /**
+     * Creates a CommitmentProof message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns CommitmentProof
+     */
+    public static fromObject(object: {
+      [k: string]: any;
+    }): proofs.CommitmentProof;
+
+    /**
+     * Creates a plain object from a CommitmentProof message. Also converts values to other types if specified.
+     * @param message CommitmentProof
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(
+      message: proofs.CommitmentProof,
+      options?: $protobuf.IConversionOptions
+    ): { [k: string]: any };
+
+    /**
+     * Converts this CommitmentProof to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+  }
+
+  /** Properties of a BatchProof. */
+  interface IBatchProof {
+    /** BatchProof proofs */
+    proofs?: proofs.ICommitmentProof[] | null;
+  }
+
+  /** Represents a BatchProof. */
+  class BatchProof implements IBatchProof {
+    /**
+     * Constructs a new BatchProof.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: proofs.IBatchProof);
+
+    /** BatchProof proofs. */
+    public proofs: proofs.ICommitmentProof[];
+
+    /**
+     * Creates a new BatchProof instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns BatchProof instance
+     */
+    public static create(properties?: proofs.IBatchProof): proofs.BatchProof;
+
+    /**
+     * Encodes the specified BatchProof message. Does not implicitly {@link proofs.BatchProof.verify|verify} messages.
+     * @param message BatchProof message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(
+      message: proofs.IBatchProof,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Encodes the specified BatchProof message, length delimited. Does not implicitly {@link proofs.BatchProof.verify|verify} messages.
+     * @param message BatchProof message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(
+      message: proofs.IBatchProof,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Decodes a BatchProof message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns BatchProof
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(
+      reader: $protobuf.Reader | Uint8Array,
+      length?: number
+    ): proofs.BatchProof;
+
+    /**
+     * Decodes a BatchProof message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns BatchProof
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(
+      reader: $protobuf.Reader | Uint8Array
+    ): proofs.BatchProof;
+
+    /**
+     * Verifies a BatchProof message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): string | null;
+
+    /**
+     * Creates a BatchProof message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns BatchProof
+     */
+    public static fromObject(object: { [k: string]: any }): proofs.BatchProof;
+
+    /**
+     * Creates a plain object from a BatchProof message. Also converts values to other types if specified.
+     * @param message BatchProof
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(
+      message: proofs.BatchProof,
+      options?: $protobuf.IConversionOptions
+    ): { [k: string]: any };
+
+    /**
+     * Converts this BatchProof to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+  }
+
   /** Properties of a LeafOp. */
   interface ILeafOp {
     /** LeafOp hash */
@@ -448,6 +789,9 @@ export namespace proofs {
   interface IProofSpec {
     /** ProofSpec leafSpec */
     leafSpec?: proofs.ILeafOp | null;
+
+    /** ProofSpec innerSpec */
+    innerSpec?: proofs.IInnerSpec | null;
   }
 
   /**
@@ -471,6 +815,9 @@ export namespace proofs {
 
     /** ProofSpec leafSpec. */
     public leafSpec?: proofs.ILeafOp | null;
+
+    /** ProofSpec innerSpec. */
+    public innerSpec?: proofs.IInnerSpec | null;
 
     /**
      * Creates a new ProofSpec instance using the specified properties.
@@ -552,6 +899,132 @@ export namespace proofs {
 
     /**
      * Converts this ProofSpec to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+  }
+
+  /** Properties of an InnerSpec. */
+  interface IInnerSpec {
+    /** InnerSpec childOrder */
+    childOrder?: number[] | null;
+
+    /** InnerSpec childSize */
+    childSize?: number | null;
+
+    /** InnerSpec minPrefixLength */
+    minPrefixLength?: number | null;
+
+    /** InnerSpec maxPrefixLength */
+    maxPrefixLength?: number | null;
+
+    /** InnerSpec emptyChild */
+    emptyChild?: Uint8Array | null;
+  }
+
+  /** Represents an InnerSpec. */
+  class InnerSpec implements IInnerSpec {
+    /**
+     * Constructs a new InnerSpec.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: proofs.IInnerSpec);
+
+    /** InnerSpec childOrder. */
+    public childOrder: number[];
+
+    /** InnerSpec childSize. */
+    public childSize: number;
+
+    /** InnerSpec minPrefixLength. */
+    public minPrefixLength: number;
+
+    /** InnerSpec maxPrefixLength. */
+    public maxPrefixLength: number;
+
+    /** InnerSpec emptyChild. */
+    public emptyChild: Uint8Array;
+
+    /**
+     * Creates a new InnerSpec instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns InnerSpec instance
+     */
+    public static create(properties?: proofs.IInnerSpec): proofs.InnerSpec;
+
+    /**
+     * Encodes the specified InnerSpec message. Does not implicitly {@link proofs.InnerSpec.verify|verify} messages.
+     * @param message InnerSpec message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(
+      message: proofs.IInnerSpec,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Encodes the specified InnerSpec message, length delimited. Does not implicitly {@link proofs.InnerSpec.verify|verify} messages.
+     * @param message InnerSpec message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(
+      message: proofs.IInnerSpec,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Decodes an InnerSpec message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns InnerSpec
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(
+      reader: $protobuf.Reader | Uint8Array,
+      length?: number
+    ): proofs.InnerSpec;
+
+    /**
+     * Decodes an InnerSpec message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns InnerSpec
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(
+      reader: $protobuf.Reader | Uint8Array
+    ): proofs.InnerSpec;
+
+    /**
+     * Verifies an InnerSpec message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): string | null;
+
+    /**
+     * Creates an InnerSpec message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns InnerSpec
+     */
+    public static fromObject(object: { [k: string]: any }): proofs.InnerSpec;
+
+    /**
+     * Creates a plain object from an InnerSpec message. Also converts values to other types if specified.
+     * @param message InnerSpec
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(
+      message: proofs.InnerSpec,
+      options?: $protobuf.IConversionOptions
+    ): { [k: string]: any };
+
+    /**
+     * Converts this InnerSpec to JSON.
      * @returns JSON object
      */
     public toJSON(): { [k: string]: any };

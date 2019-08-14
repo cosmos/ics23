@@ -1,44 +1,79 @@
 package proofs
 
 import (
+	"bytes"
 	"crypto"
 	// adds sha256 capability to crypto.SHA256
 	_ "crypto/sha256"
 	// adds sha512 capability to crypto.SHA512
 	_ "crypto/sha512"
-	fmt "fmt"
 
 	// adds ripemd160 capability to crypto.RIPEMD160
 	_ "golang.org/x/crypto/ripemd160"
+
+	"github.com/pkg/errors"
 )
 
+// Apply will calculate the leaf hash given the key and value being proven
 func (op *LeafOp) Apply(key []byte, value []byte) ([]byte, error) {
 	if len(key) == 0 {
-		return nil, fmt.Errorf("Leaf op needs key")
+		return nil, errors.New("Leaf op needs key")
 	}
 	if len(value) == 0 {
-		return nil, fmt.Errorf("Leaf op needs value")
+		return nil, errors.New("Leaf op needs value")
 	}
 	pkey, err := prepareLeafData(op.PrehashKey, op.Length, key)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "prehash key")
 	}
 	pvalue, err := prepareLeafData(op.PrehashValue, op.Length, value)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "prehash value")
 	}
 	data := append(op.Prefix, pkey...)
 	data = append(data, pvalue...)
 	return doHash(op.Hash, data)
 }
 
+// CheckAgainstSpec will verify the LeafOp is in the format defined in spec
+func (op *LeafOp) CheckAgainstSpec(spec *ProofSpec) error {
+	lspec := spec.LeafSpec
+
+	if op.Hash != lspec.Hash {
+		return errors.Errorf("Unexpected HashOp: %d", op.Hash)
+	}
+	if op.PrehashKey != lspec.PrehashKey {
+		return errors.Errorf("Unexpected PrehashKey: %d", op.PrehashKey)
+	}
+	if op.PrehashValue != lspec.PrehashValue {
+		return errors.Errorf("Unexpected PrehashValue: %d", op.PrehashValue)
+	}
+	if op.Length != lspec.Length {
+		return errors.Errorf("Unexpected LengthOp: %d", op.Length)
+	}
+	if !bytes.HasPrefix(op.Prefix, lspec.Prefix) {
+		return errors.Errorf("Leaf Prefix doesn't start with %X", lspec.Prefix)
+	}
+	return nil
+}
+
+// Apply will calculate the hash of the next step, given the hash of the previous step
 func (op *InnerOp) Apply(child []byte) ([]byte, error) {
 	if len(child) == 0 {
-		return nil, fmt.Errorf("Inner op needs child value")
+		return nil, errors.Errorf("Inner op needs child value")
 	}
 	preimage := append(op.Prefix, child...)
 	preimage = append(preimage, op.Suffix...)
 	return doHash(op.Hash, preimage)
+}
+
+// CheckAgainstSpec will verify the InnerOp is in the format defined in spec
+func (op *InnerOp) CheckAgainstSpec(spec *ProofSpec) error {
+	leafPrefix := spec.LeafSpec.Prefix
+	if bytes.HasPrefix(op.Prefix, leafPrefix) {
+		return errors.Errorf("Inner Prefix starts with %X", leafPrefix)
+	}
+	return nil
 }
 
 func prepareLeafData(hashOp HashOp, lengthOp LengthOp, data []byte) ([]byte, error) {
@@ -85,7 +120,7 @@ func doHash(hashOp HashOp, preimage []byte) ([]byte, error) {
 		hash.Write(tmp)
 		return hash.Sum(nil), nil
 	}
-	return nil, fmt.Errorf("Unsupported hashop: %d", hashOp)
+	return nil, errors.Errorf("Unsupported hashop: %d", hashOp)
 }
 
 // doLengthOp will calculate the proper prefix and return it prepended
@@ -99,12 +134,12 @@ func doLengthOp(lengthOp LengthOp, data []byte) ([]byte, error) {
 		return res, nil
 	case LengthOp_REQUIRE_32_BYTES:
 		if len(data) != 32 {
-			return nil, fmt.Errorf("Data was %d bytes, not 32", len(data))
+			return nil, errors.Errorf("Data was %d bytes, not 32", len(data))
 		}
 		return data, nil
 	case LengthOp_REQUIRE_64_BYTES:
 		if len(data) != 64 {
-			return nil, fmt.Errorf("Data was %d bytes, not 64", len(data))
+			return nil, errors.Errorf("Data was %d bytes, not 64", len(data))
 		}
 		return data, nil
 		// TODO
@@ -114,7 +149,7 @@ func doLengthOp(lengthOp LengthOp, data []byte) ([]byte, error) {
 		// case LengthOp_FIXED32_LITTLE:
 		// case LengthOp_FIXED64_LITTLE:
 	}
-	return nil, fmt.Errorf("Unsupported lengthop: %d", lengthOp)
+	return nil, errors.Errorf("Unsupported lengthop: %d", lengthOp)
 }
 
 func encodeVarintProto(l int) []byte {

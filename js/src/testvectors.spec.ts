@@ -2,12 +2,7 @@ import { readFileSync } from "fs";
 
 import { proofs } from "./generated/codecimpl";
 import { fromHex } from "./helpers";
-import {
-  calculateExistenceRoot,
-  ensureSpec,
-  IavlSpec,
-  TendermintSpec
-} from "./proofs";
+import { IavlSpec, TendermintSpec, verifyExistence } from "./proofs";
 
 describe("calculateExistenceRoot", () => {
   function validateTestVector(filepath: string, spec: proofs.IProofSpec): void {
@@ -17,11 +12,9 @@ describe("calculateExistenceRoot", () => {
     expect(root).toBeDefined();
 
     const proof = proofs.ExistenceProof.decode(fromHex(existence));
-    ensureSpec(proof, spec);
-    const calc = calculateExistenceRoot(proof);
-
     const rootHash = fromHex(root);
-    expect(calc).toEqual(rootHash);
+
+    verifyExistence(proof, spec, rootHash, proof.key, proof.value);
   }
 
   it("should parse iavl 1", () => {
