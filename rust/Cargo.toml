@@ -11,3 +11,6 @@ members = ["codegen"]
 [dependencies]
 protobuf = "2.8.0"
 hex = "0.3.2"
+sha2 = "0.8"
+sha3 = "0.8"
+ripemd160 = "0.8"

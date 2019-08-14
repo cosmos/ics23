@@ -1,10 +1,16 @@
 extern crate protobuf;
 extern crate hex;
+extern crate sha2;
+extern crate sha3;
+extern crate ripemd160;
 
 use std::result;
 use std::vec::Vec;
+use sha2::{Digest, Sha256, Sha512};
+use sha3::{Sha3_512};
+use ripemd160::{Ripemd160};
 
-use super::proofs::{HashOp, InnerOp, LengthOp, LeafOp};
+use crate::proofs::{HashOp, InnerOp, LengthOp, LeafOp};
 
 type Result<T> = result::Result<T, &'static str>;
 type Hash = Vec<u8>;
@@ -39,8 +45,12 @@ fn prepare_leaf_data(prehash: HashOp, length: LengthOp, data: &[u8]) -> Result<H
 
 fn do_hash(hash: HashOp, data: &[u8]) -> Result<Hash> {
     match hash {
-        HashOp::SHA256 => Ok(vec![1, 2]),
-        _ => Err("Unsupported HashOp"),
+        HashOp::NO_HASH => Ok(Hash::from(data)),
+        HashOp::SHA256 => Ok(Hash::from(Sha256::digest(data).as_slice())),
+        HashOp::SHA512 => Ok(Hash::from(Sha512::digest(data).as_slice())),
+        HashOp::KECCAK => Ok(Hash::from(Sha3_512::digest(data).as_slice())),
+        HashOp::RIPEMD160 => Ok(Hash::from(Ripemd160::digest(data).as_slice())),
+        HashOp::BITCOIN => Ok(Hash::from(Ripemd160::digest(Sha256::digest(data).as_slice()).as_slice())),
     }
 }
 
@@ -55,7 +65,7 @@ fn do_length(length: LengthOp, data: &[u8]) -> Result<Hash> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use protobuf::Message;
+    // use protobuf::Message;
 
     #[test]
     fn it_works() {
@@ -63,9 +73,20 @@ mod tests {
     }
 
     #[test]
-    fn do_hash_sha256() {
+    fn hashing_food() {
+        let hash = do_hash(HashOp::NO_HASH, &"food".as_bytes()).unwrap();
+        assert_eq!(hash, hex::decode("666f6f64").unwrap());
+
         let hash = do_hash(HashOp::SHA256, &"food".as_bytes()).unwrap();
-        // assert_eq!(hash, hex::decode("c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b").unwrap());
-        assert_eq!(hash, hex::decode("0102").unwrap());
+        assert_eq!(hash, hex::decode("c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b").unwrap());
+
+        let hash = do_hash(HashOp::SHA512, &"food".as_bytes()).unwrap();
+        assert_eq!(hash, hex::decode("c235548cfe84fc87678ff04c9134e060cdcd7512d09ed726192151a995541ed8db9fda5204e72e7ac268214c322c17787c70530513c59faede52b7dd9ce64331").unwrap());
+
+        let hash = do_hash(HashOp::RIPEMD160, &"food".as_bytes()).unwrap();
+        assert_eq!(hash, hex::decode("b1ab9988c7c7c5ec4b2b291adfeeee10e77cdd46").unwrap());
+
+        let hash = do_hash(HashOp::BITCOIN, &"food".as_bytes()).unwrap();
+        assert_eq!(hash, hex::decode("0bcb587dfb4fc10b36d57f2bba1878f139b75d24").unwrap());
     }
 }
