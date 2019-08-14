@@ -85,11 +85,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-
-    #[test]
     fn hashing_food() {
         let hash = do_hash(HashOp::NO_HASH, &"food".as_bytes()).unwrap();
         assert_eq!(hash, hex::decode("666f6f64").unwrap());
