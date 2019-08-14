@@ -4,16 +4,17 @@ mod ops;
 mod proofs;
 mod verify;
 
+pub use verify::{calculate_existence_root, verify_existence};
+pub use crate::proofs::*;
+pub use ops::Result;
+
+
 #[cfg(test)]
 mod tests {
-    use crate::proofs;
+    use super::*;
 
     use protobuf::Message;
 
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
 
     #[test]
     fn proto_encode() {
@@ -25,11 +26,11 @@ mod tests {
         assert_eq!(leaf.get_prehash_value(), proofs::HashOp::NO_HASH);
 
         // encode it
-        let ser = leaf.write_to_bytes().expect(&"cannot serialize");
+        let ser = leaf.write_to_bytes().expect("cannot serialize");
         assert_eq!(ser.len(), 9);
 
         // decode it
-        let parsed: proofs::LeafOp = protobuf::parse_from_bytes(&ser).expect(&"cannot parse");
+        let parsed: proofs::LeafOp = protobuf::parse_from_bytes(&ser).expect("cannot parse");
 
         // ensure we got it
         assert_eq!(leaf.get_prehash_key(), parsed.get_prehash_key());
@@ -56,12 +57,12 @@ mod tests {
         exist.set_path(protobuf::RepeatedField::from_vec(vec![inner]));
 
         // encode it
-        let ser = exist.write_to_bytes().expect(&"cannot serialize");
+        let ser = exist.write_to_bytes().expect("cannot serialize");
         assert_eq!(ser.len(), 41);
 
         // decode it
         let mut parsed = proofs::ExistenceProof::new();
-        parsed.merge_from_bytes(&ser).expect(&"cannot parse");
+        parsed.merge_from_bytes(&ser).expect("cannot parse");
 
         // ensure we got it
         assert_eq!(proofs::HashOp::KECCAK, parsed.get_leaf().get_prehash_key());

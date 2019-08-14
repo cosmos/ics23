@@ -3,7 +3,7 @@ extern crate protobuf;
 use std::vec::Vec;
 
 use crate::proofs;
-use crate::ops::{apply_inner, apply_leaf, Result, Hash};
+use crate::ops::{apply_inner, apply_leaf, Result};
 
 pub type CommitmentRoot = Vec<u8>;
 
@@ -65,8 +65,8 @@ mod tests {
         leaf.set_length(LengthOp::VAR_PROTO);
         let mut proof = proofs::ExistenceProof::new();
         proof.set_leaf(leaf);
-        proof.set_key(Hash::from("food"));
-        proof.set_value(Hash::from("some longer text"));
+        proof.set_key(b"food".to_vec());
+        proof.set_value(b"some longer text".to_vec());
 
         let expected = hex::decode("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265").unwrap();
         assert_eq!(expected, calculate_existence_root(&proof).unwrap());
@@ -83,8 +83,8 @@ mod tests {
         inner.set_prefix(hex::decode("deadbeef00cafe00").unwrap());
 
         let mut proof = proofs::ExistenceProof::new();
-        proof.set_key(Hash::from("food"));
-        proof.set_value(Hash::from("some longer text"));
+        proof.set_key(b"food".to_vec());
+        proof.set_value(b"some longer text".to_vec());
         proof.set_leaf(leaf);
         proof.set_path(protobuf::RepeatedField::from_slice(&[inner]));
 
