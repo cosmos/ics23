@@ -4,6 +4,7 @@ extern crate sha2;
 extern crate sha3;
 extern crate ripemd160;
 
+use std::convert::TryInto;
 use std::result;
 use std::vec::Vec;
 use sha2::{Digest, Sha256, Sha512};
@@ -57,8 +58,25 @@ fn do_hash(hash: HashOp, data: &[u8]) -> Result<Hash> {
 fn do_length(length: LengthOp, data: &[u8]) -> Result<Hash> {
     match length {
         LengthOp::NO_PREFIX => Ok(Hash::from(data)),
+        LengthOp::REQUIRE_32_BYTES => if data.len() == 32 { Ok(Hash::from(data)) } else { Err("Invalid length") },
+        LengthOp::REQUIRE_64_BYTES => if data.len() == 64 { Ok(Hash::from(data)) } else { Err("Invalid length") },
+        LengthOp::VAR_PROTO => {
+            let mut len = proto_len(data.len());
+            len.extend(data);
+            Ok(len)
+        },
         _ => Err("Unsupported LengthOp"),
     }
+}
+
+fn proto_len(length: usize) -> Hash {
+    // TODO: remove unwrap
+    let size: u64 = length.try_into().unwrap();
+    let mut len = Hash::new();
+    let mut str = protobuf::CodedOutputStream::vec(&mut len);
+    str.write_uint64_no_tag(size).unwrap();
+    str.flush().unwrap();
+    len
 }
 
 
@@ -88,5 +106,14 @@ mod tests {
 
         let hash = do_hash(HashOp::BITCOIN, &"food".as_bytes()).unwrap();
         assert_eq!(hash, hex::decode("0bcb587dfb4fc10b36d57f2bba1878f139b75d24").unwrap());
+    }
+
+    #[test]
+    fn length_prefix() {
+        let prefixed = do_length(LengthOp::NO_PREFIX, &"food".as_bytes()).unwrap();
+        assert_eq!(prefixed, hex::decode("666f6f64").unwrap());
+
+        let prefixed = do_length(LengthOp::VAR_PROTO, &"food".as_bytes()).unwrap();
+        assert_eq!(prefixed, hex::decode("04666f6f64").unwrap());
     }
 }
