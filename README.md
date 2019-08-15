@@ -10,6 +10,8 @@ proofs of blockchains, but more specifically for proofs that accompany IBC
 
 ## Feature Set
 
+The features and naming follow the [ICS23: Vector Commitments](https://github.com/cosmos/ics/tree/master/spec/ics-023-vector-commitments) Specification
+
 * Proof of Existence (key-value pair linked to root hash)
 * Hold Existence Proof to db-specific spec (avoid reinterpretation of bytes to different key-value pair)
 
@@ -29,10 +31,10 @@ live alongside the various merkle tree representations (eg. not in this reposito
 
 * [Go](./go)
 * [TypeScript](./js)
+* [Rust](./rust)
 
 ### Planned Support
 
-* Rust
 * Solidity - [thanks to Mossid](https://github.com/confio/proofs/pull/12)
 
 ## Supported Merkle Stores
