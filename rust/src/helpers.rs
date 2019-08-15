@@ -1,2 +1,2 @@
-pub type Result<T> = ::std::result::Result<T, failure::Error>;
-pub type Hash = ::std::vec::Vec<u8>;
+pub type Result<T> = std::result::Result<T, failure::Error>;
+pub type Hash = std::vec::Vec<u8>;

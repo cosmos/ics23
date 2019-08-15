@@ -1,6 +1,5 @@
 extern crate protoc_rust;
 
-use protoc_rust::Customize;
 use std::env;
 use std::vec::Vec;
 
@@ -15,9 +14,7 @@ fn main() {
         out_dir: &format!("{}{}", root, "/rust/src"),
         input: &[&format!("{}{}", root, "/proofs.proto")],
         includes: &[root],
-        customize: Customize {
-            ..Default::default()
-        },
+        customize: Default::default(),
     })
     .expect("protoc");
 }
