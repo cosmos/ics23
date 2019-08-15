@@ -10,12 +10,11 @@ pub fn verify_membership(
     key: &[u8],
     value: &[u8],
 ) -> bool {
-    match &proof.proof {
-        Some(proofs::CommitmentProof_oneof_proof::exist(ex)) => {
-            let valid = verify_existence(&ex, spec, root, key, value);
-            valid.is_ok() && valid.unwrap()
-        }
-        _ => false,
+    if let Some(proofs::CommitmentProof_oneof_proof::exist(ex)) = &proof.proof {
+        let valid = verify_existence(&ex, spec, root, key, value);
+        valid.is_ok() && valid.unwrap()
+    } else {
+        false
     }
 }
 #[warn(clippy::ptr_arg)]
