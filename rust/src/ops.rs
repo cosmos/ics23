@@ -1,10 +1,3 @@
-extern crate failure;
-extern crate hex;
-extern crate protobuf;
-extern crate ripemd160;
-extern crate sha2;
-extern crate sha3;
-
 use failure::{bail, ensure};
 use ripemd160::Ripemd160;
 use sha2::{Digest, Sha256, Sha512};

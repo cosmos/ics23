@@ -1,5 +1,3 @@
-extern crate protobuf;
-
 mod helpers;
 mod ops;
 mod proofs;

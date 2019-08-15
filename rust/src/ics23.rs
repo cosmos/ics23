@@ -1,5 +1,3 @@
-extern crate failure;
-
 use crate::proofs;
 use crate::verify::{verify_existence, CommitmentRoot};
 
