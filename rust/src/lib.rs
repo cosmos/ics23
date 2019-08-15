@@ -23,7 +23,7 @@ mod tests {
         let mut leaf = proofs::LeafOp::new();
         leaf.set_hash(proofs::HashOp::SHA256);
         leaf.set_prehash_key(proofs::HashOp::SHA256);
-        leaf.set_prefix(vec![0, 1, 2].into());
+        leaf.set_prefix(vec![0, 1, 2]);
         assert_eq!(leaf.get_hash(), proofs::HashOp::SHA256);
         assert_eq!(leaf.get_prehash_value(), proofs::HashOp::NO_HASH);
 
@@ -45,7 +45,7 @@ mod tests {
         let mut leaf = proofs::LeafOp::new();
         leaf.set_hash(proofs::HashOp::BITCOIN);
         leaf.set_prehash_key(proofs::HashOp::KECCAK);
-        leaf.set_prefix(vec![7, 8, 9, 233].into());
+        leaf.set_prefix(vec![7, 8, 9, 233]);
 
         let mut inner = proofs::InnerOp::new();
         inner.set_hash(proofs::HashOp::SHA256);

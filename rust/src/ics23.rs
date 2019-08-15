@@ -73,7 +73,7 @@ mod tests {
         let mut parsed = proofs::ExistenceProof::new();
         parsed.merge_from_bytes(&proto_bin)?;
         let valid = verify_existence(&parsed, spec, root, &parsed.key, &parsed.value)?;
-        ensure!(valid == true, "invalid test vector");
+        ensure!(valid, "invalid test vector");
         Ok(())
     }
 
