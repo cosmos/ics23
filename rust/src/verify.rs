@@ -83,28 +83,30 @@ mod tests {
     use crate::proofs::{HashOp, LengthOp};
 
     #[test]
-    fn calculate_root_from_leaf() {
+    fn calculate_root_from_leaf() -> Result<()> {
         let mut leaf = proofs::LeafOp::new();
         leaf.set_hash(HashOp::SHA256);
         leaf.set_length(LengthOp::VAR_PROTO);
+
         let mut proof = proofs::ExistenceProof::new();
         proof.set_leaf(leaf);
         proof.set_key(b"food".to_vec());
         proof.set_value(b"some longer text".to_vec());
 
-        let expected = hex::decode("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265").unwrap();
-        assert_eq!(expected, calculate_existence_root(&proof).unwrap());
+        let expected = hex::decode("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265")?;
+        ensure!(expected == calculate_existence_root(&proof)?, "invalid root hash");
+        Ok(())
     }
 
     #[test]
-    fn calculate_root_from_leaf_and_inner() {
+    fn calculate_root_from_leaf_and_inner() -> Result<()>  {
         let mut leaf = proofs::LeafOp::new();
         leaf.set_hash(HashOp::SHA256);
         leaf.set_length(LengthOp::VAR_PROTO);
 
         let mut inner = proofs::InnerOp::new();
         inner.set_hash(HashOp::SHA256);
-        inner.set_prefix(hex::decode("deadbeef00cafe00").unwrap());
+        inner.set_prefix(hex::decode("deadbeef00cafe00")?);
 
         let mut proof = proofs::ExistenceProof::new();
         proof.set_key(b"food".to_vec());
@@ -112,8 +114,9 @@ mod tests {
         proof.set_leaf(leaf);
         proof.set_path(protobuf::RepeatedField::from_slice(&[inner]));
 
-        let expected = hex::decode("836ea236a6902a665c2a004c920364f24cad52ded20b1e4f22c3179bfe25b2a9").unwrap();
-        assert_eq!(expected, calculate_existence_root(&proof).unwrap());
+        let expected = hex::decode("836ea236a6902a665c2a004c920364f24cad52ded20b1e4f22c3179bfe25b2a9")?;
+        ensure!(expected == calculate_existence_root(&proof)?, "invalid root hash");
+        Ok(())
     }
 
 }

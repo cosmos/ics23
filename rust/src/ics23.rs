@@ -1,5 +1,6 @@
 extern crate failure;
 
+
 use crate::proofs;
 use crate::verify::{CommitmentRoot, verify_existence};
 
@@ -48,6 +49,7 @@ mod tests {
 
     use serde::{Deserialize};
     use protobuf::Message;
+    use failure::ensure;
     use std::fs::File;
     use std::io::prelude::*;
 
@@ -59,7 +61,7 @@ mod tests {
         pub existence: String,
     }
 
-    fn verify_test_vector(filename: &str, spec: &proofs::ProofSpec) -> Result<bool> {
+    fn verify_test_vector(filename: &str, spec: &proofs::ProofSpec) -> Result<()> {
         let mut file = File::open(filename)?;
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
@@ -70,63 +72,57 @@ mod tests {
 
         let mut parsed = proofs::ExistenceProof::new();
         parsed.merge_from_bytes(&proto_bin)?;
-        verify_existence(&parsed, spec, root, &parsed.key, &parsed.value)
+        let valid = verify_existence(&parsed, spec, root, &parsed.key, &parsed.value)?;
+        ensure!(valid == true, "invalid test vector");
+        Ok(())
     }
 
     #[test]
-    fn test_vector_iavl1() {
+    fn test_vector_iavl1() -> Result<()> {
         let spec = iavl_spec();
-        let valid = verify_test_vector("../testdata/iavl/existence1.json", &spec).unwrap();
-        assert_eq!(valid, true);
+        verify_test_vector("../testdata/iavl/existence1.json", &spec)
     }
 
     #[test]
-    fn test_vector_iavl2() {
+    fn test_vector_iavl2() -> Result<()> {
         let spec = iavl_spec();
-        let valid = verify_test_vector("../testdata/iavl/existence2.json", &spec).unwrap();
-        assert_eq!(valid, true);
+        verify_test_vector("../testdata/iavl/existence2.json", &spec)
     }
 
     #[test]
-    fn test_vector_iavl3() {
+    fn test_vector_iavl3() -> Result<()> {
         let spec = iavl_spec();
-        let valid = verify_test_vector("../testdata/iavl/existence3.json", &spec).unwrap();
-        assert_eq!(valid, true);
+        verify_test_vector("../testdata/iavl/existence3.json", &spec)
     }
 
     #[test]
-    fn test_vector_iavl4() {
+    fn test_vector_iavl4() -> Result<()> {
         let spec = iavl_spec();
-        let valid = verify_test_vector("../testdata/iavl/existence4.json", &spec).unwrap();
-        assert_eq!(valid, true);
+        verify_test_vector("../testdata/iavl/existence4.json", &spec)
     }
 
     #[test]
-    fn test_vector_tendermint1() {
+    fn test_vector_tendermint1() -> Result<()> {
         let spec = tendermint_spec();
-        let valid = verify_test_vector("../testdata/tendermint/existence1.json", &spec).unwrap();
-        assert_eq!(valid, true);
+        verify_test_vector("../testdata/tendermint/existence1.json", &spec)
     }
 
     #[test]
-    fn test_vector_tendermint2() {
+    fn test_vector_tendermint2() -> Result<()> {
         let spec = tendermint_spec();
-        let valid = verify_test_vector("../testdata/tendermint/existence2.json", &spec).unwrap();
-        assert_eq!(valid, true);
+        verify_test_vector("../testdata/tendermint/existence2.json", &spec)
     }
 
     #[test]
-    fn test_vector_tendermint3() {
+    fn test_vector_tendermint3() -> Result<()> {
         let spec = tendermint_spec();
-        let valid = verify_test_vector("../testdata/tendermint/existence3.json", &spec).unwrap();
-        assert_eq!(valid, true);
+        verify_test_vector("../testdata/tendermint/existence3.json", &spec)
     }
 
     #[test]
-    fn test_vector_tendermint4() {
+    fn test_vector_tendermint4() -> Result<()> {
         let spec = tendermint_spec();
-        let valid = verify_test_vector("../testdata/tendermint/existence4.json", &spec).unwrap();
-        assert_eq!(valid, true);
+        verify_test_vector("../testdata/tendermint/existence4.json", &spec)
     }
 
 }
