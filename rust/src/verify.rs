@@ -16,11 +16,11 @@ pub fn verify_existence(
   value: &[u8],
 ) -> Result<bool> {
   check_existence_spec(proof, spec)?;
-  ensure!(proof.key.eq(&key), "Provided key doesn't match proof");
-  ensure!(proof.value.eq(&value), "Provided value doesn't match proof");
+  ensure!(proof.key == key, "Provided key doesn't match proof");
+  ensure!(proof.value == value, "Provided value doesn't match proof");
 
   let calc = calculate_existence_root(&proof)?;
-  ensure!(calc.eq(&root), "Root hash doesn't match");
+  ensure!(calc == root, "Root hash doesn't match");
   Ok(true)
 }
 
@@ -65,7 +65,7 @@ fn has_prefix(prefix: &[u8], data: &[u8]) -> bool {
   if prefix.len() > data.len() {
     return false;
   }
-  return prefix.eq(&data[..prefix.len()]);
+  return prefix == &data[..prefix.len()];
 }
 
 fn ensure_inner(inner: &proofs::InnerOp, spec: &proofs::ProofSpec) -> Result<()> {
