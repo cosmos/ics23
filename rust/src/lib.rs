@@ -1,5 +1,6 @@
 extern crate protobuf;
 
+mod helpers;
 mod ops;
 mod proofs;
 mod verify;
@@ -8,7 +9,7 @@ mod ics23;
 pub use ics23::{verify_membership};
 pub use verify::{calculate_existence_root};
 pub use crate::proofs::*;
-pub use ops::Result;
+pub use helpers::{Hash, Result};
 
 
 #[cfg(test)]

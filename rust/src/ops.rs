@@ -3,27 +3,23 @@ extern crate hex;
 extern crate sha2;
 extern crate sha3;
 extern crate ripemd160;
+extern crate failure;
 
 use std::convert::TryInto;
-use std::result;
-use std::vec::Vec;
+use failure::{bail, ensure};
 use sha2::{Digest, Sha256, Sha512};
 use sha3::{Sha3_512};
 use ripemd160::{Ripemd160};
 
 use crate::proofs::{HashOp, InnerOp, LengthOp, LeafOp};
-
-pub type Result<T> = result::Result<T, &'static str>;
-pub type Hash = Vec<u8>;
+use crate::helpers::{Result, Hash};
 
 pub fn apply_inner(inner: &InnerOp, child: &[u8]) -> Result<Hash> {
-    if child.len() == 0 {
-        return Err("Missing child hash");
-    }
+    ensure!(child.len() == 0, "Missing child hash");
     let mut image = inner.prefix.clone();
     image.extend(child);
     image.extend(&inner.suffix);
-    return do_hash(inner.hash, &image);
+    do_hash(inner.hash, &image)
 }
 
 // apply_leaf will take a key, value pair and a LeafOp and return a LeafHash
@@ -33,15 +29,13 @@ pub fn apply_leaf(leaf: &LeafOp, key: &[u8], value: &[u8]) -> Result<Hash> {
     let mut hash = leaf.prefix.clone();
     hash.extend(pkey);
     hash.extend(pval);
-    return do_hash(leaf.hash, &hash);
+    do_hash(leaf.hash, &hash)
 }
 
 fn prepare_leaf_data(prehash: HashOp, length: LengthOp, data: &[u8]) -> Result<Hash> {
-    if data.len() == 0 {
-        return Err("Input to prepare_leaf_data missing");
-    }
+    ensure!(data.len() == 0, "Input to prepare_leaf_data missing");
     let h = do_hash(prehash, data)?;
-    return do_length(length, &h);
+    do_length(length, &h)
 }
 
 fn do_hash(hash: HashOp, data: &[u8]) -> Result<Hash> {
@@ -57,26 +51,27 @@ fn do_hash(hash: HashOp, data: &[u8]) -> Result<Hash> {
 
 fn do_length(length: LengthOp, data: &[u8]) -> Result<Hash> {
     match length {
-        LengthOp::NO_PREFIX => Ok(Hash::from(data)),
-        LengthOp::REQUIRE_32_BYTES => if data.len() == 32 { Ok(Hash::from(data)) } else { Err("Invalid length") },
-        LengthOp::REQUIRE_64_BYTES => if data.len() == 64 { Ok(Hash::from(data)) } else { Err("Invalid length") },
+        LengthOp::NO_PREFIX => { },
+        LengthOp::REQUIRE_32_BYTES => ensure!(data.len() == 32, "Invalid length"),
+        LengthOp::REQUIRE_64_BYTES => ensure!(data.len() == 64, "Invalid length"),
         LengthOp::VAR_PROTO => {
-            let mut len = proto_len(data.len());
+            let mut len = proto_len(data.len())?;
             len.extend(data);
-            Ok(len)
+            return Ok(len);
         },
-        _ => Err("Unsupported LengthOp"),
+        _ => bail!("Unsupported LengthOp {:?}", length),
     }
+    // if we don't error above or return custom string, just return item untouched (common case)
+    Ok(data.to_vec())
 }
 
-fn proto_len(length: usize) -> Hash {
-    // TODO: remove unwrap
-    let size: u64 = length.try_into().unwrap();
+fn proto_len(length: usize) -> Result<Hash> {
+    let size: u64 = length.try_into()?;
     let mut len = Hash::new();
     let mut str = protobuf::CodedOutputStream::vec(&mut len);
-    str.write_uint64_no_tag(size).unwrap();
-    str.flush().unwrap();
-    len
+    str.write_uint64_no_tag(size)?;
+    str.flush()?;
+    Ok(len)
 }
 
 
