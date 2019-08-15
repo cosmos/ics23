@@ -1,10 +1,17 @@
 extern crate failure;
 
-
 use crate::proofs;
-use crate::verify::{CommitmentRoot, verify_existence};
+use crate::verify::{verify_existence, CommitmentRoot};
 
-pub fn verify_membership(proof: &proofs::CommitmentProof, spec: &proofs::ProofSpec, root: CommitmentRoot, key: &[u8], value: &[u8]) -> bool {
+// Use CommitmentRoot vs &[u8] to stick with ics naming
+#[allow(clippy::ptr_arg)]
+pub fn verify_membership(
+    proof: &proofs::CommitmentProof,
+    spec: &proofs::ProofSpec,
+    root: &CommitmentRoot,
+    key: &[u8],
+    value: &[u8],
+) -> bool {
     match &proof.proof {
         Some(proofs::CommitmentProof_oneof_proof::exist(ex)) => {
             let valid = verify_existence(&ex, spec, root, key, value);
@@ -13,10 +20,11 @@ pub fn verify_membership(proof: &proofs::CommitmentProof, spec: &proofs::ProofSp
         _ => false,
     }
 }
+#[warn(clippy::ptr_arg)]
 
 pub fn iavl_spec() -> proofs::ProofSpec {
     let mut leaf = proofs::LeafOp::new();
-    leaf.set_prefix(vec![0u8]);
+    leaf.set_prefix(vec![0_u8]);
     leaf.set_hash(proofs::HashOp::SHA256);
     leaf.set_prehash_value(proofs::HashOp::SHA256);
     leaf.set_length(proofs::LengthOp::VAR_PROTO);
@@ -28,7 +36,7 @@ pub fn iavl_spec() -> proofs::ProofSpec {
 
 pub fn tendermint_spec() -> proofs::ProofSpec {
     let mut leaf = proofs::LeafOp::new();
-    leaf.set_prefix(vec![0u8]);
+    leaf.set_prefix(vec![0_u8]);
     leaf.set_hash(proofs::HashOp::SHA256);
     leaf.set_prehash_value(proofs::HashOp::SHA256);
     leaf.set_length(proofs::LengthOp::VAR_PROTO);
@@ -38,7 +46,6 @@ pub fn tendermint_spec() -> proofs::ProofSpec {
     spec
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -47,13 +54,13 @@ mod tests {
     extern crate serde;
     extern crate serde_json;
 
-    use serde::{Deserialize};
-    use protobuf::Message;
     use failure::ensure;
+    use protobuf::Message;
+    use serde::Deserialize;
     use std::fs::File;
     use std::io::prelude::*;
 
-    use crate::helpers::{Result};
+    use crate::helpers::Result;
 
     #[derive(Deserialize, Debug)]
     struct TestVector {
@@ -72,7 +79,7 @@ mod tests {
 
         let mut parsed = proofs::ExistenceProof::new();
         parsed.merge_from_bytes(&proto_bin)?;
-        let valid = verify_existence(&parsed, spec, root, &parsed.key, &parsed.value)?;
+        let valid = verify_existence(&parsed, spec, &root, &parsed.key, &parsed.value)?;
         ensure!(valid, "invalid test vector");
         Ok(())
     }
@@ -124,5 +131,4 @@ mod tests {
         let spec = tendermint_spec();
         verify_test_vector("../testdata/tendermint/existence4.json", &spec)
     }
-
 }

@@ -3,20 +3,19 @@ extern crate protobuf;
 mod helpers;
 mod ops;
 mod proofs;
-mod verify;
 mod ics23;
+mod verify;
 
-pub use ics23::{iavl_spec, tendermint_spec, verify_membership};
-pub use verify::{calculate_existence_root};
 pub use crate::proofs::*;
 pub use helpers::{Hash, Result};
+pub use ics23::{iavl_spec, tendermint_spec, verify_membership};
+pub use verify::calculate_existence_root;
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     use protobuf::Message;
-
 
     #[test]
     fn proto_encode() {
@@ -38,7 +37,6 @@ mod tests {
         assert_eq!(leaf.get_prehash_key(), parsed.get_prehash_key());
         assert_eq!(leaf.get_prefix(), parsed.get_prefix());
     }
-
 
     #[test]
     fn proto_nested_encoding() {
@@ -71,7 +69,9 @@ mod tests {
         assert_eq!(vec![7, 8, 9, 233], parsed.get_leaf().get_prefix());
         assert_eq!(vec![66, 69], parsed.get_key());
         assert_eq!(1, parsed.get_path().len());
-        assert_eq!(vec![5, 6, 7, 1, 2, 3, 0, 0, 77], parsed.get_path()[0].get_prefix());
+        assert_eq!(
+            vec![5, 6, 7, 1, 2, 3, 0, 0, 77],
+            parsed.get_path()[0].get_prefix()
+        );
     }
 }
-

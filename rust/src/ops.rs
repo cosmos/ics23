@@ -1,18 +1,18 @@
-extern crate protobuf;
+extern crate failure;
 extern crate hex;
+extern crate protobuf;
+extern crate ripemd160;
 extern crate sha2;
 extern crate sha3;
-extern crate ripemd160;
-extern crate failure;
 
-use std::convert::TryInto;
 use failure::{bail, ensure};
+use ripemd160::Ripemd160;
 use sha2::{Digest, Sha256, Sha512};
-use sha3::{Sha3_512};
-use ripemd160::{Ripemd160};
+use sha3::Sha3_512;
+use std::convert::TryInto;
 
-use crate::proofs::{HashOp, InnerOp, LengthOp, LeafOp};
-use crate::helpers::{Result, Hash};
+use crate::helpers::{Hash, Result};
+use crate::proofs::{HashOp, InnerOp, LeafOp, LengthOp};
 
 pub fn apply_inner(inner: &InnerOp, child: &[u8]) -> Result<Hash> {
     ensure!(!child.is_empty(), "Missing child hash");
@@ -24,11 +24,11 @@ pub fn apply_inner(inner: &InnerOp, child: &[u8]) -> Result<Hash> {
 
 // apply_leaf will take a key, value pair and a LeafOp and return a LeafHash
 pub fn apply_leaf(leaf: &LeafOp, key: &[u8], value: &[u8]) -> Result<Hash> {
-    let pkey = prepare_leaf_data(leaf.prehash_key, leaf.length, key)?;
-    let pval = prepare_leaf_data(leaf.prehash_value, leaf.length, value)?;
     let mut hash = leaf.prefix.clone();
-    hash.extend(pkey);
-    hash.extend(pval);
+    let prekey = prepare_leaf_data(leaf.prehash_key, leaf.length, key)?;
+    hash.extend(prekey);
+    let preval = prepare_leaf_data(leaf.prehash_value, leaf.length, value)?;
+    hash.extend(preval);
     do_hash(leaf.hash, &hash)
 }
 
@@ -45,20 +45,22 @@ fn do_hash(hash: HashOp, data: &[u8]) -> Result<Hash> {
         HashOp::SHA512 => Ok(Hash::from(Sha512::digest(data).as_slice())),
         HashOp::KECCAK => Ok(Hash::from(Sha3_512::digest(data).as_slice())),
         HashOp::RIPEMD160 => Ok(Hash::from(Ripemd160::digest(data).as_slice())),
-        HashOp::BITCOIN => Ok(Hash::from(Ripemd160::digest(Sha256::digest(data).as_slice()).as_slice())),
+        HashOp::BITCOIN => Ok(Hash::from(
+            Ripemd160::digest(Sha256::digest(data).as_slice()).as_slice(),
+        )),
     }
 }
 
 fn do_length(length: LengthOp, data: &[u8]) -> Result<Hash> {
     match length {
-        LengthOp::NO_PREFIX => { },
+        LengthOp::NO_PREFIX => {}
         LengthOp::REQUIRE_32_BYTES => ensure!(data.len() == 32, "Invalid length"),
         LengthOp::REQUIRE_64_BYTES => ensure!(data.len() == 64, "Invalid length"),
         LengthOp::VAR_PROTO => {
             let mut len = proto_len(data.len())?;
             len.extend(data);
             return Ok(len);
-        },
+        }
         _ => bail!("Unsupported LengthOp {:?}", length),
     }
     // if we don't error above or return custom string, just return item untouched (common case)
@@ -74,7 +76,6 @@ fn proto_len(length: usize) -> Result<Hash> {
     Ok(len)
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -85,16 +86,27 @@ mod tests {
         ensure!(hash == hex::decode("666f6f64")?, "no hash fails");
 
         let hash = do_hash(HashOp::SHA256, b"food")?;
-        ensure!(hash == hex::decode("c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b")?, "sha256 hash fails");
+        ensure!(
+            hash == hex::decode(
+                "c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b"
+            )?,
+            "sha256 hash fails"
+        );
 
         let hash = do_hash(HashOp::SHA512, b"food")?;
         ensure!(hash == hex::decode("c235548cfe84fc87678ff04c9134e060cdcd7512d09ed726192151a995541ed8db9fda5204e72e7ac268214c322c17787c70530513c59faede52b7dd9ce64331")?, "sha512 hash fails");
 
         let hash = do_hash(HashOp::RIPEMD160, b"food")?;
-        ensure!(hash == hex::decode("b1ab9988c7c7c5ec4b2b291adfeeee10e77cdd46")?, "ripemd160 hash fails");
+        ensure!(
+            hash == hex::decode("b1ab9988c7c7c5ec4b2b291adfeeee10e77cdd46")?,
+            "ripemd160 hash fails"
+        );
 
         let hash = do_hash(HashOp::BITCOIN, b"food")?;
-        ensure!(hash == hex::decode("0bcb587dfb4fc10b36d57f2bba1878f139b75d24")?, "bitcoin hash fails");
+        ensure!(
+            hash == hex::decode("0bcb587dfb4fc10b36d57f2bba1878f139b75d24")?,
+            "bitcoin hash fails"
+        );
 
         Ok(())
     }
@@ -102,10 +114,16 @@ mod tests {
     #[test]
     fn length_prefix() -> Result<()> {
         let prefixed = do_length(LengthOp::NO_PREFIX, b"food")?;
-        ensure!(prefixed == hex::decode("666f6f64")?, "no prefix modifies data");
+        ensure!(
+            prefixed == hex::decode("666f6f64")?,
+            "no prefix modifies data"
+        );
 
         let prefixed = do_length(LengthOp::VAR_PROTO, b"food")?;
-        ensure!(prefixed == hex::decode("04666f6f64")?, "var proto prefix doesn't work");
+        ensure!(
+            prefixed == hex::decode("04666f6f64")?,
+            "var proto prefix doesn't work"
+        );
         Ok(())
     }
 
@@ -165,8 +183,12 @@ mod tests {
         let child = hex::decode("00cafe00")?;
 
         // echo -n 012345678900cafe00deadbeef | xxd -r -p | sha256sum
-        let expected = hex::decode("0339f76086684506a6d42a60da4b5a719febd4d96d8b8d85ae92849e3a849a5e")?;
-        ensure!(expected == apply_inner(&inner, &child)?, "unexpected inner hash");
+        let expected =
+            hex::decode("0339f76086684506a6d42a60da4b5a719febd4d96d8b8d85ae92849e3a849a5e")?;
+        ensure!(
+            expected == apply_inner(&inner, &child)?,
+            "unexpected inner hash"
+        );
         Ok(())
     }
 
@@ -178,11 +200,14 @@ mod tests {
         let child = hex::decode("ffccbb997755331100")?;
 
         // echo -n 00204080a0c0e0ffccbb997755331100 | xxd -r -p | sha256sum
-        let expected = hex::decode("45bece1678cf2e9f4f2ae033e546fc35a2081b2415edcb13121a0e908dca1927")?;
-        ensure!(expected == apply_inner(&inner, &child)?, "unexpected inner hash");
+        let expected =
+            hex::decode("45bece1678cf2e9f4f2ae033e546fc35a2081b2415edcb13121a0e908dca1927")?;
+        ensure!(
+            expected == apply_inner(&inner, &child)?,
+            "unexpected inner hash"
+        );
         Ok(())
     }
-
 
     #[test]
     fn apply_inner_suffix_only() -> Result<()> {
@@ -192,8 +217,12 @@ mod tests {
         let child = b"this is a sha256 hash, really....".to_vec();
 
         // echo -n 'this is a sha256 hash, really.... just kidding!'  | sha256sum
-        let expected = hex::decode("79ef671d27e42a53fba2201c1bbc529a099af578ee8a38df140795db0ae2184b")?;
-        ensure!(expected == apply_inner(&inner, &child)?, "unexpected inner hash");
+        let expected =
+            hex::decode("79ef671d27e42a53fba2201c1bbc529a099af578ee8a38df140795db0ae2184b")?;
+        ensure!(
+            expected == apply_inner(&inner, &child)?,
+            "unexpected inner hash"
+        );
         Ok(())
     }
 }
