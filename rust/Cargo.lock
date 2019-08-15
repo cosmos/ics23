@@ -179,7 +179,7 @@ dependencies = [
 
 [[package]]
 name = "proofs"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "hex 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
