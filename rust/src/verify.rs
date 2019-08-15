@@ -43,13 +43,38 @@ pub fn calculate_existence_root(proof: &proofs::ExistenceProof) -> Result<Commit
 fn check_existence_spec(proof: &proofs::ExistenceProof, spec: &proofs::ProofSpec) -> Result<()> {
   ensure!(proof.leaf.is_some(), "Existence proof must start with a leaf operation");
   ensure!(spec.leaf_spec.is_some(), "Spec must include leafSpec");
-//   ensureLeaf(proof.leaf, spec.leafSpec);
-//   const path = proof.path || [];
-//   for (const inner of path) {
-//     ensureInner(inner, spec.leafSpec.prefix);
-//   }
-    Ok(())
+  ensure_leaf(proof.leaf.get_ref(), spec)?;
+  for step in proof.path.iter() {
+    ensure_inner(step, spec)?;
+  }
+  Ok(())
 }
+
+fn ensure_leaf(leaf: &proofs::LeafOp, spec: &proofs::ProofSpec) -> Result<()> {
+  ensure!(spec.leaf_spec.is_some(), "Spec missing leaf_spec");
+  let lspec = spec.leaf_spec.get_ref();
+  ensure!(lspec.hash == leaf.hash, "Unexpected hashOp: {:?}", leaf.hash);
+  ensure!(lspec.prehash_key == leaf.prehash_key, "Unexpected prehash_key: {:?}", leaf.prehash_key);
+  ensure!(lspec.prehash_value == leaf.prehash_value, "Unexpected prehash_value: {:?}", leaf.prehash_value);
+  ensure!(lspec.length == leaf.length, "Unexpected lengthOp: {:?}", leaf.length);
+  ensure!(has_prefix(&lspec.prefix, &leaf.prefix), "Incorrect prefix on leaf");
+  Ok(())
+}
+
+fn has_prefix(prefix: &[u8], data: &[u8]) -> bool {
+  if prefix.len() > data.len() {
+    return false;
+  }
+  return prefix.eq(&data[..prefix.len()]);
+}
+
+fn ensure_inner(inner: &proofs::InnerOp, spec: &proofs::ProofSpec) -> Result<()> {
+  ensure!(spec.leaf_spec.is_some(), "Spec missing leaf_spec");
+  let lspec = spec.leaf_spec.get_ref();
+  ensure!(!has_prefix(&lspec.prefix, &inner.prefix), "Inner node with leaf prefix");
+  Ok(())
+}
+
 
 #[cfg(test)]
 mod tests {
