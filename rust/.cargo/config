@@ -1,0 +1,2 @@
+[alias]
+protoc = "run --package codegen --bin codegen .."

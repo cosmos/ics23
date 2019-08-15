@@ -7,6 +7,7 @@ workflows:
     jobs:
       - typescript
       - golang
+      - rust
 jobs:
   typescript:
     docker:
@@ -46,3 +47,29 @@ jobs:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
+  rust:
+    docker:
+      - image: rust:1
+    working_directory: ~/proofs/rust
+    steps:
+      - checkout:
+          path: ~/proofs
+      - run:
+          name: Version information
+          command: rustc --version; cargo --version; rustup --version
+      - restore_cache:
+          keys:
+            - v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
+      - run:
+          name: Build all targets
+          command: cargo build --all --all-targets
+      - save_cache:
+          paths:
+            - /usr/local/cargo/registry
+            - target/debug/.fingerprint
+            - target/debug/build
+            - target/debug/deps
+          key: v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
+      - run:
+          name: Run all tests
+          command: cargo test --all
