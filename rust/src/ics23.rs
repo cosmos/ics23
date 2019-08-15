@@ -25,6 +25,17 @@ pub fn iavl_spec() -> proofs::ProofSpec {
     spec
 }
 
+pub fn tendermint_spec() -> proofs::ProofSpec {
+    let mut leaf = proofs::LeafOp::new();
+    leaf.set_prefix(vec![0u8]);
+    leaf.set_hash(proofs::HashOp::SHA256);
+    leaf.set_prehash_value(proofs::HashOp::SHA256);
+    leaf.set_length(proofs::LengthOp::VAR_PROTO);
+
+    let mut spec = proofs::ProofSpec::new();
+    spec.set_leaf_spec(leaf);
+    spec
+}
 
 
 #[cfg(test)]
@@ -63,9 +74,59 @@ mod tests {
     }
 
     #[test]
-    fn test_vector() {
+    fn test_vector_iavl1() {
         let spec = iavl_spec();
         let valid = verify_test_vector("../testdata/iavl/existence1.json", &spec).unwrap();
         assert_eq!(valid, true);
     }
+
+    #[test]
+    fn test_vector_iavl2() {
+        let spec = iavl_spec();
+        let valid = verify_test_vector("../testdata/iavl/existence2.json", &spec).unwrap();
+        assert_eq!(valid, true);
+    }
+
+    #[test]
+    fn test_vector_iavl3() {
+        let spec = iavl_spec();
+        let valid = verify_test_vector("../testdata/iavl/existence3.json", &spec).unwrap();
+        assert_eq!(valid, true);
+    }
+
+    #[test]
+    fn test_vector_iavl4() {
+        let spec = iavl_spec();
+        let valid = verify_test_vector("../testdata/iavl/existence4.json", &spec).unwrap();
+        assert_eq!(valid, true);
+    }
+
+    #[test]
+    fn test_vector_tendermint1() {
+        let spec = tendermint_spec();
+        let valid = verify_test_vector("../testdata/tendermint/existence1.json", &spec).unwrap();
+        assert_eq!(valid, true);
+    }
+
+    #[test]
+    fn test_vector_tendermint2() {
+        let spec = tendermint_spec();
+        let valid = verify_test_vector("../testdata/tendermint/existence2.json", &spec).unwrap();
+        assert_eq!(valid, true);
+    }
+
+    #[test]
+    fn test_vector_tendermint3() {
+        let spec = tendermint_spec();
+        let valid = verify_test_vector("../testdata/tendermint/existence3.json", &spec).unwrap();
+        assert_eq!(valid, true);
+    }
+
+    #[test]
+    fn test_vector_tendermint4() {
+        let spec = tendermint_spec();
+        let valid = verify_test_vector("../testdata/tendermint/existence4.json", &spec).unwrap();
+        assert_eq!(valid, true);
+    }
+
 }

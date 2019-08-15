@@ -6,7 +6,7 @@ mod proofs;
 mod verify;
 mod ics23;
 
-pub use ics23::{iavl_spec, verify_membership};
+pub use ics23::{iavl_spec, tendermint_spec, verify_membership};
 pub use verify::{calculate_existence_root};
 pub use crate::proofs::*;
 pub use helpers::{Hash, Result};
