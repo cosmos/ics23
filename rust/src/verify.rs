@@ -10,13 +10,12 @@ pub type CommitmentRoot = ::std::vec::Vec<u8>;
 
 pub fn verify_existence(
   proof: &proofs::ExistenceProof,
-  _spec: &proofs::ProofSpec,
+  spec: &proofs::ProofSpec,
   root: CommitmentRoot,
   key: &[u8],
   value: &[u8],
 ) -> Result<bool> {
-
-// TODO:  ensureSpec(proof, spec);
+  check_existence_spec(proof, spec)?;
   ensure!(proof.key.eq(&key), "Provided key doesn't match proof");
   ensure!(proof.value.eq(&value), "Provided value doesn't match proof");
 
@@ -39,6 +38,17 @@ pub fn calculate_existence_root(proof: &proofs::ExistenceProof) -> Result<Commit
         hash = apply_inner(step, &hash)?;
     }
     Ok(hash)
+}
+
+fn check_existence_spec(proof: &proofs::ExistenceProof, spec: &proofs::ProofSpec) -> Result<()> {
+  ensure!(proof.leaf.is_some(), "Existence proof must start with a leaf operation");
+  ensure!(spec.leaf_spec.is_some(), "Spec must include leafSpec");
+//   ensureLeaf(proof.leaf, spec.leafSpec);
+//   const path = proof.path || [];
+//   for (const inner of path) {
+//     ensureInner(inner, spec.leafSpec.prefix);
+//   }
+    Ok(())
 }
 
 #[cfg(test)]

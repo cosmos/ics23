@@ -3,10 +3,10 @@ extern crate failure;
 use crate::proofs;
 use crate::verify::{CommitmentRoot, verify_existence};
 
-pub fn verify_membership(proof: &proofs::CommitmentProof, _spec: &proofs::ProofSpec, root: CommitmentRoot, key: &[u8], value: &[u8]) -> bool {
+pub fn verify_membership(proof: &proofs::CommitmentProof, spec: &proofs::ProofSpec, root: CommitmentRoot, key: &[u8], value: &[u8]) -> bool {
     match &proof.proof {
         Some(proofs::CommitmentProof_oneof_proof::exist(ex)) => {
-            let valid = verify_existence(&ex, _spec, root, key, value);
+            let valid = verify_existence(&ex, spec, root, key, value);
             valid.is_ok() && valid.unwrap()
         }
         _ => false,
