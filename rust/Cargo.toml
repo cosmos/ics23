@@ -15,3 +15,5 @@ sha2 = "0.8"
 sha3 = "0.8"
 ripemd160 = "0.8"
 failure = "0.1.5"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"

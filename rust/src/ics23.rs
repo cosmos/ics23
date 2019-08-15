@@ -1,4 +1,3 @@
-extern crate protobuf;
 extern crate failure;
 
 use crate::proofs;
@@ -26,17 +25,24 @@ pub fn iavl_spec() -> proofs::ProofSpec {
     spec
 }
 
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use protobuf;
-    use protobuf::Message;
 
+    extern crate protobuf;
+    extern crate serde;
+    extern crate serde_json;
+
+    use serde::{Deserialize};
+    use protobuf::Message;
     use std::fs::File;
     use std::io::prelude::*;
 
     use crate::helpers::{Result};
 
+    #[derive(Deserialize, Debug)]
     struct TestVector {
         pub root: String,
         pub existence: String,
@@ -47,24 +53,19 @@ mod tests {
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
 
-        let data: TestVector;
-
-    // const { root, existence } = JSON.parse(content);
-    // expect(existence).toBeDefined();
-    // expect(root).toBeDefined();
-
-        let mut parsed = proofs::ExistenceProof::new();
-        parsed.merge_from_bytes(data.root.as_bytes())?;
+        let data: TestVector = serde_json::from_str(&contents)?;
+        let proto_bin = hex::decode(&data.existence)?;
         let root = hex::decode(data.root)?;
 
+        let mut parsed = proofs::ExistenceProof::new();
+        parsed.merge_from_bytes(&proto_bin)?;
         verify_existence(&parsed, spec, root, &parsed.key, &parsed.value)
     }
 
     #[test]
     fn test_vector() {
-        let iavl_spec = iavl_spec();
-        let valid = verify_test_vector("../testdata/iavl/existence1.json", &iavl_spec);
-        assert_eq!(true, valid.is_ok());
-        assert_eq!(true, valid.unwrap());
+        let spec = iavl_spec();
+        let valid = verify_test_vector("../testdata/iavl/existence1.json", &spec).unwrap();
+        assert_eq!(valid, true);
     }
 }

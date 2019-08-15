@@ -15,7 +15,7 @@ use crate::proofs::{HashOp, InnerOp, LengthOp, LeafOp};
 use crate::helpers::{Result, Hash};
 
 pub fn apply_inner(inner: &InnerOp, child: &[u8]) -> Result<Hash> {
-    ensure!(child.len() == 0, "Missing child hash");
+    ensure!(child.len() > 0, "Missing child hash");
     let mut image = inner.prefix.clone();
     image.extend(child);
     image.extend(&inner.suffix);
@@ -33,7 +33,7 @@ pub fn apply_leaf(leaf: &LeafOp, key: &[u8], value: &[u8]) -> Result<Hash> {
 }
 
 fn prepare_leaf_data(prehash: HashOp, length: LengthOp, data: &[u8]) -> Result<Hash> {
-    ensure!(data.len() == 0, "Input to prepare_leaf_data missing");
+    ensure!(data.len() > 0, "Input to prepare_leaf_data missing");
     let h = do_hash(prehash, data)?;
     do_length(length, &h)
 }
