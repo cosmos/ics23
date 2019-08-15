@@ -29,8 +29,8 @@ pub fn verify_existence(
 // You must validate the result is what you have in a header.
 // Returns error if the calculations cannot be performed.
 pub fn calculate_existence_root(proof: &proofs::ExistenceProof) -> Result<CommitmentRoot> {
-    ensure!(proof.key.len() > 0, "Existence proof must have key set");
-    ensure!(proof.value.len() > 0, "Existence proof must have value set");
+    ensure!(!proof.key.is_empty(), "Existence proof must have key set");
+    ensure!(!proof.value.is_empty(), "Existence proof must have value set");
     ensure!(proof.leaf.is_some(), "No leaf operation set");
 
     let mut hash = apply_leaf(proof.leaf.get_ref(), &proof.key, &proof.value)?;
@@ -65,7 +65,7 @@ fn has_prefix(prefix: &[u8], data: &[u8]) -> bool {
   if prefix.len() > data.len() {
     return false;
   }
-  return prefix == &data[..prefix.len()];
+  prefix == &data[..prefix.len()]
 }
 
 fn ensure_inner(inner: &proofs::InnerOp, spec: &proofs::ProofSpec) -> Result<()> {
