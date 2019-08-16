@@ -51,7 +51,7 @@ mod tests {
     extern crate serde;
     extern crate serde_json;
 
-    use failure::ensure;
+    use failure::{bail, ensure};
     use protobuf::Message;
     use serde::Deserialize;
     use std::fs::File;
@@ -62,7 +62,9 @@ mod tests {
     #[derive(Deserialize, Debug)]
     struct TestVector {
         pub root: String,
-        pub existence: String,
+        pub proof: String,
+        pub key: String,
+        pub value: String,
     }
 
     fn verify_test_vector(filename: &str, spec: &proofs::ProofSpec) -> Result<()> {
@@ -71,61 +73,60 @@ mod tests {
         file.read_to_string(&mut contents)?;
 
         let data: TestVector = serde_json::from_str(&contents)?;
-        let proto_bin = hex::decode(&data.existence)?;
+        let proto_bin = hex::decode(&data.proof)?;
         let root = hex::decode(data.root)?;
+        let key = hex::decode(data.key)?;
 
-        let mut parsed = proofs::ExistenceProof::new();
+        let mut parsed = proofs::CommitmentProof::new();
         parsed.merge_from_bytes(&proto_bin)?;
-        let valid = verify_existence(&parsed, spec, &root, &parsed.key, &parsed.value)?;
-        ensure!(valid, "invalid test vector");
-        Ok(())
+
+        if data.value.is_empty() {
+            // non existence
+            bail!("non membership not yet implemented");
+            // let valid = super::verify_non_membership(spec, &root, &parsed, key);
+            // ensure!(valid, "invalid test vector");
+            // Ok(())
+        } else {
+            let value = hex::decode(data.value)?;
+            let valid = super::verify_membership(&parsed, spec, &root, &key, &value);
+            ensure!(valid, "invalid test vector");
+            Ok(())
+        }
     }
 
     #[test]
-    fn test_vector_iavl1() -> Result<()> {
+    fn test_vector_iavl_left() -> Result<()> {
         let spec = iavl_spec();
-        verify_test_vector("../testdata/iavl/existence1.json", &spec)
+        verify_test_vector("../testdata/iavl/exist_left.json", &spec)
     }
 
     #[test]
-    fn test_vector_iavl2() -> Result<()> {
+    fn test_vector_iavl_right() -> Result<()> {
         let spec = iavl_spec();
-        verify_test_vector("../testdata/iavl/existence2.json", &spec)
+        verify_test_vector("../testdata/iavl/exist_right.json", &spec)
     }
 
     #[test]
-    fn test_vector_iavl3() -> Result<()> {
+    fn test_vector_iavl_middle() -> Result<()> {
         let spec = iavl_spec();
-        verify_test_vector("../testdata/iavl/existence3.json", &spec)
+        verify_test_vector("../testdata/iavl/exist_middle.json", &spec)
     }
 
     #[test]
-    fn test_vector_iavl4() -> Result<()> {
-        let spec = iavl_spec();
-        verify_test_vector("../testdata/iavl/existence4.json", &spec)
-    }
-
-    #[test]
-    fn test_vector_tendermint1() -> Result<()> {
+    fn test_vector_tendermint_left() -> Result<()> {
         let spec = tendermint_spec();
-        verify_test_vector("../testdata/tendermint/existence1.json", &spec)
+        verify_test_vector("../testdata/tendermint/exist_left.json", &spec)
     }
 
     #[test]
-    fn test_vector_tendermint2() -> Result<()> {
+    fn test_vector_tendermint_right() -> Result<()> {
         let spec = tendermint_spec();
-        verify_test_vector("../testdata/tendermint/existence2.json", &spec)
+        verify_test_vector("../testdata/tendermint/exist_right.json", &spec)
     }
 
     #[test]
-    fn test_vector_tendermint3() -> Result<()> {
+    fn test_vector_tendermint_middle() -> Result<()> {
         let spec = tendermint_spec();
-        verify_test_vector("../testdata/tendermint/existence3.json", &spec)
-    }
-
-    #[test]
-    fn test_vector_tendermint4() -> Result<()> {
-        let spec = tendermint_spec();
-        verify_test_vector("../testdata/tendermint/existence4.json", &spec)
+        verify_test_vector("../testdata/tendermint/exist_middle.json", &spec)
     }
 }
