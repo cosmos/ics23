@@ -29,6 +29,12 @@ var TendermintSpec = &ProofSpec{
 		PrehashValue: HashOp_SHA256,
 		Length:       LengthOp_VAR_PROTO,
 	},
+	InnerSpec: &InnerSpec{
+		ChildOrder: []int32{0, 1},
+		MinPrefixLength: 1,
+		MaxPrefixLength: 1,
+		ChildSize: 32, // (no length byte)
+	},
 }
 
 // Verify does all checks to ensure this proof proves this key, value -> root

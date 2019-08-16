@@ -12,7 +12,9 @@ import (
 func TestIavlVectors(t *testing.T) {
 	type TestData struct {
 		RootHash string `json:"root"`
-		Proof    string `json:"existence"`
+		Proof    string `json:"proof"`
+		Key    string `json:"key"`
+		Value    string `json:"value"`
 	}
 
 	iavl := filepath.Join("..", "testdata", "iavl")
@@ -22,14 +24,18 @@ func TestIavlVectors(t *testing.T) {
 		filename string
 		spec     *ProofSpec
 	}{
-		{dir: iavl, filename: "existence1.json", spec: IavlSpec},
-		{dir: iavl, filename: "existence2.json", spec: IavlSpec},
-		{dir: iavl, filename: "existence3.json", spec: IavlSpec},
-		{dir: iavl, filename: "existence4.json", spec: IavlSpec},
-		{dir: tendermint, filename: "existence1.json", spec: TendermintSpec},
-		{dir: tendermint, filename: "existence2.json", spec: TendermintSpec},
-		{dir: tendermint, filename: "existence3.json", spec: TendermintSpec},
-		{dir: tendermint, filename: "existence4.json", spec: TendermintSpec},
+		{dir: iavl, filename: "exist_left.json", spec: IavlSpec},
+		{dir: iavl, filename: "exist_right.json", spec: IavlSpec},
+		{dir: iavl, filename: "exist_middle.json", spec: IavlSpec},
+		{dir: iavl, filename: "nonexist_left.json", spec: IavlSpec},
+		{dir: iavl, filename: "nonexist_right.json", spec: IavlSpec},
+		{dir: iavl, filename: "nonexist_middle.json", spec: IavlSpec},
+		{dir: tendermint, filename: "exist_left.json", spec: TendermintSpec},
+		{dir: tendermint, filename: "exist_right.json", spec: TendermintSpec},
+		{dir: tendermint, filename: "exist_middle.json", spec: TendermintSpec},
+		{dir: tendermint, filename: "nonexist_left.json", spec: TendermintSpec},
+		{dir: tendermint, filename: "nonexist_right.json", spec: TendermintSpec},
+		{dir: tendermint, filename: "nonexist_middle.json", spec: TendermintSpec},
 	}
 
 	for _, tc := range cases {
@@ -48,16 +54,27 @@ func TestIavlVectors(t *testing.T) {
 			}
 
 			// parse the protobuf object
-			var proof ExistenceProof
+			var proof CommitmentProof
 			err = proof.Unmarshal(mustHex(t, data.Proof))
 			if err != nil {
 				t.Fatalf("Unmarshal protobuf: %+v", err)
 			}
 
 			root := CommitmentRoot(mustHex(t, data.RootHash))
-			err = proof.Verify(tc.spec, root, proof.Key, proof.Value)
-			if err != nil {
-				t.Fatalf("Invalid proof: %+v", err)
+			key := mustHex(t, data.Key)
+
+			if data.Value == "" {
+				// non-existence
+				valid := VerifyNonMembership(tc.spec, root, &proof, key)
+				if !valid {
+					t.Fatal("Invalid proof")
+				}
+			} else {
+				value := mustHex(t, data.Value)
+				valid := VerifyMembership(tc.spec, root, &proof, key, value)
+				if !valid {
+					t.Fatal("Invalid proof")
+				}
 			}
 		})
 	}
