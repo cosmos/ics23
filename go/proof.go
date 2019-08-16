@@ -14,6 +14,12 @@ var IavlSpec = &ProofSpec{
 		PrehashValue: HashOp_SHA256,
 		Length:       LengthOp_VAR_PROTO,
 	},
+	InnerSpec: &InnerSpec{
+		ChildOrder: []int32{0, 1},
+		MinPrefixLength: 4,
+		MaxPrefixLength: 12,
+		ChildSize: 33, // (with length byte)
+	},
 }
 
 // TendermintSpec constrains the format from proofs-tendermint (crypto/merkle SimpleProof)
@@ -129,15 +135,57 @@ func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []b
 	}
 
 	if leftKey == nil {
-		// TODO: enforce left-most
+		if !p.Right.IsLeftmost(spec.InnerSpec) {
+			return errors.New("left proof missing, right proof must be left-most")
+		}
 		return nil
 	}
 
 	if rightKey == nil {
-		// TODO: enforce right-most
+		if !p.Left.IsRightmost(spec.InnerSpec) {
+			return errors.New("right proof missing, left proof must be right-most")
+		}
 		return nil
 	}
 
 	// TODO: enforce neighbors
 	return nil
+}
+
+// IsLeftmost returns true if this proof is the left-most path in the tree
+func (p *ExistenceProof)IsLeftmost(spec *InnerSpec) bool {
+	for _, step := range p.Path {
+		// we only want a prefix, no child....
+		if len(step.Prefix) < int(spec.MinPrefixLength) {
+			return false
+		}
+		if len(step.Prefix) > int(spec.MaxPrefixLength) {
+			return false
+		}
+
+		// and one child as suffix
+		if len(step.Suffix) != int(spec.ChildSize) {
+			return false
+		}
+	}
+	return true
+}
+
+// IsRightmost returns true if this proof is the left-most path in the tree
+func (p *ExistenceProof)IsRightmost(spec *InnerSpec) bool {
+	for _, step := range p.Path {
+		// we only want a prefix plus child....
+		if len(step.Prefix) < int(spec.MinPrefixLength + spec.ChildSize) {
+			return false
+		}
+		if len(step.Prefix) > int(spec.MaxPrefixLength + spec.ChildSize) {
+			return false
+		}
+
+		// and no suffix
+		if len(step.Suffix) != 0 {
+			return false
+		}
+	}
+	return true
 }
