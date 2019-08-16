@@ -2,7 +2,6 @@ package proofs
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/pkg/errors"
 )
 
@@ -246,8 +245,6 @@ func getPadding(spec *InnerSpec, branch int32) (minPrefix, maxPrefix, suffix int
 
 	// count how many children are in the suffix
 	suffix = (len(spec.ChildOrder) - 1 - idx) * int(spec.ChildSize)
-
-	fmt.Printf("prefix: %d -> %d, suffix: %d\n", minPrefix, maxPrefix, suffix)
 	return
 }
 
