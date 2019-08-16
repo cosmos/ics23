@@ -43,7 +43,7 @@ func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentPro
 // both left and right sub-proofs are valid existence proofs (see above) or nil
 // left and right proofs are neighbors (or left/right most if one is nil)
 // provided key is between the keys of the two proofs
-func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof CommitmentProof, key []byte) bool {
+func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, key []byte) bool {
 	// TODO: handle batch
 	np, ok := proof.Proof.(*CommitmentProof_Nonexist)
 	if !ok {
