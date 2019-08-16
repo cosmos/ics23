@@ -97,7 +97,7 @@ export function verifyNonExistence(
   }
 
   if (!spec.innerSpec) {
-    throw new Error("");
+    throw new Error("no inner spec");
   }
   if (!leftKey) {
     ensureLeftMost(spec.innerSpec, proof.right!.path!);
@@ -107,6 +107,45 @@ export function verifyNonExistence(
     ensureLeftNeighbor(spec.innerSpec, proof.left!.path!, proof.right!.path!);
   }
   return;
+}
+
+// Calculate determines the root hash that matches the given proof.
+// You must validate the result is what you have in a header.
+// Returns error if the calculations cannot be performed.
+export function calculateExistenceRoot(
+  proof: proofs.IExistenceProof
+): CommitmentRoot {
+  if (!proof.key || !proof.value) {
+    throw new Error("Existence proof needs key and value set");
+  }
+  if (!proof.leaf) {
+    throw new Error("Existence proof must start with a leaf operation");
+  }
+  const path = proof.path || [];
+
+  let res = applyLeaf(proof.leaf, proof.key, proof.value);
+  for (const inner of path) {
+    res = applyInner(inner, res);
+  }
+  return res;
+}
+
+// ensureSpec throws an Error if proof doesn't fulfill spec
+export function ensureSpec(
+  proof: proofs.IExistenceProof,
+  spec: proofs.IProofSpec
+): void {
+  if (!proof.leaf) {
+    throw new Error("Existence proof must start with a leaf operation");
+  }
+  if (!spec.leafSpec) {
+    throw new Error("Spec must include leafSpec");
+  }
+  ensureLeaf(proof.leaf, spec.leafSpec);
+  const path = proof.path || [];
+  for (const inner of path) {
+    ensureInner(inner, spec.leafSpec.prefix);
+  }
 }
 
 function ensureLeftMost(
@@ -138,7 +177,7 @@ function ensureRightMost(
   }
 }
 
-function ensureLeftNeighbor(
+export function ensureLeftNeighbor(
   spec: proofs.IInnerSpec,
   left: ReadonlyArray<proofs.IInnerOp>,
   right: ReadonlyArray<proofs.IInnerOp>
@@ -159,13 +198,39 @@ function ensureLeftNeighbor(
 
   // now topleft and topright are the first divergent nodes
   // make sure they are left and right of each other
-  // if !isLeftStep(spec, topleft, topright) {
-  // 	return false
-  // }
+  if (!isLeftStep(spec, topleft, topright)) {
+    throw new Error(`Not left neightbor at first divergent step`);
+  }
 
   // make sure the paths are left and right most possibilities respectively
   ensureRightMost(spec, mutleft);
   ensureLeftMost(spec, mutright);
+}
+
+// isLeftStep assumes left and right have common parents
+// checks if left is exactly one slot to the left of right
+function isLeftStep(
+  spec: proofs.IInnerSpec,
+  left: proofs.IInnerOp,
+  right: proofs.IInnerOp
+): boolean {
+  const leftidx = orderFromPadding(spec, left);
+  const rightidx = orderFromPadding(spec, right);
+  // TODO: is it possible there are empty (nil) children???
+  return rightidx === leftidx + 1;
+}
+
+function orderFromPadding(
+  spec: proofs.IInnerSpec,
+  inner: proofs.IInnerOp
+): number {
+  for (let branch = 0; branch < spec.childOrder!.length; branch++) {
+    const { minPrefix, maxPrefix, suffix } = getPadding(spec, branch);
+    if (hasPadding(inner, minPrefix, maxPrefix, suffix)) {
+      return branch;
+    }
+  }
+  throw new Error(`Cannot find any valid spacing for this node`);
 }
 
 function hasPadding(
@@ -206,43 +271,4 @@ function getPosition(order: ReadonlyArray<number>, branch: number): number {
     throw new Error(`Invalid branch: ${branch}`);
   }
   return order.findIndex(val => val === branch);
-}
-
-// Calculate determines the root hash that matches the given proof.
-// You must validate the result is what you have in a header.
-// Returns error if the calculations cannot be performed.
-export function calculateExistenceRoot(
-  proof: proofs.IExistenceProof
-): CommitmentRoot {
-  if (!proof.key || !proof.value) {
-    throw new Error("Existence proof needs key and value set");
-  }
-  if (!proof.leaf) {
-    throw new Error("Existence proof must start with a leaf operation");
-  }
-  const path = proof.path || [];
-
-  let res = applyLeaf(proof.leaf, proof.key, proof.value);
-  for (const inner of path) {
-    res = applyInner(inner, res);
-  }
-  return res;
-}
-
-// ensureSpec throws an Error if proof doesn't fulfill spec
-export function ensureSpec(
-  proof: proofs.IExistenceProof,
-  spec: proofs.IProofSpec
-): void {
-  if (!proof.leaf) {
-    throw new Error("Existence proof must start with a leaf operation");
-  }
-  if (!spec.leafSpec) {
-    throw new Error("Spec must include leafSpec");
-  }
-  ensureLeaf(proof.leaf, spec.leafSpec);
-  const path = proof.path || [];
-  for (const inner of path) {
-    ensureInner(inner, spec.leafSpec.prefix);
-  }
 }
