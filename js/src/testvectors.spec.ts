@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 
 import { proofs } from "./generated/codecimpl";
 import { fromHex } from "./helpers";
-import { verifyMembership } from "./ics23";
+import { verifyMembership, verifyNonMembership } from "./ics23";
 import { IavlSpec, TendermintSpec } from "./proofs";
 
 describe("calculateExistenceRoot", () => {
@@ -21,7 +21,7 @@ describe("calculateExistenceRoot", () => {
       const bvalue = fromHex(value);
       verifyMembership(commit, spec, rootHash, bkey, bvalue);
     } else {
-      throw new Error("non membership not yet implemented");
+      verifyNonMembership(commit, spec, rootHash, bkey);
     }
   }
 
@@ -34,6 +34,15 @@ describe("calculateExistenceRoot", () => {
   it("should parse iavl 3", () => {
     validateTestVector("../testdata/iavl/exist_middle.json", IavlSpec);
   });
+  it("should parse iavl 1 - nonexist", () => {
+    validateTestVector("../testdata/iavl/nonexist_left.json", IavlSpec);
+  });
+  it("should parse iavl 2 - nonexist", () => {
+    validateTestVector("../testdata/iavl/nonexist_right.json", IavlSpec);
+  });
+  // it("should parse iavl 3 - nonexist", () => {
+  //   validateTestVector("../testdata/iavl/nonexist_middle.json", IavlSpec);
+  // });
 
   it("should parse tendermint 1", () => {
     validateTestVector(
@@ -53,4 +62,22 @@ describe("calculateExistenceRoot", () => {
       TendermintSpec
     );
   });
+  it("should parse tendermint 1 - nonexist", () => {
+    validateTestVector(
+      "../testdata/tendermint/nonexist_left.json",
+      TendermintSpec
+    );
+  });
+  it("should parse tendermint 2 - nonexist", () => {
+    validateTestVector(
+      "../testdata/tendermint/nonexist_right.json",
+      TendermintSpec
+    );
+  });
+  // it("should parse tendermint 3 - nonexist", () => {
+  //   validateTestVector(
+  //     "../testdata/tendermint/nonexist_middle.json",
+  //     TendermintSpec
+  //   );
+  // });
 });

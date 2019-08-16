@@ -103,6 +103,7 @@ export function verifyNonExistence(
   } else if (!rightKey) {
     ensureRightMost(spec.innerSpec, proof.left!.path!);
   } else {
+    throw new Error("Unimplemented");
     // TODO: ensure left and right are neighbors
   }
   return;
