@@ -180,7 +180,9 @@ This enables:
   isLeftNeighbor(spec: InnerSpec, left: InnerOp, right: InnerOp)
 */
 message InnerSpec {
-    // TODO
+    // Child order is the ordering of the children node, must count from 0
+    // iavl tree is [0, 1] (left then right)
+    // merk is [0, 2, 1] (left, right, here)
     repeated int32 child_order = 1;
     int32 child_size = 2;
     int32 min_prefix_length = 3;

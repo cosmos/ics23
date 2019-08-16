@@ -2,7 +2,7 @@ package proofs
 
 import (
 	"bytes"
-
+	"fmt"
 	"github.com/pkg/errors"
 )
 
@@ -135,14 +135,14 @@ func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []b
 	}
 
 	if leftKey == nil {
-		if !p.Right.IsLeftmost(spec.InnerSpec) {
+		if !IsLeftmost(spec.InnerSpec, p.Right.Path) {
 			return errors.New("left proof missing, right proof must be left-most")
 		}
 		return nil
 	}
 
 	if rightKey == nil {
-		if !p.Left.IsRightmost(spec.InnerSpec) {
+		if !IsRightmost(spec.InnerSpec, p.Left.Path) {
 			return errors.New("right proof missing, left proof must be right-most")
 		}
 		return nil
@@ -152,40 +152,73 @@ func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []b
 	return nil
 }
 
-// IsLeftmost returns true if this proof is the left-most path in the tree
-func (p *ExistenceProof)IsLeftmost(spec *InnerSpec) bool {
-	for _, step := range p.Path {
-		// we only want a prefix, no child....
-		if len(step.Prefix) < int(spec.MinPrefixLength) {
-			return false
-		}
-		if len(step.Prefix) > int(spec.MaxPrefixLength) {
-			return false
-		}
 
-		// and one child as suffix
-		if len(step.Suffix) != int(spec.ChildSize) {
+
+// IsLeftmost returns true if this is the left-most path in the tree
+func IsLeftmost(spec *InnerSpec, path []*InnerOp) bool {
+	minPrefix, maxPrefix, suffix := getPadding(spec, 0)
+
+	// ensure every step has a prefix and suffix defined to be leftmost
+	for _, step := range path {
+		if len(step.Prefix) < minPrefix {
+			return false
+		}
+		if len(step.Prefix) > maxPrefix {
+			return false
+		}
+		if len(step.Suffix) != suffix {
 			return false
 		}
 	}
 	return true
 }
 
-// IsRightmost returns true if this proof is the left-most path in the tree
-func (p *ExistenceProof)IsRightmost(spec *InnerSpec) bool {
-	for _, step := range p.Path {
-		// we only want a prefix plus child....
-		if len(step.Prefix) < int(spec.MinPrefixLength + spec.ChildSize) {
-			return false
-		}
-		if len(step.Prefix) > int(spec.MaxPrefixLength + spec.ChildSize) {
-			return false
-		}
+// IsRightmost returns true if this is the left-most path in the tree
+func IsRightmost(spec *InnerSpec, path []*InnerOp) bool {
+	last := len(spec.ChildOrder)-1 
+	minPrefix, maxPrefix, suffix := getPadding(spec, int32(last))
 
-		// and no suffix
-		if len(step.Suffix) != 0 {
+	// ensure every step has a prefix and suffix defined to be rightmost
+	for _, step := range path {
+		if len(step.Prefix) < minPrefix {
+			return false
+		}
+		if len(step.Prefix) > maxPrefix {
+			return false
+		}
+		if len(step.Suffix) != suffix {
 			return false
 		}
 	}
 	return true
+}
+
+// getPadding determines prefix and suffix with the given spec and position in the tree
+func getPadding(spec *InnerSpec, branch int32) (minPrefix, maxPrefix, suffix int) {
+	idx := getPosition(spec.ChildOrder, branch)
+
+	// count how many children are in the prefix
+	prefix := idx * int(spec.ChildSize)
+	minPrefix = prefix + int(spec.MinPrefixLength)
+	maxPrefix = prefix + int(spec.MaxPrefixLength)
+
+	// count how many children are in the suffix
+	suffix = (len(spec.ChildOrder) - 1 - idx) * int(spec.ChildSize)
+
+	fmt.Printf("prefix: %d -> %d, suffix: %d\n", minPrefix, maxPrefix, suffix)
+	return
+}
+
+// getPosition checks where the branch is in the order and returns
+// the index of this branch
+func getPosition(order []int32, branch int32) (int) {
+	if branch < 0 || int(branch) >= len(order) {
+		panic(errors.Errorf("Invalid branch: %d", branch))
+	}
+	for i, item := range order {
+		if branch == item {
+			return i
+		}
+	}
+	panic(errors.Errorf("Branch %d not found in order %v", branch, order))
 }
