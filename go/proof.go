@@ -135,27 +135,24 @@ func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []b
 	}
 
 	if leftKey == nil {
-		if !IsLeftmost(spec.InnerSpec, p.Right.Path) {
+		if !IsLeftMost(spec.InnerSpec, p.Right.Path) {
 			return errors.New("left proof missing, right proof must be left-most")
 		}
-		return nil
-	}
-
-	if rightKey == nil {
-		if !IsRightmost(spec.InnerSpec, p.Left.Path) {
+	} else if rightKey == nil {
+		if !IsRightMost(spec.InnerSpec, p.Left.Path) {
 			return errors.New("right proof missing, left proof must be right-most")
 		}
-		return nil
+	} else { // in the middle
+		if !IsLeftNeighbor(spec.InnerSpec, p.Left.Path, p.Right.Path) {
+			return errors.New("right proof missing, left proof must be right-most")
+		}
 	}
-
-	// TODO: enforce neighbors
 	return nil
 }
 
 
-
-// IsLeftmost returns true if this is the left-most path in the tree
-func IsLeftmost(spec *InnerSpec, path []*InnerOp) bool {
+// IsLeftMost returns true if this is the left-most path in the tree
+func IsLeftMost(spec *InnerSpec, path []*InnerOp) bool {
 	minPrefix, maxPrefix, suffix := getPadding(spec, 0)
 
 	// ensure every step has a prefix and suffix defined to be leftmost
@@ -173,8 +170,8 @@ func IsLeftmost(spec *InnerSpec, path []*InnerOp) bool {
 	return true
 }
 
-// IsRightmost returns true if this is the left-most path in the tree
-func IsRightmost(spec *InnerSpec, path []*InnerOp) bool {
+// IsRightMost returns true if this is the left-most path in the tree
+func IsRightMost(spec *InnerSpec, path []*InnerOp) bool {
 	last := len(spec.ChildOrder)-1 
 	minPrefix, maxPrefix, suffix := getPadding(spec, int32(last))
 
@@ -189,6 +186,51 @@ func IsRightmost(spec *InnerSpec, path []*InnerOp) bool {
 		if len(step.Suffix) != suffix {
 			return false
 		}
+	}
+	return true
+}
+
+// IsLeftNeighbor returns true if `right` is the next possible path right of `left`
+//
+//   Find the common suffix from the Left.Path and Right.Path and remove it. We have LPath and RPath now, which must be neighbors.
+//   Validate that LPath[len-1] is the left neighbor of RPath[len-1]
+//   For step in LPath[0..len-1], validate step is right-most node
+//   For step in RPath[0..len-1], validate step is left-most node
+func IsLeftNeighbor(spec *InnerSpec, left []*InnerOp, right []*InnerOp) bool {
+	// count common tail (from end, near root)
+	left, topleft := left[:len(left)-1], left[len(left)-1]
+	right, topright := right[:len(right)-1], right[len(right)-1]
+	for bytes.Equal(topleft.Prefix, topright.Prefix) && bytes.Equal(topleft.Suffix, topright.Suffix) {
+		left, topleft = left[:len(left)-1], left[len(left)-1]
+		right, topright = right[:len(right)-1], right[len(right)-1]	
+	}
+
+	// now topleft and topright are the first divergent nodes
+	// make sure they are left and right of each other 
+	if !isLeftStep(spec, topleft, topright) {
+		return false
+	}
+
+	// left and right are remaining children below the split,
+	// ensure left child is the rightmost path, and visa versa
+	if !IsRightMost(spec, left) {
+		return false
+	}
+	if !IsLeftMost(spec, right) {
+		return false
+	}
+	return true
+} 
+
+// isLeftStep assumes left and right have common parents
+// checks if left is exactly one slot to the left of right
+func isLeftStep(spec *InnerSpec, left *InnerOp, right *InnerOp) bool {
+	// (TODO: this calculation only works for binary tree, fix for merk)
+	if !IsLeftMost(spec, []*InnerOp{left}) {
+		return false
+	}
+	if !IsRightMost(spec, []*InnerOp{right}) {
+		return false
 	}
 	return true
 }
