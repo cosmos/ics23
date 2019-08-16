@@ -40,9 +40,9 @@ describe("calculateExistenceRoot", () => {
   it("should parse iavl 2 - nonexist", () => {
     validateTestVector("../testdata/iavl/nonexist_right.json", IavlSpec);
   });
-  // it("should parse iavl 3 - nonexist", () => {
-  //   validateTestVector("../testdata/iavl/nonexist_middle.json", IavlSpec);
-  // });
+  it("should parse iavl 3 - nonexist", () => {
+    validateTestVector("../testdata/iavl/nonexist_middle.json", IavlSpec);
+  });
 
   it("should parse tendermint 1", () => {
     validateTestVector(
@@ -74,10 +74,10 @@ describe("calculateExistenceRoot", () => {
       TendermintSpec
     );
   });
-  // it("should parse tendermint 3 - nonexist", () => {
-  //   validateTestVector(
-  //     "../testdata/tendermint/nonexist_middle.json",
-  //     TendermintSpec
-  //   );
-  // });
+  it("should parse tendermint 3 - nonexist", () => {
+    validateTestVector(
+      "../testdata/tendermint/nonexist_middle.json",
+      TendermintSpec
+    );
+  });
 });

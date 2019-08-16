@@ -1,6 +1,7 @@
 import { proofs } from "./generated/codecimpl";
 import { applyInner, applyLeaf } from "./ops";
 import {
+  bytesEqual,
   ensureBytesBefore,
   ensureBytesEqual,
   ensureInner,
@@ -103,13 +104,12 @@ export function verifyNonExistence(
   } else if (!rightKey) {
     ensureRightMost(spec.innerSpec, proof.left!.path!);
   } else {
-    throw new Error("Unimplemented");
-    // TODO: ensure left and right are neighbors
+    ensureLeftNeighbor(spec.innerSpec, proof.left!.path!, proof.right!.path!);
   }
   return;
 }
 
-export function ensureLeftMost(
+function ensureLeftMost(
   spec: proofs.IInnerSpec,
   path: ReadonlyArray<proofs.IInnerOp>
 ): void {
@@ -123,7 +123,7 @@ export function ensureLeftMost(
   }
 }
 
-export function ensureRightMost(
+function ensureRightMost(
   spec: proofs.IInnerSpec,
   path: ReadonlyArray<proofs.IInnerOp>
 ): void {
@@ -136,6 +136,36 @@ export function ensureRightMost(
       throw new Error("Step not leftmost");
     }
   }
+}
+
+function ensureLeftNeighbor(
+  spec: proofs.IInnerSpec,
+  left: ReadonlyArray<proofs.IInnerOp>,
+  right: ReadonlyArray<proofs.IInnerOp>
+): void {
+  // tslint:disable:readonly-array
+  const mutleft: proofs.IInnerOp[] = [...left];
+  const mutright: proofs.IInnerOp[] = [...right];
+
+  let topleft = mutleft.pop()!;
+  let topright = mutright.pop()!;
+  while (
+    bytesEqual(topleft.prefix!, topright.prefix!) &&
+    bytesEqual(topleft.suffix!, topright.suffix!)
+  ) {
+    topleft = mutleft.pop()!;
+    topright = mutright.pop()!;
+  }
+
+  // now topleft and topright are the first divergent nodes
+  // make sure they are left and right of each other
+  // if !isLeftStep(spec, topleft, topright) {
+  // 	return false
+  // }
+
+  // make sure the paths are left and right most possibilities respectively
+  ensureRightMost(spec, mutleft);
+  ensureLeftMost(spec, mutright);
 }
 
 function hasPadding(
