@@ -29,6 +29,12 @@ var TendermintSpec = &ProofSpec{
 		PrehashValue: HashOp_SHA256,
 		Length:       LengthOp_VAR_PROTO,
 	},
+	InnerSpec: &InnerSpec{
+		ChildOrder: []int32{0, 1},
+		MinPrefixLength: 1,
+		MaxPrefixLength: 1,
+		ChildSize: 32, // (no length byte)
+	},
 }
 
 // Verify does all checks to ensure this proof proves this key, value -> root
@@ -156,13 +162,7 @@ func IsLeftMost(spec *InnerSpec, path []*InnerOp) bool {
 
 	// ensure every step has a prefix and suffix defined to be leftmost
 	for _, step := range path {
-		if len(step.Prefix) < minPrefix {
-			return false
-		}
-		if len(step.Prefix) > maxPrefix {
-			return false
-		}
-		if len(step.Suffix) != suffix {
+		if !hasPadding(step, minPrefix, maxPrefix, suffix) {
 			return false
 		}
 	}
@@ -176,18 +176,13 @@ func IsRightMost(spec *InnerSpec, path []*InnerOp) bool {
 
 	// ensure every step has a prefix and suffix defined to be rightmost
 	for _, step := range path {
-		if len(step.Prefix) < minPrefix {
-			return false
-		}
-		if len(step.Prefix) > maxPrefix {
-			return false
-		}
-		if len(step.Suffix) != suffix {
+		if !hasPadding(step, minPrefix, maxPrefix, suffix) {
 			return false
 		}
 	}
 	return true
 }
+
 
 // IsLeftNeighbor returns true if `right` is the next possible path right of `left`
 //
@@ -224,14 +219,27 @@ func IsLeftNeighbor(spec *InnerSpec, left []*InnerOp, right []*InnerOp) bool {
 // isLeftStep assumes left and right have common parents
 // checks if left is exactly one slot to the left of right
 func isLeftStep(spec *InnerSpec, left *InnerOp, right *InnerOp) bool {
-	// (TODO: this calculation only works for binary tree, fix for merk)
-	if !IsLeftMost(spec, []*InnerOp{left}) {
+	leftidx, err := orderFromPadding(spec, left)
+	if err != nil {
+		panic(err)
+	}
+	rightidx, err := orderFromPadding(spec, right)
+	if err != nil {
+		panic(err)
+	}
+
+	// TODO: is it possible there are empty (nil) children???
+	return rightidx == leftidx + 1
+}
+
+func hasPadding(op *InnerOp, minPrefix, maxPrefix, suffix int) bool {
+	if len(op.Prefix) < minPrefix {
 		return false
 	}
-	if !IsRightMost(spec, []*InnerOp{right}) {
+	if len(op.Prefix) > maxPrefix {
 		return false
 	}
-	return true
+	return len(op.Suffix) == suffix
 }
 
 // getPadding determines prefix and suffix with the given spec and position in the tree
@@ -260,4 +268,17 @@ func getPosition(order []int32, branch int32) (int) {
 		}
 	}
 	panic(errors.Errorf("Branch %d not found in order %v", branch, order))
+}
+
+// This will look at the proof and determine which order it is...
+// So we can see if it is branch 0, 1, 2 etc... to determine neighbors
+func orderFromPadding(spec *InnerSpec, inner *InnerOp) (int32, error) {
+	maxbranch := int32(len(spec.ChildOrder))
+	for branch := int32(0); branch < maxbranch; branch++ {
+		minp, maxp, suffix := getPadding(spec, branch)
+		if hasPadding(inner, minp, maxp, suffix) {
+			return branch, nil
+		}
+	}
+	return 0, errors.New("Cannot find any valid spacing for this node")
 }

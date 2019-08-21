@@ -9,7 +9,8 @@ members = ["codegen"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
-protobuf = "2.8"
+prost = "0.5"
+bytes = "0.4.12"
 hex = "0.3.2"
 sha2 = "0.8"
 sha3 = "0.8"

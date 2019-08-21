@@ -9,3 +9,16 @@ of the `protoc` binary.
 
 To rebuild protobuf, simply: `cargo protoc` (on a dev machine with `protoc` in path).
 Unless you modify the protobuf file, you can ignore this step.
+
+## Formatting
+
+`cargo fmt`
+
+
+## Testing
+
+`cargo test`
+
+## Linting
+
+`cargo clippy -- --test -W clippy::pedantic`
