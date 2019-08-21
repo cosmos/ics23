@@ -10,7 +10,7 @@ pub fn verify_membership(
     key: &[u8],
     value: &[u8],
 ) -> bool {
-    if let Some(proofs::CommitmentProof_oneof_proof::exist(ex)) = &proof.proof {
+    if let Some(proofs::commitment_proof::Proof::Exist(ex)) = &proof.proof {
         let valid = verify_existence(&ex, spec, root, key, value);
         valid.is_ok()
     } else {
@@ -27,7 +27,7 @@ pub fn verify_non_membership(
     root: &CommitmentRoot,
     key: &[u8],
 ) -> bool {
-    if let Some(proofs::CommitmentProof_oneof_proof::nonexist(non)) = &proof.proof {
+    if let Some(proofs::commitment_proof::Proof::Nonexist(non)) = &proof.proof {
         let valid = verify_non_existence(&non, spec, root, key);
         valid.is_ok()
     } else {
@@ -38,39 +38,39 @@ pub fn verify_non_membership(
 
 
 pub fn iavl_spec() -> proofs::ProofSpec {
-    let mut leaf = proofs::LeafOp::new();
-    leaf.set_prefix(vec![0_u8]);
-    leaf.set_hash(proofs::HashOp::SHA256);
-    leaf.set_prehash_value(proofs::HashOp::SHA256);
-    leaf.set_length(proofs::LengthOp::VAR_PROTO);
-
-    let mut spec = proofs::ProofSpec::new();
-    spec.set_leaf_spec(leaf);
-    spec
+    let leaf = proofs::LeafOp{
+        hash: proofs::HashOp::Sha256.into(),
+        prehash_key: 0,
+        prehash_value: proofs::HashOp::Sha256.into(),
+        length: proofs::LengthOp::VarProto.into(),
+        prefix: vec![0_u8]
+    };
+    proofs::ProofSpec{
+        leaf_spec: Some(leaf),
+        inner_spec: None
+    }
 }
 
 pub fn tendermint_spec() -> proofs::ProofSpec {
-    let mut leaf = proofs::LeafOp::new();
-    leaf.set_prefix(vec![0_u8]);
-    leaf.set_hash(proofs::HashOp::SHA256);
-    leaf.set_prehash_value(proofs::HashOp::SHA256);
-    leaf.set_length(proofs::LengthOp::VAR_PROTO);
-
-    let mut spec = proofs::ProofSpec::new();
-    spec.set_leaf_spec(leaf);
-    spec
+    let leaf = proofs::LeafOp{
+        hash: proofs::HashOp::Sha256.into(),
+        prehash_key: 0,
+        prehash_value: proofs::HashOp::Sha256.into(),
+        length: proofs::LengthOp::VarProto.into(),
+        prefix: vec![0_u8]
+    };
+    proofs::ProofSpec{
+        leaf_spec: Some(leaf),
+        inner_spec: None
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    extern crate protobuf;
-    extern crate serde;
-    extern crate serde_json;
-
-    use failure::{bail, ensure};
-    use protobuf::Message;
+    use failure::{ensure};
+    use prost::Message;
     use serde::Deserialize;
     use std::fs::File;
     use std::io::prelude::*;
@@ -95,15 +95,13 @@ mod tests {
         let root = hex::decode(data.root)?;
         let key = hex::decode(data.key)?;
 
-        let mut parsed = proofs::CommitmentProof::new();
-        parsed.merge_from_bytes(&proto_bin)?;
+        let mut parsed = proofs::CommitmentProof{ proof: None };
+        parsed.merge(&proto_bin)?;
 
         if data.value.is_empty() {
-            // non existence
-            bail!("non membership not yet implemented");
-            // let valid = super::verify_non_membership(spec, &root, &parsed, key);
-            // ensure!(valid, "invalid test vector");
-            // Ok(())
+             let valid = super::verify_non_membership(&parsed, spec, &root, &key);
+             ensure!(valid, "invalid test vector");
+             Ok(())
         } else {
             let value = hex::decode(data.value)?;
             let valid = super::verify_membership(&parsed, spec, &root, &key, &value);

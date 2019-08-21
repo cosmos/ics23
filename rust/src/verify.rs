@@ -4,7 +4,7 @@
 use crate::helpers::Result;
 use crate::ops::{apply_inner, apply_leaf};
 use crate::proofs;
-use failure::ensure;
+use failure::{bail, ensure};
 
 pub type CommitmentRoot = ::std::vec::Vec<u8>;
 
@@ -64,31 +64,31 @@ pub fn calculate_existence_root(proof: &proofs::ExistenceProof) -> Result<Commit
         !proof.value.is_empty(),
         "Existence proof must have value set"
     );
-    ensure!(proof.leaf.is_some(), "No leaf operation set");
 
-    let mut hash = apply_leaf(proof.leaf.get_ref(), &proof.key, &proof.value)?;
-    for step in proof.path.iter() {
-        hash = apply_inner(step, &hash)?;
+    if let Some(leaf_node) = &proof.leaf {
+        let mut hash = apply_leaf(leaf_node, &proof.key, &proof.value)?;
+        for step in proof.path.iter() {
+            hash = apply_inner(step, &hash)?;
+        }
+        Ok(hash)
+    } else {
+        bail!("No leaf operation set")
     }
-    Ok(hash)
 }
 
 fn check_existence_spec(proof: &proofs::ExistenceProof, spec: &proofs::ProofSpec) -> Result<()> {
-    ensure!(
-        proof.leaf.is_some(),
-        "Existence proof must start with a leaf operation"
-    );
-    ensure!(spec.leaf_spec.is_some(), "Spec must include leafSpec");
-    ensure_leaf(proof.leaf.get_ref(), spec)?;
-    for step in proof.path.iter() {
-        ensure_inner(step, spec)?;
+    if let (Some(leaf), Some(leaf_spec)) = (&proof.leaf, &spec.leaf_spec) {
+        ensure_leaf(leaf, leaf_spec)?;
+        for step in proof.path.iter() {
+            ensure_inner(step, spec)?;
+        }
+        Ok(())
+    } else {
+        bail!("Leaf and Leaf Spec must be set")
     }
-    Ok(())
 }
 
-fn ensure_leaf(leaf: &proofs::LeafOp, spec: &proofs::ProofSpec) -> Result<()> {
-    ensure!(spec.leaf_spec.is_some(), "Spec missing leaf_spec");
-    let leaf_spec = spec.leaf_spec.get_ref();
+fn ensure_leaf(leaf: &proofs::LeafOp, leaf_spec: &proofs::LeafOp) -> Result<()> {
     ensure!(
         leaf_spec.hash == leaf.hash,
         "Unexpected hashOp: {:?}",
@@ -124,13 +124,15 @@ fn has_prefix(prefix: &[u8], data: &[u8]) -> bool {
 }
 
 fn ensure_inner(inner: &proofs::InnerOp, spec: &proofs::ProofSpec) -> Result<()> {
-    ensure!(spec.leaf_spec.is_some(), "Spec missing leaf_spec");
-    let leaf = spec.leaf_spec.get_ref();
-    ensure!(
-        !has_prefix(&leaf.prefix, &inner.prefix),
-        "Inner node with leaf prefix"
-    );
-    Ok(())
+    if let Some(leaf_spec) = &spec.leaf_spec {
+        ensure!(
+            !has_prefix(&leaf_spec.prefix, &inner.prefix),
+            "Inner node with leaf prefix"
+        );
+        Ok(())
+    } else {
+        bail!("Spec missing leaf_spec")
+    }
 }
 
 #[cfg(test)]
@@ -141,14 +143,20 @@ mod tests {
 
     #[test]
     fn calculate_root_from_leaf() -> Result<()> {
-        let mut leaf = proofs::LeafOp::new();
-        leaf.set_hash(HashOp::SHA256);
-        leaf.set_length(LengthOp::VAR_PROTO);
+        let leaf = proofs::LeafOp{
+            hash: HashOp::Sha256.into(),
+            prehash_key: 0,
+            prehash_value: 0,
+            length: LengthOp::VarProto.into(),
+            prefix: vec![]
+        };
 
-        let mut proof = proofs::ExistenceProof::new();
-        proof.set_leaf(leaf);
-        proof.set_key(b"food".to_vec());
-        proof.set_value(b"some longer text".to_vec());
+        let proof = proofs::ExistenceProof{
+            key: b"food".to_vec(),
+            value: b"some longer text".to_vec(),
+            leaf: Some(leaf),
+            path: vec![]
+        };
 
         let expected =
             hex::decode("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265")?;
@@ -161,19 +169,26 @@ mod tests {
 
     #[test]
     fn calculate_root_from_leaf_and_inner() -> Result<()> {
-        let mut leaf = proofs::LeafOp::new();
-        leaf.set_hash(HashOp::SHA256);
-        leaf.set_length(LengthOp::VAR_PROTO);
+        let leaf = proofs::LeafOp{
+            hash: HashOp::Sha256.into(),
+            prehash_key: 0,
+            prehash_value: 0,
+            length: LengthOp::VarProto.into(),
+            prefix: vec![]
+        };
 
-        let mut inner = proofs::InnerOp::new();
-        inner.set_hash(HashOp::SHA256);
-        inner.set_prefix(hex::decode("deadbeef00cafe00")?);
+        let inner = proofs::InnerOp{
+            hash: HashOp::Sha256.into(),
+            prefix: hex::decode("deadbeef00cafe00")?,
+            suffix: vec![]
+        };
 
-        let mut proof = proofs::ExistenceProof::new();
-        proof.set_key(b"food".to_vec());
-        proof.set_value(b"some longer text".to_vec());
-        proof.set_leaf(leaf);
-        proof.set_path(protobuf::RepeatedField::from_slice(&[inner]));
+        let proof = proofs::ExistenceProof{
+            key: b"food".to_vec(),
+            value: b"some longer text".to_vec(),
+            leaf: Some(leaf),
+            path: vec![inner],
+        };
 
         let expected =
             hex::decode("836ea236a6902a665c2a004c920364f24cad52ded20b1e4f22c3179bfe25b2a9")?;
