@@ -64,7 +64,7 @@ pub fn calculate_existence_root(proof: &proofs::ExistenceProof) -> Result<Commit
 
     if let Some(leaf_node) = &proof.leaf {
         let mut hash = apply_leaf(leaf_node, &proof.key, &proof.value)?;
-        for step in proof.path.iter() {
+        for step in &proof.path {
             hash = apply_inner(step, &hash)?;
         }
         Ok(hash)
@@ -76,7 +76,7 @@ pub fn calculate_existence_root(proof: &proofs::ExistenceProof) -> Result<Commit
 fn check_existence_spec(proof: &proofs::ExistenceProof, spec: &proofs::ProofSpec) -> Result<()> {
     if let (Some(leaf), Some(leaf_spec)) = (&proof.leaf, &spec.leaf_spec) {
         ensure_leaf(leaf, leaf_spec)?;
-        for step in proof.path.iter() {
+        for step in &proof.path {
             ensure_inner(step, spec)?;
         }
         Ok(())

@@ -1,3 +1,6 @@
+#![allow(clippy::pedantic)]
+#![allow(clippy::all)]
+
 ///*
 ///ExistenceProof takes a key and a value and a set of steps to perform on it.
 ///The result of peforming all these steps will provide a "root hash", which can
