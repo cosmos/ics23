@@ -64,7 +64,7 @@ fn do_length(length: LengthOp, data: &[u8]) -> Result<Hash> {
 fn proto_len(length: usize) -> Result<Hash> {
     let size: u64 = length.try_into()?;
     let mut len = Hash::new();
-    size.encode(&mut len)?;
+    prost::encoding::encode_varint(size, &mut len);
     Ok(len)
 }
 
@@ -114,7 +114,8 @@ mod tests {
         let prefixed = do_length(LengthOp::VarProto, b"food")?;
         ensure!(
             prefixed == hex::decode("04666f6f64")?,
-            "var proto prefix doesn't work"
+            "proto prefix returned {}",
+            hex::encode(&prefixed),
         );
         Ok(())
     }
