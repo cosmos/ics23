@@ -44,8 +44,7 @@ pub fn verify_non_existence(
         match (&proof.left, &proof.right) {
             (Some(left), None) => ensure_right_most(inner, &left.path),
             (None, Some(right)) => ensure_left_most(inner, &right.path),
-            (Some(_left), Some(_right)) => bail!("unimplemented"), // TODO
-//            (Some(_left), Some(_right)) => Ok(()), // TODO
+            (Some(left), Some(right)) => ensure_left_neighbor(inner, &left.path, &right.path),
             (None, None) => bail!("neither left nor right proof defined"),
         }
     } else {
@@ -154,6 +153,29 @@ fn ensure_right_most(spec: &proofs::InnerSpec, path: &[proofs::InnerOp]) -> Resu
     Ok(())
 }
 
+fn ensure_left_neighbor(spec: &proofs::InnerSpec, left: &[proofs::InnerOp], right: &[proofs::InnerOp]) -> Result<()> {
+    let mut mut_left = Vec::from(left);
+    let mut mut_right = Vec::from(right);
+
+    let mut top_left = mut_left.pop().unwrap();
+    let mut top_right = mut_right.pop().unwrap();
+
+    while top_left.prefix == top_right.prefix && top_left.suffix == top_right.suffix {
+        top_left = mut_left.pop().unwrap();
+        top_right = mut_right.pop().unwrap();
+    }
+
+    if !is_left_step(spec, &top_left, &top_right) {
+        bail!("Not left neighbor at first divergent step");
+    }
+
+    ensure_right_most(spec, &mut_left)?;
+    ensure_left_most(spec, &mut_right)
+}
+
+fn is_left_step(spec: &proofs::InnerSpec, left: &proofs::InnerOp, right: &proofs::InnerOp) -> bool {
+    true
+}
 
 struct Padding {
     min_prefix: usize,
