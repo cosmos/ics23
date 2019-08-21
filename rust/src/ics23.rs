@@ -45,9 +45,16 @@ pub fn iavl_spec() -> proofs::ProofSpec {
         length: proofs::LengthOp::VarProto.into(),
         prefix: vec![0_u8]
     };
+    let inner = proofs::InnerSpec{
+        child_order: vec![0, 1],
+        min_prefix_length: 4,
+        max_prefix_length: 12,
+        child_size: 33,
+        empty_child: vec![]
+    };
     proofs::ProofSpec{
         leaf_spec: Some(leaf),
-        inner_spec: None
+        inner_spec: Some(inner),
     }
 }
 
@@ -59,9 +66,16 @@ pub fn tendermint_spec() -> proofs::ProofSpec {
         length: proofs::LengthOp::VarProto.into(),
         prefix: vec![0_u8]
     };
+    let inner = proofs::InnerSpec{
+        child_order: vec![0, 1],
+        min_prefix_length: 1,
+        max_prefix_length: 1,
+        child_size: 32,
+        empty_child: vec![]
+    };
     proofs::ProofSpec{
         leaf_spec: Some(leaf),
-        inner_spec: None
+        inner_spec: Some(inner)
     }
 }
 
