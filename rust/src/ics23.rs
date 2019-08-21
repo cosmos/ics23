@@ -1,5 +1,5 @@
 use crate::proofs;
-use crate::verify::{verify_existence, CommitmentRoot};
+use crate::verify::{CommitmentRoot, verify_existence, verify_non_existence};
 
 // Use CommitmentRoot vs &[u8] to stick with ics naming
 #[allow(clippy::ptr_arg)]
@@ -12,12 +12,30 @@ pub fn verify_membership(
 ) -> bool {
     if let Some(proofs::CommitmentProof_oneof_proof::exist(ex)) = &proof.proof {
         let valid = verify_existence(&ex, spec, root, key, value);
-        valid.is_ok() && valid.unwrap()
+        valid.is_ok()
     } else {
         false
     }
 }
 #[warn(clippy::ptr_arg)]
+
+// Use CommitmentRoot vs &[u8] to stick with ics naming
+#[allow(clippy::ptr_arg)]
+pub fn verify_non_membership(
+    proof: &proofs::CommitmentProof,
+    spec: &proofs::ProofSpec,
+    root: &CommitmentRoot,
+    key: &[u8],
+) -> bool {
+    if let Some(proofs::CommitmentProof_oneof_proof::nonexist(non)) = &proof.proof {
+        let valid = verify_non_existence(&non, spec, root, key);
+        valid.is_ok()
+    } else {
+        false
+    }
+}
+#[warn(clippy::ptr_arg)]
+
 
 pub fn iavl_spec() -> proofs::ProofSpec {
     let mut leaf = proofs::LeafOp::new();

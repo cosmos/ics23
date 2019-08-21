@@ -14,14 +14,45 @@ pub fn verify_existence(
     root: &[u8],
     key: &[u8],
     value: &[u8],
-) -> Result<bool> {
+) -> Result<()> {
     check_existence_spec(proof, spec)?;
     ensure!(proof.key == key, "Provided key doesn't match proof");
     ensure!(proof.value == value, "Provided value doesn't match proof");
 
     let calc = calculate_existence_root(&proof)?;
     ensure!(calc == root, "Root hash doesn't match");
-    Ok(true)
+    Ok(())
+}
+
+pub fn verify_non_existence(
+    proof: &proofs::NonExistenceProof,
+    spec: &proofs::ProofSpec,
+    root: &[u8],
+    key: &[u8],
+) -> Result<()> {
+    let mut left_key: Option<&[u8]> = None;
+    let mut right_key: Option<&[u8]> = None;
+
+//    if let Some(left) = &proof.left {
+//        verify_existence(&left, spec, root, &left.key, &left.value)?;
+//        ensure!(&left.key < key, "left key isn't before key");
+//        left_key = Some(&left.key);
+//    }
+//    if let Some(right) = &proof.right {
+//        verify_existence(&right, spec, root, &right.key, &right.value)?;
+//        ensure!(key < &right.key, "right key isn't after key");
+//        right_key = Some(&right.key);
+//    }
+
+    ensure!(left_key != None || right_key != None, "neither left nor right proof defined");
+
+//    check_existence_spec(proof, spec)?;
+//    ensure!(proof.key == key, "Provided key doesn't match proof");
+//    ensure!(proof.value == value, "Provided value doesn't match proof");
+//
+//    let calc = calculate_existence_root(&proof)?;
+//    ensure!(calc == root, "Root hash doesn't match");
+    Ok(())
 }
 
 // Calculate determines the root hash that matches the given proof.
