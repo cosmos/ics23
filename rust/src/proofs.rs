@@ -20,13 +20,13 @@
 ///length-prefix the data before hashing it.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ExistenceProof {
-    #[prost(bytes, tag="1")]
+    #[prost(bytes, tag = "1")]
     pub key: std::vec::Vec<u8>,
-    #[prost(bytes, tag="2")]
+    #[prost(bytes, tag = "2")]
     pub value: std::vec::Vec<u8>,
-    #[prost(message, optional, tag="3")]
+    #[prost(message, optional, tag = "3")]
     pub leaf: ::std::option::Option<LeafOp>,
-    #[prost(message, repeated, tag="4")]
+    #[prost(message, repeated, tag = "4")]
     pub path: ::std::vec::Vec<InnerOp>,
 }
 ///
@@ -36,28 +36,28 @@ pub struct ExistenceProof {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct NonExistenceProof {
     /// TODO: remove this as unnecessary??? we prove a range
-    #[prost(bytes, tag="1")]
+    #[prost(bytes, tag = "1")]
     pub key: std::vec::Vec<u8>,
-    #[prost(message, optional, tag="2")]
+    #[prost(message, optional, tag = "2")]
     pub left: ::std::option::Option<ExistenceProof>,
-    #[prost(message, optional, tag="3")]
+    #[prost(message, optional, tag = "3")]
     pub right: ::std::option::Option<ExistenceProof>,
 }
 ///
 ///CommitmentProof is either an ExistenceProof or a NonExistenceProof, or a Batch of such messages
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CommitmentProof {
-    #[prost(oneof="commitment_proof::Proof", tags="1, 2, 3")]
+    #[prost(oneof = "commitment_proof::Proof", tags = "1, 2, 3")]
     pub proof: ::std::option::Option<commitment_proof::Proof>,
 }
 pub mod commitment_proof {
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Proof {
-        #[prost(message, tag="1")]
+        #[prost(message, tag = "1")]
         Exist(super::ExistenceProof),
-        #[prost(message, tag="2")]
+        #[prost(message, tag = "2")]
         Nonexist(super::NonExistenceProof),
-        #[prost(message, tag="3")]
+        #[prost(message, tag = "3")]
         Batch(super::BatchProof),
     }
 }
@@ -65,7 +65,7 @@ pub mod commitment_proof {
 ///BatchProof is a group of multiple proof types than can be compressed
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct BatchProof {
-    #[prost(message, repeated, tag="1")]
+    #[prost(message, repeated, tag = "1")]
     pub proofs: ::std::vec::Vec<CommitmentProof>,
 }
 //*
@@ -88,17 +88,17 @@ pub struct BatchProof {
 ///output = hash(prefix || length(hkey) || hkey || length(hvalue) || hvalue)
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LeafOp {
-    #[prost(enumeration="HashOp", tag="1")]
+    #[prost(enumeration = "HashOp", tag = "1")]
     pub hash: i32,
-    #[prost(enumeration="HashOp", tag="2")]
+    #[prost(enumeration = "HashOp", tag = "2")]
     pub prehash_key: i32,
-    #[prost(enumeration="HashOp", tag="3")]
+    #[prost(enumeration = "HashOp", tag = "3")]
     pub prehash_value: i32,
-    #[prost(enumeration="LengthOp", tag="4")]
+    #[prost(enumeration = "LengthOp", tag = "4")]
     pub length: i32,
     /// prefix is a fixed bytes that may optionally be included at the beginning to differentiate
     /// a leaf node from an inner node.
-    #[prost(bytes, tag="5")]
+    #[prost(bytes, tag = "5")]
     pub prefix: std::vec::Vec<u8>,
 }
 ///*
@@ -119,11 +119,11 @@ pub struct LeafOp {
 ///If either of prefix or suffix is empty, we just treat it as an empty string
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct InnerOp {
-    #[prost(enumeration="HashOp", tag="1")]
+    #[prost(enumeration = "HashOp", tag = "1")]
     pub hash: i32,
-    #[prost(bytes, tag="2")]
+    #[prost(bytes, tag = "2")]
     pub prefix: std::vec::Vec<u8>,
-    #[prost(bytes, tag="3")]
+    #[prost(bytes, tag = "3")]
     pub suffix: std::vec::Vec<u8>,
 }
 ///*
@@ -140,10 +140,10 @@ pub struct InnerOp {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ProofSpec {
     /// any field in the ExistenceProof must be the same as in this spec.
-    /// except Prefix, which is just the first bytes of prefix (spec can be longer) 
-    #[prost(message, optional, tag="1")]
+    /// except Prefix, which is just the first bytes of prefix (spec can be longer)
+    #[prost(message, optional, tag = "1")]
     pub leaf_spec: ::std::option::Option<LeafOp>,
-    #[prost(message, optional, tag="2")]
+    #[prost(message, optional, tag = "2")]
     pub inner_spec: ::std::option::Option<InnerSpec>,
 }
 ///
@@ -160,15 +160,15 @@ pub struct InnerSpec {
     /// Child order is the ordering of the children node, must count from 0
     /// iavl tree is [0, 1] (left then right)
     /// merk is [0, 2, 1] (left, right, here)
-    #[prost(int32, repeated, tag="1")]
+    #[prost(int32, repeated, tag = "1")]
     pub child_order: ::std::vec::Vec<i32>,
-    #[prost(int32, tag="2")]
+    #[prost(int32, tag = "2")]
     pub child_size: i32,
-    #[prost(int32, tag="3")]
+    #[prost(int32, tag = "3")]
     pub min_prefix_length: i32,
-    #[prost(int32, tag="4")]
+    #[prost(int32, tag = "4")]
     pub max_prefix_length: i32,
-    #[prost(bytes, tag="5")]
+    #[prost(bytes, tag = "5")]
     pub empty_child: std::vec::Vec<u8>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]

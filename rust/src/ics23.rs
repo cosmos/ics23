@@ -1,5 +1,5 @@
 use crate::proofs;
-use crate::verify::{CommitmentRoot, verify_existence, verify_non_existence};
+use crate::verify::{verify_existence, verify_non_existence, CommitmentRoot};
 
 // Use CommitmentRoot vs &[u8] to stick with ics naming
 #[allow(clippy::ptr_arg)]
@@ -18,7 +18,6 @@ pub fn verify_membership(
     }
 }
 #[warn(clippy::ptr_arg)]
-
 // Use CommitmentRoot vs &[u8] to stick with ics naming
 #[allow(clippy::ptr_arg)]
 pub fn verify_non_membership(
@@ -36,46 +35,45 @@ pub fn verify_non_membership(
 }
 #[warn(clippy::ptr_arg)]
 
-
 pub fn iavl_spec() -> proofs::ProofSpec {
-    let leaf = proofs::LeafOp{
+    let leaf = proofs::LeafOp {
         hash: proofs::HashOp::Sha256.into(),
         prehash_key: 0,
         prehash_value: proofs::HashOp::Sha256.into(),
         length: proofs::LengthOp::VarProto.into(),
-        prefix: vec![0_u8]
+        prefix: vec![0_u8],
     };
-    let inner = proofs::InnerSpec{
+    let inner = proofs::InnerSpec {
         child_order: vec![0, 1],
         min_prefix_length: 4,
         max_prefix_length: 12,
         child_size: 33,
-        empty_child: vec![]
+        empty_child: vec![],
     };
-    proofs::ProofSpec{
+    proofs::ProofSpec {
         leaf_spec: Some(leaf),
         inner_spec: Some(inner),
     }
 }
 
 pub fn tendermint_spec() -> proofs::ProofSpec {
-    let leaf = proofs::LeafOp{
+    let leaf = proofs::LeafOp {
         hash: proofs::HashOp::Sha256.into(),
         prehash_key: 0,
         prehash_value: proofs::HashOp::Sha256.into(),
         length: proofs::LengthOp::VarProto.into(),
-        prefix: vec![0_u8]
+        prefix: vec![0_u8],
     };
-    let inner = proofs::InnerSpec{
+    let inner = proofs::InnerSpec {
         child_order: vec![0, 1],
         min_prefix_length: 1,
         max_prefix_length: 1,
         child_size: 32,
-        empty_child: vec![]
+        empty_child: vec![],
     };
-    proofs::ProofSpec{
+    proofs::ProofSpec {
         leaf_spec: Some(leaf),
-        inner_spec: Some(inner)
+        inner_spec: Some(inner),
     }
 }
 
@@ -83,7 +81,7 @@ pub fn tendermint_spec() -> proofs::ProofSpec {
 mod tests {
     use super::*;
 
-    use failure::{ensure};
+    use failure::ensure;
     use prost::Message;
     use serde::Deserialize;
     use std::fs::File;
@@ -109,13 +107,13 @@ mod tests {
         let root = hex::decode(data.root)?;
         let key = hex::decode(data.key)?;
 
-        let mut parsed = proofs::CommitmentProof{ proof: None };
+        let mut parsed = proofs::CommitmentProof { proof: None };
         parsed.merge(&proto_bin)?;
 
         if data.value.is_empty() {
-             let valid = super::verify_non_membership(&parsed, spec, &root, &key);
-             ensure!(valid, "invalid test vector");
-             Ok(())
+            let valid = super::verify_non_membership(&parsed, spec, &root, &key);
+            ensure!(valid, "invalid test vector");
+            Ok(())
         } else {
             let value = hex::decode(data.value)?;
             let valid = super::verify_membership(&parsed, spec, &root, &key, &value);

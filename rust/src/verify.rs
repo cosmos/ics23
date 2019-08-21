@@ -153,7 +153,11 @@ fn ensure_right_most(spec: &proofs::InnerSpec, path: &[proofs::InnerOp]) -> Resu
     Ok(())
 }
 
-fn ensure_left_neighbor(spec: &proofs::InnerSpec, left: &[proofs::InnerOp], right: &[proofs::InnerOp]) -> Result<()> {
+fn ensure_left_neighbor(
+    spec: &proofs::InnerSpec,
+    left: &[proofs::InnerOp],
+    right: &[proofs::InnerOp],
+) -> Result<()> {
     let mut mut_left = Vec::from(left);
     let mut mut_right = Vec::from(right);
 
@@ -173,7 +177,11 @@ fn ensure_left_neighbor(spec: &proofs::InnerSpec, left: &[proofs::InnerOp], righ
     ensure_left_most(spec, &mut_right)
 }
 
-fn is_left_step(spec: &proofs::InnerSpec, left: &proofs::InnerOp, right: &proofs::InnerOp) -> Result<bool> {
+fn is_left_step(
+    spec: &proofs::InnerSpec,
+    left: &proofs::InnerOp,
+    right: &proofs::InnerOp,
+) -> Result<bool> {
     let left_idx = order_from_padding(spec, left)?;
     let right_idx = order_from_padding(spec, right)?;
     Ok(left_idx + 1 == right_idx)
@@ -197,14 +205,16 @@ struct Padding {
 }
 
 fn has_padding(op: &proofs::InnerOp, pad: &Padding) -> bool {
-    (op.prefix.len() >= pad.min_prefix) && (op.prefix.len() <= pad.max_prefix) && (op.suffix.len() == pad.suffix)
+    (op.prefix.len() >= pad.min_prefix)
+        && (op.prefix.len() <= pad.max_prefix)
+        && (op.suffix.len() == pad.suffix)
 }
 
 fn get_padding(spec: &proofs::InnerSpec, branch: i32) -> Result<Padding> {
     if let Some(&idx) = spec.child_order.iter().find(|&&x| x == branch) {
         let prefix = idx * spec.child_size;
         let suffix = spec.child_size as usize * (spec.child_order.len() - 1 - idx as usize);
-        Ok(Padding{
+        Ok(Padding {
             min_prefix: (prefix + spec.min_prefix_length) as usize,
             max_prefix: (prefix + spec.max_prefix_length) as usize,
             suffix,
@@ -222,19 +232,19 @@ mod tests {
 
     #[test]
     fn calculate_root_from_leaf() -> Result<()> {
-        let leaf = proofs::LeafOp{
+        let leaf = proofs::LeafOp {
             hash: HashOp::Sha256.into(),
             prehash_key: 0,
             prehash_value: 0,
             length: LengthOp::VarProto.into(),
-            prefix: vec![]
+            prefix: vec![],
         };
 
-        let proof = proofs::ExistenceProof{
+        let proof = proofs::ExistenceProof {
             key: b"food".to_vec(),
             value: b"some longer text".to_vec(),
             leaf: Some(leaf),
-            path: vec![]
+            path: vec![],
         };
 
         let expected =
@@ -248,21 +258,21 @@ mod tests {
 
     #[test]
     fn calculate_root_from_leaf_and_inner() -> Result<()> {
-        let leaf = proofs::LeafOp{
+        let leaf = proofs::LeafOp {
             hash: HashOp::Sha256.into(),
             prehash_key: 0,
             prehash_value: 0,
             length: LengthOp::VarProto.into(),
-            prefix: vec![]
+            prefix: vec![],
         };
 
-        let inner = proofs::InnerOp{
+        let inner = proofs::InnerOp {
             hash: HashOp::Sha256.into(),
             prefix: hex::decode("deadbeef00cafe00")?,
-            suffix: vec![]
+            suffix: vec![],
         };
 
-        let proof = proofs::ExistenceProof{
+        let proof = proofs::ExistenceProof {
             key: b"food".to_vec(),
             value: b"some longer text".to_vec(),
             leaf: Some(leaf),

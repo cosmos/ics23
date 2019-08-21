@@ -121,12 +121,12 @@ mod tests {
 
     #[test]
     fn apply_leaf_hash() -> Result<()> {
-        let leaf = LeafOp{
+        let leaf = LeafOp {
             hash: HashOp::Sha256.into(),
             prehash_key: 0,
             prehash_value: 0,
             length: 0,
-            prefix: vec![]
+            prefix: vec![],
         };
         let key = b"foo";
         let val = b"bar";
@@ -137,12 +137,12 @@ mod tests {
 
     #[test]
     fn apply_leaf_hash_512() -> Result<()> {
-        let leaf = LeafOp{
+        let leaf = LeafOp {
             hash: HashOp::Sha512.into(),
             prehash_key: 0,
             prehash_value: 0,
             length: 0,
-            prefix: vec![]
+            prefix: vec![],
         };
         let key = b"f";
         let val = b"oobaz";
@@ -153,12 +153,12 @@ mod tests {
 
     #[test]
     fn apply_leaf_hash_length() -> Result<()> {
-        let leaf = LeafOp{
+        let leaf = LeafOp {
             hash: HashOp::Sha256.into(),
             prehash_key: 0,
             prehash_value: 0,
             length: LengthOp::VarProto.into(),
-            prefix: vec![]
+            prefix: vec![],
         };
         let key = b"food";
         let val = b"some longer text";
@@ -169,12 +169,12 @@ mod tests {
 
     #[test]
     fn apply_leaf_prehash_length() -> Result<()> {
-        let leaf = LeafOp{
+        let leaf = LeafOp {
             hash: HashOp::Sha256.into(),
             prehash_key: 0,
             prehash_value: HashOp::Sha256.into(),
             length: LengthOp::VarProto.into(),
-            prefix: vec![]
+            prefix: vec![],
         };
         let key = b"food";
         let val = b"yet another long string";
@@ -185,10 +185,10 @@ mod tests {
 
     #[test]
     fn apply_inner_prefix_suffix() -> Result<()> {
-        let inner = InnerOp{
+        let inner = InnerOp {
             hash: HashOp::Sha256.into(),
             prefix: hex::decode("0123456789")?,
-            suffix: hex::decode("deadbeef")?
+            suffix: hex::decode("deadbeef")?,
         };
         let child = hex::decode("00cafe00")?;
 
@@ -204,10 +204,10 @@ mod tests {
 
     #[test]
     fn apply_inner_prefix_only() -> Result<()> {
-        let inner = InnerOp{
+        let inner = InnerOp {
             hash: HashOp::Sha256.into(),
             prefix: hex::decode("00204080a0c0e0")?,
-            suffix: vec![]
+            suffix: vec![],
         };
         let child = hex::decode("ffccbb997755331100")?;
 
@@ -223,7 +223,7 @@ mod tests {
 
     #[test]
     fn apply_inner_suffix_only() -> Result<()> {
-        let inner = InnerOp{
+        let inner = InnerOp {
             hash: HashOp::Sha256.into(),
             prefix: vec![],
             suffix: b" just kidding!".to_vec(),
