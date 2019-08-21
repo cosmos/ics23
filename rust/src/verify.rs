@@ -165,7 +165,7 @@ fn ensure_left_neighbor(spec: &proofs::InnerSpec, left: &[proofs::InnerOp], righ
         top_right = mut_right.pop().unwrap();
     }
 
-    if !is_left_step(spec, &top_left, &top_right) {
+    if !is_left_step(spec, &top_left, &top_right)? {
         bail!("Not left neighbor at first divergent step");
     }
 
@@ -173,8 +173,21 @@ fn ensure_left_neighbor(spec: &proofs::InnerSpec, left: &[proofs::InnerOp], righ
     ensure_left_most(spec, &mut_right)
 }
 
-fn is_left_step(spec: &proofs::InnerSpec, left: &proofs::InnerOp, right: &proofs::InnerOp) -> bool {
-    true
+fn is_left_step(spec: &proofs::InnerSpec, left: &proofs::InnerOp, right: &proofs::InnerOp) -> Result<bool> {
+    let left_idx = order_from_padding(spec, left)?;
+    let right_idx = order_from_padding(spec, right)?;
+    Ok(left_idx + 1 == right_idx)
+}
+
+fn order_from_padding(spec: &proofs::InnerSpec, op: &proofs::InnerOp) -> Result<i32> {
+    let len = spec.child_order.len() as i32;
+    for branch in 0..len {
+        let padding = get_padding(spec, branch)?;
+        if has_padding(op, &padding) {
+            return Ok(branch);
+        }
+    }
+    bail!("padding doesn't match any branch");
 }
 
 struct Padding {
