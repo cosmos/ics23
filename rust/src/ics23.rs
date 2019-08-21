@@ -143,6 +143,24 @@ mod tests {
     }
 
     #[test]
+    fn test_vector_iavl_left_non() -> Result<()> {
+        let spec = iavl_spec();
+        verify_test_vector("../testdata/iavl/nonexist_left.json", &spec)
+    }
+
+    #[test]
+    fn test_vector_iavl_right_non() -> Result<()> {
+        let spec = iavl_spec();
+        verify_test_vector("../testdata/iavl/nonexist_right.json", &spec)
+    }
+
+    #[test]
+    fn test_vector_iavl_middle_non() -> Result<()> {
+        let spec = iavl_spec();
+        verify_test_vector("../testdata/iavl/nonexist_middle.json", &spec)
+    }
+
+    #[test]
     fn test_vector_tendermint_left() -> Result<()> {
         let spec = tendermint_spec();
         verify_test_vector("../testdata/tendermint/exist_left.json", &spec)
@@ -158,5 +176,23 @@ mod tests {
     fn test_vector_tendermint_middle() -> Result<()> {
         let spec = tendermint_spec();
         verify_test_vector("../testdata/tendermint/exist_middle.json", &spec)
+    }
+
+    #[test]
+    fn test_vector_tendermint_left_non() -> Result<()> {
+        let spec = tendermint_spec();
+        verify_test_vector("../testdata/tendermint/nonexist_left.json", &spec)
+    }
+
+    #[test]
+    fn test_vector_tendermint_right_non() -> Result<()> {
+        let spec = tendermint_spec();
+        verify_test_vector("../testdata/tendermint/nonexist_right.json", &spec)
+    }
+
+    #[test]
+    fn test_vector_tendermint_middle_non() -> Result<()> {
+        let spec = tendermint_spec();
+        verify_test_vector("../testdata/tendermint/nonexist_middle.json", &spec)
     }
 }

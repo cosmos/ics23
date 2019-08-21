@@ -1,10 +1,11 @@
 // we want to name functions verify_* to match ics23
 #![allow(clippy::module_name_repetitions)]
 
+use failure::{bail, ensure};
+
 use crate::helpers::Result;
 use crate::ops::{apply_inner, apply_leaf};
 use crate::proofs;
-use failure::{bail, ensure};
 
 pub type CommitmentRoot = ::std::vec::Vec<u8>;
 
@@ -30,29 +31,26 @@ pub fn verify_non_existence(
     root: &[u8],
     key: &[u8],
 ) -> Result<()> {
-    let mut left_key: Option<&[u8]> = None;
-    let mut right_key: Option<&[u8]> = None;
+    if let Some(left) = &proof.left {
+        verify_existence(&left, spec, root, &left.key, &left.value)?;
+        ensure!(key > left.key.as_slice(), "left key isn't before key");
+    }
+    if let Some(right) = &proof.right {
+        verify_existence(&right, spec, root, &right.key, &right.value)?;
+        ensure!(key < right.key.as_slice(), "right key isn't after key");
+    }
 
-//    if let Some(left) = &proof.left {
-//        verify_existence(&left, spec, root, &left.key, &left.value)?;
-//        ensure!(&left.key < key, "left key isn't before key");
-//        left_key = Some(&left.key);
-//    }
-//    if let Some(right) = &proof.right {
-//        verify_existence(&right, spec, root, &right.key, &right.value)?;
-//        ensure!(key < &right.key, "right key isn't after key");
-//        right_key = Some(&right.key);
-//    }
-
-    ensure!(left_key != None || right_key != None, "neither left nor right proof defined");
-
-//    check_existence_spec(proof, spec)?;
-//    ensure!(proof.key == key, "Provided key doesn't match proof");
-//    ensure!(proof.value == value, "Provided value doesn't match proof");
-//
-//    let calc = calculate_existence_root(&proof)?;
-//    ensure!(calc == root, "Root hash doesn't match");
-    Ok(())
+    if let Some(inner) = &spec.inner_spec {
+        match (&proof.left, &proof.right) {
+            (Some(left), None) => ensure_right_most(inner, &left.path),
+            (None, Some(right)) => ensure_left_most(inner, &right.path),
+            (Some(_left), Some(_right)) => bail!("unimplemented"), // TODO
+//            (Some(_left), Some(_right)) => Ok(()), // TODO
+            (None, None) => bail!("neither left nor right proof defined"),
+        }
+    } else {
+        bail!("Inner Spec missing")
+    }
 }
 
 // Calculate determines the root hash that matches the given proof.
@@ -132,6 +130,52 @@ fn ensure_inner(inner: &proofs::InnerOp, spec: &proofs::ProofSpec) -> Result<()>
         Ok(())
     } else {
         bail!("Spec missing leaf_spec")
+    }
+}
+
+fn ensure_left_most(spec: &proofs::InnerSpec, path: &[proofs::InnerOp]) -> Result<()> {
+    let pad = get_padding(spec, 0)?;
+    for step in path {
+        if !has_padding(step, &pad) {
+            bail!("step not leftmost")
+        }
+    }
+    Ok(())
+}
+
+fn ensure_right_most(spec: &proofs::InnerSpec, path: &[proofs::InnerOp]) -> Result<()> {
+    let idx = spec.child_order.len() - 1;
+    let pad = get_padding(spec, idx as i32)?;
+    for step in path {
+        if !has_padding(step, &pad) {
+            bail!("step not leftmost")
+        }
+    }
+    Ok(())
+}
+
+
+struct Padding {
+    min_prefix: usize,
+    max_prefix: usize,
+    suffix: usize,
+}
+
+fn has_padding(op: &proofs::InnerOp, pad: &Padding) -> bool {
+    (op.prefix.len() >= pad.min_prefix) && (op.prefix.len() <= pad.max_prefix) && (op.suffix.len() == pad.suffix)
+}
+
+fn get_padding(spec: &proofs::InnerSpec, branch: i32) -> Result<Padding> {
+    if let Some(&idx) = spec.child_order.iter().find(|&&x| x == branch) {
+        let prefix = idx * spec.child_size;
+        let suffix = spec.child_size as usize * (spec.child_order.len() - 1 - idx as usize);
+        Ok(Padding{
+            min_prefix: (prefix + spec.min_prefix_length) as usize,
+            max_prefix: (prefix + spec.max_prefix_length) as usize,
+            suffix,
+        })
+    } else {
+        bail!("Branch {} not found", branch);
     }
 }
 

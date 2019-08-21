@@ -1,5 +1,4 @@
 use failure::{bail, ensure};
-use prost::{Message};
 use ripemd160::Ripemd160;
 use sha2::{Digest, Sha256, Sha512};
 use sha3::Sha3_512;
@@ -186,7 +185,7 @@ mod tests {
 
     #[test]
     fn apply_inner_prefix_suffix() -> Result<()> {
-        let mut inner = InnerOp{
+        let inner = InnerOp{
             hash: HashOp::Sha256.into(),
             prefix: hex::decode("0123456789")?,
             suffix: hex::decode("deadbeef")?
