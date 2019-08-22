@@ -14,10 +14,10 @@ The features and naming follow the [ICS23: Vector Commitments](https://github.co
 
 * Proof of Existence (key-value pair linked to root hash)
 * Hold Existence Proof to db-specific spec (avoid reinterpretation of bytes to different key-value pair)
+* Proof of Non-Existence (key proven not to be inside tree with given root hash)
 
 ### Planned Features
 
-* Proof of Non-Existence (key proven not to be inside tree with given root hash)
 * Batch Proof or Range Proof (prove many keys at once, more efficiently than separate proofs)
 
 ## Organization
