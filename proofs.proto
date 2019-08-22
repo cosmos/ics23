@@ -86,19 +86,9 @@ message CommitmentProof {
         ExistenceProof exist = 1;
         NonExistenceProof nonexist = 2;
         BatchProof batch = 3;
+        CompressedBatchProof compressed = 4;
     }
 }
-
-/*
-BatchProof is a group of multiple proof types than can be compressed
-*/
-message BatchProof {
-    repeated CommitmentProof proofs = 1;
-}
-
-/**
-TODO: CompressedBatchProof
-**/
 
 /**
 LeafOp represents the raw key-value data we wish to prove, and
@@ -188,4 +178,48 @@ message InnerSpec {
     int32 min_prefix_length = 3;
     int32 max_prefix_length = 4;
     bytes empty_child = 5;
+}
+
+/*
+BatchProof is a group of multiple proof types than can be compressed
+*/
+message BatchProof {
+  repeated BatchEntry entries = 1;
+}
+
+// Use BatchEntry not CommitmentProof, to avoid recursion
+message BatchEntry {
+  oneof proof {
+    ExistenceProof exist = 1;
+    NonExistenceProof nonexist = 2;
+  }
+}
+
+
+/****** all items here are compressed forms *******/
+
+message CompressedBatchProof {
+  repeated BatchEntry entries = 1;
+  repeated InnerOp lookup_inners = 2;
+}
+
+// Use BatchEntry not CommitmentProof, to avoid recursion
+message CompressedBatchEntry {
+  oneof proof {
+    CompressedExistenceProof exist = 1;
+    CompressedNonExistenceProof nonexist = 2;
+  }
+}
+
+message CompressedExistenceProof {
+  bytes key = 1;
+  bytes value = 2;
+  LeafOp leaf = 3;
+  // these are indexes into the lookup_inners table in CompressedBatchProof
+  repeated int32 path = 4;    
+}
+
+message CompressedNonExistenceProof {
+  CompressedExistenceProof left = 2;
+  CompressedExistenceProof right = 3;
 }
