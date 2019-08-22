@@ -1,12 +1,12 @@
 {
-  "name": "@confio/proofs",
+  "name": "@confio/ics23",
   "version": "0.4.0",
-  "description": "Merkle proof verification library",
+  "description": "Merkle proof verification library - implements Cosmos ICS23 Spec",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/confio/proofs/tree/master/js"
+    "url": "https://github.com/confio/ics23/tree/master/js"
   },
   "publishConfig": {
     "access": "public",
@@ -16,7 +16,8 @@
   "license": "Apache-2.0",
   "private": false,
   "files": [
-    "./build/**"
+    "build/**",
+    "yarn.lock"
   ],
   "scripts": {
     "lint": "tslint -t verbose --project .",
@@ -34,18 +35,18 @@
     "@types/ripemd160": "^2.0.0",
     "@types/sha.js": "^2.4.0",
     "jasmine": "^3.4.0",
+    "jasmine-console-reporter": "^3.1.0",
     "prettier": "^1.17.0",
     "shx": "^0.3.2",
+    "source-map-support": "^0.5.12",
     "tslint": "^5.16.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-immutable": "^5.5.2",
     "typescript": "^3.4.3"
   },
   "dependencies": {
-    "jasmine-console-reporter": "^3.1.0",
     "protobufjs": "^6.8.8",
     "ripemd160": "^2.0.2",
-    "sha.js": "^2.4.11",
-    "source-map-support": "^0.5.12"
+    "sha.js": "^2.4.11"
   }
 }
