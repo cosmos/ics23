@@ -1,4 +1,4 @@
-module github.com/confio/proofs/go
+module github.com/confio/ics23/go
 
 go 1.12
 
