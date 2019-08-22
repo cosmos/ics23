@@ -22,6 +22,10 @@ and determine neighbors
 */
 package proofs
 
+import (
+	"bytes"
+)
+
 // CommitmentRoot is a byte slice that represents the merkle root of a tree that can be used to validate proofs
 type CommitmentRoot []byte
 
@@ -29,12 +33,11 @@ type CommitmentRoot []byte
 // proof is (contains) an ExistenceProof for the given key and value AND
 // calculating the root for the ExistenceProof matches the provided CommitmentRoot
 func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, key []byte, value []byte) bool {
-	// TODO: handle batch
-	ep, ok := proof.Proof.(*CommitmentProof_Exist)
-	if !ok {
+	ep := getExistProofForKey(proof, key)
+	if ep == nil {
 		return false
 	}
-	err := ep.Exist.Verify(spec, root, key, value)
+	err := ep.Verify(spec, root, key, value)
 	return err == nil
 }
 
@@ -51,4 +54,21 @@ func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *Commitment
 	}
 	err := np.Nonexist.Verify(spec, root, key)
 	return err == nil
+}
+
+func getExistProofForKey(proof *CommitmentProof, key []byte) *ExistenceProof{
+	switch p := proof.Proof.(type) {
+	case *CommitmentProof_Exist:
+		ep := p.Exist
+		if bytes.Equal(ep.Key, key) {
+			return ep
+		}
+	case *CommitmentProof_Batch:
+		for _, sub := range p.Batch.Entries {
+			if ep := sub.GetExist(); ep != nil && bytes.Equal(ep.Key, key) {
+				return ep
+			}
+		}
+	}
+	return nil
 }
