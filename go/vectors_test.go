@@ -162,6 +162,10 @@ func TestBatchVectors(t *testing.T) {
 		ref *RefData
 	}{
 		"iavl 0": {spec: IavlSpec, proof: batch_iavl, ref: refs_iavl[0]},
+		"iavl 1": {spec: IavlSpec, proof: batch_iavl, ref: refs_iavl[1]},
+		"iavl 2": {spec: IavlSpec, proof: batch_iavl, ref: refs_iavl[2]},
+		"iavl 3": {spec: IavlSpec, proof: batch_iavl, ref: refs_iavl[3]},
+		"iavl 4": {spec: IavlSpec, proof: batch_iavl, ref: refs_iavl[4]},
 		"tm 1": {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[1]},
 	}
 
