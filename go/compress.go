@@ -64,6 +64,7 @@ func compressEntry(entry *BatchEntry, lookup *[]*InnerOp, registry map[string]in
 	return &CompressedBatchEntry{
 		Proof: &CompressedBatchEntry_Nonexist{
 			Nonexist: &CompressedNonExistenceProof{
+				Key:   non.Key,
 				Left:  compressExist(non.Left, lookup, registry),
 				Right: compressExist(non.Right, lookup, registry),
 			},
@@ -131,6 +132,7 @@ func decompressEntry(entry *CompressedBatchEntry, lookup []*InnerOp) *BatchEntry
 	return &BatchEntry{
 		Proof: &BatchEntry_Nonexist{
 			Nonexist: &NonExistenceProof{
+				Key:   non.Key,
 				Left:  decompressExist(non.Left, lookup),
 				Right: decompressExist(non.Right, lookup),
 			},

@@ -220,6 +220,7 @@ message CompressedExistenceProof {
 }
 
 message CompressedNonExistenceProof {
+  bytes key = 1; // TODO: remove this as unnecessary??? we prove a range
   CompressedExistenceProof left = 2;
   CompressedExistenceProof right = 3;
 }

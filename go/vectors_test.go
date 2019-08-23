@@ -1,6 +1,7 @@
 package ics23
 
 import (
+	"bytes"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -259,6 +260,20 @@ func TestCompressBatchVectors(t *testing.T) {
 			}
 
 			// TODO: decompress
+			decomp := Decompress(compressed)
+			if decomp == compressed {
+				t.Fatalf("Decompression is a no-op")
+			}
+			refresh, err := decomp.Marshal()
+			if err != nil {
+				t.Fatalf("Marshal batch %v", err)
+			}
+			if len(refresh) != len(orig) {
+				t.Fatalf("Decompressed len %d, original len %d", len(refresh), len(orig))
+			}
+			if !bytes.Equal(refresh, orig) {
+				t.Fatal("Decompressed batch proof differs from original")
+			}
 		})
 	}
 }
