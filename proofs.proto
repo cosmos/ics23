@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package proofs;
+package ics23;
 
 enum HashOp {
     // NO_HASH is the default if no data passed. Note this is an illegal argument some places.
@@ -199,7 +199,7 @@ message BatchEntry {
 /****** all items here are compressed forms *******/
 
 message CompressedBatchProof {
-  repeated BatchEntry entries = 1;
+  repeated CompressedBatchEntry entries = 1;
   repeated InnerOp lookup_inners = 2;
 }
 
