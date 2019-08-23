@@ -13,15 +13,15 @@ import (
 type TestVector struct {
 	RootHash string `json:"root"`
 	Proof    string `json:"proof"`
-	Key    string `json:"key"`
+	Key      string `json:"key"`
 	Value    string `json:"value"`
 }
 
 // RefData is parsed version of everything except the CommitmentProof itself
-type RefData struct{
+type RefData struct {
 	RootHash []byte
-	Key []byte
-	Value []byte
+	Key      []byte
+	Value    []byte
 }
 
 func TestVectors(t *testing.T) {
@@ -132,7 +132,6 @@ func loadBatch(t *testing.T, dir string, filenames []string) (*CommitmentProof, 
 	return result, refs
 }
 
-
 func TestBatchVectors(t *testing.T) {
 	iavl := filepath.Join("..", "testdata", "iavl")
 	tendermint := filepath.Join("..", "testdata", "tendermint")
@@ -157,11 +156,10 @@ func TestBatchVectors(t *testing.T) {
 		"nonexist_middle.json",
 	})
 
-
 	cases := map[string]struct {
-		spec     *ProofSpec
-		proof 	 *CommitmentProof
-		ref 	*RefData
+		spec    *ProofSpec
+		proof   *CommitmentProof
+		ref     *RefData
 		invalid bool // default is valid
 	}{
 		"iavl 0": {spec: IavlSpec, proof: batch_iavl, ref: refs_iavl[0]},
@@ -173,12 +171,12 @@ func TestBatchVectors(t *testing.T) {
 		// Note this spec only differs for non-existence proofs
 		"iavl invalid 1": {spec: TendermintSpec, proof: batch_iavl, ref: refs_iavl[4], invalid: true},
 		"iavl invalid 2": {spec: IavlSpec, proof: batch_iavl, ref: refs_tm[0], invalid: true},
-		"tm 0": {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[0]},
-		"tm 1": {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[1]},
-		"tm 2": {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[2]},
-		"tm 3": {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[3]},
-		"tm 4": {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[4]},
-		"tm 5": {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[5]},
+		"tm 0":           {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[0]},
+		"tm 1":           {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[1]},
+		"tm 2":           {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[2]},
+		"tm 3":           {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[3]},
+		"tm 4":           {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[4]},
+		"tm 5":           {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[5]},
 		// Note this spec only differs for non-existence proofs
 		"tm invalid 1": {spec: IavlSpec, proof: batch_tm, ref: refs_tm[4], invalid: true},
 		"tm invalid 2": {spec: TendermintSpec, proof: batch_tm, ref: refs_iavl[0], invalid: true},
@@ -187,29 +185,29 @@ func TestBatchVectors(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			// try one proof
-				if tc.ref.Value == nil {
-					// non-existence
-					valid := VerifyNonMembership(tc.spec, tc.ref.RootHash, tc.proof, tc.ref.Key)
-					if valid == tc.invalid {
-						t.Fatalf("Expected proof validity: %t", !tc.invalid)
-					}
-					keys := [][]byte{tc.ref.Key}
-					valid = BatchVerifyNonMembership(tc.spec, tc.ref.RootHash, tc.proof, keys)
-					if valid == tc.invalid {
-						t.Fatalf("Expected batch proof validity: %t", !tc.invalid)
-					}
-				} else {
-					valid := VerifyMembership(tc.spec, tc.ref.RootHash, tc.proof, tc.ref.Key, tc.ref.Value)
-					if valid == tc.invalid {
-						t.Fatalf("Expected proof validity: %t", !tc.invalid)
-					}
-					items := make(map[string][]byte)
-					items[string(tc.ref.Key)] = tc.ref.Value
-					valid = BatchVerifyMembership(tc.spec, tc.ref.RootHash, tc.proof, items)
-					if valid == tc.invalid {
-						t.Fatalf("Expected batch proof validity: %t", !tc.invalid)
-					}
-				}	
+			if tc.ref.Value == nil {
+				// non-existence
+				valid := VerifyNonMembership(tc.spec, tc.ref.RootHash, tc.proof, tc.ref.Key)
+				if valid == tc.invalid {
+					t.Fatalf("Expected proof validity: %t", !tc.invalid)
+				}
+				keys := [][]byte{tc.ref.Key}
+				valid = BatchVerifyNonMembership(tc.spec, tc.ref.RootHash, tc.proof, keys)
+				if valid == tc.invalid {
+					t.Fatalf("Expected batch proof validity: %t", !tc.invalid)
+				}
+			} else {
+				valid := VerifyMembership(tc.spec, tc.ref.RootHash, tc.proof, tc.ref.Key, tc.ref.Value)
+				if valid == tc.invalid {
+					t.Fatalf("Expected proof validity: %t", !tc.invalid)
+				}
+				items := make(map[string][]byte)
+				items[string(tc.ref.Key)] = tc.ref.Value
+				valid = BatchVerifyMembership(tc.spec, tc.ref.RootHash, tc.proof, items)
+				if valid == tc.invalid {
+					t.Fatalf("Expected batch proof validity: %t", !tc.invalid)
+				}
+			}
 		})
 	}
 }
@@ -231,16 +229,15 @@ func TestCompressBatchVectors(t *testing.T) {
 		"nonexist_middle.json",
 	})
 
-
 	cases := map[string]struct {
 		batch *CommitmentProof
 	}{
-		"iavl": {batch: batch_iavl},
+		"iavl":       {batch: batch_iavl},
 		"tendermint": {batch: batch_tm},
 	}
 
 	for name, tc := range cases {
-		t.Run(name, func (t *testing.T){
+		t.Run(name, func(t *testing.T) {
 			orig, err := tc.batch.Marshal()
 			if err != nil {
 				t.Fatalf("Marshal batch %v", err)
@@ -265,7 +262,6 @@ func TestCompressBatchVectors(t *testing.T) {
 		})
 	}
 }
-
 
 func mustHex(t *testing.T, data string) []byte {
 	res, err := hex.DecodeString(data)

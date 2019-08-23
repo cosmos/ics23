@@ -46,7 +46,7 @@ func compress(batch *BatchProof) *CompressedBatchProof {
 	}
 
 	return &CompressedBatchProof{
-		Entries: centries,
+		Entries:      centries,
 		LookupInners: lookup,
 	}
 }
@@ -60,23 +60,23 @@ func compressEntry(entry *BatchEntry, lookup *[]*InnerOp, registry map[string]in
 		}
 	}
 
-		non := entry.GetNonexist()
-		return &CompressedBatchEntry{
-			Proof: &CompressedBatchEntry_Nonexist{
-				Nonexist: &CompressedNonExistenceProof{
-					Left: compressExist(non.Left, lookup, registry),
-					Right: compressExist(non.Right, lookup, registry),
-				},
+	non := entry.GetNonexist()
+	return &CompressedBatchEntry{
+		Proof: &CompressedBatchEntry_Nonexist{
+			Nonexist: &CompressedNonExistenceProof{
+				Left:  compressExist(non.Left, lookup, registry),
+				Right: compressExist(non.Right, lookup, registry),
 			},
-		}
+		},
+	}
 }
 
 func compressExist(exist *ExistenceProof, lookup *[]*InnerOp, registry map[string]int32) *CompressedExistenceProof {
 	res := &CompressedExistenceProof{
-		Key: exist.Key,
+		Key:   exist.Key,
 		Value: exist.Value,
-		Leaf: exist.Leaf,
-		Path: make([]int32, len(exist.Path)),
+		Leaf:  exist.Leaf,
+		Path:  make([]int32, len(exist.Path)),
 	}
 	for i, step := range exist.Path {
 		res.Path[i] = compressStep(step, lookup, registry)
@@ -127,23 +127,23 @@ func decompressEntry(entry *CompressedBatchEntry, lookup []*InnerOp) *BatchEntry
 		}
 	}
 
-		non := entry.GetNonexist()
-		return &BatchEntry{
-			Proof: &BatchEntry_Nonexist{
-				Nonexist: &NonExistenceProof{
-					Left: decompressExist(non.Left, lookup),
-					Right: decompressExist(non.Right, lookup),
-				},
+	non := entry.GetNonexist()
+	return &BatchEntry{
+		Proof: &BatchEntry_Nonexist{
+			Nonexist: &NonExistenceProof{
+				Left:  decompressExist(non.Left, lookup),
+				Right: decompressExist(non.Right, lookup),
 			},
-		}
+		},
+	}
 }
 
 func decompressExist(exist *CompressedExistenceProof, lookup []*InnerOp) *ExistenceProof {
 	res := &ExistenceProof{
-		Key: exist.Key,
+		Key:   exist.Key,
 		Value: exist.Value,
-		Leaf: exist.Leaf,
-		Path: make([]*InnerOp, len(exist.Path)),
+		Leaf:  exist.Leaf,
+		Path:  make([]*InnerOp, len(exist.Path)),
 	}
 	for i, step := range exist.Path {
 		res.Path[i] = lookup[step]

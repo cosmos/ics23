@@ -90,8 +90,7 @@ func BatchVerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *Commi
 	return true
 }
 
-
-func getExistProofForKey(proof *CommitmentProof, key []byte) *ExistenceProof{
+func getExistProofForKey(proof *CommitmentProof, key []byte) *ExistenceProof {
 	switch p := proof.Proof.(type) {
 	case *CommitmentProof_Exist:
 		ep := p.Exist
@@ -108,7 +107,7 @@ func getExistProofForKey(proof *CommitmentProof, key []byte) *ExistenceProof{
 	return nil
 }
 
-func getNonExistProofForKey(proof *CommitmentProof, key []byte) *NonExistenceProof{
+func getNonExistProofForKey(proof *CommitmentProof, key []byte) *NonExistenceProof {
 	switch p := proof.Proof.(type) {
 	case *CommitmentProof_Nonexist:
 		np := p.Nonexist
