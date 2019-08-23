@@ -58,7 +58,8 @@ func compressEntry(entry *BatchEntry, lookup *[]*InnerOp, registry map[string]in
 				Exist: compressExist(exist, lookup, registry),
 			},
 		}
-	} else {
+	}
+
 		non := entry.GetNonexist()
 		return &CompressedBatchEntry{
 			Proof: &CompressedBatchEntry_Nonexist{
@@ -68,7 +69,6 @@ func compressEntry(entry *BatchEntry, lookup *[]*InnerOp, registry map[string]in
 				},
 			},
 		}
-	}
 }
 
 func compressExist(exist *ExistenceProof, lookup *[]*InnerOp, registry map[string]int32) *CompressedExistenceProof {
@@ -104,5 +104,49 @@ func compressStep(step *InnerOp, lookup *[]*InnerOp, registry map[string]int32) 
 }
 
 func decompress(comp *CompressedBatchProof) *BatchProof {
-	return nil
+	lookup := comp.LookupInners
+
+	var entries []*BatchEntry
+
+	for _, centry := range comp.Entries {
+		entry := decompressEntry(centry, lookup)
+		entries = append(entries, entry)
+	}
+
+	return &BatchProof{
+		Entries: entries,
+	}
+}
+
+func decompressEntry(entry *CompressedBatchEntry, lookup []*InnerOp) *BatchEntry {
+	if exist := entry.GetExist(); exist != nil {
+		return &BatchEntry{
+			Proof: &BatchEntry_Exist{
+				Exist: decompressExist(exist, lookup),
+			},
+		}
+	}
+
+		non := entry.GetNonexist()
+		return &BatchEntry{
+			Proof: &BatchEntry_Nonexist{
+				Nonexist: &NonExistenceProof{
+					Left: decompressExist(non.Left, lookup),
+					Right: decompressExist(non.Right, lookup),
+				},
+			},
+		}
+}
+
+func decompressExist(exist *CompressedExistenceProof, lookup []*InnerOp) *ExistenceProof {
+	res := &ExistenceProof{
+		Key: exist.Key,
+		Value: exist.Value,
+		Leaf: exist.Leaf,
+		Path: make([]*InnerOp, len(exist.Path)),
+	}
+	for i, step := range exist.Path {
+		res.Path[i] = lookup[step]
+	}
+	return res
 }
