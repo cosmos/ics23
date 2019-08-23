@@ -137,6 +137,8 @@ func TestBatchVectors(t *testing.T) {
 	iavl := filepath.Join("..", "testdata", "iavl")
 	tendermint := filepath.Join("..", "testdata", "tendermint")
 
+	// Note that each item has a different commitment root,
+	// so maybe not ideal (cannot check multiple entries)
 	batch_iavl, refs_iavl := loadBatch(t, iavl, []string{
 		"exist_left.json",
 		"exist_right.json",
@@ -159,30 +161,55 @@ func TestBatchVectors(t *testing.T) {
 	cases := map[string]struct {
 		spec     *ProofSpec
 		proof 	 *CommitmentProof
-		ref *RefData
+		ref 	*RefData
+		invalid bool // default is valid
 	}{
 		"iavl 0": {spec: IavlSpec, proof: batch_iavl, ref: refs_iavl[0]},
 		"iavl 1": {spec: IavlSpec, proof: batch_iavl, ref: refs_iavl[1]},
 		"iavl 2": {spec: IavlSpec, proof: batch_iavl, ref: refs_iavl[2]},
 		"iavl 3": {spec: IavlSpec, proof: batch_iavl, ref: refs_iavl[3]},
 		"iavl 4": {spec: IavlSpec, proof: batch_iavl, ref: refs_iavl[4]},
+		"iavl 5": {spec: IavlSpec, proof: batch_iavl, ref: refs_iavl[5]},
+		// Note this spec only differs for non-existence proofs
+		"iavl invalid 1": {spec: TendermintSpec, proof: batch_iavl, ref: refs_iavl[4], invalid: true},
+		"iavl invalid 2": {spec: IavlSpec, proof: batch_iavl, ref: refs_tm[0], invalid: true},
+		"tm 0": {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[0]},
 		"tm 1": {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[1]},
+		"tm 2": {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[2]},
+		"tm 3": {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[3]},
+		"tm 4": {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[4]},
+		"tm 5": {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[5]},
+		// Note this spec only differs for non-existence proofs
+		"tm invalid 1": {spec: IavlSpec, proof: batch_tm, ref: refs_tm[4], invalid: true},
+		"tm invalid 2": {spec: TendermintSpec, proof: batch_tm, ref: refs_iavl[0], invalid: true},
 	}
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			if tc.ref.Value == nil {
-				// non-existence
-				valid := VerifyNonMembership(tc.spec, tc.ref.RootHash, tc.proof, tc.ref.Key)
-				if !valid {
-					t.Fatal("Invalid proof")
-				}
-			} else {
-				valid := VerifyMembership(tc.spec, tc.ref.RootHash, tc.proof, tc.ref.Key, tc.ref.Value)
-				if !valid {
-					t.Fatal("Invalid proof")
-				}
-			}
+			// try one proof
+				if tc.ref.Value == nil {
+					// non-existence
+					valid := VerifyNonMembership(tc.spec, tc.ref.RootHash, tc.proof, tc.ref.Key)
+					if valid == tc.invalid {
+						t.Fatalf("Expected proof validity: %t", !tc.invalid)
+					}
+					keys := [][]byte{tc.ref.Key}
+					valid = BatchVerifyNonMembership(tc.spec, tc.ref.RootHash, tc.proof, keys)
+					if valid == tc.invalid {
+						t.Fatalf("Expected batch proof validity: %t", !tc.invalid)
+					}
+				} else {
+					valid := VerifyMembership(tc.spec, tc.ref.RootHash, tc.proof, tc.ref.Key, tc.ref.Value)
+					if valid == tc.invalid {
+						t.Fatalf("Expected proof validity: %t", !tc.invalid)
+					}
+					items := make(map[string][]byte)
+					items[string(tc.ref.Key)] = tc.ref.Value
+					valid = BatchVerifyMembership(tc.spec, tc.ref.RootHash, tc.proof, items)
+					if valid == tc.invalid {
+						t.Fatalf("Expected batch proof validity: %t", !tc.invalid)
+					}
+				}	
 		})
 	}
 }

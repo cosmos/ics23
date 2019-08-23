@@ -24,6 +24,7 @@ package proofs
 
 import (
 	"bytes"
+	"fmt"
 )
 
 // CommitmentRoot is a byte slice that represents the merkle root of a tree that can be used to validate proofs
@@ -55,6 +56,33 @@ func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *Commitment
 	err := np.Verify(spec, root, key)
 	return err == nil
 }
+
+// BatchVerifyMembership will ensure all items are also proven by the CommitmentProof (which should be a BatchProof,
+// unless there is one item, when a ExistenceProof may work)
+func BatchVerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, items map[string][]byte) bool {
+	for k, v := range items {
+		valid := VerifyMembership(spec, root, proof, []byte(k), v)
+		fmt.Printf("Validate %t\n", valid)
+		if !valid {
+			return false
+		}
+	}
+	return true
+}
+
+// BatchVerifyNonMembership will ensure all items are also proven to not be in the Commitment by the CommitmentProof
+// (which should be a BatchProof, unless there is one item, when a NonExistenceProof may work)
+func BatchVerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, keys [][]byte) bool {
+	for _, k := range keys {
+		valid := VerifyNonMembership(spec, root, proof, k)
+		fmt.Printf("Validate non %t\n", valid)
+		if !valid {
+			return false
+		}
+	}
+	return true
+}
+
 
 func getExistProofForKey(proof *CommitmentProof, key []byte) *ExistenceProof{
 	switch p := proof.Proof.(type) {
