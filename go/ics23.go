@@ -20,7 +20,7 @@ We make an adjustment to accept a Spec to ensure the provided proof is in the fo
 This can avoid an range of attacks on fake preimages, as we need to be careful on how to map key, value -> leaf
 and determine neighbors
 */
-package proofs
+package ics23
 
 import (
 	"bytes"
