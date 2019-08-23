@@ -214,6 +214,58 @@ func TestBatchVectors(t *testing.T) {
 	}
 }
 
+func TestCompressBatchVectors(t *testing.T) {
+	iavl := filepath.Join("..", "testdata", "iavl")
+	tendermint := filepath.Join("..", "testdata", "tendermint")
+
+	// Note that each item has a different commitment root,
+	// so maybe not ideal (cannot check multiple entries)
+	batch_iavl, _ := loadBatch(t, iavl, []string{
+		"exist_left.json",
+		"exist_middle.json",
+		"nonexist_middle.json",
+	})
+	batch_tm, _ := loadBatch(t, tendermint, []string{
+		"exist_left.json",
+		"exist_middle.json",
+		"nonexist_middle.json",
+	})
+
+
+	cases := map[string]struct {
+		batch *CommitmentProof
+	}{
+		"iavl": {batch: batch_iavl},
+		"tendermint": {batch: batch_tm},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func (t *testing.T){
+			orig, err := tc.batch.Marshal()
+			if err != nil {
+				t.Fatalf("Marshal batch %v", err)
+			}
+
+			compressed := Compress(tc.batch)
+			small, err := compressed.Marshal()
+			if err != nil {
+				t.Fatalf("Marshal batch %v", err)
+			}
+			// ensure we got some reduction... at least 10%
+			if 10*len(small) > 9*len(orig) {
+				t.Fatalf("Compression yield less than 10%%")
+			}
+
+			recompressed := Compress(compressed)
+			if compressed != recompressed {
+				t.Fatal("Recompression is not a no-op")
+			}
+
+			// TODO: decompress
+		})
+	}
+}
+
 
 func mustHex(t *testing.T, data string) []byte {
 	res, err := hex.DecodeString(data)
