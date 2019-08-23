@@ -34,6 +34,8 @@ type CommitmentRoot []byte
 // proof is (contains) an ExistenceProof for the given key and value AND
 // calculating the root for the ExistenceProof matches the provided CommitmentRoot
 func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, key []byte, value []byte) bool {
+	// decompress it before running code (no-op if not compressed)
+	proof = Decompress(proof)
 	ep := getExistProofForKey(proof, key)
 	if ep == nil {
 		return false
@@ -48,7 +50,8 @@ func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentPro
 // left and right proofs are neighbors (or left/right most if one is nil)
 // provided key is between the keys of the two proofs
 func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, key []byte) bool {
-	// TODO: handle batch
+	// decompress it before running code (no-op if not compressed)
+	proof = Decompress(proof)
 	np := getNonExistProofForKey(proof, key)
 	if np == nil {
 		return false
@@ -60,6 +63,8 @@ func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *Commitment
 // BatchVerifyMembership will ensure all items are also proven by the CommitmentProof (which should be a BatchProof,
 // unless there is one item, when a ExistenceProof may work)
 func BatchVerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, items map[string][]byte) bool {
+	// decompress it before running code (no-op if not compressed) - once for batch
+	proof = Decompress(proof)
 	for k, v := range items {
 		valid := VerifyMembership(spec, root, proof, []byte(k), v)
 		fmt.Printf("Validate %t\n", valid)
@@ -73,6 +78,8 @@ func BatchVerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *Commitme
 // BatchVerifyNonMembership will ensure all items are also proven to not be in the Commitment by the CommitmentProof
 // (which should be a BatchProof, unless there is one item, when a NonExistenceProof may work)
 func BatchVerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, keys [][]byte) bool {
+	// decompress it before running code (no-op if not compressed) - once for batch
+	proof = Decompress(proof)
 	for _, k := range keys {
 		valid := VerifyNonMembership(spec, root, proof, k)
 		fmt.Printf("Validate non %t\n", valid)
