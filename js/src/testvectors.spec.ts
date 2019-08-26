@@ -197,6 +197,14 @@ describe("calculateExistenceRoot", () => {
       "../testdata/iavl/nonexist_middle.json"
     ]);
     const small = compress(proof);
+
+    // ensure this is acutally a different format
+    const origBin = ics23.CommitmentProof.encode(proof).finish();
+    const origBin2 = ics23.CommitmentProof.encode(proof).finish();
+    const smallBin = ics23.CommitmentProof.encode(small).finish();
+    expect(origBin).toEqual(origBin2);
+    expect(origBin).not.toEqual(smallBin);
+
     validateBatch(small, IavlSpec, data[0]);
   });
 
@@ -210,6 +218,14 @@ describe("calculateExistenceRoot", () => {
       "../testdata/iavl/nonexist_middle.json"
     ]);
     const small = compress(proof);
+
+    // ensure this is acutally a different format
+    const origBin = ics23.CommitmentProof.encode(proof).finish();
+    const origBin2 = ics23.CommitmentProof.encode(proof).finish();
+    const smallBin = ics23.CommitmentProof.encode(small).finish();
+    expect(origBin).toEqual(origBin2);
+    expect(origBin).not.toEqual(smallBin);
+
     validateBatch(small, IavlSpec, data[5]);
   });
 
