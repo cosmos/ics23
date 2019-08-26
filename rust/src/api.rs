@@ -1,3 +1,4 @@
+use failure::bail;
 use std::collections::HashMap;
 
 use crate::ics23;
@@ -12,7 +13,7 @@ pub fn verify_membership(
     key: &[u8],
     value: &[u8],
 ) -> bool {
-//    if let Some(ics23::commitment_proof::Proof::Exist(ex)) = &proof.proof {
+    //    if let Some(ics23::commitment_proof::Proof::Exist(ex)) = &proof.proof {
     if let Some(ex) = get_exist_proof(proof, key) {
         let valid = verify_existence(&ex, spec, root, key, value);
         valid.is_ok()
@@ -20,7 +21,6 @@ pub fn verify_membership(
         false
     }
 }
-
 
 // Use CommitmentRoot vs &[u8] to stick with ics naming
 pub fn verify_non_membership(
@@ -43,7 +43,9 @@ pub fn verify_batch_membership(
     root: &CommitmentRoot,
     items: HashMap<&[u8], &[u8]>,
 ) -> bool {
-    items.iter().all(|(key, value)| verify_membership(proof, spec, root, key, value))
+    items
+        .iter()
+        .all(|(key, value)| verify_membership(proof, spec, root, key, value))
 }
 
 pub fn verify_batch_non_membership(
@@ -52,46 +54,52 @@ pub fn verify_batch_non_membership(
     root: &CommitmentRoot,
     keys: &[&[u8]],
 ) -> bool {
-    keys.iter().all(|key| verify_non_membership(proof, spec, root, key))
+    keys.iter()
+        .all(|key| verify_non_membership(proof, spec, root, key))
 }
 
-
-fn get_exist_proof<'a>(proof: &'a ics23::CommitmentProof, key: &[u8]) -> Option<&'a ics23::ExistenceProof> {
+fn get_exist_proof<'a>(
+    proof: &'a ics23::CommitmentProof,
+    key: &[u8],
+) -> Option<&'a ics23::ExistenceProof> {
     match &proof.proof {
         Some(ics23::commitment_proof::Proof::Exist(ex)) => Some(ex),
         Some(ics23::commitment_proof::Proof::Batch(batch)) => {
             for entry in &batch.entries {
                 if let Some(ics23::batch_entry::Proof::Exist(ex)) = &entry.proof {
                     if ex.key == key {
-                        return Some(ex)
+                        return Some(ex);
                     }
                 }
             }
             None
-        },
+        }
         _ => None,
     }
 }
 
-fn get_nonexist_proof<'a>(proof: &'a ics23::CommitmentProof, key: &[u8]) -> Option<&'a ics23::NonExistenceProof> {
+fn get_nonexist_proof<'a>(
+    proof: &'a ics23::CommitmentProof,
+    key: &[u8],
+) -> Option<&'a ics23::NonExistenceProof> {
     match &proof.proof {
         Some(ics23::commitment_proof::Proof::Nonexist(non)) => Some(non),
         Some(ics23::commitment_proof::Proof::Batch(batch)) => {
             for entry in &batch.entries {
                 if let Some(ics23::batch_entry::Proof::Nonexist(non)) = &entry.proof {
                     // use iter/all - true if None, must check if Some
-                    if non.left.iter().all(|x| x.key.as_slice() < key) &&
-                        non.right.iter().all(|x| x.key.as_slice() > key) {
+                    if non.left.iter().all(|x| x.key.as_slice() < key)
+                        && non.right.iter().all(|x| x.key.as_slice() > key)
+                    {
                         return Some(non);
                     }
                 }
             }
             None
-        },
+        }
         _ => None,
     }
 }
-
 
 #[warn(clippy::ptr_arg)]
 pub fn iavl_spec() -> ics23::ProofSpec {
@@ -145,6 +153,7 @@ mod tests {
     use serde::Deserialize;
     use std::fs::File;
     use std::io::prelude::*;
+    use std::vec::Vec;
 
     use crate::helpers::Result;
 
@@ -156,26 +165,43 @@ mod tests {
         pub value: String,
     }
 
-    fn verify_test_vector(filename: &str, spec: &ics23::ProofSpec) -> Result<()> {
+    struct RefData {
+        pub root: Vec<u8>,
+        pub key: Vec<u8>,
+        pub value: Option<Vec<u8>>,
+    }
+
+    fn load_file(filename: &str) -> Result<(ics23::CommitmentProof, RefData)> {
         let mut file = File::open(filename)?;
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
 
         let data: TestVector = serde_json::from_str(&contents)?;
         let proto_bin = hex::decode(&data.proof)?;
-        let root = hex::decode(data.root)?;
-        let key = hex::decode(data.key)?;
-
         let mut parsed = ics23::CommitmentProof { proof: None };
         parsed.merge(&proto_bin)?;
 
-        if data.value.is_empty() {
-            let valid = super::verify_non_membership(&parsed, spec, &root, &key);
+        let root = hex::decode(data.root)?;
+        let key = hex::decode(data.key)?;
+        let value = if data.value.is_empty() {
+            None
+        } else {
+            Some(hex::decode(data.value)?)
+        };
+        let data = RefData { root, key, value };
+
+        Ok((parsed, data))
+    }
+
+    fn verify_test_vector(filename: &str, spec: &ics23::ProofSpec) -> Result<()> {
+        let (proof, data) = load_file(filename)?;
+
+        if let Some(value) = data.value {
+            let valid = super::verify_membership(&proof, spec, &data.root, &data.key, &value);
             ensure!(valid, "invalid test vector");
             Ok(())
         } else {
-            let value = hex::decode(data.value)?;
-            let valid = super::verify_membership(&parsed, spec, &root, &key, &value);
+            let valid = super::verify_non_membership(&proof, spec, &data.root, &data.key);
             ensure!(valid, "invalid test vector");
             Ok(())
         }
@@ -252,4 +278,115 @@ mod tests {
         let spec = tendermint_spec();
         verify_test_vector("../testdata/tendermint/nonexist_middle.json", &spec)
     }
+
+    fn load_batch(files: &[&str]) -> Result<(ics23::CommitmentProof, Vec<RefData>)> {
+        let mut entries = Vec::new();
+        let mut data = Vec::new();
+
+        for &file in files {
+            let (proof, datum) = load_file(file)?;
+            data.push(datum);
+            match proof.proof {
+                Some(ics23::commitment_proof::Proof::Nonexist(non)) => {
+                    entries.push(ics23::BatchEntry {
+                        proof: Some(ics23::batch_entry::Proof::Nonexist(non)),
+                    })
+                }
+                Some(ics23::commitment_proof::Proof::Exist(ex)) => {
+                    entries.push(ics23::BatchEntry {
+                        proof: Some(ics23::batch_entry::Proof::Exist(ex)),
+                    })
+                }
+                _ => bail!("unknown proof type to batch"),
+            }
+        }
+
+        let batch = ics23::CommitmentProof {
+            proof: Some(ics23::commitment_proof::Proof::Batch(ics23::BatchProof {
+                entries,
+            })),
+        };
+
+        Ok((batch, data))
+    }
+
+    fn verify_batch(
+        spec: &ics23::ProofSpec,
+        proof: &ics23::CommitmentProof,
+        data: &RefData,
+    ) -> Result<()> {
+        if let Some(value) = &data.value {
+            let valid = super::verify_membership(&proof, spec, &data.root, &data.key, &value);
+            ensure!(valid, "invalid test vector");
+            let mut items = HashMap::new();
+            items.insert(data.key.as_slice(), value.as_slice());
+            let valid = super::verify_batch_membership(&proof, spec, &data.root, items);
+            ensure!(valid, "invalid test vector");
+            Ok(())
+        } else {
+            let valid = super::verify_non_membership(&proof, spec, &data.root, &data.key);
+            ensure!(valid, "invalid test vector");
+            let keys= &[data.key.as_slice()];
+            let valid = super::verify_batch_non_membership(&proof, spec, &data.root, keys);
+            ensure!(valid, "invalid test vector");
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn test_vector_iavl_batch_exist() -> Result<()> {
+        let spec = iavl_spec();
+        let (proof, data) = load_batch(&[
+            "../testdata/iavl/exist_left.json",
+            "../testdata/iavl/exist_right.json",
+            "../testdata/iavl/exist_middle.json",
+            "../testdata/iavl/nonexist_left.json",
+            "../testdata/iavl/nonexist_right.json",
+            "../testdata/iavl/nonexist_middle.json",
+        ])?;
+        verify_batch(&spec, &proof, &data[0])
+    }
+
+    #[test]
+    fn test_vector_iavl_batch_nonexist() -> Result<()> {
+        let spec = iavl_spec();
+        let (proof, data) = load_batch(&[
+            "../testdata/iavl/exist_left.json",
+            "../testdata/iavl/exist_right.json",
+            "../testdata/iavl/exist_middle.json",
+            "../testdata/iavl/nonexist_left.json",
+            "../testdata/iavl/nonexist_right.json",
+            "../testdata/iavl/nonexist_middle.json",
+        ])?;
+        verify_batch(&spec, &proof, &data[4])
+    }
+
+    #[test]
+    fn test_vector_tendermint_batch_exist() -> Result<()> {
+        let spec = tendermint_spec();
+        let (proof, data) = load_batch(&[
+            "../testdata/tendermint/exist_left.json",
+            "../testdata/tendermint/exist_right.json",
+            "../testdata/tendermint/exist_middle.json",
+            "../testdata/tendermint/nonexist_left.json",
+            "../testdata/tendermint/nonexist_right.json",
+            "../testdata/tendermint/nonexist_middle.json",
+        ])?;
+        verify_batch(&spec, &proof, &data[2])
+    }
+
+    #[test]
+    fn test_vector_tendermint_batch_nonexist() -> Result<()> {
+        let spec = tendermint_spec();
+        let (proof, data) = load_batch(&[
+            "../testdata/tendermint/exist_left.json",
+            "../testdata/tendermint/exist_right.json",
+            "../testdata/tendermint/exist_middle.json",
+            "../testdata/tendermint/nonexist_left.json",
+            "../testdata/tendermint/nonexist_right.json",
+            "../testdata/tendermint/nonexist_middle.json",
+        ])?;
+        verify_batch(&spec, &proof, &data[5])
+    }
+
 }
