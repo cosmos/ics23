@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use crate::compress::{decompress, is_compressed};
 use crate::ics23;
 use crate::verify::{verify_existence, verify_non_existence, CommitmentRoot};
 
@@ -12,6 +13,18 @@ pub fn verify_membership(
     key: &[u8],
     value: &[u8],
 ) -> bool {
+    // ugly attempt to conditionally decompress...
+    let mut proof = proof;
+    let my_proof;
+    if is_compressed(proof) {
+        if let Ok(p) = decompress(proof) {
+            my_proof = p;
+            proof = &my_proof;
+        } else {
+            return false;
+        }
+    }
+
     //    if let Some(ics23::commitment_proof::Proof::Exist(ex)) = &proof.proof {
     if let Some(ex) = get_exist_proof(proof, key) {
         let valid = verify_existence(&ex, spec, root, key, value);
@@ -28,6 +41,18 @@ pub fn verify_non_membership(
     root: &CommitmentRoot,
     key: &[u8],
 ) -> bool {
+    // ugly attempt to conditionally decompress...
+    let mut proof = proof;
+    let my_proof;
+    if is_compressed(proof) {
+        if let Ok(p) = decompress(proof) {
+            my_proof = p;
+            proof = &my_proof;
+        } else {
+            return false;
+        }
+    }
+
     if let Some(non) = get_nonexist_proof(proof, key) {
         let valid = verify_non_existence(&non, spec, root, key);
         valid.is_ok()
@@ -42,6 +67,18 @@ pub fn verify_batch_membership(
     root: &CommitmentRoot,
     items: HashMap<&[u8], &[u8]>,
 ) -> bool {
+    // ugly attempt to conditionally decompress...
+    let mut proof = proof;
+    let my_proof;
+    if is_compressed(proof) {
+        if let Ok(p) = decompress(proof) {
+            my_proof = p;
+            proof = &my_proof;
+        } else {
+            return false;
+        }
+    }
+
     items
         .iter()
         .all(|(key, value)| verify_membership(proof, spec, root, key, value))
@@ -53,6 +90,18 @@ pub fn verify_batch_non_membership(
     root: &CommitmentRoot,
     keys: &[&[u8]],
 ) -> bool {
+    // ugly attempt to conditionally decompress...
+    let mut proof = proof;
+    let my_proof;
+    if is_compressed(proof) {
+        if let Ok(p) = decompress(proof) {
+            my_proof = p;
+            proof = &my_proof;
+        } else {
+            return false;
+        }
+    }
+
     keys.iter()
         .all(|key| verify_non_membership(proof, spec, root, key))
 }
@@ -154,6 +203,7 @@ mod tests {
     use std::io::prelude::*;
     use std::vec::Vec;
 
+    use crate::compress::compress;
     use crate::helpers::Result;
 
     #[derive(Deserialize, Debug)]
@@ -347,6 +397,21 @@ mod tests {
     }
 
     #[test]
+    fn compressed_iavl_batch_exist() -> Result<()> {
+        let spec = iavl_spec();
+        let (proof, data) = load_batch(&[
+            "../testdata/iavl/exist_left.json",
+            "../testdata/iavl/exist_right.json",
+            "../testdata/iavl/exist_middle.json",
+            "../testdata/iavl/nonexist_left.json",
+            "../testdata/iavl/nonexist_right.json",
+            "../testdata/iavl/nonexist_middle.json",
+        ])?;
+        let comp = compress(&proof)?;
+        verify_batch(&spec, &comp, &data[0])
+    }
+
+    #[test]
     fn test_vector_iavl_batch_nonexist() -> Result<()> {
         let spec = iavl_spec();
         let (proof, data) = load_batch(&[
@@ -358,6 +423,21 @@ mod tests {
             "../testdata/iavl/nonexist_middle.json",
         ])?;
         verify_batch(&spec, &proof, &data[4])
+    }
+
+    #[test]
+    fn compressed_iavl_batch_nonexist() -> Result<()> {
+        let spec = iavl_spec();
+        let (proof, data) = load_batch(&[
+            "../testdata/iavl/exist_left.json",
+            "../testdata/iavl/exist_right.json",
+            "../testdata/iavl/exist_middle.json",
+            "../testdata/iavl/nonexist_left.json",
+            "../testdata/iavl/nonexist_right.json",
+            "../testdata/iavl/nonexist_middle.json",
+        ])?;
+        let comp = compress(&proof)?;
+        verify_batch(&spec, &comp, &data[4])
     }
 
     #[test]
