@@ -5,7 +5,7 @@ use sha3::Sha3_512;
 use std::convert::TryInto;
 
 use crate::helpers::{Hash, Result};
-use crate::proofs::{HashOp, InnerOp, LeafOp, LengthOp};
+use crate::ics23::{HashOp, InnerOp, LeafOp, LengthOp};
 
 pub fn apply_inner(inner: &InnerOp, child: &[u8]) -> Result<Hash> {
     ensure!(!child.is_empty(), "Missing child hash");

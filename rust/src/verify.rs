@@ -5,13 +5,13 @@ use failure::{bail, ensure};
 
 use crate::helpers::Result;
 use crate::ops::{apply_inner, apply_leaf};
-use crate::proofs;
+use crate::ics23;
 
 pub type CommitmentRoot = ::std::vec::Vec<u8>;
 
 pub fn verify_existence(
-    proof: &proofs::ExistenceProof,
-    spec: &proofs::ProofSpec,
+    proof: &ics23::ExistenceProof,
+    spec: &ics23::ProofSpec,
     root: &[u8],
     key: &[u8],
     value: &[u8],
@@ -26,8 +26,8 @@ pub fn verify_existence(
 }
 
 pub fn verify_non_existence(
-    proof: &proofs::NonExistenceProof,
-    spec: &proofs::ProofSpec,
+    proof: &ics23::NonExistenceProof,
+    spec: &ics23::ProofSpec,
     root: &[u8],
     key: &[u8],
 ) -> Result<()> {
@@ -55,7 +55,7 @@ pub fn verify_non_existence(
 // Calculate determines the root hash that matches the given proof.
 // You must validate the result is what you have in a header.
 // Returns error if the calculations cannot be performed.
-pub fn calculate_existence_root(proof: &proofs::ExistenceProof) -> Result<CommitmentRoot> {
+pub fn calculate_existence_root(proof: &ics23::ExistenceProof) -> Result<CommitmentRoot> {
     ensure!(!proof.key.is_empty(), "Existence proof must have key set");
     ensure!(
         !proof.value.is_empty(),
@@ -73,7 +73,7 @@ pub fn calculate_existence_root(proof: &proofs::ExistenceProof) -> Result<Commit
     }
 }
 
-fn check_existence_spec(proof: &proofs::ExistenceProof, spec: &proofs::ProofSpec) -> Result<()> {
+fn check_existence_spec(proof: &ics23::ExistenceProof, spec: &ics23::ProofSpec) -> Result<()> {
     if let (Some(leaf), Some(leaf_spec)) = (&proof.leaf, &spec.leaf_spec) {
         ensure_leaf(leaf, leaf_spec)?;
         for step in &proof.path {
@@ -85,7 +85,7 @@ fn check_existence_spec(proof: &proofs::ExistenceProof, spec: &proofs::ProofSpec
     }
 }
 
-fn ensure_leaf(leaf: &proofs::LeafOp, leaf_spec: &proofs::LeafOp) -> Result<()> {
+fn ensure_leaf(leaf: &ics23::LeafOp, leaf_spec: &ics23::LeafOp) -> Result<()> {
     ensure!(
         leaf_spec.hash == leaf.hash,
         "Unexpected hashOp: {:?}",
@@ -120,7 +120,7 @@ fn has_prefix(prefix: &[u8], data: &[u8]) -> bool {
     prefix == &data[..prefix.len()]
 }
 
-fn ensure_inner(inner: &proofs::InnerOp, spec: &proofs::ProofSpec) -> Result<()> {
+fn ensure_inner(inner: &ics23::InnerOp, spec: &ics23::ProofSpec) -> Result<()> {
     if let Some(leaf_spec) = &spec.leaf_spec {
         ensure!(
             !has_prefix(&leaf_spec.prefix, &inner.prefix),
@@ -132,7 +132,7 @@ fn ensure_inner(inner: &proofs::InnerOp, spec: &proofs::ProofSpec) -> Result<()>
     }
 }
 
-fn ensure_left_most(spec: &proofs::InnerSpec, path: &[proofs::InnerOp]) -> Result<()> {
+fn ensure_left_most(spec: &ics23::InnerSpec, path: &[ics23::InnerOp]) -> Result<()> {
     let pad = get_padding(spec, 0)?;
     for step in path {
         if !has_padding(step, &pad) {
@@ -142,7 +142,7 @@ fn ensure_left_most(spec: &proofs::InnerSpec, path: &[proofs::InnerOp]) -> Resul
     Ok(())
 }
 
-fn ensure_right_most(spec: &proofs::InnerSpec, path: &[proofs::InnerOp]) -> Result<()> {
+fn ensure_right_most(spec: &ics23::InnerSpec, path: &[ics23::InnerOp]) -> Result<()> {
     let idx = spec.child_order.len() - 1;
     let pad = get_padding(spec, idx as i32)?;
     for step in path {
@@ -154,9 +154,9 @@ fn ensure_right_most(spec: &proofs::InnerSpec, path: &[proofs::InnerOp]) -> Resu
 }
 
 fn ensure_left_neighbor(
-    spec: &proofs::InnerSpec,
-    left: &[proofs::InnerOp],
-    right: &[proofs::InnerOp],
+    spec: &ics23::InnerSpec,
+    left: &[ics23::InnerOp],
+    right: &[ics23::InnerOp],
 ) -> Result<()> {
     let mut mut_left = Vec::from(left);
     let mut mut_right = Vec::from(right);
@@ -178,16 +178,16 @@ fn ensure_left_neighbor(
 }
 
 fn is_left_step(
-    spec: &proofs::InnerSpec,
-    left: &proofs::InnerOp,
-    right: &proofs::InnerOp,
+    spec: &ics23::InnerSpec,
+    left: &ics23::InnerOp,
+    right: &ics23::InnerOp,
 ) -> Result<bool> {
     let left_idx = order_from_padding(spec, left)?;
     let right_idx = order_from_padding(spec, right)?;
     Ok(left_idx + 1 == right_idx)
 }
 
-fn order_from_padding(spec: &proofs::InnerSpec, op: &proofs::InnerOp) -> Result<i32> {
+fn order_from_padding(spec: &ics23::InnerSpec, op: &ics23::InnerOp) -> Result<i32> {
     let len = spec.child_order.len() as i32;
     for branch in 0..len {
         let padding = get_padding(spec, branch)?;
@@ -204,13 +204,13 @@ struct Padding {
     suffix: usize,
 }
 
-fn has_padding(op: &proofs::InnerOp, pad: &Padding) -> bool {
+fn has_padding(op: &ics23::InnerOp, pad: &Padding) -> bool {
     (op.prefix.len() >= pad.min_prefix)
         && (op.prefix.len() <= pad.max_prefix)
         && (op.suffix.len() == pad.suffix)
 }
 
-fn get_padding(spec: &proofs::InnerSpec, branch: i32) -> Result<Padding> {
+fn get_padding(spec: &ics23::InnerSpec, branch: i32) -> Result<Padding> {
     if let Some(&idx) = spec.child_order.iter().find(|&&x| x == branch) {
         let prefix = idx * spec.child_size;
         let suffix = spec.child_size as usize * (spec.child_order.len() - 1 - idx as usize);
@@ -228,11 +228,11 @@ fn get_padding(spec: &proofs::InnerSpec, branch: i32) -> Result<Padding> {
 mod tests {
     use super::*;
 
-    use crate::proofs::{HashOp, LengthOp};
+    use crate::ics23::{HashOp, LengthOp};
 
     #[test]
     fn calculate_root_from_leaf() -> Result<()> {
-        let leaf = proofs::LeafOp {
+        let leaf = ics23::LeafOp {
             hash: HashOp::Sha256.into(),
             prehash_key: 0,
             prehash_value: 0,
@@ -240,7 +240,7 @@ mod tests {
             prefix: vec![],
         };
 
-        let proof = proofs::ExistenceProof {
+        let proof = ics23::ExistenceProof {
             key: b"food".to_vec(),
             value: b"some longer text".to_vec(),
             leaf: Some(leaf),
@@ -258,7 +258,7 @@ mod tests {
 
     #[test]
     fn calculate_root_from_leaf_and_inner() -> Result<()> {
-        let leaf = proofs::LeafOp {
+        let leaf = ics23::LeafOp {
             hash: HashOp::Sha256.into(),
             prehash_key: 0,
             prehash_value: 0,
@@ -266,13 +266,13 @@ mod tests {
             prefix: vec![],
         };
 
-        let inner = proofs::InnerOp {
+        let inner = ics23::InnerOp {
             hash: HashOp::Sha256.into(),
             prefix: hex::decode("deadbeef00cafe00")?,
             suffix: vec![],
         };
 
-        let proof = proofs::ExistenceProof {
+        let proof = ics23::ExistenceProof {
             key: b"food".to_vec(),
             value: b"some longer text".to_vec(),
             leaf: Some(leaf),
