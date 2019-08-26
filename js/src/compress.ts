@@ -6,7 +6,6 @@ export function compress(
   if (!proof.batch) {
     return proof;
   }
-  // TODO
   return { compressed: compress_batch(proof.batch) };
 }
 
@@ -16,7 +15,6 @@ export function decompress(
   if (!proof.compressed) {
     return proof;
   }
-  // TODO
   return { batch: decompress_batch(proof.compressed) };
 }
 

@@ -141,16 +141,14 @@ function doLengthOp(lengthOp: ics23.LengthOp, data: Uint8Array): Uint8Array {
   throw new Error(`Unsupported lengthop: ${lengthOp}`);
 }
 
-function encodeVarintProto(l: number): Uint8Array {
-  // TODO: handle numbers > 127
-  return new Uint8Array([l]);
-
-  // // avoid multiple allocs for normal case
-  // res := make([]byte, 0, 8)
-  // for l >= 1<<7 {
-  // 	res = append(res, uint8(l&0x7f|0x80))
-  // 	l >>= 7
-  // }
-  // res = append(res, uint8(l))
-  // return res
+function encodeVarintProto(n: number): Uint8Array {
+  let enc: ReadonlyArray<number> = [];
+  let l = n;
+  while (l >= 128) {
+    const b = (l % 128) + 128;
+    enc = [...enc, b];
+    l = l / 128;
+  }
+  enc = [...enc, l];
+  return new Uint8Array(enc);
 }

@@ -216,7 +216,6 @@ function isLeftStep(
 ): boolean {
   const leftidx = orderFromPadding(spec, left);
   const rightidx = orderFromPadding(spec, right);
-  // TODO: is it possible there are empty (nil) children???
   return rightidx === leftidx + 1;
 }
 
