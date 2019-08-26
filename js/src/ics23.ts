@@ -71,6 +71,42 @@ export function verifyNonMembership(
   }
 }
 
+/**
+ * batchVerifyMembership ensures proof is (contains) a valid existence proof for the given
+ */
+export function batchVerifyMembership(
+  proof: ics23.ICommitmentProof,
+  spec: ics23.IProofSpec,
+  root: CommitmentRoot,
+  items: Map<Uint8Array, Uint8Array>
+): boolean {
+  const norm = decompress(proof);
+  for (const [key, value] of items.entries()) {
+    if (!verifyMembership(norm, spec, root, key, value)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * batchVerifyNonMembership ensures proof is (contains) a valid existence proof for the given
+ */
+export function batchVerifyNonMembership(
+  proof: ics23.ICommitmentProof,
+  spec: ics23.IProofSpec,
+  root: CommitmentRoot,
+  keys: ReadonlyArray<Uint8Array>
+): boolean {
+  const norm = decompress(proof);
+  for (const key of keys) {
+    if (!verifyNonMembership(norm, spec, root, key)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function getExistForKey(
   proof: ics23.ICommitmentProof,
   key: Uint8Array
