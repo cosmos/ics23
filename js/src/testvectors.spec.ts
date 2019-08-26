@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
 
+import { compress } from "./compress";
 import { ics23 } from "./generated/codecimpl";
 import { fromHex } from "./helpers";
 import {
@@ -184,6 +185,32 @@ describe("calculateExistenceRoot", () => {
       "../testdata/iavl/nonexist_middle.json"
     ]);
     validateBatch(proof, IavlSpec, data[5]);
+  });
+
+  it("should validate compressed iavl batch exist", () => {
+    const { proof, data } = loadBatch([
+      "../testdata/iavl/exist_left.json",
+      "../testdata/iavl/exist_right.json",
+      "../testdata/iavl/exist_middle.json",
+      "../testdata/iavl/nonexist_left.json",
+      "../testdata/iavl/nonexist_right.json",
+      "../testdata/iavl/nonexist_middle.json"
+    ]);
+    const small = compress(proof);
+    validateBatch(small, IavlSpec, data[0]);
+  });
+
+  it("should validate compressed iavl batch nonexist", () => {
+    const { proof, data } = loadBatch([
+      "../testdata/iavl/exist_left.json",
+      "../testdata/iavl/exist_right.json",
+      "../testdata/iavl/exist_middle.json",
+      "../testdata/iavl/nonexist_left.json",
+      "../testdata/iavl/nonexist_right.json",
+      "../testdata/iavl/nonexist_middle.json"
+    ]);
+    const small = compress(proof);
+    validateBatch(small, IavlSpec, data[5]);
   });
 
   it("should validate tendermint batch exist", () => {
