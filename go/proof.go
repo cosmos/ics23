@@ -1,4 +1,4 @@
-package proofs
+package ics23
 
 import (
 	"bytes"
@@ -14,10 +14,10 @@ var IavlSpec = &ProofSpec{
 		Length:       LengthOp_VAR_PROTO,
 	},
 	InnerSpec: &InnerSpec{
-		ChildOrder: []int32{0, 1},
+		ChildOrder:      []int32{0, 1},
 		MinPrefixLength: 4,
 		MaxPrefixLength: 12,
-		ChildSize: 33, // (with length byte)
+		ChildSize:       33, // (with length byte)
 	},
 }
 
@@ -30,10 +30,10 @@ var TendermintSpec = &ProofSpec{
 		Length:       LengthOp_VAR_PROTO,
 	},
 	InnerSpec: &InnerSpec{
-		ChildOrder: []int32{0, 1},
+		ChildOrder:      []int32{0, 1},
 		MinPrefixLength: 1,
 		MaxPrefixLength: 1,
-		ChildSize: 32, // (no length byte)
+		ChildSize:       32, // (no length byte)
 	},
 }
 
@@ -155,7 +155,6 @@ func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []b
 	return nil
 }
 
-
 // IsLeftMost returns true if this is the left-most path in the tree
 func IsLeftMost(spec *InnerSpec, path []*InnerOp) bool {
 	minPrefix, maxPrefix, suffix := getPadding(spec, 0)
@@ -171,7 +170,7 @@ func IsLeftMost(spec *InnerSpec, path []*InnerOp) bool {
 
 // IsRightMost returns true if this is the left-most path in the tree
 func IsRightMost(spec *InnerSpec, path []*InnerOp) bool {
-	last := len(spec.ChildOrder)-1 
+	last := len(spec.ChildOrder) - 1
 	minPrefix, maxPrefix, suffix := getPadding(spec, int32(last))
 
 	// ensure every step has a prefix and suffix defined to be rightmost
@@ -182,7 +181,6 @@ func IsRightMost(spec *InnerSpec, path []*InnerOp) bool {
 	}
 	return true
 }
-
 
 // IsLeftNeighbor returns true if `right` is the next possible path right of `left`
 //
@@ -196,11 +194,11 @@ func IsLeftNeighbor(spec *InnerSpec, left []*InnerOp, right []*InnerOp) bool {
 	right, topright := right[:len(right)-1], right[len(right)-1]
 	for bytes.Equal(topleft.Prefix, topright.Prefix) && bytes.Equal(topleft.Suffix, topright.Suffix) {
 		left, topleft = left[:len(left)-1], left[len(left)-1]
-		right, topright = right[:len(right)-1], right[len(right)-1]	
+		right, topright = right[:len(right)-1], right[len(right)-1]
 	}
 
 	// now topleft and topright are the first divergent nodes
-	// make sure they are left and right of each other 
+	// make sure they are left and right of each other
 	if !isLeftStep(spec, topleft, topright) {
 		return false
 	}
@@ -214,7 +212,7 @@ func IsLeftNeighbor(spec *InnerSpec, left []*InnerOp, right []*InnerOp) bool {
 		return false
 	}
 	return true
-} 
+}
 
 // isLeftStep assumes left and right have common parents
 // checks if left is exactly one slot to the left of right
@@ -229,7 +227,7 @@ func isLeftStep(spec *InnerSpec, left *InnerOp, right *InnerOp) bool {
 	}
 
 	// TODO: is it possible there are empty (nil) children???
-	return rightidx == leftidx + 1
+	return rightidx == leftidx+1
 }
 
 func hasPadding(op *InnerOp, minPrefix, maxPrefix, suffix int) bool {
@@ -258,7 +256,7 @@ func getPadding(spec *InnerSpec, branch int32) (minPrefix, maxPrefix, suffix int
 
 // getPosition checks where the branch is in the order and returns
 // the index of this branch
-func getPosition(order []int32, branch int32) (int) {
+func getPosition(order []int32, branch int32) int {
 	if branch < 0 || int(branch) >= len(order) {
 		panic(errors.Errorf("Invalid branch: %d", branch))
 	}

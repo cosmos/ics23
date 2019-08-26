@@ -1,4 +1,4 @@
-import { proofs } from "./generated/codecimpl";
+import { ics23 } from "./generated/codecimpl";
 
 import { fromHex, toAscii } from "./helpers";
 import { applyInner, applyLeaf, doHash } from "./ops";
@@ -6,7 +6,7 @@ import { applyInner, applyLeaf, doHash } from "./ops";
 describe("doHash", () => {
   it("sha256 hashes food", () => {
     // echo -n food | sha256sum
-    const hash = doHash(proofs.HashOp.SHA256, toAscii("food"));
+    const hash = doHash(ics23.HashOp.SHA256, toAscii("food"));
     expect(hash).toEqual(
       fromHex(
         "c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b"
@@ -16,20 +16,20 @@ describe("doHash", () => {
 
   it("ripemd160 hashes food", () => {
     // echo -n food | openssl dgst -rmd160 -hex | cut -d' ' -f2
-    const hash = doHash(proofs.HashOp.RIPEMD160, toAscii("food"));
+    const hash = doHash(ics23.HashOp.RIPEMD160, toAscii("food"));
     expect(hash).toEqual(fromHex("b1ab9988c7c7c5ec4b2b291adfeeee10e77cdd46"));
   });
 
   it("'bitcoin' hashes food", () => {
     // echo -n c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b | xxd -r -p | openssl dgst -rmd160 -hex
-    const hash = doHash(proofs.HashOp.BITCOIN, toAscii("food"));
+    const hash = doHash(ics23.HashOp.BITCOIN, toAscii("food"));
     expect(hash).toEqual(fromHex("0bcb587dfb4fc10b36d57f2bba1878f139b75d24"));
   });
 });
 
 describe("applyLeaf", () => {
   it("hashes foobar", () => {
-    const op: proofs.ILeafOp = { hash: proofs.HashOp.SHA256 };
+    const op: ics23.ILeafOp = { hash: ics23.HashOp.SHA256 };
     const key = toAscii("foo");
     const value = toAscii("bar");
     // echo -n foobar | sha256sum
@@ -40,7 +40,7 @@ describe("applyLeaf", () => {
   });
 
   it("hashes foobaz with sha-512", () => {
-    const op: proofs.ILeafOp = { hash: proofs.HashOp.SHA512 };
+    const op: ics23.ILeafOp = { hash: ics23.HashOp.SHA512 };
     const key = toAscii("foo");
     const value = toAscii("baz");
     // echo -n foobaz | sha512sum
@@ -51,7 +51,7 @@ describe("applyLeaf", () => {
   });
 
   it("hashes foobar (different breakpoint)", () => {
-    const op: proofs.ILeafOp = { hash: proofs.HashOp.SHA256 };
+    const op: ics23.ILeafOp = { hash: ics23.HashOp.SHA256 };
     const key = toAscii("f");
     const value = toAscii("oobar");
     // echo -n foobar | sha256sum
@@ -62,9 +62,9 @@ describe("applyLeaf", () => {
   });
 
   it("hashes with length prefix", () => {
-    const op: proofs.ILeafOp = {
-      hash: proofs.HashOp.SHA256,
-      length: proofs.LengthOp.VAR_PROTO
+    const op: ics23.ILeafOp = {
+      hash: ics23.HashOp.SHA256,
+      length: ics23.LengthOp.VAR_PROTO
     };
     // echo -n food | xxd -ps
     const key = toAscii("food"); // 04666f6f64
@@ -77,10 +77,10 @@ describe("applyLeaf", () => {
   });
 
   it("hashes with prehash and length prefix", () => {
-    const op: proofs.ILeafOp = {
-      hash: proofs.HashOp.SHA256,
-      length: proofs.LengthOp.VAR_PROTO,
-      prehashValue: proofs.HashOp.SHA256
+    const op: ics23.ILeafOp = {
+      hash: ics23.HashOp.SHA256,
+      length: ics23.LengthOp.VAR_PROTO,
+      prehashValue: ics23.HashOp.SHA256
     };
     const key = toAscii("food"); // 04666f6f64
     // echo -n yet another long string | sha256sum
@@ -93,8 +93,8 @@ describe("applyLeaf", () => {
   });
 
   it("requires key", () => {
-    const op: proofs.ILeafOp = {
-      hash: proofs.HashOp.SHA256
+    const op: ics23.ILeafOp = {
+      hash: ics23.HashOp.SHA256
     };
     const key = toAscii("food");
     const value = toAscii("");
@@ -102,8 +102,8 @@ describe("applyLeaf", () => {
   });
 
   it("requires value", () => {
-    const op: proofs.ILeafOp = {
-      hash: proofs.HashOp.SHA256
+    const op: ics23.ILeafOp = {
+      hash: ics23.HashOp.SHA256
     };
     const key = toAscii("");
     const value = toAscii("time");
@@ -113,8 +113,8 @@ describe("applyLeaf", () => {
 
 describe("applyInner", () => {
   it("hash child with prefix and suffix", () => {
-    const op: proofs.IInnerOp = {
-      hash: proofs.HashOp.SHA256,
+    const op: ics23.IInnerOp = {
+      hash: ics23.HashOp.SHA256,
       prefix: fromHex("0123456789"),
       suffix: fromHex("deadbeef")
     };
@@ -127,8 +127,8 @@ describe("applyInner", () => {
   });
 
   it("requies child", () => {
-    const op: proofs.IInnerOp = {
-      hash: proofs.HashOp.SHA256,
+    const op: ics23.IInnerOp = {
+      hash: ics23.HashOp.SHA256,
       prefix: fromHex("0123456789"),
       suffix: fromHex("deadbeef")
     };
@@ -136,8 +136,8 @@ describe("applyInner", () => {
   });
 
   it("hash child with only prefix", () => {
-    const op: proofs.IInnerOp = {
-      hash: proofs.HashOp.SHA256,
+    const op: ics23.IInnerOp = {
+      hash: ics23.HashOp.SHA256,
       prefix: fromHex("00204080a0c0e0")
     };
     const child = fromHex("ffccbb997755331100");
@@ -149,8 +149,8 @@ describe("applyInner", () => {
   });
 
   it("hash child with only suffix", () => {
-    const op: proofs.IInnerOp = {
-      hash: proofs.HashOp.SHA256,
+    const op: ics23.IInnerOp = {
+      hash: ics23.HashOp.SHA256,
       suffix: toAscii(" just kidding!")
     };
     const child = toAscii("this is a sha256 hash, really....");

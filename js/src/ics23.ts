@@ -1,5 +1,7 @@
-import { proofs } from "./generated/codecimpl";
+import { decompress } from "./compress";
+import { ics23 } from "./generated/codecimpl";
 import { CommitmentRoot, verifyExistence, verifyNonExistence } from "./proofs";
+import { bytesBefore, bytesEqual } from "./specs";
 
 /*
 This implements the client side functions as specified in
@@ -28,14 +30,14 @@ and determine neighbors
  * verifyMembership ensures proof is (contains) a valid existence proof for the given
  */
 export function verifyMembership(
-  proof: proofs.ICommitmentProof,
-  spec: proofs.IProofSpec,
+  proof: ics23.ICommitmentProof,
+  spec: ics23.IProofSpec,
   root: CommitmentRoot,
   key: Uint8Array,
   value: Uint8Array
 ): boolean {
-  // TODO: handle batch
-  const exist = proof.exist;
+  const norm = decompress(proof);
+  const exist = getExistForKey(norm, key);
   if (!exist) {
     return false;
   }
@@ -51,13 +53,13 @@ export function verifyMembership(
  * verifyNonMembership ensures proof is (contains) a valid non-existence proof for the given key
  */
 export function verifyNonMembership(
-  proof: proofs.ICommitmentProof,
-  spec: proofs.IProofSpec,
+  proof: ics23.ICommitmentProof,
+  spec: ics23.IProofSpec,
   root: CommitmentRoot,
   key: Uint8Array
 ): boolean {
-  // TODO: handle batch
-  const nonexist = proof.nonexist;
+  const norm = decompress(proof);
+  const nonexist = getNonExistForKey(norm, key);
   if (!nonexist) {
     return false;
   }
@@ -67,4 +69,73 @@ export function verifyNonMembership(
   } catch {
     return false;
   }
+}
+
+/**
+ * batchVerifyMembership ensures proof is (contains) a valid existence proof for the given
+ */
+export function batchVerifyMembership(
+  proof: ics23.ICommitmentProof,
+  spec: ics23.IProofSpec,
+  root: CommitmentRoot,
+  items: Map<Uint8Array, Uint8Array>
+): boolean {
+  const norm = decompress(proof);
+  for (const [key, value] of items.entries()) {
+    if (!verifyMembership(norm, spec, root, key, value)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * batchVerifyNonMembership ensures proof is (contains) a valid existence proof for the given
+ */
+export function batchVerifyNonMembership(
+  proof: ics23.ICommitmentProof,
+  spec: ics23.IProofSpec,
+  root: CommitmentRoot,
+  keys: ReadonlyArray<Uint8Array>
+): boolean {
+  const norm = decompress(proof);
+  for (const key of keys) {
+    if (!verifyNonMembership(norm, spec, root, key)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function getExistForKey(
+  proof: ics23.ICommitmentProof,
+  key: Uint8Array
+): ics23.IExistenceProof | undefined | null {
+  const match = (p: ics23.IExistenceProof | null | undefined) =>
+    !!p && bytesEqual(key, p.key!);
+  if (match(proof.exist)) {
+    return proof.exist!;
+  } else if (!!proof.batch) {
+    return proof.batch.entries!.map(x => x.exist || null).find(match);
+  }
+  return undefined;
+}
+
+function getNonExistForKey(
+  proof: ics23.ICommitmentProof,
+  key: Uint8Array
+): ics23.INonExistenceProof | undefined | null {
+  const match = (p: ics23.INonExistenceProof | null | undefined) => {
+    return (
+      !!p &&
+      (!p.left || bytesBefore(p.left.key!, key)) &&
+      (!p.right || bytesBefore(key, p.right.key!))
+    );
+  };
+  if (match(proof.nonexist)) {
+    return proof.nonexist!;
+  } else if (!!proof.batch) {
+    return proof.batch.entries!.map(x => x.nonexist || null).find(match);
+  }
+  return undefined;
 }
