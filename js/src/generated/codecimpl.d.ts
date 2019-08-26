@@ -1,6 +1,6 @@
 import * as $protobuf from "protobufjs";
-/** Namespace proofs. */
-export namespace proofs {
+/** Namespace ics23. */
+export namespace ics23 {
   /** HashOp enum. */
   enum HashOp {
     NO_HASH = 0,
@@ -38,10 +38,10 @@ export namespace proofs {
     value?: Uint8Array | null;
 
     /** ExistenceProof leaf */
-    leaf?: proofs.ILeafOp | null;
+    leaf?: ics23.ILeafOp | null;
 
     /** ExistenceProof path */
-    path?: proofs.IInnerOp[] | null;
+    path?: ics23.IInnerOp[] | null;
   }
 
   /**
@@ -70,7 +70,7 @@ export namespace proofs {
      * Constructs a new ExistenceProof.
      * @param [properties] Properties to set
      */
-    constructor(properties?: proofs.IExistenceProof);
+    constructor(properties?: ics23.IExistenceProof);
 
     /** ExistenceProof key. */
     public key: Uint8Array;
@@ -79,10 +79,10 @@ export namespace proofs {
     public value: Uint8Array;
 
     /** ExistenceProof leaf. */
-    public leaf?: proofs.ILeafOp | null;
+    public leaf?: ics23.ILeafOp | null;
 
     /** ExistenceProof path. */
-    public path: proofs.IInnerOp[];
+    public path: ics23.IInnerOp[];
 
     /**
      * Creates a new ExistenceProof instance using the specified properties.
@@ -90,28 +90,28 @@ export namespace proofs {
      * @returns ExistenceProof instance
      */
     public static create(
-      properties?: proofs.IExistenceProof
-    ): proofs.ExistenceProof;
+      properties?: ics23.IExistenceProof
+    ): ics23.ExistenceProof;
 
     /**
-     * Encodes the specified ExistenceProof message. Does not implicitly {@link proofs.ExistenceProof.verify|verify} messages.
+     * Encodes the specified ExistenceProof message. Does not implicitly {@link ics23.ExistenceProof.verify|verify} messages.
      * @param message ExistenceProof message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
     public static encode(
-      message: proofs.IExistenceProof,
+      message: ics23.IExistenceProof,
       writer?: $protobuf.Writer
     ): $protobuf.Writer;
 
     /**
-     * Encodes the specified ExistenceProof message, length delimited. Does not implicitly {@link proofs.ExistenceProof.verify|verify} messages.
+     * Encodes the specified ExistenceProof message, length delimited. Does not implicitly {@link ics23.ExistenceProof.verify|verify} messages.
      * @param message ExistenceProof message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
     public static encodeDelimited(
-      message: proofs.IExistenceProof,
+      message: ics23.IExistenceProof,
       writer?: $protobuf.Writer
     ): $protobuf.Writer;
 
@@ -126,7 +126,7 @@ export namespace proofs {
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
       length?: number
-    ): proofs.ExistenceProof;
+    ): ics23.ExistenceProof;
 
     /**
      * Decodes an ExistenceProof message from the specified reader or buffer, length delimited.
@@ -137,7 +137,7 @@ export namespace proofs {
      */
     public static decodeDelimited(
       reader: $protobuf.Reader | Uint8Array
-    ): proofs.ExistenceProof;
+    ): ics23.ExistenceProof;
 
     /**
      * Verifies an ExistenceProof message.
@@ -153,7 +153,7 @@ export namespace proofs {
      */
     public static fromObject(object: {
       [k: string]: any;
-    }): proofs.ExistenceProof;
+    }): ics23.ExistenceProof;
 
     /**
      * Creates a plain object from an ExistenceProof message. Also converts values to other types if specified.
@@ -162,7 +162,7 @@ export namespace proofs {
      * @returns Plain object
      */
     public static toObject(
-      message: proofs.ExistenceProof,
+      message: ics23.ExistenceProof,
       options?: $protobuf.IConversionOptions
     ): { [k: string]: any };
 
@@ -179,10 +179,10 @@ export namespace proofs {
     key?: Uint8Array | null;
 
     /** NonExistenceProof left */
-    left?: proofs.IExistenceProof | null;
+    left?: ics23.IExistenceProof | null;
 
     /** NonExistenceProof right */
-    right?: proofs.IExistenceProof | null;
+    right?: ics23.IExistenceProof | null;
   }
 
   /** Represents a NonExistenceProof. */
@@ -191,16 +191,16 @@ export namespace proofs {
      * Constructs a new NonExistenceProof.
      * @param [properties] Properties to set
      */
-    constructor(properties?: proofs.INonExistenceProof);
+    constructor(properties?: ics23.INonExistenceProof);
 
     /** NonExistenceProof key. */
     public key: Uint8Array;
 
     /** NonExistenceProof left. */
-    public left?: proofs.IExistenceProof | null;
+    public left?: ics23.IExistenceProof | null;
 
     /** NonExistenceProof right. */
-    public right?: proofs.IExistenceProof | null;
+    public right?: ics23.IExistenceProof | null;
 
     /**
      * Creates a new NonExistenceProof instance using the specified properties.
@@ -208,28 +208,28 @@ export namespace proofs {
      * @returns NonExistenceProof instance
      */
     public static create(
-      properties?: proofs.INonExistenceProof
-    ): proofs.NonExistenceProof;
+      properties?: ics23.INonExistenceProof
+    ): ics23.NonExistenceProof;
 
     /**
-     * Encodes the specified NonExistenceProof message. Does not implicitly {@link proofs.NonExistenceProof.verify|verify} messages.
+     * Encodes the specified NonExistenceProof message. Does not implicitly {@link ics23.NonExistenceProof.verify|verify} messages.
      * @param message NonExistenceProof message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
     public static encode(
-      message: proofs.INonExistenceProof,
+      message: ics23.INonExistenceProof,
       writer?: $protobuf.Writer
     ): $protobuf.Writer;
 
     /**
-     * Encodes the specified NonExistenceProof message, length delimited. Does not implicitly {@link proofs.NonExistenceProof.verify|verify} messages.
+     * Encodes the specified NonExistenceProof message, length delimited. Does not implicitly {@link ics23.NonExistenceProof.verify|verify} messages.
      * @param message NonExistenceProof message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
     public static encodeDelimited(
-      message: proofs.INonExistenceProof,
+      message: ics23.INonExistenceProof,
       writer?: $protobuf.Writer
     ): $protobuf.Writer;
 
@@ -244,7 +244,7 @@ export namespace proofs {
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
       length?: number
-    ): proofs.NonExistenceProof;
+    ): ics23.NonExistenceProof;
 
     /**
      * Decodes a NonExistenceProof message from the specified reader or buffer, length delimited.
@@ -255,7 +255,7 @@ export namespace proofs {
      */
     public static decodeDelimited(
       reader: $protobuf.Reader | Uint8Array
-    ): proofs.NonExistenceProof;
+    ): ics23.NonExistenceProof;
 
     /**
      * Verifies a NonExistenceProof message.
@@ -271,7 +271,7 @@ export namespace proofs {
      */
     public static fromObject(object: {
       [k: string]: any;
-    }): proofs.NonExistenceProof;
+    }): ics23.NonExistenceProof;
 
     /**
      * Creates a plain object from a NonExistenceProof message. Also converts values to other types if specified.
@@ -280,7 +280,7 @@ export namespace proofs {
      * @returns Plain object
      */
     public static toObject(
-      message: proofs.NonExistenceProof,
+      message: ics23.NonExistenceProof,
       options?: $protobuf.IConversionOptions
     ): { [k: string]: any };
 
@@ -294,13 +294,16 @@ export namespace proofs {
   /** Properties of a CommitmentProof. */
   interface ICommitmentProof {
     /** CommitmentProof exist */
-    exist?: proofs.IExistenceProof | null;
+    exist?: ics23.IExistenceProof | null;
 
     /** CommitmentProof nonexist */
-    nonexist?: proofs.INonExistenceProof | null;
+    nonexist?: ics23.INonExistenceProof | null;
 
     /** CommitmentProof batch */
-    batch?: proofs.IBatchProof | null;
+    batch?: ics23.IBatchProof | null;
+
+    /** CommitmentProof compressed */
+    compressed?: ics23.ICompressedBatchProof | null;
   }
 
   /** Represents a CommitmentProof. */
@@ -309,19 +312,22 @@ export namespace proofs {
      * Constructs a new CommitmentProof.
      * @param [properties] Properties to set
      */
-    constructor(properties?: proofs.ICommitmentProof);
+    constructor(properties?: ics23.ICommitmentProof);
 
     /** CommitmentProof exist. */
-    public exist?: proofs.IExistenceProof | null;
+    public exist?: ics23.IExistenceProof | null;
 
     /** CommitmentProof nonexist. */
-    public nonexist?: proofs.INonExistenceProof | null;
+    public nonexist?: ics23.INonExistenceProof | null;
 
     /** CommitmentProof batch. */
-    public batch?: proofs.IBatchProof | null;
+    public batch?: ics23.IBatchProof | null;
+
+    /** CommitmentProof compressed. */
+    public compressed?: ics23.ICompressedBatchProof | null;
 
     /** CommitmentProof proof. */
-    public proof?: "exist" | "nonexist" | "batch";
+    public proof?: "exist" | "nonexist" | "batch" | "compressed";
 
     /**
      * Creates a new CommitmentProof instance using the specified properties.
@@ -329,28 +335,28 @@ export namespace proofs {
      * @returns CommitmentProof instance
      */
     public static create(
-      properties?: proofs.ICommitmentProof
-    ): proofs.CommitmentProof;
+      properties?: ics23.ICommitmentProof
+    ): ics23.CommitmentProof;
 
     /**
-     * Encodes the specified CommitmentProof message. Does not implicitly {@link proofs.CommitmentProof.verify|verify} messages.
+     * Encodes the specified CommitmentProof message. Does not implicitly {@link ics23.CommitmentProof.verify|verify} messages.
      * @param message CommitmentProof message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
     public static encode(
-      message: proofs.ICommitmentProof,
+      message: ics23.ICommitmentProof,
       writer?: $protobuf.Writer
     ): $protobuf.Writer;
 
     /**
-     * Encodes the specified CommitmentProof message, length delimited. Does not implicitly {@link proofs.CommitmentProof.verify|verify} messages.
+     * Encodes the specified CommitmentProof message, length delimited. Does not implicitly {@link ics23.CommitmentProof.verify|verify} messages.
      * @param message CommitmentProof message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
     public static encodeDelimited(
-      message: proofs.ICommitmentProof,
+      message: ics23.ICommitmentProof,
       writer?: $protobuf.Writer
     ): $protobuf.Writer;
 
@@ -365,7 +371,7 @@ export namespace proofs {
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
       length?: number
-    ): proofs.CommitmentProof;
+    ): ics23.CommitmentProof;
 
     /**
      * Decodes a CommitmentProof message from the specified reader or buffer, length delimited.
@@ -376,7 +382,7 @@ export namespace proofs {
      */
     public static decodeDelimited(
       reader: $protobuf.Reader | Uint8Array
-    ): proofs.CommitmentProof;
+    ): ics23.CommitmentProof;
 
     /**
      * Verifies a CommitmentProof message.
@@ -392,7 +398,7 @@ export namespace proofs {
      */
     public static fromObject(object: {
       [k: string]: any;
-    }): proofs.CommitmentProof;
+    }): ics23.CommitmentProof;
 
     /**
      * Creates a plain object from a CommitmentProof message. Also converts values to other types if specified.
@@ -401,7 +407,7 @@ export namespace proofs {
      * @returns Plain object
      */
     public static toObject(
-      message: proofs.CommitmentProof,
+      message: ics23.CommitmentProof,
       options?: $protobuf.IConversionOptions
     ): { [k: string]: any };
 
@@ -412,121 +418,19 @@ export namespace proofs {
     public toJSON(): { [k: string]: any };
   }
 
-  /** Properties of a BatchProof. */
-  interface IBatchProof {
-    /** BatchProof proofs */
-    proofs?: proofs.ICommitmentProof[] | null;
-  }
-
-  /** Represents a BatchProof. */
-  class BatchProof implements IBatchProof {
-    /**
-     * Constructs a new BatchProof.
-     * @param [properties] Properties to set
-     */
-    constructor(properties?: proofs.IBatchProof);
-
-    /** BatchProof proofs. */
-    public proofs: proofs.ICommitmentProof[];
-
-    /**
-     * Creates a new BatchProof instance using the specified properties.
-     * @param [properties] Properties to set
-     * @returns BatchProof instance
-     */
-    public static create(properties?: proofs.IBatchProof): proofs.BatchProof;
-
-    /**
-     * Encodes the specified BatchProof message. Does not implicitly {@link proofs.BatchProof.verify|verify} messages.
-     * @param message BatchProof message or plain object to encode
-     * @param [writer] Writer to encode to
-     * @returns Writer
-     */
-    public static encode(
-      message: proofs.IBatchProof,
-      writer?: $protobuf.Writer
-    ): $protobuf.Writer;
-
-    /**
-     * Encodes the specified BatchProof message, length delimited. Does not implicitly {@link proofs.BatchProof.verify|verify} messages.
-     * @param message BatchProof message or plain object to encode
-     * @param [writer] Writer to encode to
-     * @returns Writer
-     */
-    public static encodeDelimited(
-      message: proofs.IBatchProof,
-      writer?: $protobuf.Writer
-    ): $protobuf.Writer;
-
-    /**
-     * Decodes a BatchProof message from the specified reader or buffer.
-     * @param reader Reader or buffer to decode from
-     * @param [length] Message length if known beforehand
-     * @returns BatchProof
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    public static decode(
-      reader: $protobuf.Reader | Uint8Array,
-      length?: number
-    ): proofs.BatchProof;
-
-    /**
-     * Decodes a BatchProof message from the specified reader or buffer, length delimited.
-     * @param reader Reader or buffer to decode from
-     * @returns BatchProof
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    public static decodeDelimited(
-      reader: $protobuf.Reader | Uint8Array
-    ): proofs.BatchProof;
-
-    /**
-     * Verifies a BatchProof message.
-     * @param message Plain object to verify
-     * @returns `null` if valid, otherwise the reason why it is not
-     */
-    public static verify(message: { [k: string]: any }): string | null;
-
-    /**
-     * Creates a BatchProof message from a plain object. Also converts values to their respective internal types.
-     * @param object Plain object
-     * @returns BatchProof
-     */
-    public static fromObject(object: { [k: string]: any }): proofs.BatchProof;
-
-    /**
-     * Creates a plain object from a BatchProof message. Also converts values to other types if specified.
-     * @param message BatchProof
-     * @param [options] Conversion options
-     * @returns Plain object
-     */
-    public static toObject(
-      message: proofs.BatchProof,
-      options?: $protobuf.IConversionOptions
-    ): { [k: string]: any };
-
-    /**
-     * Converts this BatchProof to JSON.
-     * @returns JSON object
-     */
-    public toJSON(): { [k: string]: any };
-  }
-
   /** Properties of a LeafOp. */
   interface ILeafOp {
     /** LeafOp hash */
-    hash?: proofs.HashOp | null;
+    hash?: ics23.HashOp | null;
 
     /** LeafOp prehashKey */
-    prehashKey?: proofs.HashOp | null;
+    prehashKey?: ics23.HashOp | null;
 
     /** LeafOp prehashValue */
-    prehashValue?: proofs.HashOp | null;
+    prehashValue?: ics23.HashOp | null;
 
     /** LeafOp length */
-    length?: proofs.LengthOp | null;
+    length?: ics23.LengthOp | null;
 
     /** LeafOp prefix */
     prefix?: Uint8Array | null;
@@ -553,19 +457,19 @@ export namespace proofs {
      * Constructs a new LeafOp.
      * @param [properties] Properties to set
      */
-    constructor(properties?: proofs.ILeafOp);
+    constructor(properties?: ics23.ILeafOp);
 
     /** LeafOp hash. */
-    public hash: proofs.HashOp;
+    public hash: ics23.HashOp;
 
     /** LeafOp prehashKey. */
-    public prehashKey: proofs.HashOp;
+    public prehashKey: ics23.HashOp;
 
     /** LeafOp prehashValue. */
-    public prehashValue: proofs.HashOp;
+    public prehashValue: ics23.HashOp;
 
     /** LeafOp length. */
-    public length: proofs.LengthOp;
+    public length: ics23.LengthOp;
 
     /** LeafOp prefix. */
     public prefix: Uint8Array;
@@ -575,27 +479,27 @@ export namespace proofs {
      * @param [properties] Properties to set
      * @returns LeafOp instance
      */
-    public static create(properties?: proofs.ILeafOp): proofs.LeafOp;
+    public static create(properties?: ics23.ILeafOp): ics23.LeafOp;
 
     /**
-     * Encodes the specified LeafOp message. Does not implicitly {@link proofs.LeafOp.verify|verify} messages.
+     * Encodes the specified LeafOp message. Does not implicitly {@link ics23.LeafOp.verify|verify} messages.
      * @param message LeafOp message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
     public static encode(
-      message: proofs.ILeafOp,
+      message: ics23.ILeafOp,
       writer?: $protobuf.Writer
     ): $protobuf.Writer;
 
     /**
-     * Encodes the specified LeafOp message, length delimited. Does not implicitly {@link proofs.LeafOp.verify|verify} messages.
+     * Encodes the specified LeafOp message, length delimited. Does not implicitly {@link ics23.LeafOp.verify|verify} messages.
      * @param message LeafOp message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
     public static encodeDelimited(
-      message: proofs.ILeafOp,
+      message: ics23.ILeafOp,
       writer?: $protobuf.Writer
     ): $protobuf.Writer;
 
@@ -610,7 +514,7 @@ export namespace proofs {
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
       length?: number
-    ): proofs.LeafOp;
+    ): ics23.LeafOp;
 
     /**
      * Decodes a LeafOp message from the specified reader or buffer, length delimited.
@@ -621,7 +525,7 @@ export namespace proofs {
      */
     public static decodeDelimited(
       reader: $protobuf.Reader | Uint8Array
-    ): proofs.LeafOp;
+    ): ics23.LeafOp;
 
     /**
      * Verifies a LeafOp message.
@@ -635,7 +539,7 @@ export namespace proofs {
      * @param object Plain object
      * @returns LeafOp
      */
-    public static fromObject(object: { [k: string]: any }): proofs.LeafOp;
+    public static fromObject(object: { [k: string]: any }): ics23.LeafOp;
 
     /**
      * Creates a plain object from a LeafOp message. Also converts values to other types if specified.
@@ -644,7 +548,7 @@ export namespace proofs {
      * @returns Plain object
      */
     public static toObject(
-      message: proofs.LeafOp,
+      message: ics23.LeafOp,
       options?: $protobuf.IConversionOptions
     ): { [k: string]: any };
 
@@ -658,7 +562,7 @@ export namespace proofs {
   /** Properties of an InnerOp. */
   interface IInnerOp {
     /** InnerOp hash */
-    hash?: proofs.HashOp | null;
+    hash?: ics23.HashOp | null;
 
     /** InnerOp prefix */
     prefix?: Uint8Array | null;
@@ -689,10 +593,10 @@ export namespace proofs {
      * Constructs a new InnerOp.
      * @param [properties] Properties to set
      */
-    constructor(properties?: proofs.IInnerOp);
+    constructor(properties?: ics23.IInnerOp);
 
     /** InnerOp hash. */
-    public hash: proofs.HashOp;
+    public hash: ics23.HashOp;
 
     /** InnerOp prefix. */
     public prefix: Uint8Array;
@@ -705,27 +609,27 @@ export namespace proofs {
      * @param [properties] Properties to set
      * @returns InnerOp instance
      */
-    public static create(properties?: proofs.IInnerOp): proofs.InnerOp;
+    public static create(properties?: ics23.IInnerOp): ics23.InnerOp;
 
     /**
-     * Encodes the specified InnerOp message. Does not implicitly {@link proofs.InnerOp.verify|verify} messages.
+     * Encodes the specified InnerOp message. Does not implicitly {@link ics23.InnerOp.verify|verify} messages.
      * @param message InnerOp message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
     public static encode(
-      message: proofs.IInnerOp,
+      message: ics23.IInnerOp,
       writer?: $protobuf.Writer
     ): $protobuf.Writer;
 
     /**
-     * Encodes the specified InnerOp message, length delimited. Does not implicitly {@link proofs.InnerOp.verify|verify} messages.
+     * Encodes the specified InnerOp message, length delimited. Does not implicitly {@link ics23.InnerOp.verify|verify} messages.
      * @param message InnerOp message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
     public static encodeDelimited(
-      message: proofs.IInnerOp,
+      message: ics23.IInnerOp,
       writer?: $protobuf.Writer
     ): $protobuf.Writer;
 
@@ -740,7 +644,7 @@ export namespace proofs {
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
       length?: number
-    ): proofs.InnerOp;
+    ): ics23.InnerOp;
 
     /**
      * Decodes an InnerOp message from the specified reader or buffer, length delimited.
@@ -751,7 +655,7 @@ export namespace proofs {
      */
     public static decodeDelimited(
       reader: $protobuf.Reader | Uint8Array
-    ): proofs.InnerOp;
+    ): ics23.InnerOp;
 
     /**
      * Verifies an InnerOp message.
@@ -765,7 +669,7 @@ export namespace proofs {
      * @param object Plain object
      * @returns InnerOp
      */
-    public static fromObject(object: { [k: string]: any }): proofs.InnerOp;
+    public static fromObject(object: { [k: string]: any }): ics23.InnerOp;
 
     /**
      * Creates a plain object from an InnerOp message. Also converts values to other types if specified.
@@ -774,7 +678,7 @@ export namespace proofs {
      * @returns Plain object
      */
     public static toObject(
-      message: proofs.InnerOp,
+      message: ics23.InnerOp,
       options?: $protobuf.IConversionOptions
     ): { [k: string]: any };
 
@@ -788,10 +692,10 @@ export namespace proofs {
   /** Properties of a ProofSpec. */
   interface IProofSpec {
     /** ProofSpec leafSpec */
-    leafSpec?: proofs.ILeafOp | null;
+    leafSpec?: ics23.ILeafOp | null;
 
     /** ProofSpec innerSpec */
-    innerSpec?: proofs.IInnerSpec | null;
+    innerSpec?: ics23.IInnerSpec | null;
   }
 
   /**
@@ -811,40 +715,40 @@ export namespace proofs {
      * Constructs a new ProofSpec.
      * @param [properties] Properties to set
      */
-    constructor(properties?: proofs.IProofSpec);
+    constructor(properties?: ics23.IProofSpec);
 
     /** ProofSpec leafSpec. */
-    public leafSpec?: proofs.ILeafOp | null;
+    public leafSpec?: ics23.ILeafOp | null;
 
     /** ProofSpec innerSpec. */
-    public innerSpec?: proofs.IInnerSpec | null;
+    public innerSpec?: ics23.IInnerSpec | null;
 
     /**
      * Creates a new ProofSpec instance using the specified properties.
      * @param [properties] Properties to set
      * @returns ProofSpec instance
      */
-    public static create(properties?: proofs.IProofSpec): proofs.ProofSpec;
+    public static create(properties?: ics23.IProofSpec): ics23.ProofSpec;
 
     /**
-     * Encodes the specified ProofSpec message. Does not implicitly {@link proofs.ProofSpec.verify|verify} messages.
+     * Encodes the specified ProofSpec message. Does not implicitly {@link ics23.ProofSpec.verify|verify} messages.
      * @param message ProofSpec message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
     public static encode(
-      message: proofs.IProofSpec,
+      message: ics23.IProofSpec,
       writer?: $protobuf.Writer
     ): $protobuf.Writer;
 
     /**
-     * Encodes the specified ProofSpec message, length delimited. Does not implicitly {@link proofs.ProofSpec.verify|verify} messages.
+     * Encodes the specified ProofSpec message, length delimited. Does not implicitly {@link ics23.ProofSpec.verify|verify} messages.
      * @param message ProofSpec message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
     public static encodeDelimited(
-      message: proofs.IProofSpec,
+      message: ics23.IProofSpec,
       writer?: $protobuf.Writer
     ): $protobuf.Writer;
 
@@ -859,7 +763,7 @@ export namespace proofs {
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
       length?: number
-    ): proofs.ProofSpec;
+    ): ics23.ProofSpec;
 
     /**
      * Decodes a ProofSpec message from the specified reader or buffer, length delimited.
@@ -870,7 +774,7 @@ export namespace proofs {
      */
     public static decodeDelimited(
       reader: $protobuf.Reader | Uint8Array
-    ): proofs.ProofSpec;
+    ): ics23.ProofSpec;
 
     /**
      * Verifies a ProofSpec message.
@@ -884,7 +788,7 @@ export namespace proofs {
      * @param object Plain object
      * @returns ProofSpec
      */
-    public static fromObject(object: { [k: string]: any }): proofs.ProofSpec;
+    public static fromObject(object: { [k: string]: any }): ics23.ProofSpec;
 
     /**
      * Creates a plain object from a ProofSpec message. Also converts values to other types if specified.
@@ -893,7 +797,7 @@ export namespace proofs {
      * @returns Plain object
      */
     public static toObject(
-      message: proofs.ProofSpec,
+      message: ics23.ProofSpec,
       options?: $protobuf.IConversionOptions
     ): { [k: string]: any };
 
@@ -928,7 +832,7 @@ export namespace proofs {
      * Constructs a new InnerSpec.
      * @param [properties] Properties to set
      */
-    constructor(properties?: proofs.IInnerSpec);
+    constructor(properties?: ics23.IInnerSpec);
 
     /** InnerSpec childOrder. */
     public childOrder: number[];
@@ -950,27 +854,27 @@ export namespace proofs {
      * @param [properties] Properties to set
      * @returns InnerSpec instance
      */
-    public static create(properties?: proofs.IInnerSpec): proofs.InnerSpec;
+    public static create(properties?: ics23.IInnerSpec): ics23.InnerSpec;
 
     /**
-     * Encodes the specified InnerSpec message. Does not implicitly {@link proofs.InnerSpec.verify|verify} messages.
+     * Encodes the specified InnerSpec message. Does not implicitly {@link ics23.InnerSpec.verify|verify} messages.
      * @param message InnerSpec message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
     public static encode(
-      message: proofs.IInnerSpec,
+      message: ics23.IInnerSpec,
       writer?: $protobuf.Writer
     ): $protobuf.Writer;
 
     /**
-     * Encodes the specified InnerSpec message, length delimited. Does not implicitly {@link proofs.InnerSpec.verify|verify} messages.
+     * Encodes the specified InnerSpec message, length delimited. Does not implicitly {@link ics23.InnerSpec.verify|verify} messages.
      * @param message InnerSpec message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
     public static encodeDelimited(
-      message: proofs.IInnerSpec,
+      message: ics23.IInnerSpec,
       writer?: $protobuf.Writer
     ): $protobuf.Writer;
 
@@ -985,7 +889,7 @@ export namespace proofs {
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
       length?: number
-    ): proofs.InnerSpec;
+    ): ics23.InnerSpec;
 
     /**
      * Decodes an InnerSpec message from the specified reader or buffer, length delimited.
@@ -996,7 +900,7 @@ export namespace proofs {
      */
     public static decodeDelimited(
       reader: $protobuf.Reader | Uint8Array
-    ): proofs.InnerSpec;
+    ): ics23.InnerSpec;
 
     /**
      * Verifies an InnerSpec message.
@@ -1010,7 +914,7 @@ export namespace proofs {
      * @param object Plain object
      * @returns InnerSpec
      */
-    public static fromObject(object: { [k: string]: any }): proofs.InnerSpec;
+    public static fromObject(object: { [k: string]: any }): ics23.InnerSpec;
 
     /**
      * Creates a plain object from an InnerSpec message. Also converts values to other types if specified.
@@ -1019,12 +923,694 @@ export namespace proofs {
      * @returns Plain object
      */
     public static toObject(
-      message: proofs.InnerSpec,
+      message: ics23.InnerSpec,
       options?: $protobuf.IConversionOptions
     ): { [k: string]: any };
 
     /**
      * Converts this InnerSpec to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+  }
+
+  /** Properties of a BatchProof. */
+  interface IBatchProof {
+    /** BatchProof entries */
+    entries?: ics23.IBatchEntry[] | null;
+  }
+
+  /** Represents a BatchProof. */
+  class BatchProof implements IBatchProof {
+    /**
+     * Constructs a new BatchProof.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: ics23.IBatchProof);
+
+    /** BatchProof entries. */
+    public entries: ics23.IBatchEntry[];
+
+    /**
+     * Creates a new BatchProof instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns BatchProof instance
+     */
+    public static create(properties?: ics23.IBatchProof): ics23.BatchProof;
+
+    /**
+     * Encodes the specified BatchProof message. Does not implicitly {@link ics23.BatchProof.verify|verify} messages.
+     * @param message BatchProof message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(
+      message: ics23.IBatchProof,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Encodes the specified BatchProof message, length delimited. Does not implicitly {@link ics23.BatchProof.verify|verify} messages.
+     * @param message BatchProof message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(
+      message: ics23.IBatchProof,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Decodes a BatchProof message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns BatchProof
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(
+      reader: $protobuf.Reader | Uint8Array,
+      length?: number
+    ): ics23.BatchProof;
+
+    /**
+     * Decodes a BatchProof message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns BatchProof
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(
+      reader: $protobuf.Reader | Uint8Array
+    ): ics23.BatchProof;
+
+    /**
+     * Verifies a BatchProof message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): string | null;
+
+    /**
+     * Creates a BatchProof message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns BatchProof
+     */
+    public static fromObject(object: { [k: string]: any }): ics23.BatchProof;
+
+    /**
+     * Creates a plain object from a BatchProof message. Also converts values to other types if specified.
+     * @param message BatchProof
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(
+      message: ics23.BatchProof,
+      options?: $protobuf.IConversionOptions
+    ): { [k: string]: any };
+
+    /**
+     * Converts this BatchProof to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+  }
+
+  /** Properties of a BatchEntry. */
+  interface IBatchEntry {
+    /** BatchEntry exist */
+    exist?: ics23.IExistenceProof | null;
+
+    /** BatchEntry nonexist */
+    nonexist?: ics23.INonExistenceProof | null;
+  }
+
+  /** Represents a BatchEntry. */
+  class BatchEntry implements IBatchEntry {
+    /**
+     * Constructs a new BatchEntry.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: ics23.IBatchEntry);
+
+    /** BatchEntry exist. */
+    public exist?: ics23.IExistenceProof | null;
+
+    /** BatchEntry nonexist. */
+    public nonexist?: ics23.INonExistenceProof | null;
+
+    /** BatchEntry proof. */
+    public proof?: "exist" | "nonexist";
+
+    /**
+     * Creates a new BatchEntry instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns BatchEntry instance
+     */
+    public static create(properties?: ics23.IBatchEntry): ics23.BatchEntry;
+
+    /**
+     * Encodes the specified BatchEntry message. Does not implicitly {@link ics23.BatchEntry.verify|verify} messages.
+     * @param message BatchEntry message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(
+      message: ics23.IBatchEntry,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Encodes the specified BatchEntry message, length delimited. Does not implicitly {@link ics23.BatchEntry.verify|verify} messages.
+     * @param message BatchEntry message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(
+      message: ics23.IBatchEntry,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Decodes a BatchEntry message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns BatchEntry
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(
+      reader: $protobuf.Reader | Uint8Array,
+      length?: number
+    ): ics23.BatchEntry;
+
+    /**
+     * Decodes a BatchEntry message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns BatchEntry
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(
+      reader: $protobuf.Reader | Uint8Array
+    ): ics23.BatchEntry;
+
+    /**
+     * Verifies a BatchEntry message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): string | null;
+
+    /**
+     * Creates a BatchEntry message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns BatchEntry
+     */
+    public static fromObject(object: { [k: string]: any }): ics23.BatchEntry;
+
+    /**
+     * Creates a plain object from a BatchEntry message. Also converts values to other types if specified.
+     * @param message BatchEntry
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(
+      message: ics23.BatchEntry,
+      options?: $protobuf.IConversionOptions
+    ): { [k: string]: any };
+
+    /**
+     * Converts this BatchEntry to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+  }
+
+  /** Properties of a CompressedBatchProof. */
+  interface ICompressedBatchProof {
+    /** CompressedBatchProof entries */
+    entries?: ics23.ICompressedBatchEntry[] | null;
+
+    /** CompressedBatchProof lookupInners */
+    lookupInners?: ics23.IInnerOp[] | null;
+  }
+
+  /** Represents a CompressedBatchProof. */
+  class CompressedBatchProof implements ICompressedBatchProof {
+    /**
+     * Constructs a new CompressedBatchProof.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: ics23.ICompressedBatchProof);
+
+    /** CompressedBatchProof entries. */
+    public entries: ics23.ICompressedBatchEntry[];
+
+    /** CompressedBatchProof lookupInners. */
+    public lookupInners: ics23.IInnerOp[];
+
+    /**
+     * Creates a new CompressedBatchProof instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns CompressedBatchProof instance
+     */
+    public static create(
+      properties?: ics23.ICompressedBatchProof
+    ): ics23.CompressedBatchProof;
+
+    /**
+     * Encodes the specified CompressedBatchProof message. Does not implicitly {@link ics23.CompressedBatchProof.verify|verify} messages.
+     * @param message CompressedBatchProof message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(
+      message: ics23.ICompressedBatchProof,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Encodes the specified CompressedBatchProof message, length delimited. Does not implicitly {@link ics23.CompressedBatchProof.verify|verify} messages.
+     * @param message CompressedBatchProof message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(
+      message: ics23.ICompressedBatchProof,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Decodes a CompressedBatchProof message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns CompressedBatchProof
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(
+      reader: $protobuf.Reader | Uint8Array,
+      length?: number
+    ): ics23.CompressedBatchProof;
+
+    /**
+     * Decodes a CompressedBatchProof message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns CompressedBatchProof
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(
+      reader: $protobuf.Reader | Uint8Array
+    ): ics23.CompressedBatchProof;
+
+    /**
+     * Verifies a CompressedBatchProof message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): string | null;
+
+    /**
+     * Creates a CompressedBatchProof message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns CompressedBatchProof
+     */
+    public static fromObject(object: {
+      [k: string]: any;
+    }): ics23.CompressedBatchProof;
+
+    /**
+     * Creates a plain object from a CompressedBatchProof message. Also converts values to other types if specified.
+     * @param message CompressedBatchProof
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(
+      message: ics23.CompressedBatchProof,
+      options?: $protobuf.IConversionOptions
+    ): { [k: string]: any };
+
+    /**
+     * Converts this CompressedBatchProof to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+  }
+
+  /** Properties of a CompressedBatchEntry. */
+  interface ICompressedBatchEntry {
+    /** CompressedBatchEntry exist */
+    exist?: ics23.ICompressedExistenceProof | null;
+
+    /** CompressedBatchEntry nonexist */
+    nonexist?: ics23.ICompressedNonExistenceProof | null;
+  }
+
+  /** Represents a CompressedBatchEntry. */
+  class CompressedBatchEntry implements ICompressedBatchEntry {
+    /**
+     * Constructs a new CompressedBatchEntry.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: ics23.ICompressedBatchEntry);
+
+    /** CompressedBatchEntry exist. */
+    public exist?: ics23.ICompressedExistenceProof | null;
+
+    /** CompressedBatchEntry nonexist. */
+    public nonexist?: ics23.ICompressedNonExistenceProof | null;
+
+    /** CompressedBatchEntry proof. */
+    public proof?: "exist" | "nonexist";
+
+    /**
+     * Creates a new CompressedBatchEntry instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns CompressedBatchEntry instance
+     */
+    public static create(
+      properties?: ics23.ICompressedBatchEntry
+    ): ics23.CompressedBatchEntry;
+
+    /**
+     * Encodes the specified CompressedBatchEntry message. Does not implicitly {@link ics23.CompressedBatchEntry.verify|verify} messages.
+     * @param message CompressedBatchEntry message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(
+      message: ics23.ICompressedBatchEntry,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Encodes the specified CompressedBatchEntry message, length delimited. Does not implicitly {@link ics23.CompressedBatchEntry.verify|verify} messages.
+     * @param message CompressedBatchEntry message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(
+      message: ics23.ICompressedBatchEntry,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Decodes a CompressedBatchEntry message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns CompressedBatchEntry
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(
+      reader: $protobuf.Reader | Uint8Array,
+      length?: number
+    ): ics23.CompressedBatchEntry;
+
+    /**
+     * Decodes a CompressedBatchEntry message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns CompressedBatchEntry
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(
+      reader: $protobuf.Reader | Uint8Array
+    ): ics23.CompressedBatchEntry;
+
+    /**
+     * Verifies a CompressedBatchEntry message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): string | null;
+
+    /**
+     * Creates a CompressedBatchEntry message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns CompressedBatchEntry
+     */
+    public static fromObject(object: {
+      [k: string]: any;
+    }): ics23.CompressedBatchEntry;
+
+    /**
+     * Creates a plain object from a CompressedBatchEntry message. Also converts values to other types if specified.
+     * @param message CompressedBatchEntry
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(
+      message: ics23.CompressedBatchEntry,
+      options?: $protobuf.IConversionOptions
+    ): { [k: string]: any };
+
+    /**
+     * Converts this CompressedBatchEntry to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+  }
+
+  /** Properties of a CompressedExistenceProof. */
+  interface ICompressedExistenceProof {
+    /** CompressedExistenceProof key */
+    key?: Uint8Array | null;
+
+    /** CompressedExistenceProof value */
+    value?: Uint8Array | null;
+
+    /** CompressedExistenceProof leaf */
+    leaf?: ics23.ILeafOp | null;
+
+    /** CompressedExistenceProof path */
+    path?: number[] | null;
+  }
+
+  /** Represents a CompressedExistenceProof. */
+  class CompressedExistenceProof implements ICompressedExistenceProof {
+    /**
+     * Constructs a new CompressedExistenceProof.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: ics23.ICompressedExistenceProof);
+
+    /** CompressedExistenceProof key. */
+    public key: Uint8Array;
+
+    /** CompressedExistenceProof value. */
+    public value: Uint8Array;
+
+    /** CompressedExistenceProof leaf. */
+    public leaf?: ics23.ILeafOp | null;
+
+    /** CompressedExistenceProof path. */
+    public path: number[];
+
+    /**
+     * Creates a new CompressedExistenceProof instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns CompressedExistenceProof instance
+     */
+    public static create(
+      properties?: ics23.ICompressedExistenceProof
+    ): ics23.CompressedExistenceProof;
+
+    /**
+     * Encodes the specified CompressedExistenceProof message. Does not implicitly {@link ics23.CompressedExistenceProof.verify|verify} messages.
+     * @param message CompressedExistenceProof message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(
+      message: ics23.ICompressedExistenceProof,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Encodes the specified CompressedExistenceProof message, length delimited. Does not implicitly {@link ics23.CompressedExistenceProof.verify|verify} messages.
+     * @param message CompressedExistenceProof message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(
+      message: ics23.ICompressedExistenceProof,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Decodes a CompressedExistenceProof message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns CompressedExistenceProof
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(
+      reader: $protobuf.Reader | Uint8Array,
+      length?: number
+    ): ics23.CompressedExistenceProof;
+
+    /**
+     * Decodes a CompressedExistenceProof message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns CompressedExistenceProof
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(
+      reader: $protobuf.Reader | Uint8Array
+    ): ics23.CompressedExistenceProof;
+
+    /**
+     * Verifies a CompressedExistenceProof message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): string | null;
+
+    /**
+     * Creates a CompressedExistenceProof message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns CompressedExistenceProof
+     */
+    public static fromObject(object: {
+      [k: string]: any;
+    }): ics23.CompressedExistenceProof;
+
+    /**
+     * Creates a plain object from a CompressedExistenceProof message. Also converts values to other types if specified.
+     * @param message CompressedExistenceProof
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(
+      message: ics23.CompressedExistenceProof,
+      options?: $protobuf.IConversionOptions
+    ): { [k: string]: any };
+
+    /**
+     * Converts this CompressedExistenceProof to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+  }
+
+  /** Properties of a CompressedNonExistenceProof. */
+  interface ICompressedNonExistenceProof {
+    /** CompressedNonExistenceProof key */
+    key?: Uint8Array | null;
+
+    /** CompressedNonExistenceProof left */
+    left?: ics23.ICompressedExistenceProof | null;
+
+    /** CompressedNonExistenceProof right */
+    right?: ics23.ICompressedExistenceProof | null;
+  }
+
+  /** Represents a CompressedNonExistenceProof. */
+  class CompressedNonExistenceProof implements ICompressedNonExistenceProof {
+    /**
+     * Constructs a new CompressedNonExistenceProof.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: ics23.ICompressedNonExistenceProof);
+
+    /** CompressedNonExistenceProof key. */
+    public key: Uint8Array;
+
+    /** CompressedNonExistenceProof left. */
+    public left?: ics23.ICompressedExistenceProof | null;
+
+    /** CompressedNonExistenceProof right. */
+    public right?: ics23.ICompressedExistenceProof | null;
+
+    /**
+     * Creates a new CompressedNonExistenceProof instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns CompressedNonExistenceProof instance
+     */
+    public static create(
+      properties?: ics23.ICompressedNonExistenceProof
+    ): ics23.CompressedNonExistenceProof;
+
+    /**
+     * Encodes the specified CompressedNonExistenceProof message. Does not implicitly {@link ics23.CompressedNonExistenceProof.verify|verify} messages.
+     * @param message CompressedNonExistenceProof message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(
+      message: ics23.ICompressedNonExistenceProof,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Encodes the specified CompressedNonExistenceProof message, length delimited. Does not implicitly {@link ics23.CompressedNonExistenceProof.verify|verify} messages.
+     * @param message CompressedNonExistenceProof message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(
+      message: ics23.ICompressedNonExistenceProof,
+      writer?: $protobuf.Writer
+    ): $protobuf.Writer;
+
+    /**
+     * Decodes a CompressedNonExistenceProof message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns CompressedNonExistenceProof
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(
+      reader: $protobuf.Reader | Uint8Array,
+      length?: number
+    ): ics23.CompressedNonExistenceProof;
+
+    /**
+     * Decodes a CompressedNonExistenceProof message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns CompressedNonExistenceProof
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(
+      reader: $protobuf.Reader | Uint8Array
+    ): ics23.CompressedNonExistenceProof;
+
+    /**
+     * Verifies a CompressedNonExistenceProof message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): string | null;
+
+    /**
+     * Creates a CompressedNonExistenceProof message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns CompressedNonExistenceProof
+     */
+    public static fromObject(object: {
+      [k: string]: any;
+    }): ics23.CompressedNonExistenceProof;
+
+    /**
+     * Creates a plain object from a CompressedNonExistenceProof message. Also converts values to other types if specified.
+     * @param message CompressedNonExistenceProof
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(
+      message: ics23.CompressedNonExistenceProof,
+      options?: $protobuf.IConversionOptions
+    ): { [k: string]: any };
+
+    /**
+     * Converts this CompressedNonExistenceProof to JSON.
      * @returns JSON object
      */
     public toJSON(): { [k: string]: any };
