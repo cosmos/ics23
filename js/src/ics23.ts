@@ -1,5 +1,7 @@
+import { decompress } from "./compress";
 import { ics23 } from "./generated/codecimpl";
 import { CommitmentRoot, verifyExistence, verifyNonExistence } from "./proofs";
+import { bytesBefore, bytesEqual } from "./specs";
 
 /*
 This implements the client side functions as specified in
@@ -34,8 +36,8 @@ export function verifyMembership(
   key: Uint8Array,
   value: Uint8Array
 ): boolean {
-  // TODO: handle batch
-  const exist = proof.exist;
+  const norm = decompress(proof);
+  const exist = getExistForKey(norm, key);
   if (!exist) {
     return false;
   }
@@ -56,8 +58,8 @@ export function verifyNonMembership(
   root: CommitmentRoot,
   key: Uint8Array
 ): boolean {
-  // TODO: handle batch
-  const nonexist = proof.nonexist;
+  const norm = decompress(proof);
+  const nonexist = getNonExistForKey(norm, key);
   if (!nonexist) {
     return false;
   }
@@ -67,4 +69,37 @@ export function verifyNonMembership(
   } catch {
     return false;
   }
+}
+
+function getExistForKey(
+  proof: ics23.ICommitmentProof,
+  key: Uint8Array
+): ics23.IExistenceProof | undefined | null {
+  const match = (p: ics23.IExistenceProof | null | undefined) =>
+    !!p && bytesEqual(key, p.key!);
+  if (match(proof.exist)) {
+    return proof.exist!;
+  } else if (!!proof.batch) {
+    return proof.batch.entries!.map(x => x.exist || null).find(match);
+  }
+  return undefined;
+}
+
+function getNonExistForKey(
+  proof: ics23.ICommitmentProof,
+  key: Uint8Array
+): ics23.INonExistenceProof | undefined | null {
+  const match = (p: ics23.INonExistenceProof | null | undefined) => {
+    return (
+      !!p &&
+      (!p.left || bytesBefore(p.left.key!, key)) &&
+      (!p.right || bytesBefore(key, p.right.key!))
+    );
+  };
+  if (match(proof.nonexist)) {
+    return proof.nonexist!;
+  } else if (!!proof.batch) {
+    return proof.batch.entries!.map(x => x.nonexist || null).find(match);
+  }
+  return undefined;
 }

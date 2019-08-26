@@ -88,18 +88,22 @@ function hasPrefix(
 // ensureBytesBefore throws an error if first >= last
 // we compare byte by byte
 export function ensureBytesBefore(first: Uint8Array, last: Uint8Array): void {
+  if (!bytesBefore(first, last)) {
+    throw new Error("first is after last");
+  }
+}
+
+export function bytesBefore(first: Uint8Array, last: Uint8Array): boolean {
   const min = first.length < last.length ? first.length : last.length;
   for (let i = 0; i < min; i++) {
     if (first[i] < last[i]) {
-      return;
+      return true;
     }
     if (first[i] > last[i]) {
-      throw new Error("first is after last");
+      return false;
     }
     // if they are equal, continue to next step
   }
   // if they match, ensure that last is longer than first..
-  if (first.length >= last.length) {
-    throw new Error("first is after last");
-  }
+  return first.length < last.length;
 }
