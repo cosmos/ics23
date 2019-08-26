@@ -1,4 +1,4 @@
-import { proofs } from "./generated/codecimpl";
+import { ics23 } from "./generated/codecimpl";
 import { applyInner, applyLeaf } from "./ops";
 import {
   bytesEqual,
@@ -8,13 +8,13 @@ import {
   ensureLeaf
 } from "./specs";
 
-export const IavlSpec: proofs.IProofSpec = {
+export const IavlSpec: ics23.IProofSpec = {
   leafSpec: {
     prefix: Uint8Array.from([0]),
-    hash: proofs.HashOp.SHA256,
-    prehashValue: proofs.HashOp.SHA256,
-    prehashKey: proofs.HashOp.NO_HASH,
-    length: proofs.LengthOp.VAR_PROTO
+    hash: ics23.HashOp.SHA256,
+    prehashValue: ics23.HashOp.SHA256,
+    prehashKey: ics23.HashOp.NO_HASH,
+    length: ics23.LengthOp.VAR_PROTO
   },
   innerSpec: {
     childOrder: [0, 1],
@@ -24,13 +24,13 @@ export const IavlSpec: proofs.IProofSpec = {
   }
 };
 
-export const TendermintSpec: proofs.IProofSpec = {
+export const TendermintSpec: ics23.IProofSpec = {
   leafSpec: {
     prefix: Uint8Array.from([0]),
-    hash: proofs.HashOp.SHA256,
-    prehashValue: proofs.HashOp.SHA256,
-    prehashKey: proofs.HashOp.NO_HASH,
-    length: proofs.LengthOp.VAR_PROTO
+    hash: ics23.HashOp.SHA256,
+    prehashValue: ics23.HashOp.SHA256,
+    prehashKey: ics23.HashOp.NO_HASH,
+    length: ics23.LengthOp.VAR_PROTO
   },
   innerSpec: {
     childOrder: [0, 1],
@@ -45,8 +45,8 @@ export type CommitmentRoot = Uint8Array;
 // verifyExistence will throw an error if the proof doesn't link key, value -> root
 // or if it doesn't fulfill the spec
 export function verifyExistence(
-  proof: proofs.IExistenceProof,
-  spec: proofs.IProofSpec,
+  proof: ics23.IExistenceProof,
+  spec: ics23.IProofSpec,
   root: CommitmentRoot,
   key: Uint8Array,
   value: Uint8Array
@@ -62,8 +62,8 @@ export function verifyExistence(
 // and they ensure the given key is not in the CommitmentState,
 // throwing an error if there is an issue
 export function verifyNonExistence(
-  proof: proofs.INonExistenceProof,
-  spec: proofs.IProofSpec,
+  proof: ics23.INonExistenceProof,
+  spec: ics23.IProofSpec,
   root: CommitmentRoot,
   key: Uint8Array
 ): void {
@@ -113,7 +113,7 @@ export function verifyNonExistence(
 // You must validate the result is what you have in a header.
 // Returns error if the calculations cannot be performed.
 export function calculateExistenceRoot(
-  proof: proofs.IExistenceProof
+  proof: ics23.IExistenceProof
 ): CommitmentRoot {
   if (!proof.key || !proof.value) {
     throw new Error("Existence proof needs key and value set");
@@ -132,8 +132,8 @@ export function calculateExistenceRoot(
 
 // ensureSpec throws an Error if proof doesn't fulfill spec
 export function ensureSpec(
-  proof: proofs.IExistenceProof,
-  spec: proofs.IProofSpec
+  proof: ics23.IExistenceProof,
+  spec: ics23.IProofSpec
 ): void {
   if (!proof.leaf) {
     throw new Error("Existence proof must start with a leaf operation");
@@ -149,8 +149,8 @@ export function ensureSpec(
 }
 
 function ensureLeftMost(
-  spec: proofs.IInnerSpec,
-  path: ReadonlyArray<proofs.IInnerOp>
+  spec: ics23.IInnerSpec,
+  path: ReadonlyArray<ics23.IInnerOp>
 ): void {
   const { minPrefix, maxPrefix, suffix } = getPadding(spec, 0);
 
@@ -163,8 +163,8 @@ function ensureLeftMost(
 }
 
 function ensureRightMost(
-  spec: proofs.IInnerSpec,
-  path: ReadonlyArray<proofs.IInnerOp>
+  spec: ics23.IInnerSpec,
+  path: ReadonlyArray<ics23.IInnerOp>
 ): void {
   const len = spec.childOrder!.length - 1;
   const { minPrefix, maxPrefix, suffix } = getPadding(spec, len);
@@ -178,13 +178,13 @@ function ensureRightMost(
 }
 
 export function ensureLeftNeighbor(
-  spec: proofs.IInnerSpec,
-  left: ReadonlyArray<proofs.IInnerOp>,
-  right: ReadonlyArray<proofs.IInnerOp>
+  spec: ics23.IInnerSpec,
+  left: ReadonlyArray<ics23.IInnerOp>,
+  right: ReadonlyArray<ics23.IInnerOp>
 ): void {
   // tslint:disable:readonly-array
-  const mutleft: proofs.IInnerOp[] = [...left];
-  const mutright: proofs.IInnerOp[] = [...right];
+  const mutleft: ics23.IInnerOp[] = [...left];
+  const mutright: ics23.IInnerOp[] = [...right];
 
   let topleft = mutleft.pop()!;
   let topright = mutright.pop()!;
@@ -210,9 +210,9 @@ export function ensureLeftNeighbor(
 // isLeftStep assumes left and right have common parents
 // checks if left is exactly one slot to the left of right
 function isLeftStep(
-  spec: proofs.IInnerSpec,
-  left: proofs.IInnerOp,
-  right: proofs.IInnerOp
+  spec: ics23.IInnerSpec,
+  left: ics23.IInnerOp,
+  right: ics23.IInnerOp
 ): boolean {
   const leftidx = orderFromPadding(spec, left);
   const rightidx = orderFromPadding(spec, right);
@@ -221,8 +221,8 @@ function isLeftStep(
 }
 
 function orderFromPadding(
-  spec: proofs.IInnerSpec,
-  inner: proofs.IInnerOp
+  spec: ics23.IInnerSpec,
+  inner: ics23.IInnerOp
 ): number {
   for (let branch = 0; branch < spec.childOrder!.length; branch++) {
     const { minPrefix, maxPrefix, suffix } = getPadding(spec, branch);
@@ -234,7 +234,7 @@ function orderFromPadding(
 }
 
 function hasPadding(
-  op: proofs.IInnerOp,
+  op: ics23.IInnerOp,
   minPrefix: number,
   maxPrefix: number,
   suffix: number
@@ -253,7 +253,7 @@ interface PaddingResult {
   readonly maxPrefix: number;
   readonly suffix: number;
 }
-function getPadding(spec: proofs.IInnerSpec, branch: number): PaddingResult {
+function getPadding(spec: ics23.IInnerSpec, branch: number): PaddingResult {
   const idx = getPosition(spec.childOrder!, branch);
 
   // count how many children are in the prefix

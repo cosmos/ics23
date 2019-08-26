@@ -1,12 +1,12 @@
 import { readFileSync } from "fs";
 
-import { proofs } from "./generated/codecimpl";
+import { ics23 } from "./generated/codecimpl";
 import { fromHex } from "./helpers";
 import { verifyMembership, verifyNonMembership } from "./ics23";
 import { IavlSpec, TendermintSpec } from "./proofs";
 
 describe("calculateExistenceRoot", () => {
-  function validateTestVector(filepath: string, spec: proofs.IProofSpec): void {
+  function validateTestVector(filepath: string, spec: ics23.IProofSpec): void {
     const content = readFileSync(filepath).toString();
     const { root, proof, key, value } = JSON.parse(content);
     expect(proof).toBeDefined();
@@ -15,7 +15,7 @@ describe("calculateExistenceRoot", () => {
 
     const rootHash = fromHex(root);
     const bkey = fromHex(key);
-    const commit = proofs.CommitmentProof.decode(fromHex(proof));
+    const commit = ics23.CommitmentProof.decode(fromHex(proof));
 
     if (value) {
       const bvalue = fromHex(value);

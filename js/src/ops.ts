@@ -1,11 +1,11 @@
 import ripemd160 from "ripemd160";
 import shajs from "sha.js";
 
-import { proofs } from "./generated/codecimpl";
+import { ics23 } from "./generated/codecimpl";
 import { toHex } from "./helpers";
 
 export function applyLeaf(
-  leaf: proofs.ILeafOp,
+  leaf: ics23.ILeafOp,
   key: Uint8Array,
   value: Uint8Array
 ): Uint8Array {
@@ -34,7 +34,7 @@ export function applyLeaf(
 }
 
 export function applyInner(
-  inner: proofs.IInnerOp,
+  inner: ics23.IInnerOp,
   child: Uint8Array
 ): Uint8Array {
   if (child.length === 0) {
@@ -52,16 +52,16 @@ function ensure<T>(maybe: T | undefined | null, value: T): T {
   return maybe === undefined || maybe === null ? value : maybe;
 }
 
-const ensureHash = (h: proofs.HashOp | null | undefined) =>
-  ensure(h, proofs.HashOp.NO_HASH);
-const ensureLength = (l: proofs.LengthOp | null | undefined) =>
-  ensure(l, proofs.LengthOp.NO_PREFIX);
+const ensureHash = (h: ics23.HashOp | null | undefined) =>
+  ensure(h, ics23.HashOp.NO_HASH);
+const ensureLength = (l: ics23.LengthOp | null | undefined) =>
+  ensure(l, ics23.LengthOp.NO_PREFIX);
 const ensureBytes = (b: Uint8Array | null | undefined) =>
   ensure(b, new Uint8Array([]));
 
 function prepareLeafData(
-  hashOp: proofs.HashOp,
-  lengthOp: proofs.LengthOp,
+  hashOp: ics23.HashOp,
+  lengthOp: ics23.LengthOp,
   data: Uint8Array
 ): Uint8Array {
   const h = doHashOrNoop(hashOp, data);
@@ -70,8 +70,8 @@ function prepareLeafData(
 
 // doHashOrNoop will return the preimage untouched if hashOp == NONE,
 // otherwise, perform doHash
-function doHashOrNoop(hashOp: proofs.HashOp, preimage: Uint8Array): Uint8Array {
-  if (hashOp === proofs.HashOp.NO_HASH) {
+function doHashOrNoop(hashOp: ics23.HashOp, preimage: Uint8Array): Uint8Array {
+  if (hashOp === ics23.HashOp.NO_HASH) {
     return preimage;
   }
   return doHash(hashOp, preimage);
@@ -94,23 +94,20 @@ function s256(preimage: Uint8Array): Uint8Array {
 
 // doHash will preform the specified hash on the preimage.
 // if hashOp == NONE, it will return an error (use doHashOrNoop if you want different behavior)
-export function doHash(
-  hashOp: proofs.HashOp,
-  preimage: Uint8Array
-): Uint8Array {
+export function doHash(hashOp: ics23.HashOp, preimage: Uint8Array): Uint8Array {
   switch (hashOp) {
-    case proofs.HashOp.SHA256:
+    case ics23.HashOp.SHA256:
       return s256(preimage);
-    case proofs.HashOp.SHA512:
+    case ics23.HashOp.SHA512:
       return new Uint8Array(
         shajs("sha512")
           .update(preimage)
           .digest()
       );
-    case proofs.HashOp.RIPEMD160:
+    case ics23.HashOp.RIPEMD160:
       // this requires string or Buffer....
       return rp160(preimage);
-    case proofs.HashOp.BITCOIN:
+    case ics23.HashOp.BITCOIN:
       return rp160(s256(preimage));
   }
   throw new Error(`Unsupported hashop: ${hashOp}`);
@@ -118,18 +115,18 @@ export function doHash(
 
 // doLengthOp will calculate the proper prefix and return it prepended
 //   doLengthOp(op, data) -> length(data) || data
-function doLengthOp(lengthOp: proofs.LengthOp, data: Uint8Array): Uint8Array {
+function doLengthOp(lengthOp: ics23.LengthOp, data: Uint8Array): Uint8Array {
   switch (lengthOp) {
-    case proofs.LengthOp.NO_PREFIX:
+    case ics23.LengthOp.NO_PREFIX:
       return data;
-    case proofs.LengthOp.VAR_PROTO:
+    case ics23.LengthOp.VAR_PROTO:
       return new Uint8Array([...encodeVarintProto(data.length), ...data]);
-    case proofs.LengthOp.REQUIRE_32_BYTES:
+    case ics23.LengthOp.REQUIRE_32_BYTES:
       if (data.length !== 32) {
         throw new Error(`Length is ${data.length}, not 32 bytes`);
       }
       return data;
-    case proofs.LengthOp.REQUIRE_64_BYTES:
+    case ics23.LengthOp.REQUIRE_64_BYTES:
       if (data.length !== 64) {
         throw new Error(`Length is ${data.length}, not 64 bytes`);
       }

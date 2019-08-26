@@ -1,6 +1,6 @@
-import { proofs } from "./generated/codecimpl";
+import { ics23 } from "./generated/codecimpl";
 
-export function ensureLeaf(leaf: proofs.ILeafOp, spec: proofs.ILeafOp): void {
+export function ensureLeaf(leaf: ics23.ILeafOp, spec: ics23.ILeafOp): void {
   if (leaf.hash !== spec.hash) {
     throw new Error(`Unexpected hashOp: ${leaf.hash}`);
   }
@@ -17,7 +17,7 @@ export function ensureLeaf(leaf: proofs.ILeafOp, spec: proofs.ILeafOp): void {
 }
 
 export function ensureInner(
-  inner: proofs.IInnerOp,
+  inner: ics23.IInnerOp,
   prefix?: Uint8Array | null
 ): void {
   if (hasPrefix(inner.prefix, prefix)) {

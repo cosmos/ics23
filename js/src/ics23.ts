@@ -1,4 +1,4 @@
-import { proofs } from "./generated/codecimpl";
+import { ics23 } from "./generated/codecimpl";
 import { CommitmentRoot, verifyExistence, verifyNonExistence } from "./proofs";
 
 /*
@@ -28,8 +28,8 @@ and determine neighbors
  * verifyMembership ensures proof is (contains) a valid existence proof for the given
  */
 export function verifyMembership(
-  proof: proofs.ICommitmentProof,
-  spec: proofs.IProofSpec,
+  proof: ics23.ICommitmentProof,
+  spec: ics23.IProofSpec,
   root: CommitmentRoot,
   key: Uint8Array,
   value: Uint8Array
@@ -51,8 +51,8 @@ export function verifyMembership(
  * verifyNonMembership ensures proof is (contains) a valid non-existence proof for the given key
  */
 export function verifyNonMembership(
-  proof: proofs.ICommitmentProof,
-  spec: proofs.IProofSpec,
+  proof: ics23.ICommitmentProof,
+  spec: ics23.IProofSpec,
   root: CommitmentRoot,
   key: Uint8Array
 ): boolean {
