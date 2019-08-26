@@ -1,4 +1,3 @@
-use failure::bail;
 use std::collections::HashMap;
 
 use crate::ics23;
@@ -148,7 +147,7 @@ pub fn tendermint_spec() -> ics23::ProofSpec {
 mod tests {
     use super::*;
 
-    use failure::ensure;
+    use failure::{bail, ensure};
     use prost::Message;
     use serde::Deserialize;
     use std::fs::File;
@@ -326,7 +325,7 @@ mod tests {
         } else {
             let valid = super::verify_non_membership(&proof, spec, &data.root, &data.key);
             ensure!(valid, "invalid test vector");
-            let keys= &[data.key.as_slice()];
+            let keys = &[data.key.as_slice()];
             let valid = super::verify_batch_non_membership(&proof, spec, &data.root, keys);
             ensure!(valid, "invalid test vector");
             Ok(())
@@ -388,5 +387,4 @@ mod tests {
         ])?;
         verify_batch(&spec, &proof, &data[5])
     }
-
 }

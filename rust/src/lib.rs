@@ -1,4 +1,5 @@
 mod api;
+mod compress;
 mod helpers;
 mod ics23;
 mod ops;
