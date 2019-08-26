@@ -23,7 +23,7 @@ enum LengthOp {
     NO_PREFIX = 0; 
     // VAR_PROTO uses protobuf (and go-amino) varint encoding of the length
     VAR_PROTO = 1; 
-    // VAR_RLP uses rlp int encoding of the length (TODO: is this different than protobuf?)
+    // VAR_RLP uses rlp int encoding of the length
     VAR_RLP = 2; 
     // FIXED32_BIG uses big-endian encoding of the length as a 32 bit integer
     FIXED32_BIG = 3; 

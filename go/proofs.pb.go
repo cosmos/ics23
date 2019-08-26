@@ -71,7 +71,7 @@ const (
 	LengthOp_NO_PREFIX LengthOp = 0
 	// VAR_PROTO uses protobuf (and go-amino) varint encoding of the length
 	LengthOp_VAR_PROTO LengthOp = 1
-	// VAR_RLP uses rlp int encoding of the length (TODO: is this different than protobuf?)
+	// VAR_RLP uses rlp int encoding of the length
 	LengthOp_VAR_RLP LengthOp = 2
 	// FIXED32_BIG uses big-endian encoding of the length as a 32 bit integer
 	LengthOp_FIXED32_BIG LengthOp = 3
