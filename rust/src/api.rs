@@ -17,6 +17,7 @@ pub fn verify_membership(
         false
     }
 }
+
 #[warn(clippy::ptr_arg)]
 // Use CommitmentRoot vs &[u8] to stick with ics naming
 #[allow(clippy::ptr_arg)]

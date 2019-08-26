@@ -4,8 +4,8 @@
 use failure::{bail, ensure};
 
 use crate::helpers::Result;
-use crate::ops::{apply_inner, apply_leaf};
 use crate::ics23;
+use crate::ops::{apply_inner, apply_leaf};
 
 pub type CommitmentRoot = ::std::vec::Vec<u8>;
 
