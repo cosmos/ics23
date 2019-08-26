@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::hash::BuildHasher;
 
 use crate::compress::{decompress, is_compressed};
 use crate::ics23;
@@ -35,6 +36,7 @@ pub fn verify_membership(
 }
 
 // Use CommitmentRoot vs &[u8] to stick with ics naming
+#[allow(clippy::ptr_arg)]
 pub fn verify_non_membership(
     proof: &ics23::CommitmentProof,
     spec: &ics23::ProofSpec,
@@ -61,11 +63,12 @@ pub fn verify_non_membership(
     }
 }
 
-pub fn verify_batch_membership(
+#[allow(clippy::ptr_arg)]
+pub fn verify_batch_membership<G: BuildHasher>(
     proof: &ics23::CommitmentProof,
     spec: &ics23::ProofSpec,
     root: &CommitmentRoot,
-    items: HashMap<&[u8], &[u8]>,
+    items: HashMap<&[u8], &[u8], G>,
 ) -> bool {
     // ugly attempt to conditionally decompress...
     let mut proof = proof;
@@ -84,6 +87,7 @@ pub fn verify_batch_membership(
         .all(|(key, value)| verify_membership(proof, spec, root, key, value))
 }
 
+#[allow(clippy::ptr_arg)]
 pub fn verify_batch_non_membership(
     proof: &ics23::CommitmentProof,
     spec: &ics23::ProofSpec,

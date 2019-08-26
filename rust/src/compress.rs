@@ -102,7 +102,7 @@ pub fn compress_exist(
         key: exist.key.clone(),
         value: exist.value.clone(),
         leaf: exist.leaf.clone(),
-        path: path,
+        path,
     })
 }
 
@@ -153,7 +153,7 @@ pub fn decompress_batch(proof: &ics23::CompressedBatchProof) -> Result<ics23::Co
 
 fn decompress_exist(
     exist: &ics23::CompressedExistenceProof,
-    lookup: &Vec<ics23::InnerOp>,
+    lookup: &[ics23::InnerOp],
 ) -> Result<ics23::ExistenceProof> {
     let path = exist
         .path
