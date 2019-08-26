@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::ics23;
 use crate::verify::{verify_existence, verify_non_existence, CommitmentRoot};
 
@@ -10,7 +12,8 @@ pub fn verify_membership(
     key: &[u8],
     value: &[u8],
 ) -> bool {
-    if let Some(ics23::commitment_proof::Proof::Exist(ex)) = &proof.proof {
+//    if let Some(ics23::commitment_proof::Proof::Exist(ex)) = &proof.proof {
+    if let Some(ex) = get_exist_proof(proof, key) {
         let valid = verify_existence(&ex, spec, root, key, value);
         valid.is_ok()
     } else {
@@ -18,24 +21,79 @@ pub fn verify_membership(
     }
 }
 
-#[warn(clippy::ptr_arg)]
+
 // Use CommitmentRoot vs &[u8] to stick with ics naming
-#[allow(clippy::ptr_arg)]
 pub fn verify_non_membership(
     proof: &ics23::CommitmentProof,
     spec: &ics23::ProofSpec,
     root: &CommitmentRoot,
     key: &[u8],
 ) -> bool {
-    if let Some(ics23::commitment_proof::Proof::Nonexist(non)) = &proof.proof {
+    if let Some(non) = get_nonexist_proof(proof, key) {
         let valid = verify_non_existence(&non, spec, root, key);
         valid.is_ok()
     } else {
         false
     }
 }
-#[warn(clippy::ptr_arg)]
 
+pub fn verify_batch_membership(
+    proof: &ics23::CommitmentProof,
+    spec: &ics23::ProofSpec,
+    root: &CommitmentRoot,
+    items: HashMap<&[u8], &[u8]>,
+) -> bool {
+    items.iter().all(|(key, value)| verify_membership(proof, spec, root, key, value))
+}
+
+pub fn verify_batch_non_membership(
+    proof: &ics23::CommitmentProof,
+    spec: &ics23::ProofSpec,
+    root: &CommitmentRoot,
+    keys: &[&[u8]],
+) -> bool {
+    keys.iter().all(|key| verify_non_membership(proof, spec, root, key))
+}
+
+
+fn get_exist_proof<'a>(proof: &'a ics23::CommitmentProof, key: &[u8]) -> Option<&'a ics23::ExistenceProof> {
+    match &proof.proof {
+        Some(ics23::commitment_proof::Proof::Exist(ex)) => Some(ex),
+        Some(ics23::commitment_proof::Proof::Batch(batch)) => {
+            for entry in &batch.entries {
+                if let Some(ics23::batch_entry::Proof::Exist(ex)) = &entry.proof {
+                    if ex.key == key {
+                        return Some(ex)
+                    }
+                }
+            }
+            None
+        },
+        _ => None,
+    }
+}
+
+fn get_nonexist_proof<'a>(proof: &'a ics23::CommitmentProof, key: &[u8]) -> Option<&'a ics23::NonExistenceProof> {
+    match &proof.proof {
+        Some(ics23::commitment_proof::Proof::Nonexist(non)) => Some(non),
+        Some(ics23::commitment_proof::Proof::Batch(batch)) => {
+            for entry in &batch.entries {
+                if let Some(ics23::batch_entry::Proof::Nonexist(non)) = &entry.proof {
+                    // use iter/all - true if None, must check if Some
+                    if non.left.iter().all(|x| x.key.as_slice() < key) &&
+                        non.right.iter().all(|x| x.key.as_slice() > key) {
+                        return Some(non);
+                    }
+                }
+            }
+            None
+        },
+        _ => None,
+    }
+}
+
+
+#[warn(clippy::ptr_arg)]
 pub fn iavl_spec() -> ics23::ProofSpec {
     let leaf = ics23::LeafOp {
         hash: ics23::HashOp::Sha256.into(),
