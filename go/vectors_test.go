@@ -231,13 +231,9 @@ func TestDecompressBatchVectors(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Marshal batch %v", err)
 			}
-			// ensure we got some reduction... at least 10%
-			if 10*len(small) > 9*len(big) {
-				t.Fatalf("Compression yield less than 10%%")
+			if len(small) >= len(big) {
+				t.Fatalf("Compression doesn't reduce size")
 			}
-
-
-
 
 			restore := Compress(tc.batch)
 			resmall, err := restore.Marshal()

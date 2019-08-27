@@ -90,9 +90,9 @@ func BatchVerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *Commi
 	return true
 }
 
-// CombineProofs takes a number of commitment proofs (simple or batch) and 
+// CombineProofs takes a number of commitment proofs (simple or batch) and
 // converts them into a batch and compresses them.
-// 
+//
 // This is designed for proof generation libraries to create efficient batches
 func CombineProofs(proofs []*CommitmentProof) (*CommitmentProof, error) {
 	var entries []*BatchEntry
@@ -132,7 +132,6 @@ func CombineProofs(proofs []*CommitmentProof) (*CommitmentProof, error) {
 
 	return Compress(batch), nil
 }
-
 
 func getExistProofForKey(proof *CommitmentProof, key []byte) *ExistenceProof {
 	switch p := proof.Proof.(type) {

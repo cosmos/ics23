@@ -145,7 +145,7 @@ func decompressEntry(entry *CompressedBatchEntry, lookup []*InnerOp) *BatchEntry
 
 func decompressExist(exist *CompressedExistenceProof, lookup []*InnerOp) *ExistenceProof {
 	if exist == nil {
-		return nil 
+		return nil
 	}
 	res := &ExistenceProof{
 		Key:   exist.Key,
