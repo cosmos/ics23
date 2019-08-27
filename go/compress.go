@@ -73,6 +73,9 @@ func compressEntry(entry *BatchEntry, lookup *[]*InnerOp, registry map[string]in
 }
 
 func compressExist(exist *ExistenceProof, lookup *[]*InnerOp, registry map[string]int32) *CompressedExistenceProof {
+	if exist == nil {
+		return nil
+	}
 	res := &CompressedExistenceProof{
 		Key:   exist.Key,
 		Value: exist.Value,
@@ -141,6 +144,9 @@ func decompressEntry(entry *CompressedBatchEntry, lookup []*InnerOp) *BatchEntry
 }
 
 func decompressExist(exist *CompressedExistenceProof, lookup []*InnerOp) *ExistenceProof {
+	if exist == nil {
+		return nil 
+	}
 	res := &ExistenceProof{
 		Key:   exist.Key,
 		Value: exist.Value,

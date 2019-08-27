@@ -90,6 +90,50 @@ func BatchVerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *Commi
 	return true
 }
 
+// CombineProofs takes a number of commitment proofs (simple or batch) and 
+// converts them into a batch and compresses them.
+// 
+// This is designed for proof generation libraries to create efficient batches
+func CombineProofs(proofs []*CommitmentProof) (*CommitmentProof, error) {
+	var entries []*BatchEntry
+
+	for _, proof := range proofs {
+		if ex := proof.GetExist(); ex != nil {
+			entry := &BatchEntry{
+				Proof: &BatchEntry_Exist{
+					Exist: ex,
+				},
+			}
+			entries = append(entries, entry)
+		} else if non := proof.GetNonexist(); non != nil {
+			entry := &BatchEntry{
+				Proof: &BatchEntry_Nonexist{
+					Nonexist: non,
+				},
+			}
+			entries = append(entries, entry)
+		} else if batch := proof.GetBatch(); batch != nil {
+			entries = append(entries, batch.Entries...)
+		} else if comp := proof.GetCompressed(); comp != nil {
+			decomp := Decompress(proof)
+			entries = append(entries, decomp.GetBatch().Entries...)
+		} else {
+			return nil, fmt.Errorf("proof neither exist or nonexist: %#v", proof.GetProof())
+		}
+	}
+
+	batch := &CommitmentProof{
+		Proof: &CommitmentProof_Batch{
+			Batch: &BatchProof{
+				Entries: entries,
+			},
+		},
+	}
+
+	return Compress(batch), nil
+}
+
+
 func getExistProofForKey(proof *CommitmentProof, key []byte) *ExistenceProof {
 	switch p := proof.Proof.(type) {
 	case *CommitmentProof_Exist:

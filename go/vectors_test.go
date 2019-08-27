@@ -99,38 +99,18 @@ func loadFile(t *testing.T, dir string, filename string) (*CommitmentProof, *Ref
 }
 
 func loadBatch(t *testing.T, dir string, filenames []string) (*CommitmentProof, []*RefData) {
-	var proof *CommitmentProof
 	refs := make([]*RefData, len(filenames))
-	entries := make([]*BatchEntry, len(filenames))
+	proofs := make([]*CommitmentProof, len(filenames))
 
 	for i, fn := range filenames {
-		proof, refs[i] = loadFile(t, dir, fn)
-		if ex := proof.GetExist(); ex != nil {
-			entries[i] = &BatchEntry{
-				Proof: &BatchEntry_Exist{
-					Exist: ex,
-				},
-			}
-		} else if non := proof.GetNonexist(); non != nil {
-			entries[i] = &BatchEntry{
-				Proof: &BatchEntry_Nonexist{
-					Nonexist: non,
-				},
-			}
-		} else {
-			t.Fatalf("Loaded proof neither exist or nonexist: %s\n%#v", fn, proof.GetProof())
-		}
+		proofs[i], refs[i] = loadFile(t, dir, fn)
 	}
 
-	result := &CommitmentProof{
-		Proof: &CommitmentProof_Batch{
-			Batch: &BatchProof{
-				Entries: entries,
-			},
-		},
+	batch, err := CombineProofs(proofs)
+	if err != nil {
+		t.Fatalf("Generating batch: %v", err)
 	}
-
-	return result, refs
+	return batch, refs
 }
 
 func TestBatchVectors(t *testing.T) {
@@ -213,12 +193,11 @@ func TestBatchVectors(t *testing.T) {
 	}
 }
 
-func TestCompressBatchVectors(t *testing.T) {
+func TestDecompressBatchVectors(t *testing.T) {
 	iavl := filepath.Join("..", "testdata", "iavl")
 	tendermint := filepath.Join("..", "testdata", "tendermint")
 
-	// Note that each item has a different commitment root,
-	// so maybe not ideal (cannot check multiple entries)
+	// note that these batches are already compressed
 	batch_iavl, _ := loadBatch(t, iavl, []string{
 		"exist_left.json",
 		"exist_middle.json",
@@ -239,41 +218,39 @@ func TestCompressBatchVectors(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			orig, err := tc.batch.Marshal()
+			small, err := tc.batch.Marshal()
 			if err != nil {
 				t.Fatalf("Marshal batch %v", err)
 			}
 
-			compressed := Compress(tc.batch)
-			small, err := compressed.Marshal()
+			decomp := Decompress(tc.batch)
+			if decomp == tc.batch {
+				t.Fatalf("Decompression is a no-op")
+			}
+			big, err := decomp.Marshal()
 			if err != nil {
 				t.Fatalf("Marshal batch %v", err)
 			}
 			// ensure we got some reduction... at least 10%
-			if 10*len(small) > 9*len(orig) {
+			if 10*len(small) > 9*len(big) {
 				t.Fatalf("Compression yield less than 10%%")
 			}
 
-			recompressed := Compress(compressed)
-			if compressed != recompressed {
-				t.Fatal("Recompression is not a no-op")
-			}
 
-			// TODO: decompress
-			decomp := Decompress(compressed)
-			if decomp == compressed {
-				t.Fatalf("Decompression is a no-op")
-			}
-			refresh, err := decomp.Marshal()
+
+
+			restore := Compress(tc.batch)
+			resmall, err := restore.Marshal()
 			if err != nil {
 				t.Fatalf("Marshal batch %v", err)
 			}
-			if len(refresh) != len(orig) {
-				t.Fatalf("Decompressed len %d, original len %d", len(refresh), len(orig))
+			if len(resmall) != len(small) {
+				t.Fatalf("Decompressed len %d, original len %d", len(resmall), len(small))
 			}
-			if !bytes.Equal(refresh, orig) {
+			if !bytes.Equal(resmall, small) {
 				t.Fatal("Decompressed batch proof differs from original")
 			}
+
 		})
 	}
 }
