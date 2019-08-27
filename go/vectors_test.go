@@ -98,7 +98,7 @@ func loadFile(t *testing.T, dir string, filename string) (*CommitmentProof, *Ref
 	return &proof, &ref
 }
 
-func loadBatch(t *testing.T, dir string, filenames []string) (*CommitmentProof, []*RefData) {
+func buildBatch(t *testing.T, dir string, filenames []string) (*CommitmentProof, []*RefData) {
 	refs := make([]*RefData, len(filenames))
 	proofs := make([]*CommitmentProof, len(filenames))
 
@@ -113,13 +113,57 @@ func loadBatch(t *testing.T, dir string, filenames []string) (*CommitmentProof, 
 	return batch, refs
 }
 
+// BatchVector is what is stored in the file
+type BatchVector struct {
+	RootHash string `json:"root"`
+	Proof    string `json:"proof"`
+	Items []struct{
+		Key      string `json:"key"`
+		Value    string `json:"value"`	
+	}
+}
+
+func loadBatch(t *testing.T, dir string, filename string) (*CommitmentProof, []*RefData) {
+	// load the file into a json struct
+	name := filepath.Join(dir, filename)
+	bz, err := ioutil.ReadFile(name)
+	if err != nil {
+		t.Fatalf("Read file: %+v", err)
+	}
+	var data BatchVector
+	err = json.Unmarshal(bz, &data)
+	if err != nil {
+		t.Fatalf("Unmarshal json: %+v", err)
+	}
+
+	// parse the protobuf object
+	var proof CommitmentProof
+	err = proof.Unmarshal(mustHex(t, data.Proof))
+	if err != nil {
+		t.Fatalf("Unmarshal protobuf: %+v", err)
+	}
+
+	root := mustHex(t, data.RootHash)
+
+	var refs = make([]*RefData, len(data.Items))
+	for i, item := range data.Items {
+		refs[i] = &RefData{
+			RootHash: root,
+			Key: mustHex(t, item.Key),
+			Value: mustHex(t, item.Value),
+		}
+	}
+
+	return &proof, refs
+}
+
 func TestBatchVectors(t *testing.T) {
 	iavl := filepath.Join("..", "testdata", "iavl")
 	tendermint := filepath.Join("..", "testdata", "tendermint")
 
 	// Note that each item has a different commitment root,
 	// so maybe not ideal (cannot check multiple entries)
-	batch_iavl, refs_iavl := loadBatch(t, iavl, []string{
+	batch_iavl, refs_iavl := buildBatch(t, iavl, []string{
 		"exist_left.json",
 		"exist_right.json",
 		"exist_middle.json",
@@ -128,7 +172,7 @@ func TestBatchVectors(t *testing.T) {
 		"nonexist_middle.json",
 	})
 
-	batch_tm, refs_tm := loadBatch(t, tendermint, []string{
+	batch_tm, refs_tm := buildBatch(t, tendermint, []string{
 		"exist_left.json",
 		"exist_right.json",
 		"exist_middle.json",
@@ -136,6 +180,12 @@ func TestBatchVectors(t *testing.T) {
 		"nonexist_right.json",
 		"nonexist_middle.json",
 	})
+
+	batch_tm_exist, refs_tm_exist := loadBatch(t, tendermint, "batch_exist.json")
+	batch_tm_nonexist, refs_tm_nonexist := loadBatch(t, tendermint, "batch_nonexist.json")
+
+	batch_iavl_exist, refs_iavl_exist := loadBatch(t, iavl, "batch_exist.json")
+	batch_iavl_nonexist, refs_iavl_nonexist := loadBatch(t, iavl, "batch_nonexist.json")
 
 	cases := map[string]struct {
 		spec    *ProofSpec
@@ -152,6 +202,8 @@ func TestBatchVectors(t *testing.T) {
 		// Note this spec only differs for non-existence proofs
 		"iavl invalid 1": {spec: TendermintSpec, proof: batch_iavl, ref: refs_iavl[4], invalid: true},
 		"iavl invalid 2": {spec: IavlSpec, proof: batch_iavl, ref: refs_tm[0], invalid: true},
+		"iavl batch exist":           {spec: IavlSpec, proof: batch_iavl_exist, ref: refs_iavl_exist[17]},
+		"iavl batch nonexist":           {spec: IavlSpec, proof: batch_iavl_nonexist, ref: refs_iavl_nonexist[7]},
 		"tm 0":           {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[0]},
 		"tm 1":           {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[1]},
 		"tm 2":           {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[2]},
@@ -161,6 +213,8 @@ func TestBatchVectors(t *testing.T) {
 		// Note this spec only differs for non-existence proofs
 		"tm invalid 1": {spec: IavlSpec, proof: batch_tm, ref: refs_tm[4], invalid: true},
 		"tm invalid 2": {spec: TendermintSpec, proof: batch_tm, ref: refs_iavl[0], invalid: true},
+		"tm batch exist":           {spec: TendermintSpec, proof: batch_tm_exist, ref: refs_tm_exist[10]},
+		"tm batch nonexist":           {spec: TendermintSpec, proof: batch_tm_nonexist, ref: refs_tm_nonexist[3]},
 	}
 
 	for name, tc := range cases {
@@ -198,16 +252,8 @@ func TestDecompressBatchVectors(t *testing.T) {
 	tendermint := filepath.Join("..", "testdata", "tendermint")
 
 	// note that these batches are already compressed
-	batch_iavl, _ := loadBatch(t, iavl, []string{
-		"exist_left.json",
-		"exist_middle.json",
-		"nonexist_middle.json",
-	})
-	batch_tm, _ := loadBatch(t, tendermint, []string{
-		"exist_left.json",
-		"exist_middle.json",
-		"nonexist_middle.json",
-	})
+	batch_iavl, _ := loadBatch(t, iavl, "batch_exist.json")
+	batch_tm, _ := loadBatch(t, tendermint, "batch_nonexist.json")
 
 	cases := map[string]struct {
 		batch *CommitmentProof
@@ -252,6 +298,9 @@ func TestDecompressBatchVectors(t *testing.T) {
 }
 
 func mustHex(t *testing.T, data string) []byte {
+	if data == "" {
+		return nil
+	}
 	res, err := hex.DecodeString(data)
 	if err != nil {
 		t.Fatalf("decoding hex: %v", err)
