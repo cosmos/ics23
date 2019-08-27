@@ -1,6 +1,6 @@
 [package]
 name = "ics23"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["Ethan Frey <ethanfrey@users.noreply.github.com>"]
 edition = "2018"
 exclude = ["codegen"]
