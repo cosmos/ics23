@@ -1,5 +1,7 @@
 pragma solidity ^0.5.3;
 
+pragma experimental ABIEncoderV2;
+
 contract Proofs {
     enum HashOp{NO_HASH, SHA256, SHA512, KECCAK, RIPEMD160, BITCOIN}
     enum LengthOp{NO_PREFIX, VAR_PROTO, VAR_RLP, FIXED32_BIG, FIXED32_LITTLE, FIXED64_BIG, FIXED64_LITTLE, REQUIRE_32_BYTES, REQUIRE_64_BYTES}
@@ -33,31 +35,6 @@ contract Proofs {
         hex"00"
     );
     
-    function decodeExistenceProof( 
-      bytes memory key, bytes memory value,
-      bytes memory leafOpEncoded, bytes memory pathEncodedEncoded
-    )
-    internal pure returns (ExistenceProof memory) {
-      (HashOp leafHash, HashOp prehashKey, HashOp prehashValue, LengthOp len, bytes memory leafPrefix) = abi.decode(leafOpEncoded, (HashOp, HashOp, HashOp, LengthOp, bytes));
-      LeafOp memory leaf = LeafOp(leafHash, prehashKey, prehashValue, len, leafPrefix);
-      bytes[] memory pathEncoded = abi.decode(pathEncodedEncoded, (bytes[]));
-      InnerOp[] memory path = new InnerOp[](pathEncoded.length);
-      for (uint i = 0; i < pathEncoded.length; i++) {
-        (HashOp hash, bytes memory prefix, bytes memory suffix) = abi.decode(pathEncoded[i], (HashOp, bytes, bytes));
-        path[i] = InnerOp(hash, prefix, suffix);
-      }
-      
-      return ExistenceProof(key, value, leaf, path);
-    }
-
-    function encodeLeafOp(HashOp hash, HashOp phkey, HashOp phval, LengthOp len, bytes memory prefix) public pure returns (bytes memory) {
-      return abi.encode(hash, phkey, phval, len, prefix);
-    }
-
-    function encodeInnerOp(HashOp hash, bytes memory prefix, bytes memory suffix) public pure returns (bytes memory) {
-      return abi.encode(hash, prefix, suffix);
-    }
-
     function doHashOrNoop(HashOp op, bytes memory preimage) public pure returns (bytes memory) {
         if (op == HashOp.NO_HASH) {
             return preimage;
@@ -109,7 +86,7 @@ contract Proofs {
         return result;
     }
 
-    function applyLeaf(LeafOp memory op, bytes memory key, bytes memory value) internal pure returns (bytes memory) {
+    function applyLeaf(LeafOp memory op, bytes memory key, bytes memory value) public pure returns (bytes memory) {
         require(key.length != 0);
         require(value.length != 0);
 
@@ -120,8 +97,8 @@ contract Proofs {
         return doHash(op.hash, data);
     }
 
-    function applyInner(InnerOp memory op, bytes memory child) internal pure returns (bytes memory) {
-        require(child.length == 0);
+    function applyInner(InnerOp memory op, bytes memory child) public pure returns (bytes memory) {
+        require(child.length != 0);
         bytes memory preimage = abi.encodePacked(op.prefix, child, op.suffix);
         return doHash(op.hash, preimage);
     }
@@ -135,25 +112,52 @@ contract Proofs {
         return true;
     }
 
-    function checkAgainstSpec(ExistenceProof memory proof, LeafOp memory spec) internal pure {
-        require(proof.leaf.hash == spec.hash);
-        require(proof.leaf.prehash_key == spec.prehash_key);
-        require(proof.leaf.prehash_value == spec.prehash_value);
-        require(proof.leaf.len == spec.len);
-        require(hasprefix(proof.leaf.prefix, spec.prefix));
+    function checkAgainstSpec(ExistenceProof memory proof, LeafOp memory spec) public pure returns (bool) {
+        if (!(
+          proof.leaf.hash == spec.hash &&
+          proof.leaf.prehash_key == spec.prehash_key &&
+          proof.leaf.prehash_value == spec.prehash_value &&
+          proof.leaf.len == spec.len &&
+          hasprefix(proof.leaf.prefix, spec.prefix)
+        )) {
+          return false;
+        }
 
         for (uint i = 0; i < proof.path.length; i++) {
-            require(hasprefix(proof.path[i].prefix, spec.prefix));
+          if (hasprefix(proof.path[i].prefix, spec.prefix)) {
+            return false; 
+          }
         }
+
+        return true;
     }
 
-    function calculate(ExistenceProof memory proof) internal pure returns (bytes memory) {
+    function calculate(ExistenceProof memory proof) public pure returns (bytes memory) {
         bytes memory res = applyLeaf(proof.leaf, proof.key, proof.value);
         for (uint i = 0; i < proof.path.length; i++) {
             res = applyInner(proof.path[i], res);
         }
         return res;
     }
+  
+    function verifyExistence(ExistenceProof memory proof, LeafOp memory spec, bytes memory root, bytes memory key, bytes memory value) public pure returns (bool) {
+      return (
+        checkAgainstSpec(proof, spec) &&
+        equalBytes(key, proof.key) &&
+        equalBytes(value, proof.value) &&
+        equalBytes(calculate(proof), root)
+      );
+    }
 
-
+    function equalBytes(bytes memory bz1, bytes memory bz2) public pure returns (bool) {
+      if (bz1.length != bz2.length) {
+        return false;
+      }
+      for (uint i = 0; i < bz1.length; i++) {
+        if (bz1[i] != bz2[i]) {
+          return false;
+        }
+      }
+      return true;
+    }
 }
