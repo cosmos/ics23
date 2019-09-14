@@ -2,7 +2,12 @@ pragma solidity ^0.5.3;
 
 pragma experimental ABIEncoderV2;
 
+// Current solidity ICS23 implementation only supports Existence
+// NonExistence is planned to be supported, Batch and Compressed are not
+
 contract ICS23 {
+    // Data structures and helper functions
+
     enum HashOp{NO_HASH, SHA256, SHA512, KECCAK, RIPEMD160, BITCOIN}
     enum LengthOp{NO_PREFIX, VAR_PROTO, VAR_RLP, FIXED32_BIG, FIXED32_LITTLE, FIXED64_BIG, FIXED64_LITTLE, REQUIRE_32_BYTES, REQUIRE_64_BYTES}
 
@@ -159,5 +164,12 @@ contract ICS23 {
         }
       }
       return true;
+    }
+    
+    // ICS23 interface implementation
+
+    // verifyMembership is synonym for verifyExistence
+    function verifyMembership(LeafOp memory spec, bytes memory root, ExistenceProof memory proof, bytes memory key, bytes memory value) public pure returns (bool) {
+      return verifyExistence(proof, spec, root, key, value);
     }
 }
