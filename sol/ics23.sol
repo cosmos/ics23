@@ -2,7 +2,7 @@ pragma solidity ^0.5.3;
 
 pragma experimental ABIEncoderV2;
 
-contract Proofs {
+contract ICS23 {
     enum HashOp{NO_HASH, SHA256, SHA512, KECCAK, RIPEMD160, BITCOIN}
     enum LengthOp{NO_PREFIX, VAR_PROTO, VAR_RLP, FIXED32_BIG, FIXED32_LITTLE, FIXED64_BIG, FIXED64_LITTLE, REQUIRE_32_BYTES, REQUIRE_64_BYTES}
 

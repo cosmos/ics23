@@ -1,4 +1,4 @@
-package proofs
+package ics23
 
 import (
 	"crypto/sha256"
@@ -9,7 +9,7 @@ import (
 
 	"golang.org/x/crypto/ripemd160"
 
-	proofs "github.com/confio/proofs/go"
+	ics23 "github.com/confio/ics23/go"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -19,7 +19,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-func testDoHash(t *testing.T, cont ProofsSession) {
+func testDoHash(t *testing.T, cont ICS23Session) {
 	for i := 0; i < 1000; i++ {
 		image := make([]byte, 64)
 		rand.Read(image)
@@ -70,7 +70,7 @@ func testDoHash(t *testing.T, cont ProofsSession) {
 	}
 }
 
-func Initialize(t *testing.T) ProofsSession {
+func Initialize(t *testing.T) ICS23Session {
 	key, _ := crypto.GenerateKey()
 	auth := bind.NewKeyedTransactor(key)
 	address := auth.From
@@ -79,11 +79,11 @@ func Initialize(t *testing.T) ProofsSession {
 	}
 	sim := backends.NewSimulatedBackend(gAlloc, 100000000000)
 
-	_, _, cont, err := DeployProofs(auth, sim)
+	_, _, cont, err := DeployICS23(auth, sim)
 
 	require.NoError(t, err)
 
-	session := ProofsSession{cont, bind.CallOpts{}, bind.TransactOpts{}}
+	session := ICS23Session{cont, bind.CallOpts{}, bind.TransactOpts{}}
 
 	sim.Commit()
 
