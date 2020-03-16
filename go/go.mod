@@ -1,6 +1,6 @@
 module github.com/confio/ics23/go
 
-go 1.12
+go 1.14
 
 require (
 	github.com/gogo/protobuf v1.2.1

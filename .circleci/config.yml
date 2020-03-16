@@ -31,7 +31,7 @@ jobs:
   golang:
     docker:
       # specify the version
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.14
     environment:
       GO111MODULE=on
     working_directory: ~/proofs/go

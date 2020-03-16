@@ -117,9 +117,9 @@ func buildBatch(t *testing.T, dir string, filenames []string) (*CommitmentProof,
 type BatchVector struct {
 	RootHash string `json:"root"`
 	Proof    string `json:"proof"`
-	Items []struct{
-		Key      string `json:"key"`
-		Value    string `json:"value"`	
+	Items    []struct {
+		Key   string `json:"key"`
+		Value string `json:"value"`
 	}
 }
 
@@ -149,8 +149,8 @@ func loadBatch(t *testing.T, dir string, filename string) (*CommitmentProof, []*
 	for i, item := range data.Items {
 		refs[i] = &RefData{
 			RootHash: root,
-			Key: mustHex(t, item.Key),
-			Value: mustHex(t, item.Value),
+			Key:      mustHex(t, item.Key),
+			Value:    mustHex(t, item.Value),
 		}
 	}
 
@@ -200,21 +200,21 @@ func TestBatchVectors(t *testing.T) {
 		"iavl 4": {spec: IavlSpec, proof: batch_iavl, ref: refs_iavl[4]},
 		"iavl 5": {spec: IavlSpec, proof: batch_iavl, ref: refs_iavl[5]},
 		// Note this spec only differs for non-existence proofs
-		"iavl invalid 1": {spec: TendermintSpec, proof: batch_iavl, ref: refs_iavl[4], invalid: true},
-		"iavl invalid 2": {spec: IavlSpec, proof: batch_iavl, ref: refs_tm[0], invalid: true},
-		"iavl batch exist":           {spec: IavlSpec, proof: batch_iavl_exist, ref: refs_iavl_exist[17]},
-		"iavl batch nonexist":           {spec: IavlSpec, proof: batch_iavl_nonexist, ref: refs_iavl_nonexist[7]},
-		"tm 0":           {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[0]},
-		"tm 1":           {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[1]},
-		"tm 2":           {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[2]},
-		"tm 3":           {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[3]},
-		"tm 4":           {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[4]},
-		"tm 5":           {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[5]},
+		"iavl invalid 1":      {spec: TendermintSpec, proof: batch_iavl, ref: refs_iavl[4], invalid: true},
+		"iavl invalid 2":      {spec: IavlSpec, proof: batch_iavl, ref: refs_tm[0], invalid: true},
+		"iavl batch exist":    {spec: IavlSpec, proof: batch_iavl_exist, ref: refs_iavl_exist[17]},
+		"iavl batch nonexist": {spec: IavlSpec, proof: batch_iavl_nonexist, ref: refs_iavl_nonexist[7]},
+		"tm 0":                {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[0]},
+		"tm 1":                {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[1]},
+		"tm 2":                {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[2]},
+		"tm 3":                {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[3]},
+		"tm 4":                {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[4]},
+		"tm 5":                {spec: TendermintSpec, proof: batch_tm, ref: refs_tm[5]},
 		// Note this spec only differs for non-existence proofs
-		"tm invalid 1": {spec: IavlSpec, proof: batch_tm, ref: refs_tm[4], invalid: true},
-		"tm invalid 2": {spec: TendermintSpec, proof: batch_tm, ref: refs_iavl[0], invalid: true},
-		"tm batch exist":           {spec: TendermintSpec, proof: batch_tm_exist, ref: refs_tm_exist[10]},
-		"tm batch nonexist":           {spec: TendermintSpec, proof: batch_tm_nonexist, ref: refs_tm_nonexist[3]},
+		"tm invalid 1":      {spec: IavlSpec, proof: batch_tm, ref: refs_tm[4], invalid: true},
+		"tm invalid 2":      {spec: TendermintSpec, proof: batch_tm, ref: refs_iavl[0], invalid: true},
+		"tm batch exist":    {spec: TendermintSpec, proof: batch_tm_exist, ref: refs_tm_exist[10]},
+		"tm batch nonexist": {spec: TendermintSpec, proof: batch_tm_nonexist, ref: refs_tm_nonexist[3]},
 	}
 
 	for name, tc := range cases {
