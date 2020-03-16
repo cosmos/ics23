@@ -13,13 +13,13 @@ members = ["codegen"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
-prost = "0.5"
-bytes = "0.4.12"
-hex = "0.3.2"
+prost = "0.6.1"
+bytes = "0.5.4"
+hex = "0.4.2"
 sha2 = "0.8"
 sha3 = "0.8"
 ripemd160 = "0.8"
-failure = "0.1.5"
+failure = "0.1.7"
 
 [dev-dependencies]
 serde = { version = "1.0", features = ["derive"] }
