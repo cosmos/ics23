@@ -237,11 +237,17 @@ func TestCheckLeaf(t *testing.T) {
 
 func TestCheckAgainstSpec(t *testing.T) {
 	validInner := &InnerOp{
-		Prefix: fromHex("aa"),
+		Hash:   HashOp_SHA256,
+		Prefix: fromHex("aabbccdd"),
 	}
 	invalidInner := &InnerOp{
-		Prefix: fromHex("00aa"),
+		Hash:   HashOp_SHA256,
+		Prefix: fromHex("00aabbccdd"),
 		Suffix: fromHex("bb"),
+	}
+	invalidInner2 := &InnerOp{
+		Hash:   HashOp_SHA512,
+		Prefix: fromHex("aabbccdd"),
 	}
 
 	cases := map[string]struct {
@@ -309,6 +315,20 @@ func TestCheckAgainstSpec(t *testing.T) {
 				Path: []*InnerOp{
 					validInner,
 					invalidInner,
+					validInner,
+				},
+			},
+			spec:  IavlSpec,
+			isErr: true,
+		},
+		"rejects leaf with invalid inner proof (hash mismatch)": {
+			proof: &ExistenceProof{
+				Key:   []byte("food"),
+				Value: []byte("bar"),
+				Leaf:  IavlSpec.LeafSpec,
+				Path: []*InnerOp{
+					invalidInner2,
+					validInner,
 					validInner,
 				},
 			},
