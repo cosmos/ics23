@@ -81,7 +81,8 @@ func (op *InnerOp) CheckAgainstSpec(spec *ProofSpec) error {
 	if len(op.Prefix) < int(spec.InnerSpec.MinPrefixLength) {
 		return errors.Errorf("InnerOp prefix too short (%d)", len(op.Prefix))
 	}
-	if len(op.Prefix) > int(spec.InnerSpec.MaxPrefixLength) {
+	maxLeftChildBytes := (len(spec.InnerSpec.ChildOrder) - 1) * int(spec.InnerSpec.ChildSize)
+	if len(op.Prefix) > int(spec.InnerSpec.MaxPrefixLength)+maxLeftChildBytes {
 		return errors.Errorf("InnerOp prefix too long (%d)", len(op.Prefix))
 	}
 	return nil
