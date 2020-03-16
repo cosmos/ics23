@@ -232,7 +232,7 @@ mod tests {
         let data: TestVector = serde_json::from_str(&contents)?;
         let proto_bin = hex::decode(&data.proof)?;
         let mut parsed = ics23::CommitmentProof { proof: None };
-        parsed.merge(&proto_bin)?;
+        parsed.merge(proto_bin.as_slice())?;
 
         let root = hex::decode(data.root)?;
         let key = hex::decode(data.key)?;

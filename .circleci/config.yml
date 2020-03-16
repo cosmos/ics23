@@ -49,7 +49,7 @@ jobs:
             - "/go/pkg/mod"
   rust:
     docker:
-      - image: rust:1
+      - image: rust:1.42
     working_directory: ~/proofs/rust
     steps:
       - checkout:
