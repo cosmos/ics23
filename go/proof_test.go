@@ -250,6 +250,25 @@ func TestCheckAgainstSpec(t *testing.T) {
 		Prefix: fromHex("aabbccdd"),
 	}
 
+	// this is a copy of IavlSpec with a min and max depth parameters set
+	depthLimitedSpec := &ProofSpec{
+		LeafSpec: &LeafOp{
+			Prefix:       []byte{0},
+			Hash:         HashOp_SHA256,
+			PrehashValue: HashOp_SHA256,
+			Length:       LengthOp_VAR_PROTO,
+		},
+		InnerSpec: &InnerSpec{
+			ChildOrder:      []int32{0, 1},
+			MinPrefixLength: 4,
+			MaxPrefixLength: 12,
+			ChildSize:       33, // (with length byte)
+			Hash:            HashOp_SHA256,
+		},
+		MaxDepth: 4,
+		MinDepth: 2,
+	}
+
 	cases := map[string]struct {
 		proof *ExistenceProof
 		spec  *ProofSpec
@@ -321,7 +340,7 @@ func TestCheckAgainstSpec(t *testing.T) {
 			spec:  IavlSpec,
 			isErr: true,
 		},
-		"rejects leaf with invalid inner proof (hash mismatch)": {
+		"rejects invalid inner proof (hash mismatch)": {
 			proof: &ExistenceProof{
 				Key:   []byte("food"),
 				Value: []byte("bar"),
@@ -333,6 +352,48 @@ func TestCheckAgainstSpec(t *testing.T) {
 				},
 			},
 			spec:  IavlSpec,
+			isErr: true,
+		},
+		"allows depth limited in proper range": {
+			proof: &ExistenceProof{
+				Key:   []byte("food"),
+				Value: []byte("bar"),
+				Leaf:  IavlSpec.LeafSpec,
+				Path: []*InnerOp{
+					validInner,
+					validInner,
+					validInner,
+				},
+			},
+			spec:  depthLimitedSpec,
+			isErr: false,
+		},
+		"reject depth limited with too few inner nodes": {
+			proof: &ExistenceProof{
+				Key:   []byte("food"),
+				Value: []byte("bar"),
+				Leaf:  IavlSpec.LeafSpec,
+				Path: []*InnerOp{
+					validInner,
+				},
+			},
+			spec:  depthLimitedSpec,
+			isErr: true,
+		},
+		"reject depth limited with too many inner nodes": {
+			proof: &ExistenceProof{
+				Key:   []byte("food"),
+				Value: []byte("bar"),
+				Leaf:  IavlSpec.LeafSpec,
+				Path: []*InnerOp{
+					validInner,
+					validInner,
+					validInner,
+					validInner,
+					validInner,
+				},
+			},
+			spec:  depthLimitedSpec,
 			isErr: true,
 		},
 	}

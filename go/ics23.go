@@ -67,7 +67,6 @@ func BatchVerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *Commitme
 	proof = Decompress(proof)
 	for k, v := range items {
 		valid := VerifyMembership(spec, root, proof, []byte(k), v)
-		fmt.Printf("Validate %t\n", valid)
 		if !valid {
 			return false
 		}
@@ -82,7 +81,6 @@ func BatchVerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *Commi
 	proof = Decompress(proof)
 	for _, k := range keys {
 		valid := VerifyNonMembership(spec, root, proof, k)
-		fmt.Printf("Validate non %t\n", valid)
 		if !valid {
 			return false
 		}
