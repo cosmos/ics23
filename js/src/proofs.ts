@@ -143,10 +143,20 @@ export function ensureSpec(
   if (!spec.leafSpec) {
     throw new Error("Spec must include leafSpec");
   }
+  if (!spec.innerSpec) {
+    throw new Error("Spec must include innerSpec");
+  }
   ensureLeaf(proof.leaf, spec.leafSpec);
+
   const path = proof.path || [];
+  if (spec.minDepth && path.length < spec.minDepth) {
+    throw new Error(`Too few inner nodes ${path.length}`);
+  }
+  if (spec.maxDepth && path.length > spec.maxDepth) {
+    throw new Error(`Too many inner nodes ${path.length}`);
+  }
   for (const inner of path) {
-    ensureInner(inner, spec.leafSpec.prefix);
+    ensureInner(inner, spec.leafSpec.prefix, spec.innerSpec);
   }
 }
 

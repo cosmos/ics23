@@ -178,7 +178,7 @@ describe("ensureSpec", () => {
       leaf: validLeaf,
       path: [validInner]
     };
-    expect(() => ensureSpec(proof, IavlSpec)).toThrow();
+    expect(() => ensureSpec(proof, depthLimitedSpec)).toThrow();
   });
 
   it("rejects depth limited with too many nodes", () => {
@@ -188,6 +188,6 @@ describe("ensureSpec", () => {
       leaf: validLeaf,
       path: [validInner, validInner, validInner, validInner, validInner]
     };
-    expect(() => ensureSpec(proof, IavlSpec)).toThrow();
+    expect(() => ensureSpec(proof, depthLimitedSpec)).toThrow();
   });
 });
