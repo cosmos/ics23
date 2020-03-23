@@ -20,7 +20,8 @@ export const IavlSpec: ics23.IProofSpec = {
     childOrder: [0, 1],
     minPrefixLength: 4,
     maxPrefixLength: 12,
-    childSize: 33
+    childSize: 33,
+    hash: ics23.HashOp.SHA256
   }
 };
 
@@ -36,7 +37,8 @@ export const TendermintSpec: ics23.IProofSpec = {
     childOrder: [0, 1],
     minPrefixLength: 1,
     maxPrefixLength: 1,
-    childSize: 32
+    childSize: 32,
+    hash: ics23.HashOp.SHA256
   }
 };
 
