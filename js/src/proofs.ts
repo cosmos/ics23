@@ -20,7 +20,8 @@ export const IavlSpec: ics23.IProofSpec = {
     childOrder: [0, 1],
     minPrefixLength: 4,
     maxPrefixLength: 12,
-    childSize: 33
+    childSize: 33,
+    hash: ics23.HashOp.SHA256
   }
 };
 
@@ -36,7 +37,8 @@ export const TendermintSpec: ics23.IProofSpec = {
     childOrder: [0, 1],
     minPrefixLength: 1,
     maxPrefixLength: 1,
-    childSize: 32
+    childSize: 32,
+    hash: ics23.HashOp.SHA256
   }
 };
 
@@ -141,10 +143,20 @@ export function ensureSpec(
   if (!spec.leafSpec) {
     throw new Error("Spec must include leafSpec");
   }
+  if (!spec.innerSpec) {
+    throw new Error("Spec must include innerSpec");
+  }
   ensureLeaf(proof.leaf, spec.leafSpec);
+
   const path = proof.path || [];
+  if (spec.minDepth && path.length < spec.minDepth) {
+    throw new Error(`Too few inner nodes ${path.length}`);
+  }
+  if (spec.maxDepth && path.length > spec.maxDepth) {
+    throw new Error(`Too many inner nodes ${path.length}`);
+  }
   for (const inner of path) {
-    ensureInner(inner, spec.leafSpec.prefix);
+    ensureInner(inner, spec.leafSpec.prefix, spec.innerSpec);
   }
 }
 

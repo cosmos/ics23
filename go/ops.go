@@ -3,6 +3,7 @@ package ics23
 import (
 	"bytes"
 	"crypto"
+
 	// adds sha256 capability to crypto.SHA256
 	_ "crypto/sha256"
 	// adds sha512 capability to crypto.SHA512
@@ -69,9 +70,20 @@ func (op *InnerOp) Apply(child []byte) ([]byte, error) {
 
 // CheckAgainstSpec will verify the InnerOp is in the format defined in spec
 func (op *InnerOp) CheckAgainstSpec(spec *ProofSpec) error {
+	if op.Hash != spec.InnerSpec.Hash {
+		return errors.Errorf("Unexpected HashOp: %d", op.Hash)
+	}
+
 	leafPrefix := spec.LeafSpec.Prefix
 	if bytes.HasPrefix(op.Prefix, leafPrefix) {
 		return errors.Errorf("Inner Prefix starts with %X", leafPrefix)
+	}
+	if len(op.Prefix) < int(spec.InnerSpec.MinPrefixLength) {
+		return errors.Errorf("InnerOp prefix too short (%d)", len(op.Prefix))
+	}
+	maxLeftChildBytes := (len(spec.InnerSpec.ChildOrder) - 1) * int(spec.InnerSpec.ChildSize)
+	if len(op.Prefix) > int(spec.InnerSpec.MaxPrefixLength)+maxLeftChildBytes {
+		return errors.Errorf("InnerOp prefix too long (%d)", len(op.Prefix))
 	}
 	return nil
 }

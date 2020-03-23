@@ -2,6 +2,7 @@ package ics23
 
 import (
 	"bytes"
+
 	"github.com/pkg/errors"
 )
 
@@ -18,6 +19,7 @@ var IavlSpec = &ProofSpec{
 		MinPrefixLength: 4,
 		MaxPrefixLength: 12,
 		ChildSize:       33, // (with length byte)
+		Hash:            HashOp_SHA256,
 	},
 }
 
@@ -34,6 +36,7 @@ var TendermintSpec = &ProofSpec{
 		MinPrefixLength: 1,
 		MaxPrefixLength: 1,
 		ChildSize:       32, // (no length byte)
+		Hash:            HashOp_SHA256,
 	},
 }
 
@@ -96,6 +99,13 @@ func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
 	if err != nil {
 		return errors.WithMessage(err, "leaf")
 	}
+	if spec.MinDepth > 0 && len(p.Path) < int(spec.MinDepth) {
+		return errors.Errorf("InnerOps depth too short: %d", len(p.Path))
+	}
+	if spec.MaxDepth > 0 && len(p.Path) > int(spec.MaxDepth) {
+		return errors.Errorf("InnerOps depth too long: %d", len(p.Path))
+	}
+
 	for _, inner := range p.Path {
 		if err := inner.CheckAgainstSpec(spec); err != nil {
 			return errors.WithMessage(err, "inner")

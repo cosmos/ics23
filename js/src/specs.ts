@@ -18,10 +18,24 @@ export function ensureLeaf(leaf: ics23.ILeafOp, spec: ics23.ILeafOp): void {
 
 export function ensureInner(
   inner: ics23.IInnerOp,
-  prefix?: Uint8Array | null
+  prefix: Uint8Array | null | undefined,
+  spec: ics23.IInnerSpec
 ): void {
+  if (inner.hash !== spec.hash) {
+    throw new Error(`Unexpected hashOp: ${inner.hash}`);
+  }
+  if (!inner.prefix) {
+    throw new Error("No prefix set for inner node");
+  }
   if (hasPrefix(inner.prefix, prefix)) {
     throw new Error(`Inner node has leaf prefix`);
+  }
+  if (inner.prefix.length < (spec.minPrefixLength || 0)) {
+    throw new Error(`Prefix too short: ${inner.prefix.length} bytes`);
+  }
+  const maxLeftChildBytes = (spec.childOrder!.length - 1) * spec.childSize!;
+  if (inner.prefix.length > (spec.maxPrefixLength || 0) + maxLeftChildBytes) {
+    throw new Error(`Prefix too long: ${inner.prefix.length} bytes`);
   }
 }
 
