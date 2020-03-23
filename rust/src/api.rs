@@ -168,10 +168,13 @@ pub fn iavl_spec() -> ics23::ProofSpec {
         max_prefix_length: 12,
         child_size: 33,
         empty_child: vec![],
+        hash: ics23::HashOp::Sha256.into(),
     };
     ics23::ProofSpec {
         leaf_spec: Some(leaf),
         inner_spec: Some(inner),
+        min_depth: 0,
+        max_depth: 0,
     }
 }
 
@@ -189,10 +192,13 @@ pub fn tendermint_spec() -> ics23::ProofSpec {
         max_prefix_length: 1,
         child_size: 32,
         empty_child: vec![],
+        hash: ics23::HashOp::Sha256.into(),
     };
     ics23::ProofSpec {
         leaf_spec: Some(leaf),
         inner_spec: Some(inner),
+        min_depth: 0,
+        max_depth: 0,
     }
 }
 

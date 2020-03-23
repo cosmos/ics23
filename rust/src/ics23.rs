@@ -137,6 +137,12 @@ pub struct ProofSpec {
     pub leaf_spec: ::std::option::Option<LeafOp>,
     #[prost(message, optional, tag="2")]
     pub inner_spec: ::std::option::Option<InnerSpec>,
+    /// max_depth (if > 0) is the maximum number of InnerOps allowed (mainly for fixed-depth tries)
+    #[prost(int32, tag="3")]
+    pub max_depth: i32,
+    /// min_depth (if > 0) is the minimum number of InnerOps allowed (mainly for fixed-depth tries)
+    #[prost(int32, tag="4")]
+    pub min_depth: i32,
 }
 ///
 ///InnerSpec contains all store-specific structure info to determine if two proofs from a
@@ -160,8 +166,12 @@ pub struct InnerSpec {
     pub min_prefix_length: i32,
     #[prost(int32, tag="4")]
     pub max_prefix_length: i32,
+    /// empty child is the prehash image that is used when one child is nil (eg. 20 bytes of 0)
     #[prost(bytes, tag="5")]
     pub empty_child: std::vec::Vec<u8>,
+    /// hash is the algorithm that must be used for each InnerOp
+    #[prost(enumeration="HashOp", tag="6")]
+    pub hash: i32,
 }
 ///
 ///BatchProof is a group of multiple proof types than can be compressed
