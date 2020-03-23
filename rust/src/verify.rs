@@ -76,6 +76,19 @@ pub fn calculate_existence_root(proof: &ics23::ExistenceProof) -> Result<Commitm
 fn check_existence_spec(proof: &ics23::ExistenceProof, spec: &ics23::ProofSpec) -> Result<()> {
     if let (Some(leaf), Some(leaf_spec)) = (&proof.leaf, &spec.leaf_spec) {
         ensure_leaf(leaf, leaf_spec)?;
+        // ensure min/max depths
+        if spec.min_depth != 0 {
+            ensure!(
+                proof.path.len() >= spec.min_depth as usize,
+                "Too few InnerOps: {}",
+                proof.path.len(),
+            );
+            ensure!(
+                proof.path.len() <= spec.max_depth as usize,
+                "Too many InnerOps: {}",
+                proof.path.len(),
+            );
+        }
         for step in &proof.path {
             ensure_inner(step, spec)?;
         }
@@ -121,14 +134,33 @@ fn has_prefix(prefix: &[u8], data: &[u8]) -> bool {
 }
 
 fn ensure_inner(inner: &ics23::InnerOp, spec: &ics23::ProofSpec) -> Result<()> {
-    if let Some(leaf_spec) = &spec.leaf_spec {
-        ensure!(
-            !has_prefix(&leaf_spec.prefix, &inner.prefix),
-            "Inner node with leaf prefix"
-        );
-        Ok(())
-    } else {
-        bail!("Spec missing leaf_spec")
+    match (&spec.leaf_spec, &spec.inner_spec) {
+        (Some(leaf_spec), Some(inner_spec)) => {
+            ensure!(
+                inner.hash == inner_spec.hash,
+                "Unexpected hashOp: {:?}",
+                inner.hash,
+            );
+            ensure!(
+                !has_prefix(&leaf_spec.prefix, &inner.prefix),
+                "Inner node with leaf prefix",
+            );
+            ensure!(
+                inner.prefix.len() >= (inner_spec.min_prefix_length as usize),
+                "Inner prefix too short: {}",
+                inner.prefix.len(),
+            );
+            let max_left_child_bytes =
+                (inner_spec.child_order.len() - 1) as i32 * inner_spec.child_size;
+            ensure!(
+                inner.prefix.len()
+                    <= (inner_spec.max_prefix_length + max_left_child_bytes) as usize,
+                "Inner prefix too short: {}",
+                inner.prefix.len(),
+            );
+            Ok(())
+        }
+        (_, _) => bail!("Spec requires both leaf_spec and inner_spec"),
     }
 }
 
