@@ -357,8 +357,15 @@ mod tests {
             prefix: hex::decode("aa").unwrap(),
             suffix: vec![],
         };
+        let invalid_inner_hash = InnerOp {
+            hash: HashOp::Sha512.into(),
+            prefix: hex::decode("deadbeef00cafe00").unwrap(),
+            suffix: vec![],
+        };
 
-        //        let test_spec = api::iavl_spec();
+        let mut depth_limited_spec = api::iavl_spec();
+        depth_limited_spec.min_depth = 2;
+        depth_limited_spec.max_depth = 4;
 
         let cases: HashMap<&'static str, ExistenceCase> = [
             (
@@ -427,7 +434,7 @@ mod tests {
                 },
             ),
             (
-                "rejects invalid inner",
+                "rejects invalid inner (prefix)",
                 ExistenceCase {
                     proof: ExistenceProof {
                         key: b"foo".to_vec(),
@@ -436,6 +443,70 @@ mod tests {
                         path: vec![invalid_inner.clone()],
                     },
                     spec: api::iavl_spec(),
+                    valid: false,
+                },
+            ),
+            (
+                "rejects invalid inner (hash)",
+                ExistenceCase {
+                    proof: ExistenceProof {
+                        key: b"foo".to_vec(),
+                        value: b"bar".to_vec(),
+                        leaf: Some(leaf.clone()),
+                        path: vec![invalid_inner_hash.clone()],
+                    },
+                    spec: api::iavl_spec(),
+                    valid: false,
+                },
+            ),
+            (
+                "accepts depth limited with proper number of inner nodes",
+                ExistenceCase {
+                    proof: ExistenceProof {
+                        key: b"foo".to_vec(),
+                        value: b"bar".to_vec(),
+                        leaf: Some(leaf.clone()),
+                        path: vec![
+                            valid_inner.clone(),
+                            valid_inner.clone(),
+                            valid_inner.clone(),
+                        ],
+                    },
+                    spec: depth_limited_spec.clone(),
+                    valid: true,
+                },
+            ),
+            (
+                "reject depth limited with too few inner nodes",
+                ExistenceCase {
+                    proof: ExistenceProof {
+                        key: b"foo".to_vec(),
+                        value: b"bar".to_vec(),
+                        leaf: Some(leaf.clone()),
+                        path: vec![
+                            valid_inner.clone(),
+                        ],
+                    },
+                    spec: depth_limited_spec.clone(),
+                    valid: false,
+                },
+            ),
+            (
+                "reject depth limited with too many inner nodes",
+                ExistenceCase {
+                    proof: ExistenceProof {
+                        key: b"foo".to_vec(),
+                        value: b"bar".to_vec(),
+                        leaf: Some(leaf.clone()),
+                        path: vec![
+                            valid_inner.clone(),
+                            valid_inner.clone(),
+                            valid_inner.clone(),
+                            valid_inner.clone(),
+                            valid_inner.clone(),
+                        ],
+                    },
+                    spec: depth_limited_spec.clone(),
                     valid: false,
                 },
             ),
