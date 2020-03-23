@@ -1702,6 +1702,8 @@ $root.ics23 = (function() {
          * @interface IProofSpec
          * @property {ics23.ILeafOp|null} [leafSpec] ProofSpec leafSpec
          * @property {ics23.IInnerSpec|null} [innerSpec] ProofSpec innerSpec
+         * @property {number|null} [maxDepth] ProofSpec maxDepth
+         * @property {number|null} [minDepth] ProofSpec minDepth
          */
 
         /**
@@ -1745,6 +1747,22 @@ $root.ics23 = (function() {
         ProofSpec.prototype.innerSpec = null;
 
         /**
+         * ProofSpec maxDepth.
+         * @member {number} maxDepth
+         * @memberof ics23.ProofSpec
+         * @instance
+         */
+        ProofSpec.prototype.maxDepth = 0;
+
+        /**
+         * ProofSpec minDepth.
+         * @member {number} minDepth
+         * @memberof ics23.ProofSpec
+         * @instance
+         */
+        ProofSpec.prototype.minDepth = 0;
+
+        /**
          * Creates a new ProofSpec instance using the specified properties.
          * @function create
          * @memberof ics23.ProofSpec
@@ -1772,6 +1790,10 @@ $root.ics23 = (function() {
                 $root.ics23.LeafOp.encode(message.leafSpec, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.innerSpec != null && message.hasOwnProperty("innerSpec"))
                 $root.ics23.InnerSpec.encode(message.innerSpec, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            if (message.maxDepth != null && message.hasOwnProperty("maxDepth"))
+                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.maxDepth);
+            if (message.minDepth != null && message.hasOwnProperty("minDepth"))
+                writer.uint32(/* id 4, wireType 0 =*/32).int32(message.minDepth);
             return writer;
         };
 
@@ -1811,6 +1833,12 @@ $root.ics23 = (function() {
                     break;
                 case 2:
                     message.innerSpec = $root.ics23.InnerSpec.decode(reader, reader.uint32());
+                    break;
+                case 3:
+                    message.maxDepth = reader.int32();
+                    break;
+                case 4:
+                    message.minDepth = reader.int32();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1857,6 +1885,12 @@ $root.ics23 = (function() {
                 if (error)
                     return "innerSpec." + error;
             }
+            if (message.maxDepth != null && message.hasOwnProperty("maxDepth"))
+                if (!$util.isInteger(message.maxDepth))
+                    return "maxDepth: integer expected";
+            if (message.minDepth != null && message.hasOwnProperty("minDepth"))
+                if (!$util.isInteger(message.minDepth))
+                    return "minDepth: integer expected";
             return null;
         };
 
@@ -1882,6 +1916,10 @@ $root.ics23 = (function() {
                     throw TypeError(".ics23.ProofSpec.innerSpec: object expected");
                 message.innerSpec = $root.ics23.InnerSpec.fromObject(object.innerSpec);
             }
+            if (object.maxDepth != null)
+                message.maxDepth = object.maxDepth | 0;
+            if (object.minDepth != null)
+                message.minDepth = object.minDepth | 0;
             return message;
         };
 
@@ -1901,11 +1939,17 @@ $root.ics23 = (function() {
             if (options.defaults) {
                 object.leafSpec = null;
                 object.innerSpec = null;
+                object.maxDepth = 0;
+                object.minDepth = 0;
             }
             if (message.leafSpec != null && message.hasOwnProperty("leafSpec"))
                 object.leafSpec = $root.ics23.LeafOp.toObject(message.leafSpec, options);
             if (message.innerSpec != null && message.hasOwnProperty("innerSpec"))
                 object.innerSpec = $root.ics23.InnerSpec.toObject(message.innerSpec, options);
+            if (message.maxDepth != null && message.hasOwnProperty("maxDepth"))
+                object.maxDepth = message.maxDepth;
+            if (message.minDepth != null && message.hasOwnProperty("minDepth"))
+                object.minDepth = message.minDepth;
             return object;
         };
 
@@ -1934,6 +1978,7 @@ $root.ics23 = (function() {
          * @property {number|null} [minPrefixLength] InnerSpec minPrefixLength
          * @property {number|null} [maxPrefixLength] InnerSpec maxPrefixLength
          * @property {Uint8Array|null} [emptyChild] InnerSpec emptyChild
+         * @property {ics23.HashOp|null} [hash] InnerSpec hash
          */
 
         /**
@@ -1993,6 +2038,14 @@ $root.ics23 = (function() {
         InnerSpec.prototype.emptyChild = $util.newBuffer([]);
 
         /**
+         * InnerSpec hash.
+         * @member {ics23.HashOp} hash
+         * @memberof ics23.InnerSpec
+         * @instance
+         */
+        InnerSpec.prototype.hash = 0;
+
+        /**
          * Creates a new InnerSpec instance using the specified properties.
          * @function create
          * @memberof ics23.InnerSpec
@@ -2030,6 +2083,8 @@ $root.ics23 = (function() {
                 writer.uint32(/* id 4, wireType 0 =*/32).int32(message.maxPrefixLength);
             if (message.emptyChild != null && message.hasOwnProperty("emptyChild"))
                 writer.uint32(/* id 5, wireType 2 =*/42).bytes(message.emptyChild);
+            if (message.hash != null && message.hasOwnProperty("hash"))
+                writer.uint32(/* id 6, wireType 0 =*/48).int32(message.hash);
             return writer;
         };
 
@@ -2086,6 +2141,9 @@ $root.ics23 = (function() {
                 case 5:
                     message.emptyChild = reader.bytes();
                     break;
+                case 6:
+                    message.hash = reader.int32();
+                    break;
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -2140,6 +2198,18 @@ $root.ics23 = (function() {
             if (message.emptyChild != null && message.hasOwnProperty("emptyChild"))
                 if (!(message.emptyChild && typeof message.emptyChild.length === "number" || $util.isString(message.emptyChild)))
                     return "emptyChild: buffer expected";
+            if (message.hash != null && message.hasOwnProperty("hash"))
+                switch (message.hash) {
+                default:
+                    return "hash: enum value expected";
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    break;
+                }
             return null;
         };
 
@@ -2173,6 +2243,32 @@ $root.ics23 = (function() {
                     $util.base64.decode(object.emptyChild, message.emptyChild = $util.newBuffer($util.base64.length(object.emptyChild)), 0);
                 else if (object.emptyChild.length)
                     message.emptyChild = object.emptyChild;
+            switch (object.hash) {
+            case "NO_HASH":
+            case 0:
+                message.hash = 0;
+                break;
+            case "SHA256":
+            case 1:
+                message.hash = 1;
+                break;
+            case "SHA512":
+            case 2:
+                message.hash = 2;
+                break;
+            case "KECCAK":
+            case 3:
+                message.hash = 3;
+                break;
+            case "RIPEMD160":
+            case 4:
+                message.hash = 4;
+                break;
+            case "BITCOIN":
+            case 5:
+                message.hash = 5;
+                break;
+            }
             return message;
         };
 
@@ -2202,6 +2298,7 @@ $root.ics23 = (function() {
                     if (options.bytes !== Array)
                         object.emptyChild = $util.newBuffer(object.emptyChild);
                 }
+                object.hash = options.enums === String ? "NO_HASH" : 0;
             }
             if (message.childOrder && message.childOrder.length) {
                 object.childOrder = [];
@@ -2216,6 +2313,8 @@ $root.ics23 = (function() {
                 object.maxPrefixLength = message.maxPrefixLength;
             if (message.emptyChild != null && message.hasOwnProperty("emptyChild"))
                 object.emptyChild = options.bytes === String ? $util.base64.encode(message.emptyChild, 0, message.emptyChild.length) : options.bytes === Array ? Array.prototype.slice.call(message.emptyChild) : message.emptyChild;
+            if (message.hash != null && message.hasOwnProperty("hash"))
+                object.hash = options.enums === String ? $root.ics23.HashOp[message.hash] : message.hash;
             return object;
         };
 

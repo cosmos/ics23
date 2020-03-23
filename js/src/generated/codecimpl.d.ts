@@ -696,6 +696,12 @@ export namespace ics23 {
 
     /** ProofSpec innerSpec */
     innerSpec?: ics23.IInnerSpec | null;
+
+    /** ProofSpec maxDepth */
+    maxDepth?: number | null;
+
+    /** ProofSpec minDepth */
+    minDepth?: number | null;
   }
 
   /**
@@ -722,6 +728,12 @@ export namespace ics23 {
 
     /** ProofSpec innerSpec. */
     public innerSpec?: ics23.IInnerSpec | null;
+
+    /** ProofSpec maxDepth. */
+    public maxDepth: number;
+
+    /** ProofSpec minDepth. */
+    public minDepth: number;
 
     /**
      * Creates a new ProofSpec instance using the specified properties.
@@ -824,6 +836,9 @@ export namespace ics23 {
 
     /** InnerSpec emptyChild */
     emptyChild?: Uint8Array | null;
+
+    /** InnerSpec hash */
+    hash?: ics23.HashOp | null;
   }
 
   /** Represents an InnerSpec. */
@@ -848,6 +863,9 @@ export namespace ics23 {
 
     /** InnerSpec emptyChild. */
     public emptyChild: Uint8Array;
+
+    /** InnerSpec hash. */
+    public hash: ics23.HashOp;
 
     /**
      * Creates a new InnerSpec instance using the specified properties.
