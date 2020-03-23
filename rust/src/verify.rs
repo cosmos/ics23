@@ -259,7 +259,7 @@ fn get_padding(spec: &ics23::InnerSpec, branch: i32) -> Result<Padding> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{api};
+    use crate::api;
     use crate::ics23::{ExistenceProof, HashOp, InnerOp, LeafOp, LengthOp, ProofSpec};
     use std::collections::HashMap;
 
@@ -483,9 +483,7 @@ mod tests {
                         key: b"foo".to_vec(),
                         value: b"bar".to_vec(),
                         leaf: Some(leaf.clone()),
-                        path: vec![
-                            valid_inner.clone(),
-                        ],
+                        path: vec![valid_inner.clone()],
                     },
                     spec: depth_limited_spec.clone(),
                     valid: false,
