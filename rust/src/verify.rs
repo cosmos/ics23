@@ -259,11 +259,12 @@ fn get_padding(spec: &ics23::InnerSpec, branch: i32) -> Result<Padding> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    use crate::ics23::{HashOp, LengthOp};
+    use crate::{api};
+    use crate::ics23::{ExistenceProof, HashOp, InnerOp, LeafOp, LengthOp, ProofSpec};
+    use std::collections::HashMap;
 
     #[test]
-    fn calculate_root_from_leaf() -> Result<()> {
+    fn calculate_root_from_leaf() {
         let leaf = ics23::LeafOp {
             hash: HashOp::Sha256.into(),
             prehash_key: 0,
@@ -280,16 +281,17 @@ mod tests {
         };
 
         let expected =
-            hex::decode("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265")?;
-        ensure!(
-            expected == calculate_existence_root(&proof)?,
+            hex::decode("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265")
+                .unwrap();
+        assert_eq!(
+            expected,
+            calculate_existence_root(&proof).unwrap(),
             "invalid root hash"
         );
-        Ok(())
     }
 
     #[test]
-    fn calculate_root_from_leaf_and_inner() -> Result<()> {
+    fn calculate_root_from_leaf_and_inner() {
         let leaf = ics23::LeafOp {
             hash: HashOp::Sha256.into(),
             prehash_key: 0,
@@ -300,7 +302,7 @@ mod tests {
 
         let inner = ics23::InnerOp {
             hash: HashOp::Sha256.into(),
-            prefix: hex::decode("deadbeef00cafe00")?,
+            prefix: hex::decode("deadbeef00cafe00").unwrap(),
             suffix: vec![],
         };
 
@@ -312,11 +314,148 @@ mod tests {
         };
 
         let expected =
-            hex::decode("836ea236a6902a665c2a004c920364f24cad52ded20b1e4f22c3179bfe25b2a9")?;
-        ensure!(
-            expected == calculate_existence_root(&proof)?,
+            hex::decode("836ea236a6902a665c2a004c920364f24cad52ded20b1e4f22c3179bfe25b2a9")
+                .unwrap();
+        assert_eq!(
+            expected,
+            calculate_existence_root(&proof).unwrap(),
             "invalid root hash"
         );
-        Ok(())
+    }
+
+    #[derive(Debug, Clone)]
+    struct ExistenceCase {
+        proof: ExistenceProof,
+        spec: ProofSpec,
+        valid: bool,
+    }
+
+    #[test]
+    fn enforce_existence_spec() {
+        let leaf = LeafOp {
+            hash: HashOp::Sha256.into(),
+            prehash_key: 0,
+            prehash_value: HashOp::Sha256.into(),
+            length: LengthOp::VarProto.into(),
+            prefix: vec![0_u8],
+        };
+        let invalid_leaf = LeafOp {
+            hash: HashOp::Sha512.into(),
+            prehash_key: 0,
+            prehash_value: 0,
+            length: LengthOp::VarProto.into(),
+            prefix: vec![0_u8],
+        };
+
+        let valid_inner = InnerOp {
+            hash: HashOp::Sha256.into(),
+            prefix: hex::decode("deadbeef00cafe00").unwrap(),
+            suffix: vec![],
+        };
+        let invalid_inner = InnerOp {
+            hash: HashOp::Sha256.into(),
+            prefix: hex::decode("aa").unwrap(),
+            suffix: vec![],
+        };
+
+        //        let test_spec = api::iavl_spec();
+
+        let cases: HashMap<&'static str, ExistenceCase> = [
+            (
+                "empty proof fails",
+                ExistenceCase {
+                    proof: ExistenceProof {
+                        key: b"foo".to_vec(),
+                        value: b"bar".to_vec(),
+                        leaf: None,
+                        path: vec![],
+                    },
+                    spec: api::iavl_spec(),
+                    valid: false,
+                },
+            ),
+            (
+                "accepts one valid leaf",
+                ExistenceCase {
+                    proof: ExistenceProof {
+                        key: b"foo".to_vec(),
+                        value: b"bar".to_vec(),
+                        leaf: Some(leaf.clone()),
+                        path: vec![],
+                    },
+                    spec: api::iavl_spec(),
+                    valid: true,
+                },
+            ),
+            (
+                "rejects invalid leaf",
+                ExistenceCase {
+                    proof: ExistenceProof {
+                        key: b"foo".to_vec(),
+                        value: b"bar".to_vec(),
+                        leaf: Some(invalid_leaf.clone()),
+                        path: vec![],
+                    },
+                    spec: api::iavl_spec(),
+                    valid: false,
+                },
+            ),
+            (
+                "rejects only inner (no leaf)",
+                ExistenceCase {
+                    proof: ExistenceProof {
+                        key: b"foo".to_vec(),
+                        value: b"bar".to_vec(),
+                        leaf: None,
+                        path: vec![valid_inner.clone()],
+                    },
+                    spec: api::iavl_spec(),
+                    valid: false,
+                },
+            ),
+            (
+                "accepts leaf and valid inner",
+                ExistenceCase {
+                    proof: ExistenceProof {
+                        key: b"foo".to_vec(),
+                        value: b"bar".to_vec(),
+                        leaf: Some(leaf.clone()),
+                        path: vec![valid_inner.clone()],
+                    },
+                    spec: api::iavl_spec(),
+                    valid: true,
+                },
+            ),
+            (
+                "rejects invalid inner",
+                ExistenceCase {
+                    proof: ExistenceProof {
+                        key: b"foo".to_vec(),
+                        value: b"bar".to_vec(),
+                        leaf: Some(leaf.clone()),
+                        path: vec![invalid_inner.clone()],
+                    },
+                    spec: api::iavl_spec(),
+                    valid: false,
+                },
+            ),
+        ]
+        .iter()
+        .cloned()
+        .collect();
+
+        for (name, tc) in cases {
+            let check = check_existence_spec(&tc.proof, &tc.spec);
+            if tc.valid {
+                assert!(
+                    check.is_ok(),
+                    "{} should be ok, got err {}",
+                    name,
+                    check.unwrap_err()
+                );
+            } else {
+                assert!(check.is_err(), "{} should be an error", name);
+            }
+        }
     }
 }
