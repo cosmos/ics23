@@ -40,6 +40,34 @@ var TendermintSpec = &ProofSpec{
 	},
 }
 
+// Calculate determines the root hash that matches a given Commitment proof
+// by type switching and calculating root based on proof type
+// NOTE: Calculate will return the first calculated root in the proof,
+// you must validate that all other embedded ExistenceProofs commit to the same root.
+// This can be done with the Verify method
+func (p *CommitmentProof) Calculate() (CommitmentRoot, error) {
+	switch v := p.Proof.(type) {
+	case *CommitmentProof_Exist:
+		return v.Exist.Calculate()
+	case *CommitmentProof_Nonexist:
+		return v.Nonexist.Left.Calculate()
+	case *CommitmentProof_Batch:
+		if len(v.Batch.GetEntries()) == 0 || v.Batch.GetEntries()[0] == nil {
+			return nil, errors.New("batch proof has empty entry")
+		}
+		bexist := v.Batch.GetEntries()[0].GetExist()
+		if bexist == nil {
+			return nil, errors.New("batch proof is not an existence proof")
+		}
+		return bexist.Calculate()
+	case *CommitmentProof_Compressed:
+		proof := Decompress(p)
+		return proof.Calculate()
+	default:
+		return nil, errors.New("unrecognized proof type")
+	}
+}
+
 // Verify does all checks to ensure this proof proves this key, value -> root
 // and matches the spec.
 func (p *ExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte, value []byte) error {
