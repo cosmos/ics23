@@ -84,13 +84,21 @@ func TestLeafOp(t *testing.T) {
 			// echo -n yet another long string | sha256sum
 			value: []byte("yet another long string"), // 20a48c2d4f67b9f80374938535285ed285819d8a5a8fc1fccd1e3244e437cf290d
 			// echo -n 04666f6f6420a48c2d4f67b9f80374938535285ed285819d8a5a8fc1fccd1e3244e437cf290d | xxd -r -p | sha256sum
-			expected: fromHex("611ade2f206456733c24db9051027d8227ad8e0e2e96cd2f0453d011ed1d8c6a"),
+			expected: fromHex("1850bc681c147ab40561088bb295de1c3de0096d4f9318442b1b87ae8c28769d"),
 		},
 	}
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			res, err := tc.op.Apply(tc.key, tc.value)
+			vhash := tc.value
+			var err error
+			if tc.op.PrehashValue != 0 {
+				vhash, err = doHash(tc.op.PrehashValue, tc.value)
+				if err != nil {
+					t.Fatal(err)
+				}
+			}
+			res, err := tc.op.Apply(tc.key, vhash)
 			// short-circuit with error case
 			if tc.isErr {
 				if err == nil {

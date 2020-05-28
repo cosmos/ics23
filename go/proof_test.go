@@ -8,55 +8,55 @@ import (
 func TestExistenceProof(t *testing.T) {
 	cases := map[string]struct {
 		proof    *ExistenceProof
+		value    []byte
 		isErr    bool
 		expected []byte
 	}{
 		"must have at least one step": {
 			proof: &ExistenceProof{
-				Key:       []byte("foo"),
-				ValueHash: []byte("bar"),
+				Key: []byte("foo"),
 			},
+			value: []byte("bar"),
 			isErr: true,
 		},
 		// copied from ops_test / TestLeafOp
 		"executes one leaf step": {
 			proof: &ExistenceProof{
-				Key:       []byte("food"),
-				ValueHash: []byte("some longer text"),
+				Key: []byte("food"),
 				Leaf: &LeafOp{
 					Hash:   HashOp_SHA256,
 					Length: LengthOp_VAR_PROTO,
 				},
 			},
+			value:    []byte("some longer text"),
 			expected: fromHex("7496fdaa49e3764d635f9f21e60cec0a75b8d7595a9a3bb013692bb45d14e326"),
 		},
 		// iavl leaf: start with 0, length 3
 		// inner prefix: !start with 0, length >= 4
 		"demonstrate maliability of leaf if we change leaf algorithm": {
 			proof: &ExistenceProof{
-				Key:       append([]byte{4}, []byte("food")...),
-				ValueHash: []byte("some longer text"),
+				Key: append([]byte{4}, []byte("food")...),
 				Leaf: &LeafOp{
 					Hash: HashOp_SHA256,
 				},
 			},
+			value:    []byte("some longer text"),
 			expected: fromHex("7496fdaa49e3764d635f9f21e60cec0a75b8d7595a9a3bb013692bb45d14e326"),
 		},
 		"demonstrate maliability of leaf if we change leaf prefix": {
 			proof: &ExistenceProof{
-				Key:       []byte("od"),
-				ValueHash: []byte("some longer text"),
+				Key: []byte("od"),
 				Leaf: &LeafOp{
 					Prefix: []byte{4, 'f', 'o'},
 					Hash:   HashOp_SHA256,
 				},
 			},
+			value:    []byte("some longer text"),
 			expected: fromHex("7496fdaa49e3764d635f9f21e60cec0a75b8d7595a9a3bb013692bb45d14e326"),
 		},
 		"cannot execute inner first": {
 			proof: &ExistenceProof{
-				Key:       []byte("food"),
-				ValueHash: []byte("some longer text"),
+				Key: []byte("food"),
 				Path: []*InnerOp{
 					&InnerOp{
 						Hash:   HashOp_SHA256,
@@ -64,12 +64,12 @@ func TestExistenceProof(t *testing.T) {
 					},
 				},
 			},
+			value: []byte("some longer text"),
 			isErr: true,
 		},
 		"executes leaf then inner op": {
 			proof: &ExistenceProof{
-				Key:       []byte("food"),
-				ValueHash: []byte("some longer text"),
+				Key: []byte("food"),
 				Leaf: &LeafOp{
 					Hash:   HashOp_SHA256,
 					Length: LengthOp_VAR_PROTO,
@@ -83,12 +83,20 @@ func TestExistenceProof(t *testing.T) {
 					// echo -n deadbeef00cafe00b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265 | xxd -r -p | sha256sum
 				},
 			},
+			value:    []byte("some longer text"),
 			expected: fromHex("0a9acd00a6a8b95a65a46263dfddb3c4731e376bb12e25c7fb96cac5c7885ffc"),
 		},
 	}
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
+			vhash := tc.value
+			var err error
+			if tc.proof.Leaf != nil && tc.proof.Leaf.PrehashValue != 0 {
+				vhash, err = doHash(tc.proof.Leaf.PrehashValue, tc.value)
+			}
+			// Set ValueHash in ExistenceProof
+			tc.proof.ValueHash = vhash
 			res, err := tc.proof.Calculate()
 			// short-circuit with error case
 			if tc.isErr {

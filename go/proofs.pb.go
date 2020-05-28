@@ -497,14 +497,15 @@ func _CommitmentProof_OneofSizer(msg proto.Message) (n int) {
 //hkey = prehashKey(key)
 //
 //Then combine the bytes, and hash it
-//output = hash(prefix || length(hkey) || hkey || valuehash)
+//output = hash(prefix || length(hkey) || hkey || length(valuehash) || valuehash)
 type LeafOp struct {
-	Hash       HashOp   `protobuf:"varint,1,opt,name=hash,proto3,enum=ics23.HashOp" json:"hash,omitempty"`
-	PrehashKey HashOp   `protobuf:"varint,2,opt,name=prehash_key,json=prehashKey,proto3,enum=ics23.HashOp" json:"prehash_key,omitempty"`
-	Length     LengthOp `protobuf:"varint,3,opt,name=length,proto3,enum=ics23.LengthOp" json:"length,omitempty"`
+	Hash         HashOp   `protobuf:"varint,1,opt,name=hash,proto3,enum=ics23.HashOp" json:"hash,omitempty"`
+	PrehashKey   HashOp   `protobuf:"varint,2,opt,name=prehash_key,json=prehashKey,proto3,enum=ics23.HashOp" json:"prehash_key,omitempty"`
+	PrehashValue HashOp   `protobuf:"varint,3,opt,name=prehash_value,json=prehashValue,proto3,enum=ics23.HashOp" json:"prehash_value,omitempty"`
+	Length       LengthOp `protobuf:"varint,4,opt,name=length,proto3,enum=ics23.LengthOp" json:"length,omitempty"`
 	// prefix is a fixed bytes that may optionally be included at the beginning to differentiate
 	// a leaf node from an inner node.
-	Prefix []byte `protobuf:"bytes,4,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	Prefix []byte `protobuf:"bytes,5,opt,name=prefix,proto3" json:"prefix,omitempty"`
 }
 
 func (m *LeafOp) Reset()         { *m = LeafOp{} }
@@ -550,6 +551,13 @@ func (m *LeafOp) GetHash() HashOp {
 func (m *LeafOp) GetPrehashKey() HashOp {
 	if m != nil {
 		return m.PrehashKey
+	}
+	return HashOp_NO_HASH
+}
+
+func (m *LeafOp) GetPrehashValue() HashOp {
+	if m != nil {
+		return m.PrehashValue
 	}
 	return HashOp_NO_HASH
 }
