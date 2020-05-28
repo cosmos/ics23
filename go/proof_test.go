@@ -35,7 +35,7 @@ func TestExistenceProof(t *testing.T) {
 		"demonstrate maliability of leaf if we change leaf algorithm": {
 			proof: &ExistenceProof{
 				Key:       append([]byte{4}, []byte("food")...),
-				ValueHash: append([]byte{16}, []byte("some longer text")...),
+				ValueHash: []byte("some longer text"),
 				Leaf: &LeafOp{
 					Hash: HashOp_SHA256,
 				},
@@ -44,7 +44,7 @@ func TestExistenceProof(t *testing.T) {
 		},
 		"demonstrate maliability of leaf if we change leaf prefix": {
 			proof: &ExistenceProof{
-				Key:       append([]byte("od"), byte(16)),
+				Key:       []byte("od"),
 				ValueHash: []byte("some longer text"),
 				Leaf: &LeafOp{
 					Prefix: []byte{4, 'f', 'o'},

@@ -20,6 +20,9 @@ func (op *LeafOp) Apply(key []byte, vhash []byte) ([]byte, error) {
 	if len(key) == 0 {
 		return nil, errors.New("Leaf op needs key")
 	}
+	if len(vhash) == 0 {
+		return nil, errors.New("Leaf op needs value")
+	}
 	pkey, err := prepareLeafData(op.PrehashKey, op.Length, key)
 	if err != nil {
 		return nil, errors.Wrap(err, "prehash key")

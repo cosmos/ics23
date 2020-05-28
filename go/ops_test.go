@@ -44,7 +44,7 @@ func TestLeafOp(t *testing.T) {
 			// echo -n foobar | sha256sum
 			expected: fromHex("c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"),
 		},
-		"requires key": {
+		"requires value": {
 			op: &LeafOp{
 				Hash: HashOp_SHA256,
 				// no prehash, no length prefix
@@ -52,7 +52,7 @@ func TestLeafOp(t *testing.T) {
 			key:   []byte("foo"),
 			isErr: true,
 		},
-		"requires value": {
+		"requires key": {
 			op: &LeafOp{
 				Hash: HashOp_SHA256,
 				// no prehash, no length prefix
@@ -71,7 +71,7 @@ func TestLeafOp(t *testing.T) {
 			key:   []byte("food"),             // 04666f6f64
 			value: []byte("some longer text"), // 10736f6d65206c6f6e6765722074657874
 			// echo -n 04666f6f6410736f6d65206c6f6e6765722074657874 | xxd -r -p | sha256sum
-			expected: fromHex("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"),
+			expected: fromHex("7496fdaa49e3764d635f9f21e60cec0a75b8d7595a9a3bb013692bb45d14e326"),
 		},
 		"hash with prehash and length prefix": {
 			op: &LeafOp{
@@ -84,7 +84,7 @@ func TestLeafOp(t *testing.T) {
 			// echo -n yet another long string | sha256sum
 			value: []byte("yet another long string"), // 20a48c2d4f67b9f80374938535285ed285819d8a5a8fc1fccd1e3244e437cf290d
 			// echo -n 04666f6f6420a48c2d4f67b9f80374938535285ed285819d8a5a8fc1fccd1e3244e437cf290d | xxd -r -p | sha256sum
-			expected: fromHex("87e0483e8fb624aef2e2f7b13f4166cda485baa8e39f437c83d74c94bedb148f"),
+			expected: fromHex("611ade2f206456733c24db9051027d8227ad8e0e2e96cd2f0453d011ed1d8c6a"),
 		},
 	}
 
