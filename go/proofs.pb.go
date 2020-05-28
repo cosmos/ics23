@@ -490,23 +490,21 @@ func _CommitmentProof_OneofSizer(msg proto.Message) (n int) {
 //the original key-value pairs into the basis hash, for many existing
 //merkle trees.
 //
-//key and value are passed in. So that the signature of this operation is:
-//leafOp(key, value) -> output
+//key and valuehash are passed in. So that the signature of this operation is:
+//leafOp(key, valuehash) -> output
 //
-//To process this, first prehash the keys and values if needed (ANY means no hash in this case):
+//To process this, first prehash the keys if needed (ANY means no hash in this case):
 //hkey = prehashKey(key)
-//hvalue = prehashValue(value)
 //
 //Then combine the bytes, and hash it
-//output = hash(prefix || length(hkey) || hkey || length(hvalue) || hvalue)
+//output = hash(prefix || length(hkey) || hkey || valuehash)
 type LeafOp struct {
-	Hash         HashOp   `protobuf:"varint,1,opt,name=hash,proto3,enum=ics23.HashOp" json:"hash,omitempty"`
-	PrehashKey   HashOp   `protobuf:"varint,2,opt,name=prehash_key,json=prehashKey,proto3,enum=ics23.HashOp" json:"prehash_key,omitempty"`
-	PrehashValue HashOp   `protobuf:"varint,3,opt,name=prehash_value,json=prehashValue,proto3,enum=ics23.HashOp" json:"prehash_value,omitempty"`
-	Length       LengthOp `protobuf:"varint,4,opt,name=length,proto3,enum=ics23.LengthOp" json:"length,omitempty"`
+	Hash       HashOp   `protobuf:"varint,1,opt,name=hash,proto3,enum=ics23.HashOp" json:"hash,omitempty"`
+	PrehashKey HashOp   `protobuf:"varint,2,opt,name=prehash_key,json=prehashKey,proto3,enum=ics23.HashOp" json:"prehash_key,omitempty"`
+	Length     LengthOp `protobuf:"varint,3,opt,name=length,proto3,enum=ics23.LengthOp" json:"length,omitempty"`
 	// prefix is a fixed bytes that may optionally be included at the beginning to differentiate
 	// a leaf node from an inner node.
-	Prefix []byte `protobuf:"bytes,5,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	Prefix []byte `protobuf:"bytes,4,opt,name=prefix,proto3" json:"prefix,omitempty"`
 }
 
 func (m *LeafOp) Reset()         { *m = LeafOp{} }
@@ -552,13 +550,6 @@ func (m *LeafOp) GetHash() HashOp {
 func (m *LeafOp) GetPrehashKey() HashOp {
 	if m != nil {
 		return m.PrehashKey
-	}
-	return HashOp_NO_HASH
-}
-
-func (m *LeafOp) GetPrehashValue() HashOp {
-	if m != nil {
-		return m.PrehashValue
 	}
 	return HashOp_NO_HASH
 }
