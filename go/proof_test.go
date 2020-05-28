@@ -13,50 +13,50 @@ func TestExistenceProof(t *testing.T) {
 	}{
 		"must have at least one step": {
 			proof: &ExistenceProof{
-				Key:   []byte("foo"),
-				Value: []byte("bar"),
+				Key:       []byte("foo"),
+				ValueHash: []byte("bar"),
 			},
 			isErr: true,
 		},
 		// copied from ops_test / TestLeafOp
 		"executes one leaf step": {
 			proof: &ExistenceProof{
-				Key:   []byte("food"),
-				Value: []byte("some longer text"),
+				Key:       []byte("food"),
+				ValueHash: []byte("some longer text"),
 				Leaf: &LeafOp{
 					Hash:   HashOp_SHA256,
 					Length: LengthOp_VAR_PROTO,
 				},
 			},
-			expected: fromHex("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"),
+			expected: fromHex("7496fdaa49e3764d635f9f21e60cec0a75b8d7595a9a3bb013692bb45d14e326"),
 		},
 		// iavl leaf: start with 0, length 3
 		// inner prefix: !start with 0, length >= 4
 		"demonstrate maliability of leaf if we change leaf algorithm": {
 			proof: &ExistenceProof{
-				Key:   append([]byte{4}, []byte("food")...),
-				Value: append([]byte{16}, []byte("some longer text")...),
+				Key:       append([]byte{4}, []byte("food")...),
+				ValueHash: append([]byte{16}, []byte("some longer text")...),
 				Leaf: &LeafOp{
 					Hash: HashOp_SHA256,
 				},
 			},
-			expected: fromHex("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"),
+			expected: fromHex("7496fdaa49e3764d635f9f21e60cec0a75b8d7595a9a3bb013692bb45d14e326"),
 		},
 		"demonstrate maliability of leaf if we change leaf prefix": {
 			proof: &ExistenceProof{
-				Key:   append([]byte("od"), byte(16)),
-				Value: []byte("some longer text"),
+				Key:       append([]byte("od"), byte(16)),
+				ValueHash: []byte("some longer text"),
 				Leaf: &LeafOp{
 					Prefix: []byte{4, 'f', 'o'},
 					Hash:   HashOp_SHA256,
 				},
 			},
-			expected: fromHex("b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"),
+			expected: fromHex("7496fdaa49e3764d635f9f21e60cec0a75b8d7595a9a3bb013692bb45d14e326"),
 		},
 		"cannot execute inner first": {
 			proof: &ExistenceProof{
-				Key:   []byte("food"),
-				Value: []byte("some longer text"),
+				Key:       []byte("food"),
+				ValueHash: []byte("some longer text"),
 				Path: []*InnerOp{
 					&InnerOp{
 						Hash:   HashOp_SHA256,
@@ -68,8 +68,8 @@ func TestExistenceProof(t *testing.T) {
 		},
 		"executes leaf then inner op": {
 			proof: &ExistenceProof{
-				Key:   []byte("food"),
-				Value: []byte("some longer text"),
+				Key:       []byte("food"),
+				ValueHash: []byte("some longer text"),
 				Leaf: &LeafOp{
 					Hash:   HashOp_SHA256,
 					Length: LengthOp_VAR_PROTO,
@@ -83,7 +83,7 @@ func TestExistenceProof(t *testing.T) {
 					// echo -n deadbeef00cafe00b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265 | xxd -r -p | sha256sum
 				},
 			},
-			expected: fromHex("836ea236a6902a665c2a004c920364f24cad52ded20b1e4f22c3179bfe25b2a9"),
+			expected: fromHex("0a9acd00a6a8b95a65a46263dfddb3c4731e376bb12e25c7fb96cac5c7885ffc"),
 		},
 	}
 
@@ -276,24 +276,24 @@ func TestCheckAgainstSpec(t *testing.T) {
 	}{
 		"empty proof fails": {
 			proof: &ExistenceProof{
-				Key:   []byte("foo"),
-				Value: []byte("bar"),
+				Key:       []byte("foo"),
+				ValueHash: []byte("bar"),
 			},
 			spec:  IavlSpec,
 			isErr: true,
 		},
 		"accepts one proper leaf": {
 			proof: &ExistenceProof{
-				Key:   []byte("food"),
-				Value: []byte("bar"),
-				Leaf:  IavlSpec.LeafSpec,
+				Key:       []byte("food"),
+				ValueHash: []byte("bar"),
+				Leaf:      IavlSpec.LeafSpec,
 			},
 			spec: IavlSpec,
 		},
 		"rejects invalid leaf": {
 			proof: &ExistenceProof{
-				Key:   []byte("food"),
-				Value: []byte("bar"),
+				Key:       []byte("food"),
+				ValueHash: []byte("bar"),
 				Leaf: &LeafOp{
 					Prefix: []byte{0},
 					Hash:   HashOp_SHA256,
@@ -305,8 +305,8 @@ func TestCheckAgainstSpec(t *testing.T) {
 		},
 		"rejects only inner proof": {
 			proof: &ExistenceProof{
-				Key:   []byte("food"),
-				Value: []byte("bar"),
+				Key:       []byte("food"),
+				ValueHash: []byte("bar"),
 				Path: []*InnerOp{
 					validInner,
 				},
@@ -316,9 +316,9 @@ func TestCheckAgainstSpec(t *testing.T) {
 		},
 		"accepts leaf with valid inner proofs": {
 			proof: &ExistenceProof{
-				Key:   []byte("food"),
-				Value: []byte("bar"),
-				Leaf:  IavlSpec.LeafSpec,
+				Key:       []byte("food"),
+				ValueHash: []byte("bar"),
+				Leaf:      IavlSpec.LeafSpec,
 				Path: []*InnerOp{
 					validInner,
 					validInner,
@@ -328,9 +328,9 @@ func TestCheckAgainstSpec(t *testing.T) {
 		},
 		"rejects leaf with invalid inner proofs": {
 			proof: &ExistenceProof{
-				Key:   []byte("food"),
-				Value: []byte("bar"),
-				Leaf:  IavlSpec.LeafSpec,
+				Key:       []byte("food"),
+				ValueHash: []byte("bar"),
+				Leaf:      IavlSpec.LeafSpec,
 				Path: []*InnerOp{
 					validInner,
 					invalidInner,
@@ -342,9 +342,9 @@ func TestCheckAgainstSpec(t *testing.T) {
 		},
 		"rejects invalid inner proof (hash mismatch)": {
 			proof: &ExistenceProof{
-				Key:   []byte("food"),
-				Value: []byte("bar"),
-				Leaf:  IavlSpec.LeafSpec,
+				Key:       []byte("food"),
+				ValueHash: []byte("bar"),
+				Leaf:      IavlSpec.LeafSpec,
 				Path: []*InnerOp{
 					invalidInner2,
 					validInner,
@@ -356,9 +356,9 @@ func TestCheckAgainstSpec(t *testing.T) {
 		},
 		"allows depth limited in proper range": {
 			proof: &ExistenceProof{
-				Key:   []byte("food"),
-				Value: []byte("bar"),
-				Leaf:  IavlSpec.LeafSpec,
+				Key:       []byte("food"),
+				ValueHash: []byte("bar"),
+				Leaf:      IavlSpec.LeafSpec,
 				Path: []*InnerOp{
 					validInner,
 					validInner,
@@ -370,9 +370,9 @@ func TestCheckAgainstSpec(t *testing.T) {
 		},
 		"reject depth limited with too few inner nodes": {
 			proof: &ExistenceProof{
-				Key:   []byte("food"),
-				Value: []byte("bar"),
-				Leaf:  IavlSpec.LeafSpec,
+				Key:       []byte("food"),
+				ValueHash: []byte("bar"),
+				Leaf:      IavlSpec.LeafSpec,
 				Path: []*InnerOp{
 					validInner,
 				},
@@ -382,9 +382,9 @@ func TestCheckAgainstSpec(t *testing.T) {
 		},
 		"reject depth limited with too many inner nodes": {
 			proof: &ExistenceProof{
-				Key:   []byte("food"),
-				Value: []byte("bar"),
-				Leaf:  IavlSpec.LeafSpec,
+				Key:       []byte("food"),
+				ValueHash: []byte("bar"),
+				Leaf:      IavlSpec.LeafSpec,
 				Path: []*InnerOp{
 					validInner,
 					validInner,

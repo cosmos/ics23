@@ -77,10 +77,10 @@ func compressExist(exist *ExistenceProof, lookup *[]*InnerOp, registry map[strin
 		return nil
 	}
 	res := &CompressedExistenceProof{
-		Key:   exist.Key,
-		Value: exist.Value,
-		Leaf:  exist.Leaf,
-		Path:  make([]int32, len(exist.Path)),
+		Key:       exist.Key,
+		ValueHash: exist.ValueHash,
+		Leaf:      exist.Leaf,
+		Path:      make([]int32, len(exist.Path)),
 	}
 	for i, step := range exist.Path {
 		res.Path[i] = compressStep(step, lookup, registry)
@@ -148,10 +148,10 @@ func decompressExist(exist *CompressedExistenceProof, lookup []*InnerOp) *Existe
 		return nil
 	}
 	res := &ExistenceProof{
-		Key:   exist.Key,
-		Value: exist.Value,
-		Leaf:  exist.Leaf,
-		Path:  make([]*InnerOp, len(exist.Path)),
+		Key:       exist.Key,
+		ValueHash: exist.ValueHash,
+		Leaf:      exist.Leaf,
+		Path:      make([]*InnerOp, len(exist.Path)),
 	}
 	for i, step := range exist.Path {
 		res.Path[i] = lookup[step]

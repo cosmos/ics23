@@ -15,24 +15,17 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Apply will calculate the leaf hash given the key and value being proven
-func (op *LeafOp) Apply(key []byte, value []byte) ([]byte, error) {
+// Apply will calculate the leaf hash given the key and value hash being proven
+func (op *LeafOp) Apply(key []byte, vhash []byte) ([]byte, error) {
 	if len(key) == 0 {
 		return nil, errors.New("Leaf op needs key")
-	}
-	if len(value) == 0 {
-		return nil, errors.New("Leaf op needs value")
 	}
 	pkey, err := prepareLeafData(op.PrehashKey, op.Length, key)
 	if err != nil {
 		return nil, errors.Wrap(err, "prehash key")
 	}
-	pvalue, err := prepareLeafData(op.PrehashValue, op.Length, value)
-	if err != nil {
-		return nil, errors.Wrap(err, "prehash value")
-	}
 	data := append(op.Prefix, pkey...)
-	data = append(data, pvalue...)
+	data = append(data, vhash...)
 	return doHash(op.Hash, data)
 }
 

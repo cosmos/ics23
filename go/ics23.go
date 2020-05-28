@@ -40,7 +40,7 @@ func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentPro
 	if ep == nil {
 		return false
 	}
-	err := ep.Verify(spec, root, key, value)
+	err := ep.VerifyItem(spec, root, key, value)
 	return err == nil
 }
 

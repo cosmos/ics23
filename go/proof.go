@@ -40,18 +40,11 @@ var TendermintSpec = &ProofSpec{
 	},
 }
 
-// Verify does all checks to ensure this proof proves this key, value -> root
-// and matches the spec.
-func (p *ExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte, value []byte) error {
+// Verify does all checks to ensure this proof is a valid existence proof for this root
+// NOTE: In order to prove a value, we must call VerifyItem
+func (p *ExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot) error {
 	if err := p.CheckAgainstSpec(spec); err != nil {
 		return err
-	}
-
-	if !bytes.Equal(key, p.Key) {
-		return errors.Errorf("Provided key doesn't match proof")
-	}
-	if !bytes.Equal(value, p.Value) {
-		return errors.Errorf("Provided value doesn't match proof")
 	}
 
 	calc, err := p.Calculate()
@@ -66,6 +59,23 @@ func (p *ExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte
 
 }
 
+// VerifyItem checks that the proof is a valid proof of a (key, value) for this root
+func (p *ExistenceProof) VerifyItem(spec *ProofSpec, root CommitmentRoot, key, value []byte) error {
+
+	if !bytes.Equal(key, p.Key) {
+		return errors.Errorf("Provided key doesn't match proof")
+	}
+	vhash, err := prepareLeafData(p.Leaf.PrehashValue, p.Leaf.Length, value)
+	if err != nil {
+		return errors.Wrap(err, "prehash value")
+	}
+	if !bytes.Equal(p.ValueHash, vhash) {
+		return errors.Errorf("Provided value doesn't match proof")
+	}
+
+	return p.Verify(spec, root)
+}
+
 // Calculate determines the root hash that matches the given proof.
 // You must validate the result is what you have in a header.
 // Returns error if the calculations cannot be performed.
@@ -74,8 +84,8 @@ func (p *ExistenceProof) Calculate() (CommitmentRoot, error) {
 		return nil, errors.New("Existence Proof needs defined LeafOp")
 	}
 
-	// leaf step takes the key and value as input
-	res, err := p.Leaf.Apply(p.Key, p.Value)
+	// leaf step takes the key and value hash as input
+	res, err := p.Leaf.Apply(p.Key, p.ValueHash)
 	if err != nil {
 		return nil, errors.WithMessage(err, "leaf")
 	}
@@ -120,13 +130,13 @@ func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []b
 	// ensure the existence proofs are valid
 	var leftKey, rightKey []byte
 	if p.Left != nil {
-		if err := p.Left.Verify(spec, root, p.Left.Key, p.Left.Value); err != nil {
+		if err := p.Left.Verify(spec, root); err != nil {
 			return errors.Wrap(err, "left proof")
 		}
 		leftKey = p.Left.Key
 	}
 	if p.Right != nil {
-		if err := p.Right.Verify(spec, root, p.Right.Key, p.Right.Value); err != nil {
+		if err := p.Right.Verify(spec, root); err != nil {
 			return errors.Wrap(err, "right proof")
 		}
 		rightKey = p.Right.Key

@@ -1,5 +1,6 @@
 github.com/confio/ics23/go v0.0.0-20190827155221-fd7dc387df77 h1:Z9qMeSGpcvAuBNPPClGqKQ9iENWCv/+GZZcEjeujl88=
 github.com/confio/ics23/go v0.0.0-20190827155221-fd7dc387df77/go.mod h1:rWOCtymU+x3jM2Uib0aszytidui3pfpffvjCfNwATaE=
+github.com/confio/ics23/go v0.0.0-20190827163309-7909e7dd24d5/go.mod h1:rWOCtymU+x3jM2Uib0aszytidui3pfpffvjCfNwATaE=
 github.com/confio/proofs/go v0.0.0-20190805152205-de743e64f0fb h1:rS/lyrNsqaGwWKyXKSqvG4qu0Lg6THh0zH5EXGEQy8w=
 github.com/confio/proofs/go v0.0.0-20190805152205-de743e64f0fb/go.mod h1:NqF1V1FlsE96h8vZYDTKq/f/xQvOAQXMZx6hSnD4XFA=
 github.com/gogo/protobuf v1.2.1 h1:/s5zKNz0uPFCZ5hddgPdo2TK2TVrUNMn0OOX8/aZMTE=
