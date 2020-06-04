@@ -49,9 +49,19 @@ func TestVectors(t *testing.T) {
 	}
 
 	for _, tc := range cases {
+		tc := tc
 		name := fmt.Sprintf("%s/%s", tc.dir, tc.filename)
 		t.Run(name, func(t *testing.T) {
 			proof, ref := loadFile(t, tc.dir, tc.filename)
+			// Test Calculate method
+			calculatedRoot, err := proof.Calculate()
+			if err != nil {
+				t.Fatal("proof.Calculate() returned error")
+			}
+			if !bytes.Equal(ref.RootHash, calculatedRoot) {
+				t.Fatalf("calculated root: %X did not match expected root: %X", calculatedRoot, ref.RootHash)
+			}
+			// Test Verify method
 			if ref.Value == nil {
 				// non-existence
 				valid := VerifyNonMembership(tc.spec, ref.RootHash, proof, ref.Key)
@@ -218,6 +228,7 @@ func TestBatchVectors(t *testing.T) {
 	}
 
 	for name, tc := range cases {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
 			// try one proof
 			if tc.ref.Value == nil {

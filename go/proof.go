@@ -40,6 +40,36 @@ var TendermintSpec = &ProofSpec{
 	},
 }
 
+// Calculate determines the root hash that matches a given Commitment proof
+// by type switching and calculating root based on proof type
+// NOTE: Calculate will return the first calculated root in the proof,
+// you must validate that all other embedded ExistenceProofs commit to the same root.
+// This can be done with the Verify method
+func (p *CommitmentProof) Calculate() (CommitmentRoot, error) {
+	switch v := p.Proof.(type) {
+	case *CommitmentProof_Exist:
+		return v.Exist.Calculate()
+	case *CommitmentProof_Nonexist:
+		return v.Nonexist.Calculate()
+	case *CommitmentProof_Batch:
+		if len(v.Batch.GetEntries()) == 0 || v.Batch.GetEntries()[0] == nil {
+			return nil, errors.New("batch proof has empty entry")
+		}
+		if e := v.Batch.GetEntries()[0].GetExist(); e != nil {
+			return e.Calculate()
+		}
+		if n := v.Batch.GetEntries()[0].GetNonexist(); n != nil {
+			return n.Calculate()
+		}
+	case *CommitmentProof_Compressed:
+		proof := Decompress(p)
+		return proof.Calculate()
+	default:
+		return nil, errors.New("unrecognized proof type")
+	}
+	return nil, errors.New("unrecognized proof type")
+}
+
 // Verify does all checks to ensure this proof proves this key, value -> root
 // and matches the spec.
 func (p *ExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte, value []byte) error {
@@ -88,6 +118,21 @@ func (p *ExistenceProof) Calculate() (CommitmentRoot, error) {
 		}
 	}
 	return res, nil
+}
+
+// Calculate determines the root hash that matches the given nonexistence rpoog.
+// You must validate the result is what you have in a header.
+// Returns error if the calculations cannot be performed.
+func (p *NonExistenceProof) Calculate() (CommitmentRoot, error) {
+	// A Nonexist proof may have left or right proof nil
+	switch {
+	case p.Left != nil:
+		return p.Left.Calculate()
+	case p.Right != nil:
+		return p.Right.Calculate()
+	default:
+		return nil, errors.New("Nonexistence proof has empty Left and Right proof")
+	}
 }
 
 // CheckAgainstSpec will verify the leaf and all path steps are in the format defined in spec
