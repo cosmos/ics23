@@ -11,5 +11,10 @@ test:
 
 protoc:
 #	@go mod vendor
-	protoc --gogofaster_out=. $(PROTOC_FLAGS) ../proofs.proto
+	protoc --gocosmos_out=plugins=interfacetype+grpc,Mgoogle/protobuf/any.proto=github.com/gogo/protobuf/types:. $(PROTOC_FLAGS) ../proofs.proto
+
+install-proto-dep:
+	@echo "Installing protoc-gen-gocosmos..."
+	@go install github.com/regen-network/cosmos-proto/protoc-gen-gocosmos
+
 
