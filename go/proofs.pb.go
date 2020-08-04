@@ -8,6 +8,7 @@ import (
 	proto "github.com/gogo/protobuf/proto"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -19,7 +20,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type HashOp int32
 
@@ -160,7 +161,7 @@ func (m *ExistenceProof) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return xxx_messageInfo_ExistenceProof.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -231,7 +232,7 @@ func (m *NonExistenceProof) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return xxx_messageInfo_NonExistenceProof.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -296,7 +297,7 @@ func (m *CommitmentProof) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return xxx_messageInfo_CommitmentProof.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -322,16 +323,16 @@ type isCommitmentProof_Proof interface {
 }
 
 type CommitmentProof_Exist struct {
-	Exist *ExistenceProof `protobuf:"bytes,1,opt,name=exist,proto3,oneof"`
+	Exist *ExistenceProof `protobuf:"bytes,1,opt,name=exist,proto3,oneof" json:"exist,omitempty"`
 }
 type CommitmentProof_Nonexist struct {
-	Nonexist *NonExistenceProof `protobuf:"bytes,2,opt,name=nonexist,proto3,oneof"`
+	Nonexist *NonExistenceProof `protobuf:"bytes,2,opt,name=nonexist,proto3,oneof" json:"nonexist,omitempty"`
 }
 type CommitmentProof_Batch struct {
-	Batch *BatchProof `protobuf:"bytes,3,opt,name=batch,proto3,oneof"`
+	Batch *BatchProof `protobuf:"bytes,3,opt,name=batch,proto3,oneof" json:"batch,omitempty"`
 }
 type CommitmentProof_Compressed struct {
-	Compressed *CompressedBatchProof `protobuf:"bytes,4,opt,name=compressed,proto3,oneof"`
+	Compressed *CompressedBatchProof `protobuf:"bytes,4,opt,name=compressed,proto3,oneof" json:"compressed,omitempty"`
 }
 
 func (*CommitmentProof_Exist) isCommitmentProof_Proof()      {}
@@ -374,116 +375,14 @@ func (m *CommitmentProof) GetCompressed() *CompressedBatchProof {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*CommitmentProof) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _CommitmentProof_OneofMarshaler, _CommitmentProof_OneofUnmarshaler, _CommitmentProof_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*CommitmentProof) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*CommitmentProof_Exist)(nil),
 		(*CommitmentProof_Nonexist)(nil),
 		(*CommitmentProof_Batch)(nil),
 		(*CommitmentProof_Compressed)(nil),
 	}
-}
-
-func _CommitmentProof_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*CommitmentProof)
-	// proof
-	switch x := m.Proof.(type) {
-	case *CommitmentProof_Exist:
-		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Exist); err != nil {
-			return err
-		}
-	case *CommitmentProof_Nonexist:
-		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Nonexist); err != nil {
-			return err
-		}
-	case *CommitmentProof_Batch:
-		_ = b.EncodeVarint(3<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Batch); err != nil {
-			return err
-		}
-	case *CommitmentProof_Compressed:
-		_ = b.EncodeVarint(4<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Compressed); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("CommitmentProof.Proof has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _CommitmentProof_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*CommitmentProof)
-	switch tag {
-	case 1: // proof.exist
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ExistenceProof)
-		err := b.DecodeMessage(msg)
-		m.Proof = &CommitmentProof_Exist{msg}
-		return true, err
-	case 2: // proof.nonexist
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(NonExistenceProof)
-		err := b.DecodeMessage(msg)
-		m.Proof = &CommitmentProof_Nonexist{msg}
-		return true, err
-	case 3: // proof.batch
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(BatchProof)
-		err := b.DecodeMessage(msg)
-		m.Proof = &CommitmentProof_Batch{msg}
-		return true, err
-	case 4: // proof.compressed
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(CompressedBatchProof)
-		err := b.DecodeMessage(msg)
-		m.Proof = &CommitmentProof_Compressed{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _CommitmentProof_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*CommitmentProof)
-	// proof
-	switch x := m.Proof.(type) {
-	case *CommitmentProof_Exist:
-		s := proto.Size(x.Exist)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *CommitmentProof_Nonexist:
-		s := proto.Size(x.Nonexist)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *CommitmentProof_Batch:
-		s := proto.Size(x.Batch)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *CommitmentProof_Compressed:
-		s := proto.Size(x.Compressed)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 //*
@@ -525,7 +424,7 @@ func (m *LeafOp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_LeafOp.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -615,7 +514,7 @@ func (m *InnerOp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_InnerOp.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -691,7 +590,7 @@ func (m *ProofSpec) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_ProofSpec.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -775,7 +674,7 @@ func (m *InnerSpec) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_InnerSpec.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -856,7 +755,7 @@ func (m *BatchProof) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_BatchProof.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -904,7 +803,7 @@ func (m *BatchEntry) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return xxx_messageInfo_BatchEntry.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -930,10 +829,10 @@ type isBatchEntry_Proof interface {
 }
 
 type BatchEntry_Exist struct {
-	Exist *ExistenceProof `protobuf:"bytes,1,opt,name=exist,proto3,oneof"`
+	Exist *ExistenceProof `protobuf:"bytes,1,opt,name=exist,proto3,oneof" json:"exist,omitempty"`
 }
 type BatchEntry_Nonexist struct {
-	Nonexist *NonExistenceProof `protobuf:"bytes,2,opt,name=nonexist,proto3,oneof"`
+	Nonexist *NonExistenceProof `protobuf:"bytes,2,opt,name=nonexist,proto3,oneof" json:"nonexist,omitempty"`
 }
 
 func (*BatchEntry_Exist) isBatchEntry_Proof()    {}
@@ -960,78 +859,12 @@ func (m *BatchEntry) GetNonexist() *NonExistenceProof {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*BatchEntry) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _BatchEntry_OneofMarshaler, _BatchEntry_OneofUnmarshaler, _BatchEntry_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*BatchEntry) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*BatchEntry_Exist)(nil),
 		(*BatchEntry_Nonexist)(nil),
 	}
-}
-
-func _BatchEntry_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*BatchEntry)
-	// proof
-	switch x := m.Proof.(type) {
-	case *BatchEntry_Exist:
-		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Exist); err != nil {
-			return err
-		}
-	case *BatchEntry_Nonexist:
-		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Nonexist); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("BatchEntry.Proof has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _BatchEntry_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*BatchEntry)
-	switch tag {
-	case 1: // proof.exist
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ExistenceProof)
-		err := b.DecodeMessage(msg)
-		m.Proof = &BatchEntry_Exist{msg}
-		return true, err
-	case 2: // proof.nonexist
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(NonExistenceProof)
-		err := b.DecodeMessage(msg)
-		m.Proof = &BatchEntry_Nonexist{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _BatchEntry_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*BatchEntry)
-	// proof
-	switch x := m.Proof.(type) {
-	case *BatchEntry_Exist:
-		s := proto.Size(x.Exist)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *BatchEntry_Nonexist:
-		s := proto.Size(x.Nonexist)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type CompressedBatchProof struct {
@@ -1053,7 +886,7 @@ func (m *CompressedBatchProof) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return xxx_messageInfo_CompressedBatchProof.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1108,7 +941,7 @@ func (m *CompressedBatchEntry) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return xxx_messageInfo_CompressedBatchEntry.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1134,10 +967,10 @@ type isCompressedBatchEntry_Proof interface {
 }
 
 type CompressedBatchEntry_Exist struct {
-	Exist *CompressedExistenceProof `protobuf:"bytes,1,opt,name=exist,proto3,oneof"`
+	Exist *CompressedExistenceProof `protobuf:"bytes,1,opt,name=exist,proto3,oneof" json:"exist,omitempty"`
 }
 type CompressedBatchEntry_Nonexist struct {
-	Nonexist *CompressedNonExistenceProof `protobuf:"bytes,2,opt,name=nonexist,proto3,oneof"`
+	Nonexist *CompressedNonExistenceProof `protobuf:"bytes,2,opt,name=nonexist,proto3,oneof" json:"nonexist,omitempty"`
 }
 
 func (*CompressedBatchEntry_Exist) isCompressedBatchEntry_Proof()    {}
@@ -1164,78 +997,12 @@ func (m *CompressedBatchEntry) GetNonexist() *CompressedNonExistenceProof {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*CompressedBatchEntry) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _CompressedBatchEntry_OneofMarshaler, _CompressedBatchEntry_OneofUnmarshaler, _CompressedBatchEntry_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*CompressedBatchEntry) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*CompressedBatchEntry_Exist)(nil),
 		(*CompressedBatchEntry_Nonexist)(nil),
 	}
-}
-
-func _CompressedBatchEntry_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*CompressedBatchEntry)
-	// proof
-	switch x := m.Proof.(type) {
-	case *CompressedBatchEntry_Exist:
-		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Exist); err != nil {
-			return err
-		}
-	case *CompressedBatchEntry_Nonexist:
-		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Nonexist); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("CompressedBatchEntry.Proof has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _CompressedBatchEntry_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*CompressedBatchEntry)
-	switch tag {
-	case 1: // proof.exist
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(CompressedExistenceProof)
-		err := b.DecodeMessage(msg)
-		m.Proof = &CompressedBatchEntry_Exist{msg}
-		return true, err
-	case 2: // proof.nonexist
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(CompressedNonExistenceProof)
-		err := b.DecodeMessage(msg)
-		m.Proof = &CompressedBatchEntry_Nonexist{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _CompressedBatchEntry_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*CompressedBatchEntry)
-	// proof
-	switch x := m.Proof.(type) {
-	case *CompressedBatchEntry_Exist:
-		s := proto.Size(x.Exist)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *CompressedBatchEntry_Nonexist:
-		s := proto.Size(x.Nonexist)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type CompressedExistenceProof struct {
@@ -1260,7 +1027,7 @@ func (m *CompressedExistenceProof) XXX_Marshal(b []byte, deterministic bool) ([]
 		return xxx_messageInfo_CompressedExistenceProof.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1327,7 +1094,7 @@ func (m *CompressedNonExistenceProof) XXX_Marshal(b []byte, deterministic bool) 
 		return xxx_messageInfo_CompressedNonExistenceProof.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
+		n, err := m.MarshalToSizedBuffer(b)
 		if err != nil {
 			return nil, err
 		}
@@ -1453,7 +1220,7 @@ var fileDescriptor_855156e15e7b8e99 = []byte{
 func (m *ExistenceProof) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1461,51 +1228,62 @@ func (m *ExistenceProof) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ExistenceProof) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ExistenceProof) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Key) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(len(m.Key)))
-		i += copy(dAtA[i:], m.Key)
-	}
-	if len(m.Value) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(len(m.Value)))
-		i += copy(dAtA[i:], m.Value)
+	if len(m.Path) > 0 {
+		for iNdEx := len(m.Path) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Path[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintProofs(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
 	}
 	if m.Leaf != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Leaf.Size()))
-		n1, err := m.Leaf.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n1
-	}
-	if len(m.Path) > 0 {
-		for _, msg := range m.Path {
-			dAtA[i] = 0x22
-			i++
-			i = encodeVarintProofs(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
+		{
+			size, err := m.Leaf.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
-			i += n
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	if len(m.Value) > 0 {
+		i -= len(m.Value)
+		copy(dAtA[i:], m.Value)
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.Value)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Key) > 0 {
+		i -= len(m.Key)
+		copy(dAtA[i:], m.Key)
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.Key)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *NonExistenceProof) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1513,43 +1291,53 @@ func (m *NonExistenceProof) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *NonExistenceProof) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *NonExistenceProof) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Key) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(len(m.Key)))
-		i += copy(dAtA[i:], m.Key)
+	if m.Right != nil {
+		{
+			size, err := m.Right.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
 	}
 	if m.Left != nil {
+		{
+			size, err := m.Left.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
+		}
+		i--
 		dAtA[i] = 0x12
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Left.Size()))
-		n2, err := m.Left.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n2
 	}
-	if m.Right != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Right.Size()))
-		n3, err := m.Right.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n3
+	if len(m.Key) > 0 {
+		i -= len(m.Key)
+		copy(dAtA[i:], m.Key)
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.Key)))
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *CommitmentProof) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1557,80 +1345,115 @@ func (m *CommitmentProof) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CommitmentProof) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CommitmentProof) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.Proof != nil {
-		nn4, err := m.Proof.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size := m.Proof.Size()
+			i -= size
+			if _, err := m.Proof.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
 		}
-		i += nn4
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *CommitmentProof_Exist) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CommitmentProof_Exist) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.Exist != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Exist.Size()))
-		n5, err := m.Exist.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.Exist.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
 		}
-		i += n5
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *CommitmentProof_Nonexist) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CommitmentProof_Nonexist) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.Nonexist != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Nonexist.Size()))
-		n6, err := m.Nonexist.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.Nonexist.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
 		}
-		i += n6
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *CommitmentProof_Batch) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CommitmentProof_Batch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.Batch != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Batch.Size()))
-		n7, err := m.Batch.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.Batch.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
 		}
-		i += n7
+		i--
+		dAtA[i] = 0x1a
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *CommitmentProof_Compressed) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CommitmentProof_Compressed) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.Compressed != nil {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Compressed.Size()))
-		n8, err := m.Compressed.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.Compressed.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
 		}
-		i += n8
+		i--
+		dAtA[i] = 0x22
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *LeafOp) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1638,43 +1461,49 @@ func (m *LeafOp) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *LeafOp) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *LeafOp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Hash != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Hash))
-	}
-	if m.PrehashKey != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.PrehashKey))
-	}
-	if m.PrehashValue != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.PrehashValue))
+	if len(m.Prefix) > 0 {
+		i -= len(m.Prefix)
+		copy(dAtA[i:], m.Prefix)
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.Prefix)))
+		i--
+		dAtA[i] = 0x2a
 	}
 	if m.Length != 0 {
-		dAtA[i] = 0x20
-		i++
 		i = encodeVarintProofs(dAtA, i, uint64(m.Length))
+		i--
+		dAtA[i] = 0x20
 	}
-	if len(m.Prefix) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(len(m.Prefix)))
-		i += copy(dAtA[i:], m.Prefix)
+	if m.PrehashValue != 0 {
+		i = encodeVarintProofs(dAtA, i, uint64(m.PrehashValue))
+		i--
+		dAtA[i] = 0x18
 	}
-	return i, nil
+	if m.PrehashKey != 0 {
+		i = encodeVarintProofs(dAtA, i, uint64(m.PrehashKey))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.Hash != 0 {
+		i = encodeVarintProofs(dAtA, i, uint64(m.Hash))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *InnerOp) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1682,34 +1511,41 @@ func (m *InnerOp) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *InnerOp) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *InnerOp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Hash != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Hash))
+	if len(m.Suffix) > 0 {
+		i -= len(m.Suffix)
+		copy(dAtA[i:], m.Suffix)
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.Suffix)))
+		i--
+		dAtA[i] = 0x1a
 	}
 	if len(m.Prefix) > 0 {
-		dAtA[i] = 0x12
-		i++
+		i -= len(m.Prefix)
+		copy(dAtA[i:], m.Prefix)
 		i = encodeVarintProofs(dAtA, i, uint64(len(m.Prefix)))
-		i += copy(dAtA[i:], m.Prefix)
+		i--
+		dAtA[i] = 0x12
 	}
-	if len(m.Suffix) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(len(m.Suffix)))
-		i += copy(dAtA[i:], m.Suffix)
+	if m.Hash != 0 {
+		i = encodeVarintProofs(dAtA, i, uint64(m.Hash))
+		i--
+		dAtA[i] = 0x8
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *ProofSpec) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1717,47 +1553,56 @@ func (m *ProofSpec) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *ProofSpec) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ProofSpec) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.LeafSpec != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.LeafSpec.Size()))
-		n9, err := m.LeafSpec.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n9
-	}
-	if m.InnerSpec != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.InnerSpec.Size()))
-		n10, err := m.InnerSpec.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n10
+	if m.MinDepth != 0 {
+		i = encodeVarintProofs(dAtA, i, uint64(m.MinDepth))
+		i--
+		dAtA[i] = 0x20
 	}
 	if m.MaxDepth != 0 {
-		dAtA[i] = 0x18
-		i++
 		i = encodeVarintProofs(dAtA, i, uint64(m.MaxDepth))
+		i--
+		dAtA[i] = 0x18
 	}
-	if m.MinDepth != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.MinDepth))
+	if m.InnerSpec != nil {
+		{
+			size, err := m.InnerSpec.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	if m.LeafSpec != nil {
+		{
+			size, err := m.LeafSpec.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *InnerSpec) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1765,61 +1610,68 @@ func (m *InnerSpec) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *InnerSpec) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *InnerSpec) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
+	if m.Hash != 0 {
+		i = encodeVarintProofs(dAtA, i, uint64(m.Hash))
+		i--
+		dAtA[i] = 0x30
+	}
+	if len(m.EmptyChild) > 0 {
+		i -= len(m.EmptyChild)
+		copy(dAtA[i:], m.EmptyChild)
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.EmptyChild)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.MaxPrefixLength != 0 {
+		i = encodeVarintProofs(dAtA, i, uint64(m.MaxPrefixLength))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.MinPrefixLength != 0 {
+		i = encodeVarintProofs(dAtA, i, uint64(m.MinPrefixLength))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.ChildSize != 0 {
+		i = encodeVarintProofs(dAtA, i, uint64(m.ChildSize))
+		i--
+		dAtA[i] = 0x10
+	}
 	if len(m.ChildOrder) > 0 {
-		dAtA12 := make([]byte, len(m.ChildOrder)*10)
-		var j11 int
+		dAtA11 := make([]byte, len(m.ChildOrder)*10)
+		var j10 int
 		for _, num1 := range m.ChildOrder {
 			num := uint64(num1)
 			for num >= 1<<7 {
-				dAtA12[j11] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA11[j10] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j11++
+				j10++
 			}
-			dAtA12[j11] = uint8(num)
-			j11++
+			dAtA11[j10] = uint8(num)
+			j10++
 		}
+		i -= j10
+		copy(dAtA[i:], dAtA11[:j10])
+		i = encodeVarintProofs(dAtA, i, uint64(j10))
+		i--
 		dAtA[i] = 0xa
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(j11))
-		i += copy(dAtA[i:], dAtA12[:j11])
 	}
-	if m.ChildSize != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.ChildSize))
-	}
-	if m.MinPrefixLength != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.MinPrefixLength))
-	}
-	if m.MaxPrefixLength != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.MaxPrefixLength))
-	}
-	if len(m.EmptyChild) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(len(m.EmptyChild)))
-		i += copy(dAtA[i:], m.EmptyChild)
-	}
-	if m.Hash != 0 {
-		dAtA[i] = 0x30
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Hash))
-	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *BatchProof) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1827,29 +1679,36 @@ func (m *BatchProof) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *BatchProof) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *BatchProof) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Entries) > 0 {
-		for _, msg := range m.Entries {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintProofs(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.Entries) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Entries[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintProofs(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0xa
 		}
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *BatchEntry) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1857,52 +1716,73 @@ func (m *BatchEntry) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *BatchEntry) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *BatchEntry) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.Proof != nil {
-		nn13, err := m.Proof.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size := m.Proof.Size()
+			i -= size
+			if _, err := m.Proof.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
 		}
-		i += nn13
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *BatchEntry_Exist) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *BatchEntry_Exist) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.Exist != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Exist.Size()))
-		n14, err := m.Exist.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.Exist.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
 		}
-		i += n14
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *BatchEntry_Nonexist) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *BatchEntry_Nonexist) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.Nonexist != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Nonexist.Size()))
-		n15, err := m.Nonexist.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.Nonexist.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
 		}
-		i += n15
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *CompressedBatchProof) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1910,41 +1790,50 @@ func (m *CompressedBatchProof) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CompressedBatchProof) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CompressedBatchProof) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Entries) > 0 {
-		for _, msg := range m.Entries {
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintProofs(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
 	if len(m.LookupInners) > 0 {
-		for _, msg := range m.LookupInners {
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintProofs(dAtA, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil {
-				return 0, err
+		for iNdEx := len(m.LookupInners) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.LookupInners[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintProofs(dAtA, i, uint64(size))
 			}
-			i += n
+			i--
+			dAtA[i] = 0x12
 		}
 	}
-	return i, nil
+	if len(m.Entries) > 0 {
+		for iNdEx := len(m.Entries) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Entries[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintProofs(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *CompressedBatchEntry) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -1952,52 +1841,73 @@ func (m *CompressedBatchEntry) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CompressedBatchEntry) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CompressedBatchEntry) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if m.Proof != nil {
-		nn16, err := m.Proof.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size := m.Proof.Size()
+			i -= size
+			if _, err := m.Proof.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
 		}
-		i += nn16
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func (m *CompressedBatchEntry_Exist) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CompressedBatchEntry_Exist) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.Exist != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Exist.Size()))
-		n17, err := m.Exist.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.Exist.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
 		}
-		i += n17
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *CompressedBatchEntry_Nonexist) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CompressedBatchEntry_Nonexist) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	if m.Nonexist != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Nonexist.Size()))
-		n18, err := m.Nonexist.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
+		{
+			size, err := m.Nonexist.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
 		}
-		i += n18
+		i--
+		dAtA[i] = 0x12
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 func (m *CompressedExistenceProof) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2005,57 +1915,67 @@ func (m *CompressedExistenceProof) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CompressedExistenceProof) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CompressedExistenceProof) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Key) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(len(m.Key)))
-		i += copy(dAtA[i:], m.Key)
-	}
-	if len(m.Value) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(len(m.Value)))
-		i += copy(dAtA[i:], m.Value)
-	}
-	if m.Leaf != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Leaf.Size()))
-		n19, err := m.Leaf.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n19
-	}
 	if len(m.Path) > 0 {
-		dAtA21 := make([]byte, len(m.Path)*10)
-		var j20 int
+		dAtA17 := make([]byte, len(m.Path)*10)
+		var j16 int
 		for _, num1 := range m.Path {
 			num := uint64(num1)
 			for num >= 1<<7 {
-				dAtA21[j20] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA17[j16] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j20++
+				j16++
 			}
-			dAtA21[j20] = uint8(num)
-			j20++
+			dAtA17[j16] = uint8(num)
+			j16++
 		}
+		i -= j16
+		copy(dAtA[i:], dAtA17[:j16])
+		i = encodeVarintProofs(dAtA, i, uint64(j16))
+		i--
 		dAtA[i] = 0x22
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(j20))
-		i += copy(dAtA[i:], dAtA21[:j20])
 	}
-	return i, nil
+	if m.Leaf != nil {
+		{
+			size, err := m.Leaf.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Value) > 0 {
+		i -= len(m.Value)
+		copy(dAtA[i:], m.Value)
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.Value)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Key) > 0 {
+		i -= len(m.Key)
+		copy(dAtA[i:], m.Key)
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.Key)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *CompressedNonExistenceProof) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
 		return nil, err
 	}
@@ -2063,47 +1983,59 @@ func (m *CompressedNonExistenceProof) Marshal() (dAtA []byte, err error) {
 }
 
 func (m *CompressedNonExistenceProof) MarshalTo(dAtA []byte) (int, error) {
-	var i int
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CompressedNonExistenceProof) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Key) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(len(m.Key)))
-		i += copy(dAtA[i:], m.Key)
+	if m.Right != nil {
+		{
+			size, err := m.Right.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
 	}
 	if m.Left != nil {
+		{
+			size, err := m.Left.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
+		}
+		i--
 		dAtA[i] = 0x12
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Left.Size()))
-		n22, err := m.Left.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n22
 	}
-	if m.Right != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintProofs(dAtA, i, uint64(m.Right.Size()))
-		n23, err := m.Right.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n23
+	if len(m.Key) > 0 {
+		i -= len(m.Key)
+		copy(dAtA[i:], m.Key)
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.Key)))
+		i--
+		dAtA[i] = 0xa
 	}
-	return i, nil
+	return len(dAtA) - i, nil
 }
 
 func encodeVarintProofs(dAtA []byte, offset int, v uint64) int {
+	offset -= sovProofs(v)
+	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
 	}
 	dAtA[offset] = uint8(v)
-	return offset + 1
+	return base
 }
 func (m *ExistenceProof) Size() (n int) {
 	if m == nil {
@@ -2471,14 +2403,7 @@ func (m *CompressedNonExistenceProof) Size() (n int) {
 }
 
 func sovProofs(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozProofs(x uint64) (n int) {
 	return sovProofs(uint64((x << 1) ^ uint64((int64(x) >> 63))))
@@ -4580,6 +4505,7 @@ func (m *CompressedNonExistenceProof) Unmarshal(dAtA []byte) error {
 func skipProofs(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
+	depth := 0
 	for iNdEx < l {
 		var wire uint64
 		for shift := uint(0); ; shift += 7 {
@@ -4611,10 +4537,8 @@ func skipProofs(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			return iNdEx, nil
 		case 1:
 			iNdEx += 8
-			return iNdEx, nil
 		case 2:
 			var length int
 			for shift := uint(0); ; shift += 7 {
@@ -4635,55 +4559,30 @@ func skipProofs(dAtA []byte) (n int, err error) {
 				return 0, ErrInvalidLengthProofs
 			}
 			iNdEx += length
-			if iNdEx < 0 {
-				return 0, ErrInvalidLengthProofs
-			}
-			return iNdEx, nil
 		case 3:
-			for {
-				var innerWire uint64
-				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return 0, ErrIntOverflowProofs
-					}
-					if iNdEx >= l {
-						return 0, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 {
-					break
-				}
-				next, err := skipProofs(dAtA[start:])
-				if err != nil {
-					return 0, err
-				}
-				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthProofs
-				}
-			}
-			return iNdEx, nil
+			depth++
 		case 4:
-			return iNdEx, nil
+			if depth == 0 {
+				return 0, ErrUnexpectedEndOfGroupProofs
+			}
+			depth--
 		case 5:
 			iNdEx += 4
-			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
 		}
+		if iNdEx < 0 {
+			return 0, ErrInvalidLengthProofs
+		}
+		if depth == 0 {
+			return iNdEx, nil
+		}
 	}
-	panic("unreachable")
+	return 0, io.ErrUnexpectedEOF
 }
 
 var (
-	ErrInvalidLengthProofs = fmt.Errorf("proto: negative length found during unmarshaling")
-	ErrIntOverflowProofs   = fmt.Errorf("proto: integer overflow")
+	ErrInvalidLengthProofs        = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowProofs          = fmt.Errorf("proto: integer overflow")
+	ErrUnexpectedEndOfGroupProofs = fmt.Errorf("proto: unexpected end of group")
 )
