@@ -8,7 +8,7 @@ import {
   ensureLeaf
 } from "./specs";
 
-export const IavlSpec: ics23.IProofSpec = {
+export const iavlSpec: ics23.IProofSpec = {
   leafSpec: {
     prefix: Uint8Array.from([0]),
     hash: ics23.HashOp.SHA256,
@@ -25,7 +25,7 @@ export const IavlSpec: ics23.IProofSpec = {
   }
 };
 
-export const TendermintSpec: ics23.IProofSpec = {
+export const tendermintSpec: ics23.IProofSpec = {
   leafSpec: {
     prefix: Uint8Array.from([0]),
     hash: ics23.HashOp.SHA256,

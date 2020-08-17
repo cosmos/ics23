@@ -1,7 +1,7 @@
 import { ics23 } from "./generated/codecimpl";
 
 import { fromHex, toAscii } from "./helpers";
-import { calculateExistenceRoot, ensureSpec, IavlSpec } from "./proofs";
+import { calculateExistenceRoot, ensureSpec, iavlSpec } from "./proofs";
 
 describe("calculateExistenceRoot", () => {
   it("must have at least one step", () => {
@@ -63,7 +63,7 @@ describe("calculateExistenceRoot", () => {
 });
 
 describe("ensureSpec", () => {
-  const validLeaf = IavlSpec.leafSpec;
+  const validLeaf = iavlSpec.leafSpec;
   const invalidLeaf = {
     prefix: Uint8Array.from([0]),
     hash: ics23.HashOp.SHA512,
@@ -87,8 +87,8 @@ describe("ensureSpec", () => {
   };
 
   const depthLimitedSpec = {
-    leafSpec: IavlSpec.leafSpec,
-    innerSpec: IavlSpec.innerSpec,
+    leafSpec: iavlSpec.leafSpec,
+    innerSpec: iavlSpec.innerSpec,
     minDepth: 2,
     maxDepth: 4
   };
@@ -98,7 +98,7 @@ describe("ensureSpec", () => {
       key: toAscii("foo"),
       value: toAscii("bar")
     };
-    expect(() => ensureSpec(proof, IavlSpec)).toThrow();
+    expect(() => ensureSpec(proof, iavlSpec)).toThrow();
   });
 
   it("accepts one valid leaf", () => {
@@ -108,7 +108,7 @@ describe("ensureSpec", () => {
       leaf: validLeaf
     };
     // fail if this throws (invalid spec)
-    ensureSpec(proof, IavlSpec);
+    ensureSpec(proof, iavlSpec);
   });
 
   it("rejects invalid leaf", () => {
@@ -117,7 +117,7 @@ describe("ensureSpec", () => {
       value: toAscii("bar"),
       leaf: invalidLeaf
     };
-    expect(() => ensureSpec(proof, IavlSpec)).toThrow();
+    expect(() => ensureSpec(proof, iavlSpec)).toThrow();
   });
 
   it("rejects inner without leaf", () => {
@@ -126,7 +126,7 @@ describe("ensureSpec", () => {
       value: toAscii("bar"),
       path: [validInner]
     };
-    expect(() => ensureSpec(proof, IavlSpec)).toThrow();
+    expect(() => ensureSpec(proof, iavlSpec)).toThrow();
   });
 
   it("accepts leaf with one inner", () => {
@@ -137,7 +137,7 @@ describe("ensureSpec", () => {
       path: [validInner]
     };
     // fail if this throws (invalid spec)
-    ensureSpec(proof, IavlSpec);
+    ensureSpec(proof, iavlSpec);
   });
 
   it("rejects with invalid inner (prefix)", () => {
@@ -147,7 +147,7 @@ describe("ensureSpec", () => {
       leaf: validLeaf,
       path: [invalidInner, validInner]
     };
-    expect(() => ensureSpec(proof, IavlSpec)).toThrow();
+    expect(() => ensureSpec(proof, iavlSpec)).toThrow();
   });
 
   it("rejects with invalid inner (hash)", () => {
@@ -157,7 +157,7 @@ describe("ensureSpec", () => {
       leaf: validLeaf,
       path: [validInner, invalidInnerHash]
     };
-    expect(() => ensureSpec(proof, IavlSpec)).toThrow();
+    expect(() => ensureSpec(proof, iavlSpec)).toThrow();
   });
 
   it("accepts depth limited with proper number of nodes", () => {
