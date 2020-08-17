@@ -9,7 +9,7 @@ import {
   verifyMembership,
   verifyNonMembership
 } from "./ics23";
-import { IavlSpec, TendermintSpec } from "./proofs";
+import { iavlSpec, tendermintSpec } from "./proofs";
 
 describe("calculateExistenceRoot", () => {
   interface RefData {
@@ -61,58 +61,58 @@ describe("calculateExistenceRoot", () => {
   }
 
   it("should parse iavl left", () => {
-    validateTestVector("../testdata/iavl/exist_left.json", IavlSpec);
+    validateTestVector("../testdata/iavl/exist_left.json", iavlSpec);
   });
   it("should parse iavl right", () => {
-    validateTestVector("../testdata/iavl/exist_right.json", IavlSpec);
+    validateTestVector("../testdata/iavl/exist_right.json", iavlSpec);
   });
   it("should parse iavl middle", () => {
-    validateTestVector("../testdata/iavl/exist_middle.json", IavlSpec);
+    validateTestVector("../testdata/iavl/exist_middle.json", iavlSpec);
   });
   it("should parse iavl left - nonexist", () => {
-    validateTestVector("../testdata/iavl/nonexist_left.json", IavlSpec);
+    validateTestVector("../testdata/iavl/nonexist_left.json", iavlSpec);
   });
   it("should parse iavl right - nonexist", () => {
-    validateTestVector("../testdata/iavl/nonexist_right.json", IavlSpec);
+    validateTestVector("../testdata/iavl/nonexist_right.json", iavlSpec);
   });
   it("should parse iavl middle - nonexist", () => {
-    validateTestVector("../testdata/iavl/nonexist_middle.json", IavlSpec);
+    validateTestVector("../testdata/iavl/nonexist_middle.json", iavlSpec);
   });
 
   it("should parse tendermint left", () => {
     validateTestVector(
       "../testdata/tendermint/exist_left.json",
-      TendermintSpec
+      tendermintSpec
     );
   });
   it("should parse tendermint right", () => {
     validateTestVector(
       "../testdata/tendermint/exist_right.json",
-      TendermintSpec
+      tendermintSpec
     );
   });
   it("should parse tendermint middle", () => {
     validateTestVector(
       "../testdata/tendermint/exist_middle.json",
-      TendermintSpec
+      tendermintSpec
     );
   });
   it("should parse tendermint left - nonexist", () => {
     validateTestVector(
       "../testdata/tendermint/nonexist_left.json",
-      TendermintSpec
+      tendermintSpec
     );
   });
   it("should parse tendermint right - nonexist", () => {
     validateTestVector(
       "../testdata/tendermint/nonexist_right.json",
-      TendermintSpec
+      tendermintSpec
     );
   });
   it("should parse tendermint middle - nonexist", () => {
     validateTestVector(
       "../testdata/tendermint/nonexist_middle.json",
-      TendermintSpec
+      tendermintSpec
     );
   });
 
@@ -172,7 +172,7 @@ describe("calculateExistenceRoot", () => {
       "../testdata/iavl/nonexist_right.json",
       "../testdata/iavl/nonexist_middle.json"
     ]);
-    validateBatch(proof, IavlSpec, data[0]);
+    validateBatch(proof, iavlSpec, data[0]);
   });
 
   it("should validate iavl batch nonexist", () => {
@@ -184,7 +184,7 @@ describe("calculateExistenceRoot", () => {
       "../testdata/iavl/nonexist_right.json",
       "../testdata/iavl/nonexist_middle.json"
     ]);
-    validateBatch(proof, IavlSpec, data[5]);
+    validateBatch(proof, iavlSpec, data[5]);
   });
 
   it("should validate compressed iavl batch exist", () => {
@@ -205,7 +205,7 @@ describe("calculateExistenceRoot", () => {
     expect(origBin).toEqual(origBin2);
     expect(origBin).not.toEqual(smallBin);
 
-    validateBatch(small, IavlSpec, data[0]);
+    validateBatch(small, iavlSpec, data[0]);
   });
 
   it("should validate compressed iavl batch nonexist", () => {
@@ -226,7 +226,7 @@ describe("calculateExistenceRoot", () => {
     expect(origBin).toEqual(origBin2);
     expect(origBin).not.toEqual(smallBin);
 
-    validateBatch(small, IavlSpec, data[5]);
+    validateBatch(small, iavlSpec, data[5]);
   });
 
   it("should validate tendermint batch exist", () => {
@@ -238,7 +238,7 @@ describe("calculateExistenceRoot", () => {
       "../testdata/tendermint/nonexist_right.json",
       "../testdata/tendermint/nonexist_middle.json"
     ]);
-    validateBatch(proof, TendermintSpec, data[2]);
+    validateBatch(proof, tendermintSpec, data[2]);
   });
 
   it("should validate tendermint batch nonexist", () => {
@@ -250,6 +250,6 @@ describe("calculateExistenceRoot", () => {
       "../testdata/tendermint/nonexist_right.json",
       "../testdata/tendermint/nonexist_middle.json"
     ]);
-    validateBatch(proof, TendermintSpec, data[3]);
+    validateBatch(proof, tendermintSpec, data[3]);
   });
 });
