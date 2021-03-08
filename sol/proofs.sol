@@ -1,4 +1,4 @@
-pragma solidity ^0.5.1;
+pragma solidity ^0.5.3;
 
 contract Proofs {
     enum HashOp{NO_HASH, SHA256, SHA512, KECCAK, RIPEMD160, BITCOIN}
@@ -32,42 +32,30 @@ contract Proofs {
         LengthOp.VAR_PROTO,
         hex"00"
     );
+    
+    function decodeExistenceProof( 
+      bytes memory key, bytes memory value,
+      bytes memory leafOpEncoded, bytes memory pathEncodedEncoded
+    )
+    internal pure returns (ExistenceProof memory) {
+      (HashOp leafHash, HashOp prehashKey, HashOp prehashValue, LengthOp len, bytes memory leafPrefix) = abi.decode(leafOpEncoded, (HashOp, HashOp, HashOp, LengthOp, bytes));
+      LeafOp memory leaf = LeafOp(leafHash, prehashKey, prehashValue, len, leafPrefix);
+      bytes[] memory pathEncoded = abi.decode(pathEncodedEncoded, (bytes[]));
+      InnerOp[] memory path = new InnerOp[](pathEncoded.length);
+      for (uint i = 0; i < pathEncoded.length; i++) {
+        (HashOp hash, bytes memory prefix, bytes memory suffix) = abi.decode(pathEncoded[i], (HashOp, bytes, bytes));
+        path[i] = InnerOp(hash, prefix, suffix);
+      }
+      
+      return ExistenceProof(key, value, leaf, path);
+    }
 
-    function decodeExistenceProof(
-        // ExistenceProof basic info
-        bytes memory key, bytes memory value,
-        // LeafOp info
-        HashOp leaf_hash, HashOp prehash_key, HashOp prehash_value, LengthOp leaf_len, bytes memory leaf_prefix,
-        // InnerOp info
-        bytes memory inner_hashes_encoded, bytes memory inner_prefixes_encoded, bytes memory inner_suffixes_encoded
-    ) internal pure returns (ExistenceProof memory) {
-        HashOp[] memory inner_hashes = abi.decode(inner_hashes_encoded, (HashOp[]));
-        bytes[] memory inner_prefixes = abi.decode(inner_prefixes_encoded, (bytes[]));
-        bytes[] memory inner_suffixes = abi.decode(inner_suffixes_encoded, (bytes[]));
-        require(inner_hashes.length == inner_prefixes.length && inner_prefixes.length == inner_suffixes.length);
+    function encodeLeafOp(HashOp hash, HashOp phkey, HashOp phval, LengthOp len, bytes memory prefix) public pure returns (bytes memory) {
+      return abi.encode(hash, phkey, phval, len, prefix);
+    }
 
-        uint inners = inner_hashes.length;
-        InnerOp[] memory innerops = new InnerOp[](inners);
-        for (uint i = 0; i < inners; i++) {
-            innerops[i] = InnerOp (
-                inner_hashes[i],
-                inner_prefixes[i],
-                inner_suffixes[i]
-            );
-        }  
-
-        return ExistenceProof (
-            key,
-            value,
-            LeafOp(
-              leaf_hash,
-              prehash_key,
-              prehash_value,
-              leaf_len,
-              leaf_prefix
-            ),
-            innerops
-        );
+    function encodeInnerOp(HashOp hash, bytes memory prefix, bytes memory suffix) public pure returns (bytes memory) {
+      return abi.encode(hash, prefix, suffix);
     }
 
     function doHashOrNoop(HashOp op, bytes memory preimage) public pure returns (bytes memory) {
