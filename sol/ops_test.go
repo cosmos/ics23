@@ -99,11 +99,11 @@ func TestHelperFunctions(t *testing.T) {
 func TestLeafOp(t *testing.T) {
 	session := Initialize(t)
 
-	cases := proofs.LeafOpTestData()
+	cases := ics23.LeafOpTestData()
 
 	// Set IsErr = true for all SHA512
 	for name, tc := range cases {
-		if tc.Op.Hash == proofs.HashOp_SHA512 {
+		if tc.Op.Hash == ics23.HashOp_SHA512 {
 			tc.IsErr = true
 			cases[name] = tc
 		}
@@ -125,7 +125,7 @@ func TestLeafOp(t *testing.T) {
 func TestInnerOp(t *testing.T) {
 	session := Initialize(t)
 
-	cases := proofs.InnerOpTestData()
+	cases := ics23.InnerOpTestData()
 
 	for name, tc := range cases {
 		if tc.IsErr {
@@ -149,12 +149,12 @@ func TestInnerOp(t *testing.T) {
 func TestDoHash(t *testing.T) {
 	session := Initialize(t)
 
-	cases := proofs.DoHashTestData()
+	cases := ics23.DoHashTestData()
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			res, err := session.DoHash(uint8(tc.HashOp), []byte(tc.Preimage))
-			if tc.HashOp == proofs.HashOp_SHA512 {
+			if tc.HashOp == ics23.HashOp_SHA512 {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
