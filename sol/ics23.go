@@ -1,16 +1,11 @@
 package ics23
 
 import (
-
-	proofs "github.com/confio/proofs/go"
+	ics23 "github.com/confio/ics23/go"
 )
 
-type LeafOp = Struct0
-type InnerOp = Struct1
-type ExistenceProof = Struct2
-
-func LeafOpToABI(op *proofs.LeafOp) LeafOp {
-	return LeafOp{
+func LeafOpToABI(op *ics23.LeafOp) ICS23LeafOp {
+	return ICS23LeafOp{
 		Hash:         uint8(op.Hash),
 		PrehashKey:   uint8(op.PrehashKey),
 		PrehashValue: uint8(op.PrehashValue),
@@ -19,20 +14,20 @@ func LeafOpToABI(op *proofs.LeafOp) LeafOp {
 	}
 }
 
-func InnerOpToABI(op *proofs.InnerOp) InnerOp {
-	return InnerOp{
+func InnerOpToABI(op *ics23.InnerOp) ICS23InnerOp {
+	return ICS23InnerOp{
 		Hash:   uint8(op.Hash),
 		Prefix: op.Prefix,
 		Suffix: op.Suffix,
 	}
 }
 
-func ExistenceProofToABI(op *proofs.ExistenceProof) ExistenceProof {
-	path := make([]InnerOp, len(op.Path))
+func ExistenceProofToABI(op *ics23.ExistenceProof) ICS23ExistenceProof {
+	path := make([]ICS23InnerOp, len(op.Path))
 	for i, op := range op.Path {
 		path[i] = InnerOpToABI(op)
 	}
-	return Struct2{
+	return ICS23ExistenceProof{
 		Key:   op.Key,
 		Value: op.Value,
 		Leaf:  LeafOpToABI(op.Leaf),

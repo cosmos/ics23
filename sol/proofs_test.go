@@ -3,14 +3,14 @@ package ics23
 import (
 	"testing"
 
-	proofs "github.com/confio/proofs/go"
+	ics23 "github.com/confio/ics23/go"
 	"github.com/stretchr/testify/require"
 )
 
 func TestExistenceProof(t *testing.T) {
 	session := Initialize(t)
 
-	cases := proofs.ExistenceProofTestData()
+	cases := ics23.ExistenceProofTestData()
 
 	for name, tc := range cases {
 		if tc.Proof.Leaf == nil {
@@ -34,7 +34,7 @@ func TestExistenceProof(t *testing.T) {
 func TestCheckAgainstSpec(t *testing.T) {
 	session := Initialize(t)
 
-	cases := proofs.CheckAgainstSpecTestData()
+	cases := ics23.CheckAgainstSpecTestData()
 
 	for name, tc := range cases {
 		if tc.Proof.Leaf == nil {

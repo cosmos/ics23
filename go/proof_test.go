@@ -33,8 +33,8 @@ func TestCheckLeaf(t *testing.T) {
 	cases := CheckLeafTestData()
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			err := tc.leaf.CheckAgainstSpec(&ProofSpec{LeafSpec: tc.spec})
-			if tc.isErr && err == nil {
+			err := tc.Leaf.CheckAgainstSpec(&ProofSpec{LeafSpec: tc.Spec})
+			if tc.IsErr && err == nil {
 				t.Fatal("Expected error, but got nil")
 			} else if !tc.IsErr && err != nil {
 				t.Fatalf("Unexpected error: %v", err)
@@ -208,10 +208,10 @@ func TestCheckAgainstSpec(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			err := tc.Proof.CheckAgainstSpec(tc.Spec)
-			if tc.IsErr && err == nil {
+			err := tc.proof.CheckAgainstSpec(tc.spec)
+			if tc.isErr && err == nil {
 				t.Fatal("Expected error, but got nil")
-			} else if !tc.IsErr && err != nil {
+			} else if !tc.isErr && err != nil {
 				t.Fatalf("Unexpected error: %v", err)
 			}
 		})

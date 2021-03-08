@@ -1,4 +1,4 @@
-package proofs
+package ics23
 
 type ExistenceProofTestStruct struct {
 	Proof    *ExistenceProof
