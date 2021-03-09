@@ -1,10 +1,5 @@
 pragma solidity >=0.8.0;
 
-pragma experimental ABIEncoderV2;
-
-// Current solidity ICS23 implementation only supports Existence
-// NonExistence is planned to be supported, Batch and Compressed are not
-
 contract ICS23 {
     // Data structures and helper functions
 
@@ -12,13 +7,22 @@ contract ICS23 {
     enum LengthOp{NO_PREFIX, VAR_PROTO, VAR_RLP, FIXED32_BIG, FIXED32_LITTLE, FIXED64_BIG, FIXED64_LITTLE, REQUIRE_32_BYTES, REQUIRE_64_BYTES}
 
     struct ExistenceProof {
+        bool valid;
         bytes key;
         bytes value;
         LeafOp leaf;
         InnerOp[] path;
     }
 
+    struct NonExistenceProof {
+        bool valid;
+        bytes key;
+        ExistenceProof left;
+        ExistenceProof right;
+    }
+
     struct LeafOp {
+        bool valid;
         HashOp hash;
         HashOp prehash_key;
         HashOp prehash_value;
@@ -27,19 +31,39 @@ contract ICS23 {
     }
 
     struct InnerOp {
+        bool valid;
         HashOp hash;
         bytes prefix;
         bytes suffix;
     }
 
+    struct ProofSpec {
+        LeafOp leafSpec;
+        InnerSpec innerSpec;
+        uint maxDepth;
+        uint minDepth;
+    }
+
+    struct InnerSpec {
+        uint[] childOrder;
+        uint childSize;
+        uint minPrefixLength;
+        uint maxPrefixLength;
+        bytes emptyChild;
+        HashOp hash;
+    }
+
     LeafOp iavlSpec = LeafOp(
+        true,
         HashOp.SHA256,
         HashOp.NO_HASH,
         HashOp.SHA256,
         LengthOp.VAR_PROTO,
         hex"00"
     );
-    
+   
+    enum Ordering {LT, EQ, GT}
+
     function doHashOrNoop(HashOp op, bytes memory preimage) public pure returns (bytes memory) {
         if (op == HashOp.NO_HASH) {
             return preimage;
@@ -154,6 +178,143 @@ contract ICS23 {
       );
     }
 
+    function verifyNonExistence(NonExistenceProof memory proof, ProofSpec memory spec, bytes memory root, bytes memory key) public pure returns (bool) {
+      if (!proof.left.valid && !proof.right.valid) {
+        return false;
+      }
+      if (proof.left.valid) {
+        if (!verifyExistence(proof.left, spec.leafSpec, root, proof.left.key, proof.left.value)) {
+          return false;
+        }
+        if (compareBytes(key, proof.right.key) != Ordering.LT) {
+          return false;
+        }
+      }
+      if (proof.right.valid) {
+        if (!verifyExistence(proof.right, spec.leafSpec, root, proof.right.key, proof.right.value)) {
+          return false;
+        }
+        if (compareBytes(key, proof.left.key) != Ordering.GT) {
+          return false;
+        }
+      }
+
+      if (!proof.left.valid) {
+        if (!isLeftMost(spec.innerSpec, proof.right.path)) {
+          return false;
+        }
+      } else if (!proof.right.valid) {
+        if (!isRightMost(spec.innerSpec, proof.left.path)) {
+          return false;
+        }
+      } else {
+        if (!isLeftNeighbor(spec.innerSpec, proof.left.path, proof.right.path)) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    function orderFromPadding(InnerSpec memory spec, InnerOp memory op) public pure returns (uint) {
+      uint maxBranch = spec.childOrder.length;
+      
+      for (uint branch = 0; branch < maxBranch; branch++) {
+        (uint minPrefix, uint maxPrefix, uint suffix) = getPadding(spec, branch);
+        if (hasPadding(op, minPrefix, maxPrefix, suffix)) {
+          return branch;
+        }
+      }
+
+      revert();
+    }
+
+    function isLeftStep(InnerSpec memory spec, InnerOp memory left, InnerOp memory right) public pure returns (bool) {
+      uint leftidx = orderFromPadding(spec, left);
+      uint rightidx = orderFromPadding(spec, right);
+      return leftidx + 1 == rightidx;
+    }
+
+    function isLeftMost(InnerSpec memory spec, InnerOp[] memory path) public pure returns (bool) {
+      (uint minPrefix, uint maxPrefix, uint suffix) = getPadding(spec, 0);
+      
+      for (uint i = 0; i < path.length; i++) {
+        if (!hasPadding(path[i], minPrefix, maxPrefix, suffix)) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function isRightMost(InnerSpec memory spec, InnerOp[] memory path) public pure returns (bool) {
+      uint last = spec.childOrder.length - 1;
+      (uint minPrefix, uint maxPrefix, uint suffix) = getPadding(spec, last);
+
+      for (uint i = 0; i < path.length; i++) {
+        if (!hasPadding(path[i], minPrefix, maxPrefix, suffix)) {
+          return false;
+        }
+      }
+      return true;
+
+    }
+
+    function isLeftNeighbor(InnerSpec memory spec, InnerOp[] memory left, InnerOp[] memory right) public pure returns (bool) {
+      uint top = 1; 
+      for ( ;
+        equalBytes(left[left.length-top].prefix, right[right.length-top].prefix) && equalBytes(left[left.length-top].suffix, right[right.length-top].suffix); 
+        top++) {}
+
+      InnerOp memory topLeft = left[left.length-top];
+      InnerOp memory topRight = right[right.length-top];
+
+      if (!isLeftStep(spec, topLeft, topRight)) {
+        return false;
+      }
+
+      if (!isRightMost(spec, left)) {
+        return false;
+      }
+
+      if (!isLeftMost(spec, right)) {
+        return false;
+      }
+
+      return true;
+    }
+
+    function getPosition(uint[] memory order, uint branch) public pure returns (uint) {
+      require(branch < order.length);
+      for (uint i = 0; i < order.length; i++) {
+        if (order[i] == branch) {
+          return i;
+        }
+      }
+      revert();
+    }
+
+    function hasPadding(InnerOp memory op, uint minPrefix, uint maxPrefix, uint suffix) public pure returns (bool) {
+      if (op.prefix.length < minPrefix) {
+        return false;
+      }
+      if (op.prefix.length > maxPrefix) {
+        return false;
+      } 
+      return op.suffix.length == suffix;
+    }
+
+    function getPadding(InnerSpec memory spec, uint branch) public pure returns (uint, uint, uint) {
+      uint idx = getPosition(spec.childOrder, branch);
+      
+      uint prefix = idx * spec.childSize;
+      uint minPrefix = prefix + spec.minPrefixLength;
+      uint maxPrefix = prefix + spec.maxPrefixLength;
+
+      uint suffix = (spec.childOrder.length - 1 - idx) * spec.childSize;
+    
+      return (minPrefix, maxPrefix, suffix);
+    }
+
     function equalBytes(bytes memory bz1, bytes memory bz2) public pure returns (bool) {
       if (bz1.length != bz2.length) {
         return false;
@@ -165,11 +326,36 @@ contract ICS23 {
       }
       return true;
     }
-    
+   
+    function compareBytes(bytes memory bz1, bytes memory bz2) public pure returns (Ordering) {
+      for (uint i = 0; i < bz1.length && i < bz2.length; i++) {
+        if (bz1[i] < bz2[i]) {
+          return Ordering.LT;
+        }
+        if (bz1[i] > bz2[i]) {
+          return Ordering.GT;
+        }
+      }
+      if (bz1.length == bz2.length) {
+        return Ordering.EQ;
+      }
+      if (bz1.length < bz2.length) {
+        return Ordering.LT;
+      }
+      if (bz1.length > bz2.length) {
+        return Ordering.GT;
+      }
+      revert("should not reach this line");
+    }
+
     // ICS23 interface implementation
 
     // verifyMembership is synonym for verifyExistence
     function verifyMembership(LeafOp memory spec, bytes memory root, ExistenceProof memory proof, bytes memory key, bytes memory value) public pure returns (bool) {
       return verifyExistence(proof, spec, root, key, value);
+    }
+
+    function verifyNonMembership(ProofSpec memory spec, bytes memory root, NonExistenceProof memory proof, bytes memory key) public pure returns (bool) {
+      return verifyNonExistence(proof, spec, root, key);
     }
 }
