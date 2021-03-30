@@ -1,7 +1,7 @@
 // we want to name functions verify_* to match ics23
 #![allow(clippy::module_name_repetitions)]
 
-use failure::{bail, ensure};
+use anyhow::{bail, ensure};
 
 use crate::helpers::Result;
 use crate::ics23;

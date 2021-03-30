@@ -206,7 +206,7 @@ pub fn tendermint_spec() -> ics23::ProofSpec {
 mod tests {
     use super::*;
 
-    use failure::{bail, ensure};
+    use anyhow::{bail, ensure};
     use prost::Message;
     use serde::Deserialize;
     use std::fs::File;

@@ -1,4 +1,4 @@
-use failure::{bail, ensure};
+use anyhow::{bail, ensure};
 use ripemd160::Ripemd160;
 use sha2::{Digest, Sha256, Sha512};
 use sha3::Sha3_512;
