@@ -1,5 +1,3 @@
-github.com/confio/ics23/go v0.0.0-20200804135649-a9fbc744ca3d h1:VbtIIE3NDC6/aIRUR9FdmRE4l0B5IDgYHiFi8pw0QOc=
-github.com/confio/ics23/go v0.0.0-20200804135649-a9fbc744ca3d/go.mod h1:E45NqnlpxGnpfTWL/xauN7MRwEE28T4Dd4uraToOaKg=
 github.com/confio/ics23/go v0.6.3 h1:PuGK2V1NJWZ8sSkNDq91jgT/cahFEW9RGp4Y5jxulf0=
 github.com/confio/ics23/go v0.6.3/go.mod h1:E45NqnlpxGnpfTWL/xauN7MRwEE28T4Dd4uraToOaKg=
 github.com/gogo/protobuf v1.3.1 h1:DqDEcV5aeaTmdFBePNpYsp3FlcVH/2ISVVM9Qf8PSls=
