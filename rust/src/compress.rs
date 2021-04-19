@@ -114,22 +114,14 @@ pub fn decompress_batch(proof: &ics23::CompressedBatchProof) -> Result<ics23::Co
         .map(|cent| -> Result<ics23::BatchEntry> {
             match &cent.proof {
                 Some(ics23::compressed_batch_entry::Proof::Exist(ex)) => {
-                    let exist = decompress_exist(&ex, &lookup)?;
+                    let exist = decompress_exist(&ex, &lookup);
                     Ok(ics23::BatchEntry {
                         proof: Some(ics23::batch_entry::Proof::Exist(exist)),
                     })
                 }
                 Some(ics23::compressed_batch_entry::Proof::Nonexist(non)) => {
-                    let left = non
-                        .left
-                        .clone()
-                        .map(|l| decompress_exist(&l, &lookup))
-                        .transpose()?;
-                    let right = non
-                        .right
-                        .clone()
-                        .map(|r| decompress_exist(&r, &lookup))
-                        .transpose()?;
+                    let left = non.left.clone().map(|l| decompress_exist(&l, &lookup));
+                    let right = non.right.clone().map(|r| decompress_exist(&r, &lookup));
                     let nonexist = ics23::NonExistenceProof {
                         key: non.key.clone(),
                         left,
@@ -154,17 +146,17 @@ pub fn decompress_batch(proof: &ics23::CompressedBatchProof) -> Result<ics23::Co
 fn decompress_exist(
     exist: &ics23::CompressedExistenceProof,
     lookup: &[ics23::InnerOp],
-) -> Result<ics23::ExistenceProof> {
+) -> ics23::ExistenceProof {
     let path = exist
         .path
         .iter()
         .map(|&x| lookup.get(x as usize).cloned())
         .collect::<Option<Vec<_>>>()
-        .unwrap();
-    Ok(ics23::ExistenceProof {
+        .unwrap_or_default();
+    ics23::ExistenceProof {
         key: exist.key.clone(),
         value: exist.value.clone(),
         leaf: exist.leaf.clone(),
         path,
-    })
+    }
 }

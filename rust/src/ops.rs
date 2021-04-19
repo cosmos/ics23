@@ -12,7 +12,7 @@ pub fn apply_inner(inner: &InnerOp, child: &[u8]) -> Result<Hash> {
     let mut image = inner.prefix.clone();
     image.extend(child);
     image.extend(&inner.suffix);
-    do_hash(inner.hash(), &image)
+    Ok(do_hash(inner.hash(), &image))
 }
 
 // apply_leaf will take a key, value pair and a LeafOp and return a LeafHash
@@ -22,26 +22,26 @@ pub fn apply_leaf(leaf: &LeafOp, key: &[u8], value: &[u8]) -> Result<Hash> {
     hash.extend(prekey);
     let preval = prepare_leaf_data(leaf.prehash_value(), leaf.length(), value)?;
     hash.extend(preval);
-    do_hash(leaf.hash(), &hash)
+    Ok(do_hash(leaf.hash(), &hash))
 }
 
 fn prepare_leaf_data(prehash: HashOp, length: LengthOp, data: &[u8]) -> Result<Hash> {
     ensure!(!data.is_empty(), "Input to prepare_leaf_data missing");
-    let h = do_hash(prehash, data)?;
+    let h = do_hash(prehash, data);
     do_length(length, &h)
 }
 
-fn do_hash(hash: HashOp, data: &[u8]) -> Result<Hash> {
+fn do_hash(hash: HashOp, data: &[u8]) -> Hash {
     match hash {
-        HashOp::NoHash => Ok(Hash::from(data)),
-        HashOp::Sha256 => Ok(Hash::from(Sha256::digest(data).as_slice())),
-        HashOp::Sha512 => Ok(Hash::from(Sha512::digest(data).as_slice())),
-        HashOp::Keccak => Ok(Hash::from(Sha3_512::digest(data).as_slice())),
-        HashOp::Ripemd160 => Ok(Hash::from(Ripemd160::digest(data).as_slice())),
-        HashOp::Bitcoin => Ok(Hash::from(
-            Ripemd160::digest(Sha256::digest(data).as_slice()).as_slice(),
-        )),
-        HashOp::Sha512_256 => Ok(Hash::from(Sha512Trunc256::digest(data).as_slice())),
+        HashOp::NoHash => Hash::from(data),
+        HashOp::Sha256 => Hash::from(Sha256::digest(data).as_slice()),
+        HashOp::Sha512 => Hash::from(Sha512::digest(data).as_slice()),
+        HashOp::Keccak => Hash::from(Sha3_512::digest(data).as_slice()),
+        HashOp::Ripemd160 => Hash::from(Ripemd160::digest(data).as_slice()),
+        HashOp::Bitcoin => {
+            Hash::from(Ripemd160::digest(Sha256::digest(data).as_slice()).as_slice())
+        }
+        HashOp::Sha512_256 => Hash::from(Sha512Trunc256::digest(data).as_slice()),
     }
 }
 
@@ -77,43 +77,43 @@ fn proto_len(length: usize) -> Result<Hash> {
 mod tests {
     use super::*;
 
-    #[test]
-    fn hashing_food() -> Result<()> {
-        let hash = do_hash(HashOp::NoHash, b"food")?;
-        ensure!(hash == hex::decode("666f6f64")?, "no hash fails");
+    fn decode(input: &str) -> Vec<u8> {
+        hex::decode(input).unwrap()
+    }
 
-        let hash = do_hash(HashOp::Sha256, b"food")?;
-        ensure!(
-            hash == hex::decode(
-                "c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b"
-            )?,
+    #[test]
+    fn hashing_food() {
+        let hash = do_hash(HashOp::NoHash, b"food");
+        assert!(hash == hex::decode("666f6f64").unwrap(), "no hash fails");
+
+        let hash = do_hash(HashOp::Sha256, b"food");
+        assert!(
+            hash == hex::decode("c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b")
+                .unwrap(),
             "sha256 hash fails"
         );
 
-        let hash = do_hash(HashOp::Sha512, b"food")?;
-        ensure!(hash == hex::decode("c235548cfe84fc87678ff04c9134e060cdcd7512d09ed726192151a995541ed8db9fda5204e72e7ac268214c322c17787c70530513c59faede52b7dd9ce64331")?, "sha512 hash fails");
+        let hash = do_hash(HashOp::Sha512, b"food");
+        assert!(hash == hex::decode("c235548cfe84fc87678ff04c9134e060cdcd7512d09ed726192151a995541ed8db9fda5204e72e7ac268214c322c17787c70530513c59faede52b7dd9ce64331").unwrap(), "sha512 hash fails");
 
-        let hash = do_hash(HashOp::Ripemd160, b"food")?;
-        ensure!(
-            hash == hex::decode("b1ab9988c7c7c5ec4b2b291adfeeee10e77cdd46")?,
+        let hash = do_hash(HashOp::Ripemd160, b"food");
+        assert!(
+            hash == hex::decode("b1ab9988c7c7c5ec4b2b291adfeeee10e77cdd46").unwrap(),
             "ripemd160 hash fails"
         );
 
-        let hash = do_hash(HashOp::Bitcoin, b"food")?;
-        ensure!(
-            hash == hex::decode("0bcb587dfb4fc10b36d57f2bba1878f139b75d24")?,
+        let hash = do_hash(HashOp::Bitcoin, b"food");
+        assert!(
+            hash == hex::decode("0bcb587dfb4fc10b36d57f2bba1878f139b75d24").unwrap(),
             "bitcoin hash fails"
         );
 
-        let hash = do_hash(HashOp::Sha512_256, b"food")?;
-        ensure!(
-            hash == hex::decode(
-                "5b3a452a6acbf1fc1e553a40c501585d5bd3cca176d562e0a0e19a3c43804e88"
-            )?,
+        let hash = do_hash(HashOp::Sha512_256, b"food");
+        assert!(
+            hash == hex::decode("5b3a452a6acbf1fc1e553a40c501585d5bd3cca176d562e0a0e19a3c43804e88")
+                .unwrap(),
             "sha512/256 hash fails"
         );
-
-        Ok(())
     }
 
     #[test]
