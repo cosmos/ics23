@@ -50,6 +50,16 @@ describe("applyLeaf", () => {
     expect(applyLeaf(op, key, value)).toEqual(expected);
   });
 
+  it("hashes food with sha-512/256", () => {
+    const op: ics23.ILeafOp = { hash: ics23.HashOp.SHA512_256 };
+    const key = toAscii("fo");
+    const value = toAscii("od");
+    const expected = fromHex(
+      "5b3a452a6acbf1fc1e553a40c501585d5bd3cca176d562e0a0e19a3c43804e88"
+    );
+    expect(applyLeaf(op, key, value)).toEqual(expected);
+  });
+
   it("hashes foobar (different breakpoint)", () => {
     const op: ics23.ILeafOp = { hash: ics23.HashOp.SHA256 };
     const key = toAscii("f");

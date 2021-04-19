@@ -1,6 +1,6 @@
 use anyhow::{bail, ensure};
 use ripemd160::Ripemd160;
-use sha2::{Digest, Sha256, Sha512};
+use sha2::{Digest, Sha256, Sha512, Sha512Trunc256};
 use sha3::Sha3_512;
 use std::convert::TryInto;
 
@@ -41,6 +41,7 @@ fn do_hash(hash: HashOp, data: &[u8]) -> Result<Hash> {
         HashOp::Bitcoin => Ok(Hash::from(
             Ripemd160::digest(Sha256::digest(data).as_slice()).as_slice(),
         )),
+        HashOp::Sha512_256 => Ok(Hash::from(Sha512Trunc256::digest(data).as_slice())),
     }
 }
 
@@ -97,6 +98,14 @@ mod tests {
         ensure!(
             hash == hex::decode("0bcb587dfb4fc10b36d57f2bba1878f139b75d24")?,
             "bitcoin hash fails"
+        );
+
+        let hash = do_hash(HashOp::Sha512_256, b"food")?;
+        ensure!(
+            hash == hex::decode(
+                "5b3a452a6acbf1fc1e553a40c501585d5bd3cca176d562e0a0e19a3c43804e88"
+            )?,
+            "sha512/256 hash fails"
         );
 
         Ok(())

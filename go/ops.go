@@ -131,6 +131,10 @@ func doHash(hashOp HashOp, preimage []byte) ([]byte, error) {
 		hash := crypto.RIPEMD160.New()
 		hash.Write(tmp)
 		return hash.Sum(nil), nil
+	case HashOp_SHA512_256:
+		hash := crypto.SHA512_256.New()
+		hash.Write(preimage)
+		return hash.Sum(nil), nil
 	}
 	return nil, errors.Errorf("Unsupported hashop: %d", hashOp)
 }

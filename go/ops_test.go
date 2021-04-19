@@ -199,6 +199,12 @@ func TestDoHash(t *testing.T) {
 			// echo -n c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b | xxd -r -p | openssl dgst -rmd160 -hex
 			expectedHash: "0bcb587dfb4fc10b36d57f2bba1878f139b75d24",
 		},
+		"sha512_256": {
+			hashOp:   HashOp_SHA512_256,
+			preimage: "food",
+			// echo -n food | openssl dgst -sha512-256 -hex | cut -d' ' -f2
+			expectedHash: "5b3a452a6acbf1fc1e553a40c501585d5bd3cca176d562e0a0e19a3c43804e88",
+		},
 	}
 
 	for name, tc := range cases {

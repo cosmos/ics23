@@ -252,6 +252,7 @@ pub enum HashOp {
     Ripemd160 = 4,
     /// ripemd160(sha256(x))
     Bitcoin = 5,
+    Sha512_256 = 6,
 }
 ///*
 ///LengthOp defines how to process the key and value of the LeafOp

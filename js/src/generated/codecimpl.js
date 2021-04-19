@@ -28,6 +28,7 @@ $root.ics23 = (function() {
      * @property {number} KECCAK=3 KECCAK value
      * @property {number} RIPEMD160=4 RIPEMD160 value
      * @property {number} BITCOIN=5 BITCOIN value
+     * @property {number} SHA512_256=6 SHA512_256 value
      */
     ics23.HashOp = (function() {
         var valuesById = {}, values = Object.create(valuesById);
@@ -37,6 +38,7 @@ $root.ics23 = (function() {
         values[valuesById[3] = "KECCAK"] = 3;
         values[valuesById[4] = "RIPEMD160"] = 4;
         values[valuesById[5] = "BITCOIN"] = 5;
+        values[valuesById[6] = "SHA512_256"] = 6;
         return values;
     })();
 
@@ -1161,6 +1163,7 @@ $root.ics23 = (function() {
                 case 3:
                 case 4:
                 case 5:
+                case 6:
                     break;
                 }
             if (message.prehashKey != null && message.hasOwnProperty("prehashKey"))
@@ -1173,6 +1176,7 @@ $root.ics23 = (function() {
                 case 3:
                 case 4:
                 case 5:
+                case 6:
                     break;
                 }
             if (message.prehashValue != null && message.hasOwnProperty("prehashValue"))
@@ -1185,6 +1189,7 @@ $root.ics23 = (function() {
                 case 3:
                 case 4:
                 case 5:
+                case 6:
                     break;
                 }
             if (message.length != null && message.hasOwnProperty("length"))
@@ -1245,6 +1250,10 @@ $root.ics23 = (function() {
             case 5:
                 message.hash = 5;
                 break;
+            case "SHA512_256":
+            case 6:
+                message.hash = 6;
+                break;
             }
             switch (object.prehashKey) {
             case "NO_HASH":
@@ -1271,6 +1280,10 @@ $root.ics23 = (function() {
             case 5:
                 message.prehashKey = 5;
                 break;
+            case "SHA512_256":
+            case 6:
+                message.prehashKey = 6;
+                break;
             }
             switch (object.prehashValue) {
             case "NO_HASH":
@@ -1296,6 +1309,10 @@ $root.ics23 = (function() {
             case "BITCOIN":
             case 5:
                 message.prehashValue = 5;
+                break;
+            case "SHA512_256":
+            case 6:
+                message.prehashValue = 6;
                 break;
             }
             switch (object.length) {
@@ -1579,6 +1596,7 @@ $root.ics23 = (function() {
                 case 3:
                 case 4:
                 case 5:
+                case 6:
                     break;
                 }
             if (message.prefix != null && message.hasOwnProperty("prefix"))
@@ -1626,6 +1644,10 @@ $root.ics23 = (function() {
             case "BITCOIN":
             case 5:
                 message.hash = 5;
+                break;
+            case "SHA512_256":
+            case 6:
+                message.hash = 6;
                 break;
             }
             if (object.prefix != null)
@@ -2208,6 +2230,7 @@ $root.ics23 = (function() {
                 case 3:
                 case 4:
                 case 5:
+                case 6:
                     break;
                 }
             return null;
@@ -2267,6 +2290,10 @@ $root.ics23 = (function() {
             case "BITCOIN":
             case 5:
                 message.hash = 5;
+                break;
+            case "SHA512_256":
+            case 6:
+                message.hash = 6;
                 break;
             }
             return message;

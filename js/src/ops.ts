@@ -1,3 +1,4 @@
+import { sha512_256 } from "js-sha512";
 import ripemd160 from "ripemd160";
 import shajs from "sha.js";
 
@@ -109,6 +110,8 @@ export function doHash(hashOp: ics23.HashOp, preimage: Uint8Array): Uint8Array {
       return rp160(preimage);
     case ics23.HashOp.BITCOIN:
       return rp160(s256(preimage));
+    case ics23.HashOp.SHA512_256:
+      return new Uint8Array(sha512_256.arrayBuffer(preimage));
   }
   throw new Error(`Unsupported hashop: ${hashOp}`);
 }
