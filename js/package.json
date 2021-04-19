@@ -47,6 +47,7 @@
   "dependencies": {
     "protobufjs": "^6.8.8",
     "ripemd160": "^2.0.2",
-    "sha.js": "^2.4.11"
+    "sha.js": "^2.4.11",
+    "js-sha512": "^0.8.0"
   }
 }

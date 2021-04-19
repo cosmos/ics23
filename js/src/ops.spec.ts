@@ -50,6 +50,16 @@ describe("applyLeaf", () => {
     expect(applyLeaf(op, key, value)).toEqual(expected);
   });
 
+  it("hashes food with sha-512/256", () => {
+    const op: ics23.ILeafOp = { hash: ics23.HashOp.SHA512_256 };
+    const key = toAscii("fo");
+    const value = toAscii("od");
+    const expected = fromHex(
+      "5b3a452a6acbf1fc1e553a40c501585d5bd3cca176d562e0a0e19a3c43804e88"
+    );
+    expect(applyLeaf(op, key, value)).toEqual(expected);
+  });
+
   it("hashes foobar (different breakpoint)", () => {
     const op: ics23.ILeafOp = { hash: ics23.HashOp.SHA256 };
     const key = toAscii("f");
@@ -72,6 +82,21 @@ describe("applyLeaf", () => {
     // echo -n 04666f6f6410736f6d65206c6f6e6765722074657874 | xxd -r -p | sha256sum -b
     const expected = fromHex(
       "b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"
+    );
+    expect(applyLeaf(op, key, value)).toEqual(expected);
+  });
+
+  it("hashes with length prefix (fixed 32-bit little-endian encoding)", () => {
+    const op: ics23.ILeafOp = {
+      hash: ics23.HashOp.SHA256,
+      length: ics23.LengthOp.FIXED32_LITTLE
+    };
+    // echo -n food | xxd -ps
+    const key = toAscii("food"); // 04000000666f6f64
+    const value = toAscii("some longer text"); // 10000000736f6d65206c6f6e6765722074657874
+    // echo -n 04000000666f6f6410000000736f6d65206c6f6e6765722074657874 | xxd -r -p | sha256sum
+    const expected = fromHex(
+      "c853652437be02501c674744bf2a2b45d92a0a9f29c4b1044010fb3e2d43a949"
     );
     expect(applyLeaf(op, key, value)).toEqual(expected);
   });

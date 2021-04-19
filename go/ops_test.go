@@ -86,6 +86,19 @@ func TestLeafOp(t *testing.T) {
 			// echo -n 04666f6f6420a48c2d4f67b9f80374938535285ed285819d8a5a8fc1fccd1e3244e437cf290d | xxd -r -p | sha256sum
 			expected: fromHex("87e0483e8fb624aef2e2f7b13f4166cda485baa8e39f437c83d74c94bedb148f"),
 		},
+		"hash with length prefix (fixed 32-bit little-endian encoding)": {
+			op: &LeafOp{
+				Hash:   HashOp_SHA256,
+				Length: LengthOp_FIXED32_LITTLE,
+				// no prehash
+			},
+			// echo -n food | xxs -ps
+			// and manually compute length bytes
+			key:   []byte("food"),             // 04000000666f6f64
+			value: []byte("some longer text"), // 10000000736f6d65206c6f6e6765722074657874
+			// echo -n 04000000666f6f6410000000736f6d65206c6f6e6765722074657874 | xxd -r -p | sha256sum
+			expected: fromHex("c853652437be02501c674744bf2a2b45d92a0a9f29c4b1044010fb3e2d43a949"),
+		},
 	}
 
 	for name, tc := range cases {
@@ -198,6 +211,12 @@ func TestDoHash(t *testing.T) {
 			preimage: "food",
 			// echo -n c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b | xxd -r -p | openssl dgst -rmd160 -hex
 			expectedHash: "0bcb587dfb4fc10b36d57f2bba1878f139b75d24",
+		},
+		"sha512_256": {
+			hashOp:   HashOp_SHA512_256,
+			preimage: "food",
+			// echo -n food | openssl dgst -sha512-256 -hex | cut -d' ' -f2
+			expectedHash: "5b3a452a6acbf1fc1e553a40c501585d5bd3cca176d562e0a0e19a3c43804e88",
 		},
 	}
 

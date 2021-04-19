@@ -1,6 +1,6 @@
 use anyhow::{bail, ensure};
 use ripemd160::Ripemd160;
-use sha2::{Digest, Sha256, Sha512};
+use sha2::{Digest, Sha256, Sha512, Sha512Trunc256};
 use sha3::Sha3_512;
 use std::convert::TryInto;
 
@@ -41,6 +41,7 @@ fn do_hash(hash: HashOp, data: &[u8]) -> Result<Hash> {
         HashOp::Bitcoin => Ok(Hash::from(
             Ripemd160::digest(Sha256::digest(data).as_slice()).as_slice(),
         )),
+        HashOp::Sha512_256 => Ok(Hash::from(Sha512Trunc256::digest(data).as_slice())),
     }
 }
 
@@ -51,6 +52,11 @@ fn do_length(length: LengthOp, data: &[u8]) -> Result<Hash> {
         LengthOp::Require64Bytes => ensure!(data.len() == 64, "Invalid length"),
         LengthOp::VarProto => {
             let mut len = proto_len(data.len())?;
+            len.extend(data);
+            return Ok(len);
+        }
+        LengthOp::Fixed32Little => {
+            let mut len = (data.len() as u32).to_le_bytes().to_vec();
             len.extend(data);
             return Ok(len);
         }
@@ -99,6 +105,14 @@ mod tests {
             "bitcoin hash fails"
         );
 
+        let hash = do_hash(HashOp::Sha512_256, b"food")?;
+        ensure!(
+            hash == hex::decode(
+                "5b3a452a6acbf1fc1e553a40c501585d5bd3cca176d562e0a0e19a3c43804e88"
+            )?,
+            "sha512/256 hash fails"
+        );
+
         Ok(())
     }
 
@@ -113,6 +127,13 @@ mod tests {
         let prefixed = do_length(LengthOp::VarProto, b"food")?;
         ensure!(
             prefixed == hex::decode("04666f6f64")?,
+            "proto prefix returned {}",
+            hex::encode(&prefixed),
+        );
+
+        let prefixed = do_length(LengthOp::Fixed32Little, b"food")?;
+        ensure!(
+            prefixed == hex::decode("04000000666f6f64")?,
             "proto prefix returned {}",
             hex::encode(&prefixed),
         );
