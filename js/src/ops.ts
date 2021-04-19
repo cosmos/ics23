@@ -134,11 +134,12 @@ function doLengthOp(lengthOp: ics23.LengthOp, data: Uint8Array): Uint8Array {
         throw new Error(`Length is ${data.length}, not 64 bytes`);
       }
       return data;
+    case ics23.LengthOp.FIXED32_LITTLE:
+      return new Uint8Array([...encodeFixed32LE(data.length), ...data]);
     // TODO
     // case LengthOp_VAR_RLP:
     // case LengthOp_FIXED32_BIG:
     // case LengthOp_FIXED64_BIG:
-    // case LengthOp_FIXED32_LITTLE:
     // case LengthOp_FIXED64_LITTLE:
   }
   throw new Error(`Unsupported lengthop: ${lengthOp}`);
@@ -154,4 +155,16 @@ function encodeVarintProto(n: number): Uint8Array {
   }
   enc = [...enc, l];
   return new Uint8Array(enc);
+}
+
+function encodeFixed32LE(n: number): Uint8Array {
+  const enc = new Uint8Array(4);
+  let l = n;
+  for (let i = enc.length; i > 0; i--) {
+    /* tslint:disable */
+    enc[Math.abs(i - enc.length)] = l % 256;
+    /* tslint:enable */
+    l = Math.floor(l / 256);
+  }
+  return enc;
 }

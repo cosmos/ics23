@@ -3,6 +3,7 @@ package ics23
 import (
 	"bytes"
 	"crypto"
+	"encoding/binary"
 
 	// adds sha256 capability to crypto.SHA256
 	_ "crypto/sha256"
@@ -158,11 +159,15 @@ func doLengthOp(lengthOp LengthOp, data []byte) ([]byte, error) {
 			return nil, errors.Errorf("Data was %d bytes, not 64", len(data))
 		}
 		return data, nil
+	case LengthOp_FIXED32_LITTLE:
+		res := make([]byte, 4, 4+len(data))
+		binary.LittleEndian.PutUint32(res[:4], uint32(len(data)))
+		res = append(res, data...)
+		return res, nil
 		// TODO
 		// case LengthOp_VAR_RLP:
 		// case LengthOp_FIXED32_BIG:
 		// case LengthOp_FIXED64_BIG:
-		// case LengthOp_FIXED32_LITTLE:
 		// case LengthOp_FIXED64_LITTLE:
 	}
 	return nil, errors.Errorf("Unsupported lengthop: %d", lengthOp)

@@ -55,6 +55,11 @@ fn do_length(length: LengthOp, data: &[u8]) -> Result<Hash> {
             len.extend(data);
             return Ok(len);
         }
+        LengthOp::Fixed32Little => {
+            let mut len = (data.len() as u32).to_le_bytes().to_vec();
+            len.extend(data);
+            return Ok(len);
+        }
         _ => bail!("Unsupported LengthOp {:?}", length),
     }
     // if we don't error above or return custom string, just return item untouched (common case)
@@ -122,6 +127,13 @@ mod tests {
         let prefixed = do_length(LengthOp::VarProto, b"food")?;
         ensure!(
             prefixed == hex::decode("04666f6f64")?,
+            "proto prefix returned {}",
+            hex::encode(&prefixed),
+        );
+
+        let prefixed = do_length(LengthOp::Fixed32Little, b"food")?;
+        ensure!(
+            prefixed == hex::decode("04000000666f6f64")?,
             "proto prefix returned {}",
             hex::encode(&prefixed),
         );

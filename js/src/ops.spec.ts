@@ -86,6 +86,21 @@ describe("applyLeaf", () => {
     expect(applyLeaf(op, key, value)).toEqual(expected);
   });
 
+  it("hashes with length prefix (fixed 32-bit little-endian encoding)", () => {
+    const op: ics23.ILeafOp = {
+      hash: ics23.HashOp.SHA256,
+      length: ics23.LengthOp.FIXED32_LITTLE
+    };
+    // echo -n food | xxd -ps
+    const key = toAscii("food"); // 04000000666f6f64
+    const value = toAscii("some longer text"); // 10000000736f6d65206c6f6e6765722074657874
+    // echo -n 04000000666f6f6410000000736f6d65206c6f6e6765722074657874 | xxd -r -p | sha256sum
+    const expected = fromHex(
+      "c853652437be02501c674744bf2a2b45d92a0a9f29c4b1044010fb3e2d43a949"
+    );
+    expect(applyLeaf(op, key, value)).toEqual(expected);
+  });
+
   it("hashes with prehash and length prefix", () => {
     const op: ics23.ILeafOp = {
       hash: ics23.HashOp.SHA256,
