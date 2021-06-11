@@ -61,7 +61,13 @@ jobs:
           keys:
             - v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
       - run:
-          name: Build all targets
+          name: Check all targets in std
+          command: cargo check --all
+      - run:
+          name: Check all target in no_std
+          command: cargo check --no-default-features --all
+      - run:
+          name: Build all targets in std
           command: cargo build --all --all-targets
       - save_cache:
           paths:
