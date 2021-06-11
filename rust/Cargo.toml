@@ -14,9 +14,6 @@ members = ["codegen"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 prost = { version = "0.7.0", default-features = false, features = ["prost-derive"] }
-# Only necessary if using Protobuf well-known types:
-#prost-types = { version = "0.6", default-features = false }
-#prost = { version = "0.7.0", default-features = false }
 bytes = { version = "1.0.1", default-features = false }
 hex = { version = "0.4.3", default-features = false }
 sha2 = { version = "0.9.3", default-features = false }
