@@ -187,6 +187,7 @@ dependencies = [
  "anyhow",
  "bytes 1.0.1",
  "hex",
+ "no-std-compat",
  "prost 0.7.0",
  "ripemd160",
  "serde",
@@ -264,6 +265,12 @@ name = "multimap"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2eb04b9f127583ed176e163fb9ec6f3e793b87e21deedd5734a69386a18a0151"
+
+[[package]]
+name = "no-std-compat"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b93853da6d84c2e3c7d730d6473e8817692dd89be387eb01b94d7f108ecb5b8c"
 
 [[package]]
 name = "object"

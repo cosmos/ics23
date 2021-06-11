@@ -1,5 +1,5 @@
-use std::collections::HashMap;
-use std::hash::BuildHasher;
+use std::collections::btree_map::BTreeMap as HashMap;
+use std::prelude::v1::*;
 
 use crate::compress::{decompress, is_compressed};
 use crate::ics23;
@@ -64,11 +64,11 @@ pub fn verify_non_membership(
 }
 
 #[allow(clippy::ptr_arg)]
-pub fn verify_batch_membership<G: BuildHasher>(
+pub fn verify_batch_membership(
     proof: &ics23::CommitmentProof,
     spec: &ics23::ProofSpec,
     root: &CommitmentRoot,
-    items: HashMap<&[u8], &[u8], G>,
+    items: HashMap<&[u8], &[u8]>,
 ) -> bool {
     // ugly attempt to conditionally decompress...
     let mut proof = proof;
