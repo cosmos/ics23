@@ -1,6 +1,11 @@
 #![cfg_attr(not(feature = "std"), no_std)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
 
-extern crate no_std_compat as std;
+extern crate alloc;
+extern crate core;
+extern crate sp_std as std;
+
 mod api;
 mod compress;
 mod helpers;
