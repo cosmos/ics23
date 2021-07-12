@@ -204,6 +204,7 @@ pub fn tendermint_spec() -> ics23::ProofSpec {
     }
 }
 
+#[cfg(feature = "std")]
 #[cfg(test)]
 mod tests {
     extern crate std as _std;

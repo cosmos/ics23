@@ -77,6 +77,7 @@ fn proto_len(length: usize) -> Result<Hash> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(not(feature = "std"))]
     use std::prelude::*;
     use std::vec::Vec;
 
