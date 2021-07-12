@@ -3,6 +3,8 @@ use ripemd160::Ripemd160;
 use sha2::{Digest, Sha256, Sha512, Sha512Trunc256};
 use sha3::Sha3_512;
 use std::convert::TryInto;
+use alloc::format;
+
 
 use crate::helpers::{Hash, Result};
 use crate::ics23::{HashOp, InnerOp, LeafOp, LengthOp};
@@ -76,6 +78,8 @@ fn proto_len(length: usize) -> Result<Hash> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::vec::Vec;
+    use std::prelude::*;
 
     fn decode(input: &str) -> Vec<u8> {
         hex::decode(input).unwrap()

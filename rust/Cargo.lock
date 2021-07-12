@@ -193,6 +193,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "sha3",
+ "sp-std",
 ]
 
 [[package]]
@@ -539,6 +540,12 @@ dependencies = [
  "keccak",
  "opaque-debug",
 ]
+
+[[package]]
+name = "sp-std"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "35391ea974fa5ee869cb094d5b437688fbf3d8127d64d1b9fed5822a1ed39b12"
 
 [[package]]
 name = "syn"
