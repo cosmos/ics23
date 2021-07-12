@@ -520,12 +520,7 @@ mod tests {
         for (name, tc) in cases {
             let check = check_existence_spec(&tc.proof, &tc.spec);
             if tc.valid {
-                assert!(
-                    check.is_ok(),
-                    "{} should be ok, got err {}",
-                    name,
-                    check.unwrap_err()
-                );
+                check.expect(name);
             } else {
                 assert!(check.is_err(), "{} should be an error", name);
             }
