@@ -264,6 +264,7 @@ mod tests {
     use crate::api;
     use crate::ics23::{ExistenceProof, HashOp, InnerOp, LeafOp, LengthOp, ProofSpec};
     use std::collections::btree_map::BTreeMap as HashMap;
+    #[cfg(not(feature = "std"))]
     use std::prelude::*;
 
     #[test]
