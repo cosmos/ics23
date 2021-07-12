@@ -1,7 +1,7 @@
 use prost::Message;
+use std::borrow::ToOwned;
 use std::collections::btree_map::BTreeMap as HashMap;
 use std::vec::Vec;
-use std::borrow::ToOwned;
 
 use crate::helpers::Result;
 use crate::ics23;
@@ -87,9 +87,8 @@ pub fn compress_exist(
         .iter()
         .map(|x| {
             let mut buf = Vec::new();
-            x.encode(&mut buf).map_err(|e : prost::EncodeError | {
-                anyhow::anyhow!(e)
-            })?;
+            x.encode(&mut buf)
+                .map_err(|e: prost::EncodeError| anyhow::anyhow!(e))?;
 
             if let Some(&idx) = registry.get(buf.as_slice()) {
                 return Ok(idx);

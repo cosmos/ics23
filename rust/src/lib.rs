@@ -1,9 +1,9 @@
 #![cfg_attr(not(feature = "std"), no_std)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
+#![allow(clippy::large_enum_variant)]
 
 extern crate alloc;
 extern crate core;
+#[cfg(not(feature = "std"))]
 extern crate sp_std as std;
 
 mod api;

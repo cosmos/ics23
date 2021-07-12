@@ -6,8 +6,8 @@ use anyhow::{bail, ensure};
 use crate::helpers::Result;
 use crate::ics23;
 use crate::ops::{apply_inner, apply_leaf};
-use std::vec::Vec;
 use alloc::format;
+use std::vec::Vec;
 
 pub type CommitmentRoot = ::std::vec::Vec<u8>;
 
@@ -264,8 +264,8 @@ mod tests {
     use crate::api;
     use crate::ics23::{ExistenceProof, HashOp, InnerOp, LeafOp, LengthOp, ProofSpec};
     use std::collections::btree_map::BTreeMap as HashMap;
+    #[cfg(not(feature = "std"))]
     use std::prelude::*;
-
 
     #[test]
     fn calculate_root_from_leaf() {
@@ -520,12 +520,7 @@ mod tests {
         for (name, tc) in cases {
             let check = check_existence_spec(&tc.proof, &tc.spec);
             if tc.valid {
-                assert!(
-                    check.is_ok(),
-                    "{} should be ok, got err {}",
-                    name,
-                    check.unwrap_err()
-                );
+                check.expect(name);
             } else {
                 assert!(check.is_err(), "{} should be an error", name);
             }

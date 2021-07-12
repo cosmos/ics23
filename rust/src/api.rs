@@ -1,4 +1,4 @@
-use std::collections::btree_map::BTreeMap as HashMap;
+use std::collections::btree_map::BTreeMap;
 
 #[cfg(not(feature = "std"))]
 use std::prelude::*;
@@ -70,7 +70,7 @@ pub fn verify_batch_membership(
     proof: &ics23::CommitmentProof,
     spec: &ics23::ProofSpec,
     root: &CommitmentRoot,
-    items: HashMap<&[u8], &[u8]>,
+    items: BTreeMap<&[u8], &[u8]>,
 ) -> bool {
     // ugly attempt to conditionally decompress...
     let mut proof = proof;
@@ -204,20 +204,21 @@ pub fn tendermint_spec() -> ics23::ProofSpec {
     }
 }
 
+#[cfg(feature = "std")]
 #[cfg(test)]
 mod tests {
     extern crate std as _std;
     use super::*;
 
-    use anyhow::{bail, ensure};
-    use prost::Message;
-    use serde::Deserialize;
     #[cfg(feature = "std")]
     use _std::fs::File;
     #[cfg(feature = "std")]
     use _std::io::prelude::*;
-    use std::vec::Vec;
     use alloc::string::String;
+    use anyhow::{bail, ensure};
+    use prost::Message;
+    use serde::Deserialize;
+    use std::vec::Vec;
 
     use crate::compress::compress;
     use crate::helpers::Result;
@@ -398,7 +399,7 @@ mod tests {
         if let Some(value) = &data.value {
             let valid = super::verify_membership(&proof, spec, &data.root, &data.key, &value);
             ensure!(valid, "invalid test vector");
-            let mut items = HashMap::new();
+            let mut items = BTreeMap::new();
             items.insert(data.key.as_slice(), value.as_slice());
             let valid = super::verify_batch_membership(&proof, spec, &data.root, items);
             ensure!(valid, "invalid test vector");
