@@ -209,15 +209,15 @@ mod tests {
     extern crate std as _std;
     use super::*;
 
-    use anyhow::{bail, ensure};
-    use prost::Message;
-    use serde::Deserialize;
     #[cfg(feature = "std")]
     use _std::fs::File;
     #[cfg(feature = "std")]
     use _std::io::prelude::*;
-    use std::vec::Vec;
     use alloc::string::String;
+    use anyhow::{bail, ensure};
+    use prost::Message;
+    use serde::Deserialize;
+    use std::vec::Vec;
 
     use crate::compress::compress;
     use crate::helpers::Result;
