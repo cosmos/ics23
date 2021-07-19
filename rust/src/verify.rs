@@ -22,7 +22,7 @@ pub fn verify_existence(
     ensure!(proof.key == key, "Provided key doesn't match proof");
     ensure!(proof.value == value, "Provided value doesn't match proof");
 
-    let calc = calculate_existence_root(&proof)?;
+    let calc = calculate_existence_root(proof)?;
     ensure!(calc == root, "Root hash doesn't match");
     Ok(())
 }
@@ -34,11 +34,11 @@ pub fn verify_non_existence(
     key: &[u8],
 ) -> Result<()> {
     if let Some(left) = &proof.left {
-        verify_existence(&left, spec, root, &left.key, &left.value)?;
+        verify_existence(left, spec, root, &left.key, &left.value)?;
         ensure!(key > left.key.as_slice(), "left key isn't before key");
     }
     if let Some(right) = &proof.right {
-        verify_existence(&right, spec, root, &right.key, &right.value)?;
+        verify_existence(right, spec, root, &right.key, &right.value)?;
         ensure!(key < right.key.as_slice(), "right key isn't after key");
     }
 

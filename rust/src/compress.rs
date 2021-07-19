@@ -7,11 +7,7 @@ use crate::helpers::Result;
 use crate::ics23;
 
 pub fn is_compressed(proof: &ics23::CommitmentProof) -> bool {
-    if let Some(ics23::commitment_proof::Proof::Compressed(_)) = &proof.proof {
-        true
-    } else {
-        false
-    }
+    matches!(&proof.proof, Some(ics23::commitment_proof::Proof::Compressed(_)))
 }
 
 pub fn compress(proof: &ics23::CommitmentProof) -> Result<ics23::CommitmentProof> {
@@ -38,7 +34,7 @@ pub fn compress_batch(proof: &ics23::BatchProof) -> Result<ics23::CommitmentProo
     for entry in &proof.entries {
         let centry = match &entry.proof {
             Some(ics23::batch_entry::Proof::Exist(ex)) => {
-                let exist = compress_exist(&ex, &mut lookup, &mut registry)?;
+                let exist = compress_exist(ex, &mut lookup, &mut registry)?;
                 ics23::CompressedBatchEntry {
                     proof: Some(ics23::compressed_batch_entry::Proof::Exist(exist)),
                 }
@@ -116,14 +112,14 @@ pub fn decompress_batch(proof: &ics23::CompressedBatchProof) -> Result<ics23::Co
         .map(|cent| -> Result<ics23::BatchEntry> {
             match &cent.proof {
                 Some(ics23::compressed_batch_entry::Proof::Exist(ex)) => {
-                    let exist = decompress_exist(&ex, &lookup);
+                    let exist = decompress_exist(ex, lookup);
                     Ok(ics23::BatchEntry {
                         proof: Some(ics23::batch_entry::Proof::Exist(exist)),
                     })
                 }
                 Some(ics23::compressed_batch_entry::Proof::Nonexist(non)) => {
-                    let left = non.left.clone().map(|l| decompress_exist(&l, &lookup));
-                    let right = non.right.clone().map(|r| decompress_exist(&r, &lookup));
+                    let left = non.left.clone().map(|l| decompress_exist(&l, lookup));
+                    let right = non.right.clone().map(|r| decompress_exist(&r, lookup));
                     let nonexist = ics23::NonExistenceProof {
                         key: non.key.clone(),
                         left,
