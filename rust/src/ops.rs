@@ -42,7 +42,7 @@ fn do_hash(hash: HashOp, data: &[u8]) -> Hash {
         HashOp::Bitcoin => {
             Hash::from(Ripemd160::digest(Sha256::digest(data).as_slice()).as_slice())
         }
-        HashOp::Sha512_256 => Hash::from(Sha512Trunc256::digest(data).as_slice()),
+        HashOp::Sha512256 => Hash::from(Sha512Trunc256::digest(data).as_slice()),
     }
 }
 
@@ -111,7 +111,7 @@ mod tests {
             "bitcoin hash fails"
         );
 
-        let hash = do_hash(HashOp::Sha512_256, b"food");
+        let hash = do_hash(HashOp::Sha512256, b"food");
         assert!(
             hash == decode("5b3a452a6acbf1fc1e553a40c501585d5bd3cca176d562e0a0e19a3c43804e88"),
             "sha512/256 hash fails"
