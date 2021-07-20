@@ -9,4 +9,4 @@ edition = "2018"
 [dependencies]
 prost = "0.8.0"
 prost-build = "0.8.0"
-bytes = "0.4.12"
+bytes = "1.0.1"

@@ -7,7 +7,10 @@ use crate::helpers::Result;
 use crate::ics23;
 
 pub fn is_compressed(proof: &ics23::CommitmentProof) -> bool {
-    matches!(&proof.proof, Some(ics23::commitment_proof::Proof::Compressed(_)))
+    matches!(
+        &proof.proof,
+        Some(ics23::commitment_proof::Proof::Compressed(_))
+    )
 }
 
 pub fn compress(proof: &ics23::CommitmentProof) -> Result<ics23::CommitmentProof> {
