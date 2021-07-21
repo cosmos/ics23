@@ -30,7 +30,7 @@ pub fn verify_membership(
 
     //    if let Some(ics23::commitment_proof::Proof::Exist(ex)) = &proof.proof {
     if let Some(ex) = get_exist_proof(proof, key) {
-        let valid = verify_existence(&ex, spec, root, key, value);
+        let valid = verify_existence(ex, spec, root, key, value);
         valid.is_ok()
     } else {
         false
@@ -58,7 +58,7 @@ pub fn verify_non_membership(
     }
 
     if let Some(non) = get_nonexist_proof(proof, key) {
-        let valid = verify_non_existence(&non, spec, root, key);
+        let valid = verify_non_existence(non, spec, root, key);
         valid.is_ok()
     } else {
         false
@@ -397,18 +397,18 @@ mod tests {
         data: &RefData,
     ) -> Result<()> {
         if let Some(value) = &data.value {
-            let valid = super::verify_membership(&proof, spec, &data.root, &data.key, &value);
+            let valid = super::verify_membership(proof, spec, &data.root, &data.key, value);
             ensure!(valid, "invalid test vector");
             let mut items = BTreeMap::new();
             items.insert(data.key.as_slice(), value.as_slice());
-            let valid = super::verify_batch_membership(&proof, spec, &data.root, items);
+            let valid = super::verify_batch_membership(proof, spec, &data.root, items);
             ensure!(valid, "invalid test vector");
             Ok(())
         } else {
-            let valid = super::verify_non_membership(&proof, spec, &data.root, &data.key);
+            let valid = super::verify_non_membership(proof, spec, &data.root, &data.key);
             ensure!(valid, "invalid test vector");
             let keys = &[data.key.as_slice()];
-            let valid = super::verify_batch_non_membership(&proof, spec, &data.root, keys);
+            let valid = super::verify_batch_non_membership(proof, spec, &data.root, keys);
             ensure!(valid, "invalid test vector");
             Ok(())
         }
