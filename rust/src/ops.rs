@@ -68,7 +68,7 @@ fn do_length(length: LengthOp, data: &[u8]) -> Result<Hash> {
 }
 
 fn proto_len(length: usize) -> Result<Hash> {
-    let size: u64 = length.try_into()?;
+    let size: u64 = length.try_into().map_err(anyhow::Error::msg)?;
     let mut len = Hash::new();
     prost::encoding::encode_varint(size, &mut len);
     Ok(len)
