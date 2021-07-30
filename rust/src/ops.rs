@@ -4,6 +4,7 @@ use ripemd160::Ripemd160;
 use sha2::{Digest, Sha256, Sha512, Sha512Trunc256};
 use sha3::Sha3_512;
 use std::convert::TryInto;
+use std::num::TryFromIntError;
 
 use crate::helpers::{Hash, Result};
 use crate::ics23::{HashOp, InnerOp, LeafOp, LengthOp};
@@ -68,7 +69,7 @@ fn do_length(length: LengthOp, data: &[u8]) -> Result<Hash> {
 }
 
 fn proto_len(length: usize) -> Result<Hash> {
-    let size: u64 = length.try_into()?;
+    let size: u64 = length.try_into().map_err(|e : TryFromIntError | anyhow::anyhow!(e))?;
     let mut len = Hash::new();
     prost::encoding::encode_varint(size, &mut len);
     Ok(len)
