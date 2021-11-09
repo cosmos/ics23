@@ -9,6 +9,7 @@ workflows:
       - golang
       - rust
       - lint-rust
+      - solidity
 
 jobs:
   typescript:
@@ -126,3 +127,22 @@ jobs:
             - target/debug/build
             - target/debug/deps
           key: cargocache-v2-lint-rust:1.42.0-{{ checksum "Cargo.lock" }}
+
+  solidity:
+    docker:
+      - image: circleci/golang:1.14
+    environment:
+      GO111MODULE=on
+    working_directory: ~/proofs/sol
+    steps:
+      # we checkout here, all other code runs in go subdir
+      - checkout:
+          path: ~/proofs
+      - restore_cache:
+          keys:
+            - solidity-{{ checksum "ics23.json" }}
+      - run: go test ./...
+      - save_cache:
+          key: solidity-{{ checksum "ics23.json" }}
+          paths:
+            - "/sol"
