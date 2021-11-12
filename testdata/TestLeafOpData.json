@@ -1,0 +1,78 @@
+{
+  "hash foobar": {
+    "Op": {
+      "hash": 1
+    },
+    "Key": "Zm9v",
+    "Value": "YmFy",
+    "IsErr": false,
+    "Expected": "w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI="
+  },
+  "hash foobar (different break)": {
+    "Op": {
+      "hash": 1
+    },
+    "Key": "Zg==",
+    "Value": "b29iYXI=",
+    "IsErr": false,
+    "Expected": "w6uP8Tcg6K2QR905Rms8iXTlksL6OD1KOWBxTK7wxPI="
+  },
+  "hash foobaz, sha-512": {
+    "Op": {
+      "hash": 2
+    },
+    "Key": "Zm9v",
+    "Value": "YmF6",
+    "IsErr": false,
+    "Expected": "T3nxkSmOx0YdYBNsYPd8Kujd2F2/YWi7klCS1Rv7ObVZIZs5rlOFugSUbIf2R0E4W++QV46m/m2shdv3rT954Q=="
+  },
+  "hash with length prefix": {
+    "Op": {
+      "hash": 1,
+      "length": 1
+    },
+    "Key": "Zm9vZA==",
+    "Value": "c29tZSBsb25nZXIgdGV4dA==",
+    "IsErr": false,
+    "Expected": "to9dKY6RWuF1PdMz2h+c9gVBGl8uElFr5nWPNl5tsmU="
+  },
+  "hash with length prefix (fixed 32-bit little-endian encoding)": {
+    "Op": {
+      "hash": 1,
+      "length": 4
+    },
+    "Key": "Zm9vZA==",
+    "Value": "c29tZSBsb25nZXIgdGV4dA==",
+    "IsErr": false,
+    "Expected": "yFNlJDe+AlAcZ0dEvyorRdkqCp8pxLEEQBD7Pi1DqUk="
+  },
+  "hash with prehash and length prefix": {
+    "Op": {
+      "hash": 1,
+      "prehash_value": 1,
+      "length": 1
+    },
+    "Key": "Zm9vZA==",
+    "Value": "eWV0IGFub3RoZXIgbG9uZyBzdHJpbmc=",
+    "IsErr": false,
+    "Expected": "h+BIPo+2JK7y4vexP0FmzaSFuqjjn0N8g9dMlL7bFI8="
+  },
+  "requires key": {
+    "Op": {
+      "hash": 1
+    },
+    "Key": "Zm9v",
+    "Value": null,
+    "IsErr": true,
+    "Expected": null
+  },
+  "requires value": {
+    "Op": {
+      "hash": 1
+    },
+    "Key": null,
+    "Value": "YmFy",
+    "IsErr": true,
+    "Expected": null
+  }
+}

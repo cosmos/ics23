@@ -1,0 +1,40 @@
+{
+  "hash child with only prefix": {
+    "Op": {
+      "hash": 1,
+      "prefix": "ACBAgKDA4A=="
+    },
+    "Child": "/8y7mXdVMxEA",
+    "IsErr": false,
+    "Expected": "Rb7OFnjPLp9PKuAz5Ub8NaIIGyQV7csTEhoOkI3KGSc="
+  },
+  "hash child with only suffix": {
+    "Op": {
+      "hash": 1,
+      "suffix": "IGp1c3Qga2lkZGluZyE="
+    },
+    "Child": "dGhpcyBpcyBhIHNoYTI1NiBoYXNoLCByZWFsbHkuLi4u",
+    "IsErr": false,
+    "Expected": "ee9nHSfkKlP7oiAcG7xSmgma9XjuijjfFAeV2wriGEs="
+  },
+  "hash child with prefix and suffix": {
+    "Op": {
+      "hash": 1,
+      "prefix": "ASNFZ4k=",
+      "suffix": "3q2+7w=="
+    },
+    "Child": "AMr+AA==",
+    "IsErr": false,
+    "Expected": "Azn3YIZoRQam1Cpg2ktacZ/r1Nlti42FrpKEnjqEml4="
+  },
+  "requires child": {
+    "Op": {
+      "hash": 1,
+      "prefix": "ASNFZ4k=",
+      "suffix": "3q2+7w=="
+    },
+    "Child": null,
+    "IsErr": true,
+    "Expected": null
+  }
+}
