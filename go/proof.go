@@ -40,6 +40,26 @@ var TendermintSpec = &ProofSpec{
 	},
 }
 
+// SmtSpec constrains the format for SMT proofs (as implemented by github.com/celestiaorg/smt)
+var SmtSpec = &ProofSpec{
+	LeafSpec: &LeafOp{
+		Hash:         HashOp_SHA256,
+		PrehashKey:   HashOp_NO_HASH,
+		PrehashValue: HashOp_SHA256,
+		Length:       LengthOp_NO_PREFIX,
+		Prefix:       []byte{0},
+	},
+	InnerSpec: &InnerSpec{
+		ChildOrder:      []int32{0, 1},
+		ChildSize:       32,
+		MinPrefixLength: 1,
+		MaxPrefixLength: 1,
+		EmptyChild:      make([]byte, 32),
+		Hash:            HashOp_SHA256,
+	},
+	MaxDepth: 256,
+}
+
 // Calculate determines the root hash that matches a given Commitment proof
 // by type switching and calculating root based on proof type
 // NOTE: Calculate will return the first calculated root in the proof,
