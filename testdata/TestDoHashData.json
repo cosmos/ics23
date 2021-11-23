@@ -1,0 +1,22 @@
+{
+  "bitcoin": {
+    "HashOp": 5,
+    "Preimage": "food",
+    "ExpectedHash": "0bcb587dfb4fc10b36d57f2bba1878f139b75d24"
+  },
+  "ripemd160": {
+    "HashOp": 4,
+    "Preimage": "food",
+    "ExpectedHash": "b1ab9988c7c7c5ec4b2b291adfeeee10e77cdd46"
+  },
+  "sha256": {
+    "HashOp": 1,
+    "Preimage": "food",
+    "ExpectedHash": "c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b"
+  },
+  "sha512_256": {
+    "HashOp": 6,
+    "Preimage": "food",
+    "ExpectedHash": "5b3a452a6acbf1fc1e553a40c501585d5bd3cca176d562e0a0e19a3c43804e88"
+  }
+}

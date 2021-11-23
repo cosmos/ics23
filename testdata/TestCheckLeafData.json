@@ -1,0 +1,111 @@
+{
+  "empty spec allows prefix": {
+    "Leaf": {
+      "prefix": "qrs="
+    },
+    "Spec": {},
+    "IsErr": false
+  },
+  "empty spec doesn't allow hashop": {
+    "Leaf": {
+      "hash": 1
+    },
+    "Spec": {},
+    "IsErr": true
+  },
+  "empty spec, empty leaf": {
+    "Leaf": {},
+    "Spec": {},
+    "IsErr": false
+  },
+  "leaf and spec differ on hash": {
+    "Leaf": {
+      "hash": 1,
+      "prehash_value": 1,
+      "length": 1,
+      "prefix": "AA=="
+    },
+    "Spec": {
+      "hash": 2,
+      "prehash_value": 1,
+      "length": 1,
+      "prefix": "AA=="
+    },
+    "IsErr": true
+  },
+  "leaf and spec differ on length": {
+    "Leaf": {
+      "hash": 2,
+      "prehash_value": 1,
+      "prefix": "AA=="
+    },
+    "Spec": {
+      "hash": 2,
+      "prehash_value": 1,
+      "length": 1,
+      "prefix": "AA=="
+    },
+    "IsErr": true
+  },
+  "leaf and spec differ on prehash key": {
+    "Leaf": {
+      "hash": 2,
+      "prehash_key": 1,
+      "prehash_value": 1,
+      "length": 1,
+      "prefix": "AA=="
+    },
+    "Spec": {
+      "hash": 2,
+      "prehash_value": 1,
+      "length": 1,
+      "prefix": "AA=="
+    },
+    "IsErr": true
+  },
+  "leaf and spec differ on prehash value": {
+    "Leaf": {
+      "hash": 2,
+      "length": 1,
+      "prefix": "AA=="
+    },
+    "Spec": {
+      "hash": 2,
+      "prehash_value": 1,
+      "length": 1,
+      "prefix": "AA=="
+    },
+    "IsErr": true
+  },
+  "leaf and spec match, all fields full": {
+    "Leaf": {
+      "hash": 2,
+      "prehash_value": 1,
+      "length": 1,
+      "prefix": "AA=="
+    },
+    "Spec": {
+      "hash": 2,
+      "prehash_value": 1,
+      "length": 1,
+      "prefix": "AA=="
+    },
+    "IsErr": false
+  },
+  "leaf with empty prefix (but spec has one)": {
+    "Leaf": {},
+    "Spec": {
+      "prefix": "uw=="
+    },
+    "IsErr": true
+  },
+  "spec with different prefixes": {
+    "Leaf": {
+      "prefix": "qrs="
+    },
+    "Spec": {
+      "prefix": "uw=="
+    },
+    "IsErr": true
+  }
+}
