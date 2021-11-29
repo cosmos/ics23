@@ -1,0 +1,3 @@
+dependencies:
+    - OpenZeppelin/openzeppelin-contracts@4.2.0
+    - GNSPS/solidity-bytes-utils@0.8.0
