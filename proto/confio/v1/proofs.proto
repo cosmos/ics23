@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package ics23;
+package confio.v1.ics23;
 
 option go_package = "github.com/confio/ics23/go";
 
