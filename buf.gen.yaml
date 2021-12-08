@@ -1,0 +1,8 @@
+version: v1
+plugins:
+  # required to use gocosmos to keep compatability with ibc & cosmos-sdk
+  - name: gocosmos
+    # The the relative output directory.
+    out: proto
+    opt: paths=source_relative
+  # todo: add rust and js compilers here
