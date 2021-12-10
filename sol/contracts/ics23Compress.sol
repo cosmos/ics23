@@ -65,3 +65,12 @@ library Compress {
         return decoProof;
     }
 }
+
+
+
+
+contract Compress_UnitTest {
+    function decompress(CommitmentProof.Data memory proof) public pure returns(CommitmentProof.Data memory) {
+        return Compress.decompress(proof);
+    }
+}

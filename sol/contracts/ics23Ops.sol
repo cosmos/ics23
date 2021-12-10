@@ -15,7 +15,7 @@ library Ops {
         require(value.length > 0); // dev: Leaf op needs value
         bytes memory pKey = prepareLeafData(leafOp.prehash_key, leafOp.length, key);
         bytes memory pValue = prepareLeafData(leafOp.prehash_value, leafOp.length, value);
-        bytes memory data = bytes.concat(leafOp.prefix, pKey, pValue);
+        bytes memory data = abi.encodePacked(leafOp.prefix, pKey, pValue);
         return doHash(leafOp.hash, data);
     }
     function prepareLeafData(PROOFS_PROTO_GLOBAL_ENUMS.HashOp hashOp, PROOFS_PROTO_GLOBAL_ENUMS.LengthOp lenOp, bytes memory data) internal pure returns(bytes memory) {
@@ -34,7 +34,7 @@ library Ops {
     // InnerOp operations
     function applyOp(InnerOp.Data memory innerOp, bytes memory child ) internal pure returns(bytes memory) {
         require(child.length > 0); // dev: Inner op needs child value
-        bytes memory preImage = bytes.concat(innerOp.prefix, child, innerOp.suffix);
+        bytes memory preImage = abi.encodePacked(innerOp.prefix, child, innerOp.suffix);
         return doHash(innerOp.hash, preImage);
     }
     function checkAgainstSpec(InnerOp.Data memory innerOp, ProofSpec.Data memory spec) internal pure {
@@ -107,7 +107,7 @@ library Ops {
             uint256 sz = ProtoBufRuntime._sz_varint(data.length);
             bytes memory encoded = new bytes(sz);
             ProtoBufRuntime._encode_varint(data.length, 32, encoded);
-            return bytes.concat(encoded, data);
+            return abi.encodePacked(encoded, data);
         }
         if (lenOp == PROOFS_PROTO_GLOBAL_ENUMS.LengthOp.REQUIRE_32_BYTES) {
             require(data.length == 32); // dev: data.length != 32
@@ -127,7 +127,7 @@ library Ops {
             littleE[1] = sizeB[2];
             littleE[2] = sizeB[1];
             littleE[3] = sizeB[0];
-            return bytes.concat(littleE, data);
+            return abi.encodePacked(littleE, data);
         }
         revert(); // dev: Unsupported lenOp
     }

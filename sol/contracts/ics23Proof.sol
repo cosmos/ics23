@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.2;
-pragma experimental ABIEncoderV2;
 
 import {LeafOp, CompressedBatchProof, ExistenceProof, NonExistenceProof, BatchEntry, BatchProof, ProofSpec, InnerOp, InnerSpec, CommitmentProof} from "./proofs.sol";
 import {Ops} from "./ics23Ops.sol";
