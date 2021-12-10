@@ -217,6 +217,10 @@ func IsLeftMost(spec *InnerSpec, path []*InnerOp) bool {
 	// ensure every step has a prefix and suffix defined to be leftmost
 	for _, step := range path {
 		if !hasPadding(step, minPrefix, maxPrefix, suffix) {
+			// if this is a placeholder node, skip it
+			if leftBranchesAreEmpty(spec, step, 0) {
+				continue
+			}
 			return false
 		}
 	}
@@ -231,6 +235,10 @@ func IsRightMost(spec *InnerSpec, path []*InnerOp) bool {
 	// ensure every step has a prefix and suffix defined to be rightmost
 	for _, step := range path {
 		if !hasPadding(step, minPrefix, maxPrefix, suffix) {
+			// if this is a placeholder node, skip it
+			if rightBranchesAreEmpty(spec, step, int32(last)) {
+				continue
+			}
 			return false
 		}
 	}
@@ -307,6 +315,42 @@ func getPadding(spec *InnerSpec, branch int32) (minPrefix, maxPrefix, suffix int
 	// count how many children are in the suffix
 	suffix = (len(spec.ChildOrder) - 1 - idx) * int(spec.ChildSize)
 	return
+}
+
+// leftBranchesAreEmpty returns true if the padding bytes correspond to all empty children
+// on the left side of this branch, ie. it's a valid placeholder on a leftmost path
+func leftBranchesAreEmpty(spec *InnerSpec, op *InnerOp, branch int32) bool {
+	idx := getPosition(spec.ChildOrder, branch)
+	// compare the prefix bytes with the appropriate number of empty children
+	leftChildren := len(spec.ChildOrder) - 1 - idx
+	actualPrefix := len(op.Prefix) - leftChildren*int(spec.ChildSize)
+	if actualPrefix < 0 {
+		return false
+	}
+	for i := 0; i < leftChildren; i++ {
+		from := actualPrefix + i*int(spec.ChildSize)
+		if !bytes.Equal(spec.EmptyChild, op.Prefix[from:from+int(spec.ChildSize)]) {
+			return false
+		}
+	}
+	return true
+}
+
+// rightBranchesAreEmpty returns true if the padding bytes correspond to all empty children
+// on the right side of this branch, ie. it's a valid placeholder on a rightmost path
+func rightBranchesAreEmpty(spec *InnerSpec, op *InnerOp, branch int32) bool {
+	idx := getPosition(spec.ChildOrder, branch)
+	// compare the suffix bytes with the appropriate number of empty children
+	if len(op.Suffix) != idx*int(spec.ChildSize) {
+		return false
+	}
+	for i := 0; i < idx; i++ {
+		from := i * int(spec.ChildSize)
+		if !bytes.Equal(spec.EmptyChild, op.Suffix[from:from+int(spec.ChildSize)]) {
+			return false
+		}
+	}
+	return true
 }
 
 // getPosition checks where the branch is in the order and returns

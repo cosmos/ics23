@@ -54,3 +54,21 @@ func TestCheckAgainstSpec(t *testing.T) {
 		})
 	}
 }
+
+func TestEmptyBranch(t *testing.T) {
+	cases := EmptyBranchTestData(t)
+
+	for i, tc := range cases {
+		var res bool
+		if tc.IsLeft {
+			res = leftBranchesAreEmpty(tc.Spec, tc.Op, 0)
+		} else {
+			res = rightBranchesAreEmpty(tc.Spec, tc.Op, 1)
+		}
+		if tc.IsTrue && !res {
+			t.Errorf("Result should be true, but was false (i=%v)", i)
+		} else if !tc.IsTrue && res {
+			t.Errorf("Result should be false, but was true (i=%v)", i)
+		}
+	}
+}
