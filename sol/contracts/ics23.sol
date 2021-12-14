@@ -8,19 +8,37 @@ import {BytesLib} from "GNSPS/solidity-bytes-utils@0.8.0/contracts/BytesLib.sol"
 
 library Ics23  {
 
+    enum VerifyMembershipError {
+        None,
+        ExistenceProofIsNil,
+        ProofVerify
+    }
     // verifyMembership, throws an exception in case anything goes wrong
-    function verifyMembership(ProofSpec.Data memory spec, bytes memory commitmentRoot, CommitmentProof.Data memory proof, bytes memory key, bytes memory value) internal pure {
+    function verifyMembership(ProofSpec.Data memory spec, bytes memory commitmentRoot, CommitmentProof.Data memory proof, bytes memory key, bytes memory value) internal pure returns(VerifyMembershipError){
         CommitmentProof.Data memory decoProof = Compress.decompress(proof);
         ExistenceProof.Data memory exiProof = getExistProofForKey(decoProof, key);
-        require(ExistenceProof.isNil(exiProof) == false); // dev: getExistProofForKey not available
-        Proof.verify(exiProof, spec, commitmentRoot, key, value);
+        //require(ExistenceProof.isNil(exiProof) == false); // dev: getExistProofForKey not available
+        if (ExistenceProof.isNil(exiProof)) return VerifyMembershipError.ExistenceProofIsNil;
+        Proof.VerifyExistenceError vCode = Proof.verify(exiProof, spec, commitmentRoot, key, value);
+        if (vCode != Proof.VerifyExistenceError.None) return VerifyMembershipError.ProofVerify;
+
+        return VerifyMembershipError.None;
     }
 
-    function verifyNonMembership(ProofSpec.Data memory spec, bytes memory commitmentRoot, CommitmentProof.Data memory proof, bytes memory key) internal pure {
+    enum VerifyNonMembershipError {
+        None,
+        NonExistenceProofIsNil,
+        ProofVerify
+    }
+    function verifyNonMembership(ProofSpec.Data memory spec, bytes memory commitmentRoot, CommitmentProof.Data memory proof, bytes memory key) internal pure returns(VerifyNonMembershipError) {
         CommitmentProof.Data memory decoProof = Compress.decompress(proof);
         NonExistenceProof.Data memory nonProof = getNonExistProofForKey(decoProof, key);
-        require(NonExistenceProof.isNil(nonProof) == false); // dev: getNonExistProofForKey not available
-        Proof.verify(nonProof, spec, commitmentRoot, key);
+        //require(NonExistenceProof.isNil(nonProof) == false); // dev: getNonExistProofForKey not available
+        if (NonExistenceProof.isNil(nonProof)) return VerifyNonMembershipError.NonExistenceProofIsNil;
+        Proof.VerifyNonExistenceError vCode =  Proof.verify(nonProof, spec, commitmentRoot, key);
+        if (vCode != Proof.VerifyNonExistenceError.None) return VerifyNonMembershipError.ProofVerify;
+
+        return VerifyNonMembershipError.None;
     }
 /* -- temporarily disabled as they are not covered by unit tests
     struct BatchItem {
@@ -90,10 +108,12 @@ library Ics23  {
 
 contract ICS23_UnitTest {
     function verifyMembership(ProofSpec.Data memory spec, bytes memory commitmentRoot, CommitmentProof.Data memory proof, bytes memory key, bytes memory value) public pure {
-        Ics23.verifyMembership(spec, commitmentRoot, proof, key, value);
+        Ics23.VerifyMembershipError vCode = Ics23.verifyMembership(spec, commitmentRoot, proof, key, value);
+        require(vCode == Ics23.VerifyMembershipError.None);
     }
     function verifyNonMembership(ProofSpec.Data memory spec, bytes memory commitmentRoot, CommitmentProof.Data memory proof, bytes memory key) public pure {
-        Ics23.verifyNonMembership(spec, commitmentRoot, proof, key);
+        Ics23.VerifyNonMembershipError vCode = Ics23.verifyNonMembership(spec, commitmentRoot, proof, key);
+        require(vCode == Ics23.VerifyNonMembershipError.None);
     }
 /* -- temporarily disabled as they are not covered by unit tests
     function batchVerifyMembership(ProofSpec.Data memory spec, bytes memory commitmentRoot, CommitmentProof.Data memory proof, Ics23.BatchItem[] memory items ) public pure {

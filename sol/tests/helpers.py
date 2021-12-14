@@ -22,7 +22,6 @@ def loadBatchFile(f, contract):
                 for item in case["items"]
                 ]
             }
-    print(to_bytes(case.get("proof", b''), "bytes"))
     proof = contract.protobufDecodeCommitmentProof(to_bytes(case.get("proof", b''), "bytes"))
     return proof, refData
 

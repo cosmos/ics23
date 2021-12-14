@@ -8,76 +8,144 @@ import {Math} from "OpenZeppelin/openzeppelin-contracts@4.2.0/contracts/utils/ma
 import {BytesLib} from "GNSPS/solidity-bytes-utils@0.8.0/contracts/BytesLib.sol";
 
 library Ops {
+    bytes constant empty = new bytes(0);
 
+    enum ApplyLeafOpError {
+        None,
+        KeyLength,
+        ValueLength,
+        DoHash,
+        PrepareLeafData
+    }
     // LeafOp operations
-    function applyOp(LeafOp.Data memory leafOp, bytes memory key, bytes memory value) internal pure returns(bytes memory) {
-        require(key.length > 0); // dev: Leaf op needs key
-        require(value.length > 0); // dev: Leaf op needs value
-        bytes memory pKey = prepareLeafData(leafOp.prehash_key, leafOp.length, key);
-        bytes memory pValue = prepareLeafData(leafOp.prehash_value, leafOp.length, value);
+    function applyOp(LeafOp.Data memory leafOp, bytes memory key, bytes memory value) internal pure returns(bytes memory, ApplyLeafOpError) {
+        //require(key.length > 0); // dev: Leaf op needs key
+        if (key.length == 0) return (empty, ApplyLeafOpError.KeyLength);
+        //require(value.length > 0); // dev: Leaf op needs value
+        if (value.length == 0) return (empty, ApplyLeafOpError.ValueLength);
+        (bytes memory pKey, PrepareLeafDataError pCode1) = prepareLeafData(leafOp.prehash_key, leafOp.length, key);
+        if (pCode1 != PrepareLeafDataError.None) return (empty, ApplyLeafOpError.PrepareLeafData);
+        (bytes memory pValue, PrepareLeafDataError pCode2) = prepareLeafData(leafOp.prehash_value, leafOp.length, value);
+        if (pCode2 != PrepareLeafDataError.None) return (empty, ApplyLeafOpError.PrepareLeafData);
         bytes memory data = abi.encodePacked(leafOp.prefix, pKey, pValue);
-        return doHash(leafOp.hash, data);
-    }
-    function prepareLeafData(PROOFS_PROTO_GLOBAL_ENUMS.HashOp hashOp, PROOFS_PROTO_GLOBAL_ENUMS.LengthOp lenOp, bytes memory data) internal pure returns(bytes memory) {
-        bytes memory hdata = doHashOrNoop(hashOp, data);
-        return doLengthOp(lenOp, hdata);
-    }
-    function checkAgainstSpec(LeafOp.Data memory leafOp, ProofSpec.Data memory spec) internal pure {
-        require (leafOp.hash == spec.leaf_spec.hash); // dev: checkAgainstSpec for LeafOp - Unexpected HashOp
-        require(leafOp.prehash_key == spec.leaf_spec.prehash_key); // dev: checkAgainstSpec for LeafOp - Unexpected PrehashKey
-        require(leafOp.prehash_value == spec.leaf_spec.prehash_value); // dev: checkAgainstSpec for LeafOp - Unexpected PrehashValue");
-        require(leafOp.length == spec.leaf_spec.length); // dev: checkAgainstSpec for LeafOp - Unexpected lengthOp
-        bool hasprefix = hasPrefix(leafOp.prefix, spec.leaf_spec.prefix);
-        require(hasprefix); // dev: checkAgainstSpec for LeafOp - Leaf Prefix doesn't start with
+        (bytes memory hashed, DoHashError hCode) = doHash(leafOp.hash, data);
+        if (hCode != DoHashError.None) return (empty, ApplyLeafOpError.DoHash);
+        return(hashed, ApplyLeafOpError.None);
     }
 
-    // InnerOp operations
-    function applyOp(InnerOp.Data memory innerOp, bytes memory child ) internal pure returns(bytes memory) {
-        require(child.length > 0); // dev: Inner op needs child value
-        bytes memory preImage = abi.encodePacked(innerOp.prefix, child, innerOp.suffix);
-        return doHash(innerOp.hash, preImage);
+    enum PrepareLeafDataError {
+        None,
+        DoHash,
+        DoLengthOp
     }
-    function checkAgainstSpec(InnerOp.Data memory innerOp, ProofSpec.Data memory spec) internal pure {
-        require(innerOp.hash == spec.inner_spec.hash); // dev: checkAgainstSpec for InnerOp - Unexpected HashOp
+    // preapare leaf data for encoding
+    function prepareLeafData(PROOFS_PROTO_GLOBAL_ENUMS.HashOp hashOp, PROOFS_PROTO_GLOBAL_ENUMS.LengthOp lenOp, bytes memory data) internal pure returns(bytes memory, PrepareLeafDataError) {
+        (bytes memory hased, DoHashError hCode) = doHashOrNoop(hashOp, data);
+        if (hCode != DoHashError.None)return (empty, PrepareLeafDataError.DoHash);
+        (bytes memory res, DoLengthOpError lCode) = doLengthOp(lenOp, hased);
+        if (lCode != DoLengthOpError.None) return (empty, PrepareLeafDataError.DoLengthOp);
+
+        return (res, PrepareLeafDataError.None);
+    }
+
+    enum CheckAgainstSpecError{
+        None,
+        Hash,
+        PreHashKey,
+        PreHashValue,
+        Length,
+        MinPrefixLength,
+        HasPrefix,
+        MaxPrefixLength
+    }
+    function checkAgainstSpec(LeafOp.Data memory leafOp, ProofSpec.Data memory spec) internal pure returns(CheckAgainstSpecError) {
+        //require (leafOp.hash == spec.leaf_spec.hash); // dev: checkAgainstSpec for LeafOp - Unexpected HashOp
+        if (leafOp.hash != spec.leaf_spec.hash) return CheckAgainstSpecError.Hash;
+        //require(leafOp.prehash_key == spec.leaf_spec.prehash_key); // dev: checkAgainstSpec for LeafOp - Unexpected PrehashKey
+        if (leafOp.prehash_key != spec.leaf_spec.prehash_key) return CheckAgainstSpecError.PreHashKey;
+        //require(leafOp.prehash_value == spec.leaf_spec.prehash_value); // dev: checkAgainstSpec for LeafOp - Unexpected PrehashValue");
+        if (leafOp.prehash_value != spec.leaf_spec.prehash_value) return CheckAgainstSpecError.PreHashValue;
+        //require(leafOp.length == spec.leaf_spec.length); // dev: checkAgainstSpec for LeafOp - Unexpected lengthOp
+        if (leafOp.length != spec.leaf_spec.length) return CheckAgainstSpecError.Length;
+        bool hasprefix = hasPrefix(leafOp.prefix, spec.leaf_spec.prefix);
+        //require(hasprefix); // dev: checkAgainstSpec for LeafOp - Leaf Prefix doesn't start with
+        if (hasprefix == false) return CheckAgainstSpecError.HasPrefix;
+
+        return CheckAgainstSpecError.None;
+    }
+
+    enum ApplyInnerOpError {
+        None,
+        ChildLength,
+        DoHash
+    }
+    // InnerOp operations
+    function applyOp(InnerOp.Data memory innerOp, bytes memory child ) internal pure returns(bytes memory, ApplyInnerOpError) {
+        //require(child.length > 0); // dev: Inner op needs child value
+        if (child.length == 0) return (empty, ApplyInnerOpError.ChildLength);
+        bytes memory preImage = abi.encodePacked(innerOp.prefix, child, innerOp.suffix);
+        (bytes memory hashed, DoHashError code) = doHash(innerOp.hash, preImage);
+        if (code != DoHashError.None) return (empty, ApplyInnerOpError.DoHash);
+
+        return (hashed, ApplyInnerOpError.None);
+    }
+
+    function checkAgainstSpec(InnerOp.Data memory innerOp, ProofSpec.Data memory spec) internal pure returns(CheckAgainstSpecError) {
+        //require(innerOp.hash == spec.inner_spec.hash); // dev: checkAgainstSpec for InnerOp - Unexpected HashOp
+        if (innerOp.hash != spec.inner_spec.hash) return CheckAgainstSpecError.Hash;
         uint256 minPrefixLength = SafeCast.toUint256(spec.inner_spec.min_prefix_length);
-        require(innerOp.prefix.length >= minPrefixLength); // dev: InnerOp prefix too short;
+        //require(innerOp.prefix.length >= minPrefixLength); // dev: InnerOp prefix too short;
+        if (innerOp.prefix.length < minPrefixLength)  return CheckAgainstSpecError.MinPrefixLength;
         bytes memory leafPrefix = spec.leaf_spec.prefix;
         bool hasprefix = hasPrefix(innerOp.prefix, leafPrefix);
-        require(hasprefix == false); // dev: Inner Prefix starts with wrong value
+        //require(hasprefix == false); // dev: Inner Prefix starts with wrong value
+        if (hasprefix) return CheckAgainstSpecError.HasPrefix;
         uint256 childSize = SafeCast.toUint256(spec.inner_spec.child_size);
         uint256 maxLeftChildBytes = (spec.inner_spec.child_order.length - 1) * childSize;
         uint256 maxPrefixLength = SafeCast.toUint256(spec.inner_spec.max_prefix_length);
-        require(innerOp.prefix.length <= maxPrefixLength + maxLeftChildBytes); // dev: InnerOp prefix too long
+        //require(innerOp.prefix.length <= maxPrefixLength + maxLeftChildBytes); // dev: InnerOp prefix too long
+        if (innerOp.prefix.length > maxPrefixLength + maxLeftChildBytes)  return CheckAgainstSpecError.MaxPrefixLength;
+
+        return CheckAgainstSpecError.None;
     }
 
-    function doHashOrNoop(PROOFS_PROTO_GLOBAL_ENUMS.HashOp hashOp, bytes memory preImage) internal pure returns(bytes memory) {
+    function doHashOrNoop(PROOFS_PROTO_GLOBAL_ENUMS.HashOp hashOp, bytes memory preImage) internal pure returns(bytes memory, DoHashError) {
         if (hashOp == PROOFS_PROTO_GLOBAL_ENUMS.HashOp.NO_HASH) {
-            return preImage;
+            return (preImage, DoHashError.None);
         }
         return doHash(hashOp, preImage);
     }
 
-    function doHash(PROOFS_PROTO_GLOBAL_ENUMS.HashOp hashOp, bytes memory preImage) internal pure returns(bytes memory) {
+    enum DoHashError {
+        None,
+        Sha512,
+        Sha512_256,
+        Unsupported
+    }
+    function doHash(PROOFS_PROTO_GLOBAL_ENUMS.HashOp hashOp, bytes memory preImage) internal pure returns(bytes memory, DoHashError) {
         if (hashOp == PROOFS_PROTO_GLOBAL_ENUMS.HashOp.SHA256) {
-            return abi.encodePacked(sha256(preImage));
+            return (abi.encodePacked(sha256(preImage)), DoHashError.None);
         }
         if (hashOp == PROOFS_PROTO_GLOBAL_ENUMS.HashOp.KECCAK) {
-            return abi.encodePacked(keccak256(preImage));
+            return (abi.encodePacked(keccak256(preImage)), DoHashError.None);
         }
         if (hashOp == PROOFS_PROTO_GLOBAL_ENUMS.HashOp.RIPEMD160) {
-            return abi.encodePacked(ripemd160(preImage));
+            return (abi.encodePacked(ripemd160(preImage)), DoHashError.None);
         }
         if (hashOp == PROOFS_PROTO_GLOBAL_ENUMS.HashOp.BITCOIN) {
             bytes memory tmp = abi.encodePacked(sha256(preImage));
-            return abi.encodePacked(ripemd160(tmp));
+            return (abi.encodePacked(ripemd160(tmp)), DoHashError.None);
         }
+        //require(hashOp != PROOFS_PROTO_GLOBAL_ENUMS.HashOp.Sha512); // dev: SHA512 not supported
         if (hashOp == PROOFS_PROTO_GLOBAL_ENUMS.HashOp.SHA512) {
-            revert(); // dev: SHA512 not supported
+            return (empty, DoHashError.Sha512);
         }
+        //require(hashOp != PROOFS_PROTO_GLOBAL_ENUMS.HashOp.Sha512_256); // dev: SHA512_256 not supported
         if (hashOp == PROOFS_PROTO_GLOBAL_ENUMS.HashOp.SHA512_256) {
-            revert(); // dev: SHA512_256 not supported
+            return (empty, DoHashError.Sha512_256);
         }
-        revert(); // dev: Unsupported hashOp
+        //revert(); // dev: Unsupported hashOp
+        return (empty, DoHashError.Unsupported);
     }
 
     function compare(bytes memory a, bytes memory b) internal pure returns(int) {
@@ -99,23 +167,33 @@ library Ops {
     }
 
     // private
-    function doLengthOp(PROOFS_PROTO_GLOBAL_ENUMS.LengthOp lenOp, bytes memory data) private pure returns(bytes memory) {
+    enum DoLengthOpError {
+        None,
+        Require32DataLength,
+        Require64DataLength,
+        Unsupported
+    }
+    function doLengthOp(PROOFS_PROTO_GLOBAL_ENUMS.LengthOp lenOp, bytes memory data) private pure returns(bytes memory, DoLengthOpError) {
         if (lenOp == PROOFS_PROTO_GLOBAL_ENUMS.LengthOp.NO_PREFIX) {
-            return data;
+            return (data, DoLengthOpError.None);
         }
         if (lenOp == PROOFS_PROTO_GLOBAL_ENUMS.LengthOp.VAR_PROTO) {
             uint256 sz = ProtoBufRuntime._sz_varint(data.length);
             bytes memory encoded = new bytes(sz);
             ProtoBufRuntime._encode_varint(data.length, 32, encoded);
-            return abi.encodePacked(encoded, data);
+            return (abi.encodePacked(encoded, data), DoLengthOpError.None);
         }
         if (lenOp == PROOFS_PROTO_GLOBAL_ENUMS.LengthOp.REQUIRE_32_BYTES) {
-            require(data.length == 32); // dev: data.length != 32
-            return data;
+            //require(data.length == 32); // dev: data.length != 32
+            if (data.length != 32) return (empty, DoLengthOpError.Require32DataLength);
+
+            return (data, DoLengthOpError.None);
         }
         if (lenOp == PROOFS_PROTO_GLOBAL_ENUMS.LengthOp.REQUIRE_64_BYTES) {
-            require(data.length == 64); // dev: data.length != 64"
-            return data;
+            //require(data.length == 64); // dev: data.length != 64"
+            if (data.length != 64) return (empty, DoLengthOpError.Require64DataLength);
+
+            return (data, DoLengthOpError.None);
         }
         if (lenOp == PROOFS_PROTO_GLOBAL_ENUMS.LengthOp.FIXED32_LITTLE) {
             uint32 size = SafeCast.toUint32(data.length);
@@ -127,9 +205,10 @@ library Ops {
             littleE[1] = sizeB[2];
             littleE[2] = sizeB[1];
             littleE[3] = sizeB[0];
-            return abi.encodePacked(littleE, data);
+            return (abi.encodePacked(littleE, data), DoLengthOpError.None);
         }
-        revert(); // dev: Unsupported lenOp
+        //revert(); // dev: Unsupported lenOp
+        return (empty, DoLengthOpError.Unsupported);
     }
 
     function hasPrefix(bytes memory element, bytes memory prefix) private pure returns (bool) {
@@ -149,18 +228,26 @@ library Ops {
 
 contract Ops_UnitTest {
     function applyLeafOp(LeafOp.Data memory leaf, bytes memory key, bytes memory value) public pure returns(bytes memory) {
-        return Ops.applyOp(leaf, key, value);
+        (bytes memory res, Ops.ApplyLeafOpError aCode) = Ops.applyOp(leaf, key, value);
+        require(aCode == Ops.ApplyLeafOpError.None); // dev: expand this require to check error code
+        return res;
     }
-    function checkAgainstLeafOpSpec(LeafOp.Data memory op, ProofSpec.Data memory spec) public pure {
-        return Ops.checkAgainstSpec(op, spec);
+    function checkAgainstLeafOpSpec(LeafOp.Data memory op, ProofSpec.Data memory spec) public pure  {
+        Ops.CheckAgainstSpecError cCode = Ops.checkAgainstSpec(op, spec);
+        require(cCode == Ops.CheckAgainstSpecError.None); // dev: expand this require to check error code
     }
     function applyInnerOp(InnerOp.Data memory inner,bytes memory child) public pure returns(bytes memory) {
-        return Ops.applyOp(inner, child);
+        (bytes memory res, Ops.ApplyInnerOpError aCode) = Ops.applyOp(inner, child);
+        require(aCode == Ops.ApplyInnerOpError.None); // dev: expand this require to check error code
+        return res;
     }
     function checkAgainstInnerOpSpec(InnerOp.Data memory op, ProofSpec.Data memory spec) public pure {
-        return Ops.checkAgainstSpec(op, spec);
+        Ops.CheckAgainstSpecError cCode = Ops.checkAgainstSpec(op, spec);
+        require(cCode == Ops.CheckAgainstSpecError.None); // dev: expand this require to check error code
     }
     function doHash(PROOFS_PROTO_GLOBAL_ENUMS.HashOp hashOp, bytes memory preImage) public pure returns(bytes memory) {
-        return Ops.doHash(hashOp, preImage);
+        (bytes memory res, Ops.DoHashError hCode) = Ops.doHash(hashOp, preImage);
+        require(hCode == Ops.DoHashError.None);  // dev: expand this require to check error code
+        return res;
     }
 }
