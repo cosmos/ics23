@@ -1,4 +1,4 @@
-from brownie import accounts, Proof_UnitTest
+from brownie import accounts, ProofMock
 from brownie.convert import to_bytes, to_string
 import brownie
 import pytest
@@ -9,7 +9,7 @@ import helpers
 
 @pytest.fixture
 def proof():
-    return accounts[0].deploy(Proof_UnitTest)
+    return accounts[0].deploy(ProofMock)
 
 
 @pytest.mark.parametrize("name,case", helpers.loadJsonTestCases("../testdata/TestExistenceProofData.json"))

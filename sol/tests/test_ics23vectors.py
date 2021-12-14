@@ -1,4 +1,4 @@
-from brownie import accounts, ICS23_UnitTest, Proof_UnitTest
+from brownie import accounts, ICS23Mock, ProofMock
 from brownie.convert import to_bytes
 import pytest
 import specs
@@ -13,12 +13,12 @@ cases_fname = ["exist_left.json","exist_right.json", "exist_middle.json", "nonex
 
 @pytest.fixture
 def ics23():
-    return accounts[0].deploy(ICS23_UnitTest)
+    return accounts[0].deploy(ICS23Mock)
 
 
 @pytest.fixture
 def proof():
-    return accounts[0].deploy(Proof_UnitTest)
+    return accounts[0].deploy(ProofMock)
 
 
 @pytest.mark.parametrize("fname", [os.path.join(IAVL_TEST_DIR, fname) for fname in cases_fname])

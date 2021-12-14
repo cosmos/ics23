@@ -1,4 +1,4 @@
-from brownie import accounts, Ops_UnitTest
+from brownie import accounts, OpsMock
 from brownie.convert import to_bytes, to_string
 import brownie
 import pytest
@@ -9,7 +9,7 @@ import helpers
 
 @pytest.fixture
 def ops():
-    return accounts[0].deploy(Ops_UnitTest)
+    return accounts[0].deploy(OpsMock)
 
 
 @pytest.mark.parametrize("name,case", helpers.loadJsonTestCases("../testdata/TestLeafOpData.json"))

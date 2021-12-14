@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.2;
+
 import {InnerOp, ExistenceProof, NonExistenceProof, CommitmentProof, CompressedBatchEntry, CompressedBatchProof, CompressedExistenceProof, BatchEntry, BatchProof} from "./proofs.sol";
 import {SafeCast} from "OpenZeppelin/openzeppelin-contracts@4.2.0/contracts/utils/math/SafeCast.sol";
 
@@ -63,14 +64,5 @@ library Compress {
             decoProof.path[i] = lookup[step];
         }
         return decoProof;
-    }
-}
-
-
-
-
-contract Compress_UnitTest {
-    function decompress(CommitmentProof.Data memory proof) public pure returns(CommitmentProof.Data memory) {
-        return Compress.decompress(proof);
     }
 }

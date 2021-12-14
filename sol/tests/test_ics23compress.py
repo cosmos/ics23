@@ -1,4 +1,4 @@
-from brownie import accounts, Compress_UnitTest, Proof_UnitTest
+from brownie import accounts, CompressMock, ProofMock
 from brownie.convert import to_bytes
 import pytest
 import specs
@@ -13,12 +13,12 @@ cases_fname = ["batch_exist.json", "batch_nonexist.json"]
 
 @pytest.fixture
 def compress():
-    return accounts[0].deploy(Compress_UnitTest)
+    return accounts[0].deploy(CompressMock)
 
 
 @pytest.fixture
 def proof():
-    return accounts[0].deploy(Proof_UnitTest)
+    return accounts[0].deploy(ProofMock)
 
 
 @pytest.mark.parametrize("fname", [os.path.join(IAVL_TEST_DIR, fname) for fname in cases_fname])
