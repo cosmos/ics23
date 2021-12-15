@@ -169,6 +169,9 @@ function ensureLeftMost(
   // ensure every step has a prefix and suffix defined to be leftmost
   for (const step of path) {
     if (!hasPadding(step, minPrefix, maxPrefix, suffix)) {
+      if rightBranchesAreEmpty(spec, step, 0) {
+        continue;
+      }
       throw new Error("Step not leftmost");
     }
   }
@@ -184,6 +187,9 @@ function ensureRightMost(
   // ensure every step has a prefix and suffix defined to be leftmost
   for (const step of path) {
     if (!hasPadding(step, minPrefix, maxPrefix, suffix)) {
+      if leftBranchesAreEmpty(spec, step, len) {
+        continue;
+      }
       throw new Error("Step not leftmost");
     }
   }
@@ -275,6 +281,43 @@ function getPadding(spec: ics23.IInnerSpec, branch: number): PaddingResult {
   // count how many children are in the suffix
   const suffix = (spec.childOrder!.length - 1 - idx) * spec.childSize!;
   return { minPrefix, maxPrefix, suffix };
+}
+
+
+// leftBranchesAreEmpty returns true if the padding bytes correspond to all empty children
+// on the left side of this branch, ie. it's a valid placeholder on a leftmost path
+function leftBranchesAreEmpty(spec: ics23.IInnerSpec, op ics23.IInnerOp, branch: number): bool {
+  const idx = getPosition(spec.childOrder!, branch);
+  // compare the prefix bytes with the appropriate number of empty children
+  const leftChildren = spec.childOrder!.length - 1 - idx;
+  const actualPrefix = (op.prefix || []).length - leftChildren * spec.childSize!;
+  if actualPrefix < 0 {
+    return false;
+  }
+  for (let i = 0; i < leftChildren; i++) {
+    const offset = actualPrefix + i * spec.childSize!;
+    if !bytesEqual((spec.emptyChild || []), op.prefix!.slice(offset, offset + spec.childSize!)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// rightBranchesAreEmpty returns true if the padding bytes correspond to all empty children
+// on the right side of this branch, ie. it's a valid placeholder on a rightmost path
+function rightBranchesAreEmpty(spec: ics23.IInnerSpec, op ics23.IInnerOp, branch: number): bool {
+  const idx = getPosition(spec.childOrder!, branch);
+  // compare the suffix bytes with the appropriate number of empty children
+  if (op.suffix || []).length !== idx * spec.childSize! {
+    return false;
+  }
+  for (let i = 0; i < idx; i++) {
+    const offset = i * spec.childSize!;
+    if !bytesEqual((spec.emptyChild || []), op.suffix!.slice(offset, offset + spec.childSize!)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function getPosition(order: ReadonlyArray<number>, branch: number): number {
