@@ -383,6 +383,48 @@ mod tests {
         verify_test_vector("../testdata/tendermint/nonexist_middle.json", &spec)
     }
 
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_left() -> Result<()> {
+        let spec = smt_spec();
+        verify_test_vector("../testdata/smt/exist_left.json", &spec)
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_right() -> Result<()> {
+        let spec = smt_spec();
+        verify_test_vector("../testdata/smt/exist_right.json", &spec)
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_middle() -> Result<()> {
+        let spec = smt_spec();
+        verify_test_vector("../testdata/smt/exist_middle.json", &spec)
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_left_non() -> Result<()> {
+        let spec = smt_spec();
+        verify_test_vector("../testdata/smt/nonexist_left.json", &spec)
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_right_non() -> Result<()> {
+        let spec = smt_spec();
+        verify_test_vector("../testdata/smt/nonexist_right.json", &spec)
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_middle_non() -> Result<()> {
+        let spec = smt_spec();
+        verify_test_vector("../testdata/smt/nonexist_middle.json", &spec)
+    }
+
     #[cfg(feature = "std")]
     fn load_batch(files: &[&str]) -> Result<(ics23::CommitmentProof, Vec<RefData>)> {
         let mut entries = Vec::new();
@@ -528,5 +570,67 @@ mod tests {
             "../testdata/tendermint/nonexist_middle.json",
         ])?;
         verify_batch(&spec, &proof, &data[5])
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_batch_exist() -> Result<()> {
+        let spec = smt_spec();
+        let (proof, data) = load_batch(&[
+            "../testdata/smt/exist_left.json",
+            "../testdata/smt/exist_right.json",
+            "../testdata/smt/exist_middle.json",
+            "../testdata/smt/nonexist_left.json",
+            "../testdata/smt/nonexist_right.json",
+            "../testdata/smt/nonexist_middle.json",
+        ])?;
+        verify_batch(&spec, &proof, &data[0])
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn compressed_smt_batch_exist() -> Result<()> {
+        let spec = smt_spec();
+        let (proof, data) = load_batch(&[
+            "../testdata/smt/exist_left.json",
+            "../testdata/smt/exist_right.json",
+            "../testdata/smt/exist_middle.json",
+            "../testdata/smt/nonexist_left.json",
+            "../testdata/smt/nonexist_right.json",
+            "../testdata/smt/nonexist_middle.json",
+        ])?;
+        let comp = compress(&proof)?;
+        verify_batch(&spec, &comp, &data[0])
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_batch_nonexist() -> Result<()> {
+        let spec = smt_spec();
+        let (proof, data) = load_batch(&[
+            "../testdata/smt/exist_left.json",
+            "../testdata/smt/exist_right.json",
+            "../testdata/smt/exist_middle.json",
+            "../testdata/smt/nonexist_left.json",
+            "../testdata/smt/nonexist_right.json",
+            "../testdata/smt/nonexist_middle.json",
+        ])?;
+        verify_batch(&spec, &proof, &data[4])
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn compressed_smt_batch_nonexist() -> Result<()> {
+        let spec = smt_spec();
+        let (proof, data) = load_batch(&[
+            "../testdata/smt/exist_left.json",
+            "../testdata/smt/exist_right.json",
+            "../testdata/smt/exist_middle.json",
+            "../testdata/smt/nonexist_left.json",
+            "../testdata/smt/nonexist_right.json",
+            "../testdata/smt/nonexist_middle.json",
+        ])?;
+        let comp = compress(&proof)?;
+        verify_batch(&spec, &comp, &data[4])
     }
 }
