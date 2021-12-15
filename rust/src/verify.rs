@@ -170,6 +170,9 @@ fn ensure_left_most(spec: &ics23::InnerSpec, path: &[ics23::InnerOp]) -> Result<
     let pad = get_padding(spec, 0)?;
     for step in path {
         if !has_padding(step, &pad) {
+            if left_branches_are_empty(spec, step, 0)? {
+                continue;
+            }
             bail!("step not leftmost")
         }
     }
@@ -181,6 +184,9 @@ fn ensure_right_most(spec: &ics23::InnerSpec, path: &[ics23::InnerOp]) -> Result
     let pad = get_padding(spec, idx as i32)?;
     for step in path {
         if !has_padding(step, &pad) {
+            if right_branches_are_empty(spec, step, idx as i32)? {
+                continue;
+            }
             bail!("step not leftmost")
         }
     }
@@ -258,11 +264,61 @@ fn get_padding(spec: &ics23::InnerSpec, branch: i32) -> Result<Padding> {
     }
 }
 
+// left_branches_are_empty returns true if the padding bytes correspond to all empty children
+// on the left side of this branch, ie. it's a valid placeholder on a leftmost path
+fn left_branches_are_empty(
+    spec: &ics23::InnerSpec,
+    op: &ics23::InnerOp,
+    branch: i32,
+) -> Result<bool> {
+    if let Some(&idx) = spec.child_order.iter().find(|&&x| x == branch) {
+        // compare the prefix bytes with the appropriate number of empty children
+        let left_children = spec.child_order.len() - 1 - idx as usize;
+        if op.prefix.len() < left_children * spec.child_size as usize {
+            return Ok(false);
+        }
+        let actual_prefix = op.prefix.len() - left_children * spec.child_size as usize;
+        for i in 0..left_children {
+            let from = actual_prefix + i * spec.child_size as usize;
+            if spec.empty_child != op.prefix[from..from + spec.child_size as usize] {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    } else {
+        bail!("Branch {} not found", branch);
+    }
+}
+
+// right_branches_are_empty returns true if the padding bytes correspond to all empty children
+// on the right side of this branch, ie. it's a valid placeholder on a rightmost path
+fn right_branches_are_empty(
+    spec: &ics23::InnerSpec,
+    op: &ics23::InnerOp,
+    branch: i32,
+) -> Result<bool> {
+    if let Some(&idx) = spec.child_order.iter().find(|&&x| x == branch) {
+        // compare the suffix bytes with the appropriate number of empty children
+        if op.suffix.len() != spec.child_size as usize {
+            return Ok(false);
+        }
+        for i in 0..(idx as usize) {
+            let from = i * spec.child_size as usize;
+            if spec.empty_child != op.suffix[from..from + spec.child_size as usize] {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    } else {
+        bail!("Branch {} not found", branch);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::api;
-    use crate::ics23::{ExistenceProof, HashOp, InnerOp, LeafOp, LengthOp, ProofSpec};
+    use crate::ics23::{ExistenceProof, HashOp, InnerOp, InnerSpec, LeafOp, LengthOp, ProofSpec};
     use std::collections::btree_map::BTreeMap as HashMap;
     #[cfg(not(feature = "std"))]
     use std::prelude::*;
@@ -525,5 +581,187 @@ mod tests {
                 assert!(check.is_err(), "{} should be an error", name);
             }
         }
+    }
+
+    fn inner_spec_with_empty_child() -> InnerSpec {
+        InnerSpec {
+            child_order: vec![0, 1],
+            child_size: 32,
+            min_prefix_length: 1,
+            max_prefix_length: 1,
+            empty_child: b"32_empty_child_placeholder_bytes".to_vec(),
+            hash: ics23::HashOp::Sha256.into(),
+        }
+    }
+
+    struct EmptyBranchCase<'a> {
+        op: InnerOp,
+        spec: &'a InnerSpec,
+        is_true: bool,
+        is_left: bool,
+    }
+
+    #[test]
+    fn check_empty_branch() -> Result<()> {
+        let spec = &inner_spec_with_empty_child();
+        let non_empty_spec = api::iavl_spec().inner_spec.unwrap();
+
+        let cases = vec![
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: vec![1_u8],
+                    suffix: spec.empty_child.clone(),
+                    hash: spec.hash,
+                },
+                spec: spec,
+                is_true: true,
+                is_left: false,
+            },
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: vec![1_u8]
+                        .into_iter()
+                        .chain(vec![0_u8; 32].into_iter())
+                        .collect(),
+                    suffix: spec.empty_child.clone(),
+                    hash: spec.hash,
+                },
+                spec: spec,
+                is_true: true,
+                is_left: false,
+            },
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: vec![1_u8],
+                    suffix: vec![0_u8; 32],
+                    hash: spec.hash,
+                },
+                spec: spec,
+                is_true: false,
+                is_left: false,
+            },
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: vec![1_u8],
+                    suffix: vec![],
+                    hash: spec.hash,
+                },
+                spec: spec,
+                is_true: false,
+                is_left: false,
+            },
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: vec![1_u8],
+                    suffix: spec
+                        .empty_child
+                        .clone()
+                        .into_iter()
+                        .chain(b"xxxx".to_vec())
+                        .collect(),
+                    hash: spec.hash,
+                },
+                spec: spec,
+                is_true: false,
+                is_left: false,
+            },
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: vec![1_u8],
+                    suffix: vec![],
+                    hash: non_empty_spec.hash,
+                },
+                spec: &non_empty_spec,
+                is_true: false,
+                is_left: false,
+            },
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: vec![1_u8]
+                        .into_iter()
+                        .chain(spec.empty_child.iter().cloned())
+                        .collect(),
+                    suffix: vec![],
+                    hash: spec.hash,
+                },
+                spec: spec,
+                is_true: true,
+                is_left: true,
+            },
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: vec![1_u8]
+                        .into_iter()
+                        .chain(spec.empty_child.iter().cloned())
+                        .collect(),
+                    suffix: vec![0_u8; 32],
+                    hash: spec.hash,
+                },
+                spec: spec,
+                is_true: true,
+                is_left: true,
+            },
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: vec![1_u8]
+                        .into_iter()
+                        .chain(vec![0_u8; 32].into_iter())
+                        .collect(),
+                    suffix: vec![],
+                    hash: spec.hash,
+                },
+                spec: spec,
+                is_true: false,
+                is_left: true,
+            },
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: vec![1_u8],
+                    suffix: vec![],
+                    hash: spec.hash,
+                },
+                spec: spec,
+                is_true: false,
+                is_left: true,
+            },
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: vec![1_u8]
+                        .into_iter()
+                        .chain(spec.empty_child.iter().cloned())
+                        .chain(b"xxxx".to_vec())
+                        .collect(),
+                    suffix: vec![],
+                    hash: spec.hash,
+                },
+                spec: spec,
+                is_true: false,
+                is_left: true,
+            },
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: vec![1_u8],
+                    suffix: vec![],
+                    hash: non_empty_spec.hash,
+                },
+                spec: &non_empty_spec,
+                is_true: false,
+                is_left: true,
+            },
+        ];
+
+        for (i, case) in cases.iter().enumerate() {
+            let res = if case.is_left {
+                left_branches_are_empty(case.spec, &case.op, 0)?
+            } else {
+                right_branches_are_empty(case.spec, &case.op, 1)?
+            };
+            if case.is_true {
+                assert!(res, "result should be true (i={})", i);
+            } else {
+                assert!(!res, "result should be false (i={})", i);
+            }
+        }
+        Ok(())
     }
 }
