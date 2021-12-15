@@ -204,6 +204,30 @@ pub fn tendermint_spec() -> ics23::ProofSpec {
     }
 }
 
+pub fn smt_spec() -> ics23::ProofSpec {
+    let leaf = ics23::LeafOp {
+        hash: ics23::HashOp::Sha256.into(),
+        prehash_key: 0,
+        prehash_value: ics23::HashOp::Sha256.into(),
+        length: 0,
+        prefix: vec![0_u8],
+    };
+    let inner = ics23::InnerSpec {
+        child_order: vec![0, 1],
+        min_prefix_length: 1,
+        max_prefix_length: 1,
+        child_size: 32,
+        empty_child: vec![0; 32],
+        hash: ics23::HashOp::Sha256.into(),
+    };
+    ics23::ProofSpec {
+        leaf_spec: Some(leaf),
+        inner_spec: Some(inner),
+        min_depth: 0,
+        max_depth: 0,
+    }
+}
+
 #[cfg(feature = "std")]
 #[cfg(test)]
 mod tests {
