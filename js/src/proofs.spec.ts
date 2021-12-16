@@ -1,7 +1,8 @@
 import { ics23 } from "./generated/codecimpl";
 
 import { fromHex, toAscii } from "./helpers";
-import { calculateExistenceRoot, ensureSpec, iavlSpec } from "./proofs";
+import { calculateExistenceRoot, ensureSpec, iavlSpec,
+         leftBranchesAreEmpty, rightBranchesAreEmpty } from "./proofs";
 
 describe("calculateExistenceRoot", () => {
   it("must have at least one step", () => {
@@ -191,3 +192,26 @@ describe("ensureSpec", () => {
     expect(() => ensureSpec(proof, depthLimitedSpec)).toThrow();
   });
 });
+
+describe("checkEmptyBranch", () => {
+  const innerSpecWithEmptyChild: IInnerSpec = {
+    childOrder: [0, 1],
+    childSize: 32,
+    minPrefixLength: 1,
+    maxPrefixLength: 1,
+    emptyChild: new Uint8Array(32),
+    hash: ics23.HashOp.SHA256
+  };
+
+  it("identifies empty right branches", () => {
+    const ops: ReadonlyArray<ics23.IInnerOp> = [
+      {
+        prefix: Uint8Array.from([1]),
+        suffix: innerSpecWithEmptyChild.emptyChild,
+      },
+    ];
+    for (const op of ops) {
+      expect(() => rightBranchesAreEmpty(innerSpecWithEmptyChild, op, 1)).toEqual(true);
+    }
+  })
+})
