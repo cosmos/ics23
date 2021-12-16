@@ -70,134 +70,114 @@ func CheckAgainstSpecTestData(t *testing.T) map[string]CheckAgainstSpecTestStruc
 	return cases
 }
 
-type EmptyBranchTestStruct struct {
-	Op     *InnerOp
-	Spec   *InnerSpec
-	IsTrue bool
-	IsLeft bool
+var SpecWithEmptyChild = &ProofSpec{
+	LeafSpec: &LeafOp{
+		Prefix:       []byte{0},
+		Hash:         HashOp_SHA256,
+		PrehashValue: HashOp_SHA256,
+	},
+	InnerSpec: &InnerSpec{
+		ChildOrder:      []int32{0, 1},
+		ChildSize:       32,
+		MinPrefixLength: 1,
+		MaxPrefixLength: 1,
+		EmptyChild:      []byte("32_empty_child_placeholder_bytes"),
+		Hash:            HashOp_SHA256,
+	},
 }
 
-var InnerSpecWithEmptyChild = InnerSpec{
-	ChildOrder:      []int32{0, 1},
-	ChildSize:       32,
-	MinPrefixLength: 1,
-	MaxPrefixLength: 1,
-	EmptyChild:      []byte("32_empty_child_placeholder_bytes"),
-	Hash:            HashOp_SHA256,
+type EmptyBranchTestStruct struct {
+	Op      *InnerOp
+	Spec    *ProofSpec
+	IsLeft  bool
+	IsRight bool
 }
 
 func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
+	var emptyChild = SpecWithEmptyChild.InnerSpec.EmptyChild
+
 	return []EmptyBranchTestStruct{
 		EmptyBranchTestStruct{
 			Op: &InnerOp{
-				Prefix: []byte{1},
-				Suffix: InnerSpecWithEmptyChild.EmptyChild,
+				Prefix: append([]byte{1}, emptyChild...),
+				Suffix: nil,
+				Hash:   SpecWithEmptyChild.InnerSpec.Hash,
 			},
-			Spec:   &InnerSpecWithEmptyChild,
-			IsTrue: true,
-			IsLeft: false,
+			Spec:    SpecWithEmptyChild,
+			IsLeft:  true,
+			IsRight: false,
 		},
 		EmptyBranchTestStruct{
 			Op: &InnerOp{
-				Prefix: append([]byte{1}, make([]byte, 32)...),
-				Suffix: InnerSpecWithEmptyChild.EmptyChild,
+				Prefix: []byte{1},
+				Suffix: emptyChild,
+				Hash:   SpecWithEmptyChild.InnerSpec.Hash,
 			},
-			Spec:   &InnerSpecWithEmptyChild,
-			IsTrue: true,
-			IsLeft: false,
+			Spec:    SpecWithEmptyChild,
+			IsLeft:  false,
+			IsRight: true,
+		},
+		// non-empty cases
+		EmptyBranchTestStruct{
+			Op: &InnerOp{
+				Prefix: append([]byte{1}, make([]byte, 32)...),
+				Suffix: nil,
+				Hash:   SpecWithEmptyChild.InnerSpec.Hash,
+			},
+			Spec:    SpecWithEmptyChild,
+			IsLeft:  false,
+			IsRight: false,
 		},
 		EmptyBranchTestStruct{
 			Op: &InnerOp{
 				Prefix: []byte{1},
 				Suffix: make([]byte, 32),
+				Hash:   SpecWithEmptyChild.InnerSpec.Hash,
 			},
-			Spec:   &InnerSpecWithEmptyChild,
-			IsTrue: false,
-			IsLeft: false,
+			Spec:    SpecWithEmptyChild,
+			IsLeft:  false,
+			IsRight: false,
+		},
+		EmptyBranchTestStruct{
+			Op: &InnerOp{
+				Prefix: append(append([]byte{1}, emptyChild[0:28]...), []byte("xxxx")...),
+				Suffix: nil,
+				Hash:   SpecWithEmptyChild.InnerSpec.Hash,
+			},
+			Spec:    SpecWithEmptyChild,
+			IsLeft:  false,
+			IsRight: false,
 		},
 		EmptyBranchTestStruct{
 			Op: &InnerOp{
 				Prefix: []byte{1},
-				Suffix: nil,
+				Suffix: append(append([]byte(nil), emptyChild[0:28]...), []byte("xxxx")...),
+				Hash:   SpecWithEmptyChild.InnerSpec.Hash,
 			},
-			Spec:   &InnerSpecWithEmptyChild,
-			IsTrue: false,
-			IsLeft: false,
+			Spec:    SpecWithEmptyChild,
+			IsLeft:  false,
+			IsRight: false,
 		},
-		EmptyBranchTestStruct{
-			Op: &InnerOp{
-				Prefix: []byte{1},
-				Suffix: append(InnerSpecWithEmptyChild.EmptyChild, []byte("xxxx")...),
-			},
-			Spec:   &InnerSpecWithEmptyChild,
-			IsTrue: false,
-			IsLeft: false,
-		},
-		EmptyBranchTestStruct{
-			Op: &InnerOp{
-				Prefix: []byte{1},
-				Suffix: nil,
-			},
-			Spec:   IavlSpec.InnerSpec,
-			IsTrue: false,
-			IsLeft: false,
-		},
-
-		EmptyBranchTestStruct{
-			Op: &InnerOp{
-				Prefix: append([]byte{1}, InnerSpecWithEmptyChild.EmptyChild...),
-				Suffix: nil,
-			},
-			Spec:   &InnerSpecWithEmptyChild,
-			IsTrue: true,
-			IsLeft: true,
-		},
-		EmptyBranchTestStruct{
-			Op: &InnerOp{
-				Prefix: append([]byte{1}, InnerSpecWithEmptyChild.EmptyChild...),
-				Suffix: make([]byte, 32),
-			},
-			Spec:   &InnerSpecWithEmptyChild,
-			IsTrue: true,
-			IsLeft: true,
-		},
+		// some cases using a spec with no empty child
 		EmptyBranchTestStruct{
 			Op: &InnerOp{
 				Prefix: append([]byte{1}, make([]byte, 32)...),
 				Suffix: nil,
+				Hash:   TendermintSpec.InnerSpec.Hash,
 			},
-			Spec:   &InnerSpecWithEmptyChild,
-			IsTrue: false,
-			IsLeft: true,
+			Spec:    TendermintSpec,
+			IsLeft:  false,
+			IsRight: false,
 		},
 		EmptyBranchTestStruct{
 			Op: &InnerOp{
 				Prefix: []byte{1},
-				Suffix: nil,
+				Suffix: make([]byte, 32),
+				Hash:   TendermintSpec.InnerSpec.Hash,
 			},
-			Spec:   &InnerSpecWithEmptyChild,
-			IsTrue: false,
-			IsLeft: true,
-		},
-		EmptyBranchTestStruct{
-			Op: &InnerOp{
-				Prefix: append(
-					append([]byte{1}, InnerSpecWithEmptyChild.EmptyChild...),
-					[]byte("xxxx")...),
-				Suffix: nil,
-			},
-			Spec:   &InnerSpecWithEmptyChild,
-			IsTrue: false,
-			IsLeft: true,
-		},
-		EmptyBranchTestStruct{
-			Op: &InnerOp{
-				Prefix: []byte{1},
-				Suffix: nil,
-			},
-			Spec:   IavlSpec.InnerSpec,
-			IsTrue: false,
-			IsLeft: true,
+			Spec:    TendermintSpec,
+			IsLeft:  false,
+			IsRight: false,
 		},
 	}
 }

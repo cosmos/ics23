@@ -58,17 +58,17 @@ func TestCheckAgainstSpec(t *testing.T) {
 func TestEmptyBranch(t *testing.T) {
 	cases := EmptyBranchTestData(t)
 
-	for i, tc := range cases {
-		var res bool
-		if tc.IsLeft {
-			res = leftBranchesAreEmpty(tc.Spec, tc.Op, 0)
-		} else {
-			res = rightBranchesAreEmpty(tc.Spec, tc.Op, 1)
-		}
-		if tc.IsTrue && !res {
-			t.Errorf("Result should be true, but was false (i=%v)", i)
-		} else if !tc.IsTrue && res {
-			t.Errorf("Result should be false, but was true (i=%v)", i)
-		}
+	for _, tc := range cases {
+		t.Run("case", func(t *testing.T) {
+			if err := tc.Op.CheckAgainstSpec(tc.Spec); err != nil {
+				t.Errorf("Invalid InnerOp: %v", err)
+			}
+			if leftBranchesAreEmpty(tc.Spec.InnerSpec, tc.Op, 0) != tc.IsLeft {
+				t.Errorf("Expected leftBranchesAreEmpty to be %t but it wasn't", tc.IsLeft)
+			}
+			if rightBranchesAreEmpty(tc.Spec.InnerSpec, tc.Op, 1) != tc.IsRight {
+				t.Errorf("Expected rightBranchesAreEmpty to be %t but it wasn't", tc.IsRight)
+			}
+		})
 	}
 }
