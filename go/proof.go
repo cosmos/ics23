@@ -210,35 +210,27 @@ func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []b
 	return nil
 }
 
-// IsLeftMost returns true if this is the left-most path in the tree
+// IsLeftMost returns true if this is the left-most path in the tree, excluding placeholder (empty child) nodes
 func IsLeftMost(spec *InnerSpec, path []*InnerOp) bool {
 	minPrefix, maxPrefix, suffix := getPadding(spec, 0)
 
-	// ensure every step has a prefix and suffix defined to be leftmost
+	// ensure every step has a prefix and suffix defined to be leftmost, unless it is a placeholder node
 	for _, step := range path {
-		if !hasPadding(step, minPrefix, maxPrefix, suffix) {
-			// if this is a placeholder node, skip it
-			if leftBranchesAreEmpty(spec, step, 0) {
-				continue
-			}
+		if !hasPadding(step, minPrefix, maxPrefix, suffix) && !leftBranchesAreEmpty(spec, step, 0) {
 			return false
 		}
 	}
 	return true
 }
 
-// IsRightMost returns true if this is the left-most path in the tree
+// IsRightMost returns true if this is the left-most path in the tree, excluding placeholder (empty child) nodes
 func IsRightMost(spec *InnerSpec, path []*InnerOp) bool {
 	last := len(spec.ChildOrder) - 1
 	minPrefix, maxPrefix, suffix := getPadding(spec, int32(last))
 
-	// ensure every step has a prefix and suffix defined to be rightmost
+	// ensure every step has a prefix and suffix defined to be rightmost, unless it is a placeholder node
 	for _, step := range path {
-		if !hasPadding(step, minPrefix, maxPrefix, suffix) {
-			// if this is a placeholder node, skip it
-			if rightBranchesAreEmpty(spec, step, int32(last)) {
-				continue
-			}
+		if !hasPadding(step, minPrefix, maxPrefix, suffix) && !rightBranchesAreEmpty(spec, step, int32(last)) {
 			return false
 		}
 	}
