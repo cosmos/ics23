@@ -166,27 +166,25 @@ fn ensure_inner(inner: &ics23::InnerOp, spec: &ics23::ProofSpec) -> Result<()> {
     }
 }
 
+// ensure_left_most fails unless this is the left-most path in the tree, excluding placeholder (empty child) nodes
 fn ensure_left_most(spec: &ics23::InnerSpec, path: &[ics23::InnerOp]) -> Result<()> {
     let pad = get_padding(spec, 0)?;
+    // ensure every step has a prefix and suffix defined to be leftmost, unless it is a placeholder node
     for step in path {
-        if !has_padding(step, &pad) {
-            if left_branches_are_empty(spec, step, 0)? {
-                continue;
-            }
+        if !has_padding(step, &pad) && !left_branches_are_empty(spec, step, 0)? {
             bail!("step not leftmost")
         }
     }
     Ok(())
 }
 
+// ensure_right_most returns true if this is the right-most path in the tree, excluding placeholder (empty child) nodes
 fn ensure_right_most(spec: &ics23::InnerSpec, path: &[ics23::InnerOp]) -> Result<()> {
     let idx = spec.child_order.len() - 1;
     let pad = get_padding(spec, idx as i32)?;
+    // ensure every step has a prefix and suffix defined to be rightmost, unless it is a placeholder node
     for step in path {
-        if !has_padding(step, &pad) {
-            if right_branches_are_empty(spec, step, idx as i32)? {
-                continue;
-            }
+        if !has_padding(step, &pad) && !right_branches_are_empty(spec, step, idx as i32)? {
             bail!("step not leftmost")
         }
     }
@@ -274,13 +272,13 @@ fn left_branches_are_empty(
     if let Some(&idx) = spec.child_order.iter().find(|&&x| x == branch) {
         // compare the prefix bytes with the appropriate number of empty children
         let left_children = spec.child_order.len() - 1 - idx as usize;
-        if op.prefix.len() < left_children * spec.child_size as usize {
-            return Ok(false);
-        }
-        let actual_prefix = op.prefix.len() - left_children * spec.child_size as usize;
+        let child_size = spec.child_size as usize;
+        let actual_prefix = match op.prefix.len().checked_sub(left_children * child_size) {
+            Some(n) => n, _ => return Ok(false)
+        };
         for i in 0..left_children {
-            let from = actual_prefix + i * spec.child_size as usize;
-            if spec.empty_child != op.prefix[from..from + spec.child_size as usize] {
+            let from = actual_prefix + i * child_size;
+            if spec.empty_child != op.prefix[from..from + child_size] {
                 return Ok(false);
             }
         }
