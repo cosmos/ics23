@@ -48,23 +48,26 @@ func TestBatchVectors(t *testing.T) {
 				// non-existence
 				valid := VerifyNonMembership(tc.Spec, tc.Ref.RootHash, tc.Proof, tc.Ref.Key)
 				if valid == tc.Invalid {
-					t.Fatalf("Expected proof validity: %t", !tc.Invalid)
+					t.Logf("name: %+v", name)
+					t.Logf("ref: %+v", tc.Ref)
+					t.Logf("spec: %+v", tc.Spec)
+					t.Errorf("Expected proof validity: %t", !tc.Invalid)
 				}
 				keys := [][]byte{tc.Ref.Key}
 				valid = BatchVerifyNonMembership(tc.Spec, tc.Ref.RootHash, tc.Proof, keys)
 				if valid == tc.Invalid {
-					t.Fatalf("Expected batch proof validity: %t", !tc.Invalid)
+					t.Errorf("Expected batch proof validity: %t", !tc.Invalid)
 				}
 			} else {
 				valid := VerifyMembership(tc.Spec, tc.Ref.RootHash, tc.Proof, tc.Ref.Key, tc.Ref.Value)
 				if valid == tc.Invalid {
-					t.Fatalf("Expected proof validity: %t", !tc.Invalid)
+					t.Errorf("Expected proof validity: %t", !tc.Invalid)
 				}
 				items := make(map[string][]byte)
 				items[string(tc.Ref.Key)] = tc.Ref.Value
 				valid = BatchVerifyMembership(tc.Spec, tc.Ref.RootHash, tc.Proof, items)
 				if valid == tc.Invalid {
-					t.Fatalf("Expected batch proof validity: %t", !tc.Invalid)
+					t.Errorf("Expected batch proof validity: %t", !tc.Invalid)
 				}
 			}
 		})

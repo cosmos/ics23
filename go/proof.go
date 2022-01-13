@@ -281,10 +281,15 @@ func isLeftStep(spec *InnerSpec, left *InnerOp, right *InnerOp) bool {
 		panic(err)
 	}
 
+	// for idx := leftidx + 1; idx != rightidx; idx++ {
+	// leftBranchesAreEmpty()
+	// }
+
 	// TODO: is it possible there are empty (nil) children???
 	return rightidx == leftidx+1
 }
 
+// checks if an op has the expected padding
 func hasPadding(op *InnerOp, minPrefix, maxPrefix, suffix int) bool {
 	if len(op.Prefix) < minPrefix {
 		return false
@@ -313,13 +318,17 @@ func getPadding(spec *InnerSpec, branch int32) (minPrefix, maxPrefix, suffix int
 // on the left side of this branch, ie. it's a valid placeholder on a leftmost path
 func leftBranchesAreEmpty(spec *InnerSpec, op *InnerOp, branch int32) bool {
 	idx := getPosition(spec.ChildOrder, branch)
-	// compare the prefix bytes with the appropriate number of empty children
-	leftChildren := idx
-	actualPrefix := len(op.Prefix) - leftChildren*int(spec.ChildSize)
+	// count branches to left of this
+	leftBranches := idx
+	if leftBranches == 0 {
+		return false
+	}
+	// compare prefix with the expected number of empty branches
+	actualPrefix := len(op.Prefix) - leftBranches*int(spec.ChildSize)
 	if actualPrefix < 0 {
 		return false
 	}
-	for i := 0; i < leftChildren; i++ {
+	for i := 0; i < leftBranches; i++ {
 		from := actualPrefix + i*int(spec.ChildSize)
 		if !bytes.Equal(spec.EmptyChild, op.Prefix[from:from+int(spec.ChildSize)]) {
 			return false
@@ -332,10 +341,14 @@ func leftBranchesAreEmpty(spec *InnerSpec, op *InnerOp, branch int32) bool {
 // on the right side of this branch, ie. it's a valid placeholder on a rightmost path
 func rightBranchesAreEmpty(spec *InnerSpec, op *InnerOp, branch int32) bool {
 	idx := getPosition(spec.ChildOrder, branch)
+	// count branches to right of this one
 	rightBranches := len(spec.ChildOrder) - 1 - idx
-	// compare the suffix bytes with the appropriate number of empty children
-	if len(op.Suffix) != rightBranches*int(spec.ChildSize) {
+	if rightBranches == 0 {
 		return false
+	}
+	// compare suffix with the expected number of empty branches
+	if len(op.Suffix) != rightBranches*int(spec.ChildSize) {
+		return false // sanity check
 	}
 	for i := 0; i < rightBranches; i++ {
 		from := i * int(spec.ChildSize)
