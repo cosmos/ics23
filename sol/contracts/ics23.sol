@@ -14,7 +14,6 @@ library Ics23  {
         ExistenceProofIsNil,
         ProofVerify
     }
-    // verifyMembership, throws an exception in case anything goes wrong
     function verifyMembership(ProofSpec.Data memory spec, bytes memory commitmentRoot, CommitmentProof.Data memory proof, bytes memory key, bytes memory value) internal pure returns(VerifyMembershipError){
         CommitmentProof.Data memory decoProof = Compress.decompress(proof);
         ExistenceProof.Data memory exiProof = getExistProofForKey(decoProof, key);
@@ -31,6 +30,7 @@ library Ics23  {
         NonExistenceProofIsNil,
         ProofVerify
     }
+
     function verifyNonMembership(ProofSpec.Data memory spec, bytes memory commitmentRoot, CommitmentProof.Data memory proof, bytes memory key) internal pure returns(VerifyNonMembershipError) {
         CommitmentProof.Data memory decoProof = Compress.decompress(proof);
         NonExistenceProof.Data memory nonProof = getNonExistProofForKey(decoProof, key);

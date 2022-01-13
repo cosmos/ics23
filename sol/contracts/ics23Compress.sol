@@ -5,6 +5,10 @@ import {InnerOp, ExistenceProof, NonExistenceProof, CommitmentProof, CompressedB
 import {SafeCast} from "OpenZeppelin/openzeppelin-contracts@4.2.0/contracts/utils/math/SafeCast.sol";
 
 library Compress {
+    /**
+      @notice will return a BatchProof if the input is CompressedBatchProof. Otherwise it will return the input.
+      This is safe to call multiple times (idempotent)
+    */
     function decompress(CommitmentProof.Data memory proof) internal pure returns(CommitmentProof.Data memory) {
         //CompressedBatchProof.isNil() does not work
         if (CompressedBatchProof._empty(proof.compressed) == true){
@@ -20,7 +24,6 @@ library Compress {
         });
     }
 
-    // private 
     function decompress(CompressedBatchProof.Data memory proof) private pure returns(BatchEntry.Data[] memory) {
         BatchEntry.Data[] memory entries = new BatchEntry.Data[](proof.entries.length);
         for(uint i = 0; i < proof.entries.length; i++) {
@@ -29,7 +32,10 @@ library Compress {
         return entries;
     }
 
-    function decompressEntry(CompressedBatchEntry.Data memory entry, InnerOp.Data[] memory lookup) private pure returns(BatchEntry.Data memory) {
+    function decompressEntry(
+        CompressedBatchEntry.Data memory entry,
+        InnerOp.Data[] memory lookup
+    ) private pure returns(BatchEntry.Data memory) {
         //CompressedExistenceProof.isNil does not work
         if (CompressedExistenceProof._empty(entry.exist) == false) {
             return BatchEntry.Data({
@@ -47,7 +53,10 @@ library Compress {
         });
     }
 
-    function decompressExist(CompressedExistenceProof.Data memory proof, InnerOp.Data[] memory lookup) private pure returns(ExistenceProof.Data memory) {
+    function decompressExist(
+        CompressedExistenceProof.Data memory proof,
+        InnerOp.Data[] memory lookup
+    ) private pure returns(ExistenceProof.Data memory) {
         if (CompressedExistenceProof._empty(proof)) {
             return ExistenceProof.nil();
         }

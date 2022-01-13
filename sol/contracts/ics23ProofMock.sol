@@ -18,8 +18,8 @@ contract ProofMock {
         require(eCode == Proof.CalculateRootError.None); // dev: expand this require to check error code
         return res;
     }
-    function protobufDecodeCommitmentProof(bytes memory msg) public pure returns(CommitmentProof.Data memory) {
-        CommitmentProof.Data memory res = CommitmentProof.decode(msg);
+    function protobufDecodeCommitmentProof(bytes memory protoMsg) public pure returns(CommitmentProof.Data memory) {
+        CommitmentProof.Data memory res = CommitmentProof.decode(protoMsg);
         return res;
     }
 }
