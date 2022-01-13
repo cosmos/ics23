@@ -105,7 +105,7 @@ func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
 			},
 			Spec:    SpecWithEmptyChild,
 			IsLeft:  true,
-			IsRight: false,
+			IsRight: true,
 		},
 		EmptyBranchTestStruct{
 			Op: &InnerOp{
@@ -114,7 +114,7 @@ func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
 				Hash:   SpecWithEmptyChild.InnerSpec.Hash,
 			},
 			Spec:    SpecWithEmptyChild,
-			IsLeft:  false,
+			IsLeft:  true,
 			IsRight: true,
 		},
 		// non-empty cases
@@ -126,7 +126,7 @@ func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
 			},
 			Spec:    SpecWithEmptyChild,
 			IsLeft:  false,
-			IsRight: false,
+			IsRight: true,
 		},
 		EmptyBranchTestStruct{
 			Op: &InnerOp{
@@ -135,7 +135,7 @@ func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
 				Hash:   SpecWithEmptyChild.InnerSpec.Hash,
 			},
 			Spec:    SpecWithEmptyChild,
-			IsLeft:  false,
+			IsLeft:  true,
 			IsRight: false,
 		},
 		EmptyBranchTestStruct{
@@ -146,7 +146,7 @@ func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
 			},
 			Spec:    SpecWithEmptyChild,
 			IsLeft:  false,
-			IsRight: false,
+			IsRight: true,
 		},
 		EmptyBranchTestStruct{
 			Op: &InnerOp{
@@ -155,7 +155,7 @@ func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
 				Hash:   SpecWithEmptyChild.InnerSpec.Hash,
 			},
 			Spec:    SpecWithEmptyChild,
-			IsLeft:  false,
+			IsLeft:  true,
 			IsRight: false,
 		},
 		// some cases using a spec with no empty child
@@ -167,7 +167,7 @@ func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
 			},
 			Spec:    TendermintSpec,
 			IsLeft:  false,
-			IsRight: false,
+			IsRight: true,
 		},
 		EmptyBranchTestStruct{
 			Op: &InnerOp{
@@ -176,7 +176,7 @@ func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
 				Hash:   TendermintSpec.InnerSpec.Hash,
 			},
 			Spec:    TendermintSpec,
-			IsLeft:  false,
+			IsLeft:  true,
 			IsRight: false,
 		},
 	}

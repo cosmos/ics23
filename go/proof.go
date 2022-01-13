@@ -314,7 +314,7 @@ func getPadding(spec *InnerSpec, branch int32) (minPrefix, maxPrefix, suffix int
 func leftBranchesAreEmpty(spec *InnerSpec, op *InnerOp, branch int32) bool {
 	idx := getPosition(spec.ChildOrder, branch)
 	// compare the prefix bytes with the appropriate number of empty children
-	leftChildren := len(spec.ChildOrder) - 1 - idx
+	leftChildren := idx
 	actualPrefix := len(op.Prefix) - leftChildren*int(spec.ChildSize)
 	if actualPrefix < 0 {
 		return false
@@ -332,11 +332,12 @@ func leftBranchesAreEmpty(spec *InnerSpec, op *InnerOp, branch int32) bool {
 // on the right side of this branch, ie. it's a valid placeholder on a rightmost path
 func rightBranchesAreEmpty(spec *InnerSpec, op *InnerOp, branch int32) bool {
 	idx := getPosition(spec.ChildOrder, branch)
+	rightBranches := len(spec.ChildOrder) - 1 - idx
 	// compare the suffix bytes with the appropriate number of empty children
-	if len(op.Suffix) != idx*int(spec.ChildSize) {
+	if len(op.Suffix) != rightBranches*int(spec.ChildSize) {
 		return false
 	}
-	for i := 0; i < idx; i++ {
+	for i := 0; i < rightBranches; i++ {
 		from := i * int(spec.ChildSize)
 		if !bytes.Equal(spec.EmptyChild, op.Suffix[from:from+int(spec.ChildSize)]) {
 			return false
