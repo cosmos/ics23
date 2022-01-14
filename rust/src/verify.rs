@@ -270,13 +270,18 @@ fn left_branches_are_empty(
     branch: i32,
 ) -> Result<bool> {
     if let Some(&idx) = spec.child_order.iter().find(|&&x| x == branch) {
-        // compare the prefix bytes with the appropriate number of empty children
-        let left_children = spec.child_order.len() - 1 - idx as usize;
+        // count branches to left of this
+        let left_branches = idx as usize;
+        if left_branches == 0 {
+            return Ok(false);
+        }
         let child_size = spec.child_size as usize;
-        let actual_prefix = match op.prefix.len().checked_sub(left_children * child_size) {
-            Some(n) => n, _ => return Ok(false)
+        // compare prefix with the expected number of empty branches
+        let actual_prefix = match op.prefix.len().checked_sub(left_branches * child_size) {
+            Some(n) => n,
+            _ => return Ok(false),
         };
-        for i in 0..left_children {
+        for i in 0..left_branches {
             let from = actual_prefix + i * child_size;
             if spec.empty_child != op.prefix[from..from + child_size] {
                 return Ok(false);
@@ -296,11 +301,16 @@ fn right_branches_are_empty(
     branch: i32,
 ) -> Result<bool> {
     if let Some(&idx) = spec.child_order.iter().find(|&&x| x == branch) {
-        // compare the suffix bytes with the appropriate number of empty children
+        // count branches to right of this one
+        let right_branches = spec.child_order.len() - 1 - idx as usize;
+        // compare suffix with the expected number of empty branches
+        if right_branches == 0 {
+            return Ok(false);
+        }
         if op.suffix.len() != spec.child_size as usize {
             return Ok(false);
         }
-        for i in 0..(idx as usize) {
+        for i in 0..right_branches {
             let from = i * spec.child_size as usize;
             if spec.empty_child != op.suffix[from..from + spec.child_size as usize] {
                 return Ok(false);
@@ -709,15 +719,19 @@ mod tests {
         for (i, case) in cases.iter().enumerate() {
             ensure_inner(&case.op, case.spec)?;
             let inner = &case.spec.inner_spec.as_ref().unwrap();
+            let order = match order_from_padding(inner, &case.op) {
+                Ok(branch) => branch,
+                _ => bail!("invalid op"),
+            };
             assert_eq!(
                 case.is_left,
-                left_branches_are_empty(inner, &case.op, 0)?,
+                left_branches_are_empty(inner, &case.op, order)?,
                 "case {}",
                 i
             );
             assert_eq!(
                 case.is_right,
-                right_branches_are_empty(inner, &case.op, 1)?,
+                right_branches_are_empty(inner, &case.op, order)?,
                 "case {}",
                 i
             );
