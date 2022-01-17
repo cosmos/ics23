@@ -281,10 +281,6 @@ func isLeftStep(spec *InnerSpec, left *InnerOp, right *InnerOp) bool {
 		panic(err)
 	}
 
-	// for idx := leftidx + 1; idx != rightidx; idx++ {
-	// leftBranchesAreEmpty()
-	// }
-
 	// TODO: is it possible there are empty (nil) children???
 	return rightidx == leftidx+1
 }
