@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.2;
 
-import {BatchProof, CompressedBatchProof, CommitmentProof, ProofSpec, ExistenceProof, NonExistenceProof} from "./proofs.sol";
+import {
+    Ics23BatchProof, Ics23CompressedBatchProof, Ics23CommitmentProof, Ics23ProofSpec, Ics23ExistenceProof, Ics23NonExistenceProof
+} from "./proofs.sol";
 import {Compress} from "./ics23Compress.sol";
 import {Proof} from "./ics23Proof.sol";
 import {Ops} from "./ics23Ops.sol";
@@ -14,11 +16,17 @@ library Ics23  {
         ExistenceProofIsNil,
         ProofVerify
     }
-    function verifyMembership(ProofSpec.Data memory spec, bytes memory commitmentRoot, CommitmentProof.Data memory proof, bytes memory key, bytes memory value) internal pure returns(VerifyMembershipError){
-        CommitmentProof.Data memory decoProof = Compress.decompress(proof);
-        ExistenceProof.Data memory exiProof = getExistProofForKey(decoProof, key);
-        //require(ExistenceProof.isNil(exiProof) == false); // dev: getExistProofForKey not available
-        if (ExistenceProof.isNil(exiProof)) return VerifyMembershipError.ExistenceProofIsNil;
+    function verifyMembership(
+        Ics23ProofSpec.Data memory spec,
+        bytes memory commitmentRoot,
+        Ics23CommitmentProof.Data memory proof,
+        bytes memory key,
+        bytes memory value
+    ) internal pure returns(VerifyMembershipError){
+        Ics23CommitmentProof.Data memory decoProof = Compress.decompress(proof);
+        Ics23ExistenceProof.Data memory exiProof = getExistProofForKey(decoProof, key);
+        //require(Ics23ExistenceProof.isNil(exiProof) == false); // dev: getExistProofForKey not available
+        if (Ics23ExistenceProof.isNil(exiProof)) return VerifyMembershipError.ExistenceProofIsNil;
         Proof.VerifyExistenceError vCode = Proof.verify(exiProof, spec, commitmentRoot, key, value);
         if (vCode != Proof.VerifyExistenceError.None) return VerifyMembershipError.ProofVerify;
 
@@ -31,11 +39,16 @@ library Ics23  {
         ProofVerify
     }
 
-    function verifyNonMembership(ProofSpec.Data memory spec, bytes memory commitmentRoot, CommitmentProof.Data memory proof, bytes memory key) internal pure returns(VerifyNonMembershipError) {
-        CommitmentProof.Data memory decoProof = Compress.decompress(proof);
-        NonExistenceProof.Data memory nonProof = getNonExistProofForKey(decoProof, key);
-        //require(NonExistenceProof.isNil(nonProof) == false); // dev: getNonExistProofForKey not available
-        if (NonExistenceProof.isNil(nonProof)) return VerifyNonMembershipError.NonExistenceProofIsNil;
+    function verifyNonMembership(
+        Ics23ProofSpec.Data memory spec,
+        bytes memory commitmentRoot,
+        Ics23CommitmentProof.Data memory proof,
+        bytes memory key
+    ) internal pure returns(VerifyNonMembershipError) {
+        Ics23CommitmentProof.Data memory decoProof = Compress.decompress(proof);
+        Ics23NonExistenceProof.Data memory nonProof = getNonExistProofForKey(decoProof, key);
+        //require(Ics23NonExistenceProof.isNil(nonProof) == false); // dev: getNonExistProofForKey not available
+        if (Ics23NonExistenceProof.isNil(nonProof)) return VerifyNonMembershipError.NonExistenceProofIsNil;
         Proof.VerifyNonExistenceError vCode =  Proof.verify(nonProof, spec, commitmentRoot, key);
         if (vCode != Proof.VerifyNonExistenceError.None) return VerifyNonMembershipError.ProofVerify;
 
@@ -62,46 +75,52 @@ library Ics23  {
 */
 
     // private
-    function getExistProofForKey(CommitmentProof.Data memory proof, bytes memory key) private pure returns(ExistenceProof.Data memory) {
-        if (ExistenceProof.isNil(proof.exist) == false){
+    function getExistProofForKey(
+        Ics23CommitmentProof.Data memory proof,
+        bytes memory key
+    ) private pure returns(Ics23ExistenceProof.Data memory) {
+        if (Ics23ExistenceProof.isNil(proof.exist) == false){
             if (BytesLib.equal(proof.exist.key, key) == true) {
                 return proof.exist;
             }
-        } else if(BatchProof.isNil(proof.batch) == false) {
+        } else if(Ics23BatchProof.isNil(proof.batch) == false) {
             for (uint i = 0; i < proof.batch.entries.length; i++) {
-                if (ExistenceProof.isNil(proof.batch.entries[i].exist) == false && 
+                if (Ics23ExistenceProof.isNil(proof.batch.entries[i].exist) == false && 
                     BytesLib.equal(proof.batch.entries[i].exist.key, key)) {
                     return proof.batch.entries[i].exist;
                 }
             }
         }
-        return ExistenceProof.nil();
+        return Ics23ExistenceProof.nil();
     }
 
-    function getNonExistProofForKey(CommitmentProof.Data memory proof, bytes memory key) private pure returns(NonExistenceProof.Data memory) {
-        if (NonExistenceProof.isNil(proof.nonexist) == false) {
+    function getNonExistProofForKey(
+        Ics23CommitmentProof.Data memory proof,
+        bytes memory key
+    ) private pure returns(Ics23NonExistenceProof.Data memory) {
+        if (Ics23NonExistenceProof.isNil(proof.nonexist) == false) {
             if (isLeft(proof.nonexist.left, key) && isRight(proof.nonexist.right, key)) {
                 return proof.nonexist;
             }
-        } else if (BatchProof.isNil(proof.batch) == false) {
+        } else if (Ics23BatchProof.isNil(proof.batch) == false) {
             for (uint i = 0; i < proof.batch.entries.length; i++) {
-                if (NonExistenceProof.isNil(proof.batch.entries[i].nonexist) == false && 
+                if (Ics23NonExistenceProof.isNil(proof.batch.entries[i].nonexist) == false && 
                     isLeft(proof.batch.entries[i].nonexist.left, key) && 
                     isRight(proof.batch.entries[i].nonexist.right, key)) {
                     return proof.batch.entries[i].nonexist;
                 }
             }
         }
-        return NonExistenceProof.nil();
+        return Ics23NonExistenceProof.nil();
     }
 
-    function isLeft(ExistenceProof.Data memory left, bytes memory key) private pure returns(bool) {
-        // ExistenceProof.isNil does not work
-        return ExistenceProof._empty(left) || Ops.compare(left.key, key) < 0;
+    function isLeft(Ics23ExistenceProof.Data memory left, bytes memory key) private pure returns(bool) {
+        // Ics23ExistenceProof.isNil does not work
+        return Ics23ExistenceProof._empty(left) || Ops.compare(left.key, key) < 0;
     }
 
-    function isRight(ExistenceProof.Data memory right, bytes memory key) private pure returns(bool) {
-        // ExistenceProof.isNil does not work
-        return ExistenceProof._empty(right) || Ops.compare(right.key, key) > 0;
+    function isRight(Ics23ExistenceProof.Data memory right, bytes memory key) private pure returns(bool) {
+        // Ics23ExistenceProof.isNil does not work
+        return Ics23ExistenceProof._empty(right) || Ops.compare(right.key, key) > 0;
     }
 }

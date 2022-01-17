@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.2;
 
-import {LeafOp, InnerOp, PROOFS_PROTO_GLOBAL_ENUMS, ProofSpec} from "./proofs.sol";
+import {Ics23LeafOp, Ics23InnerOp, PROOFS_PROTO_GLOBAL_ENUMS, Ics23ProofSpec} from "./proofs.sol";
 import {ProtoBufRuntime} from "./ProtoBufRuntime.sol";
 import {SafeCast} from "OpenZeppelin/openzeppelin-contracts@4.2.0/contracts/utils/math/SafeCast.sol";
 import {Math} from "OpenZeppelin/openzeppelin-contracts@4.2.0/contracts/utils/math/Math.sol";
@@ -22,7 +22,7 @@ library Ops {
     @return VerifyExistenceError enum giving indication of where error happened, None if verification succeded
         */
     function applyOp(
-        LeafOp.Data memory leafOp,
+        Ics23LeafOp.Data memory leafOp,
         bytes memory key,
         bytes memory value
     ) internal pure returns(bytes memory, ApplyLeafOpError) {
@@ -69,9 +69,12 @@ library Ops {
         MaxPrefixLength
     }
     /**
-    @notice will verify the LeafOp is in the format defined in spec
+    @notice will verify the Ics23LeafOp is in the format defined in spec
     */
-    function checkAgainstSpec(LeafOp.Data memory leafOp, ProofSpec.Data memory spec) internal pure returns(CheckAgainstSpecError) {
+    function checkAgainstSpec(
+        Ics23LeafOp.Data memory leafOp,
+        Ics23ProofSpec.Data memory spec
+    ) internal pure returns(CheckAgainstSpecError) {
         //require (leafOp.hash == spec.leaf_spec.hash); // dev: checkAgainstSpec for LeafOp - Unexpected HashOp
         if (leafOp.hash != spec.leaf_spec.hash) return CheckAgainstSpecError.Hash;
         //require(leafOp.prehash_key == spec.leaf_spec.prehash_key); // dev: checkAgainstSpec for LeafOp - Unexpected PrehashKey
@@ -95,7 +98,7 @@ library Ops {
     /**
     @notice apply will calculate the hash of the next step, given the hash of the previous step
     */
-    function applyOp(InnerOp.Data memory innerOp, bytes memory child ) internal pure returns(bytes memory, ApplyInnerOpError) {
+    function applyOp(Ics23InnerOp.Data memory innerOp, bytes memory child ) internal pure returns(bytes memory, ApplyInnerOpError) {
         //require(child.length > 0); // dev: Inner op needs child value
         if (child.length == 0) return (empty, ApplyInnerOpError.ChildLength);
         bytes memory preImage = abi.encodePacked(innerOp.prefix, child, innerOp.suffix);
@@ -106,9 +109,12 @@ library Ops {
     }
 
     /**
-    @notice will verify the InnerOp is in the format defined in spec
+    @notice will verify the Ics23InnerOp is in the format defined in spec
     */
-    function checkAgainstSpec(InnerOp.Data memory innerOp, ProofSpec.Data memory spec) internal pure returns(CheckAgainstSpecError) {
+    function checkAgainstSpec(
+        Ics23InnerOp.Data memory innerOp,
+        Ics23ProofSpec.Data memory spec
+    ) internal pure returns(CheckAgainstSpecError) {
         //require(innerOp.hash == spec.inner_spec.hash); // dev: checkAgainstSpec for InnerOp - Unexpected HashOp
         if (innerOp.hash != spec.inner_spec.hash) return CheckAgainstSpecError.Hash;
         uint256 minPrefixLength = SafeCast.toUint256(spec.inner_spec.min_prefix_length);
