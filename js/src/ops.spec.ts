@@ -14,6 +14,16 @@ describe("doHash", () => {
     );
   });
 
+  it("sha512 hashes food", () => {
+    // echo -n food | sha512sum
+    const hash = doHash(ics23.HashOp.SHA512, toAscii("food"));
+    expect(hash).toEqual(
+      fromHex(
+        "c235548cfe84fc87678ff04c9134e060cdcd7512d09ed726192151a995541ed8db9fda5204e72e7ac268214c322c17787c70530513c59faede52b7dd9ce64331"
+      )
+    );
+  });
+
   it("ripemd160 hashes food", () => {
     // echo -n food | openssl dgst -rmd160 -hex | cut -d' ' -f2
     const hash = doHash(ics23.HashOp.RIPEMD160, toAscii("food"));

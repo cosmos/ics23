@@ -81,6 +81,7 @@ function doHashOrNoop(hashOp: ics23.HashOp, preimage: Uint8Array): Uint8Array {
 function rp160(preimage: Uint8Array): Uint8Array {
   // this is a bit tricky to work with besides buffer
   return new Uint8Array(
+    // this requires string or Buffer....
     new ripemd160().update(toHex(preimage), "hex" as any).digest()
   );
 }
@@ -93,6 +94,18 @@ function s256(preimage: Uint8Array): Uint8Array {
   );
 }
 
+function s512(preimage: Uint8Array): Uint8Array {
+  return new Uint8Array(
+    shajs("sha512")
+      .update(preimage)
+      .digest()
+  );
+}
+
+function s512_256(preimage: Uint8Array): Uint8Array {
+  return new Uint8Array(sha512_256.arrayBuffer(preimage));
+}
+
 // doHash will preform the specified hash on the preimage.
 // if hashOp == NONE, it will return an error (use doHashOrNoop if you want different behavior)
 export function doHash(hashOp: ics23.HashOp, preimage: Uint8Array): Uint8Array {
@@ -100,18 +113,13 @@ export function doHash(hashOp: ics23.HashOp, preimage: Uint8Array): Uint8Array {
     case ics23.HashOp.SHA256:
       return s256(preimage);
     case ics23.HashOp.SHA512:
-      return new Uint8Array(
-        shajs("sha512")
-          .update(preimage)
-          .digest()
-      );
+      return s512(preimage);
     case ics23.HashOp.RIPEMD160:
-      // this requires string or Buffer....
       return rp160(preimage);
     case ics23.HashOp.BITCOIN:
       return rp160(s256(preimage));
     case ics23.HashOp.SHA512_256:
-      return new Uint8Array(sha512_256.arrayBuffer(preimage));
+      return s512_256(preimage);
   }
   throw new Error(`Unsupported hashop: ${hashOp}`);
 }
