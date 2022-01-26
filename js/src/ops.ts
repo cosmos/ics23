@@ -1,9 +1,11 @@
-import { sha512_256 } from "js-sha512";
-import ripemd160 from "ripemd160";
-import shajs from "sha.js";
+// tslint:disable-next-line:no-submodule-imports
+import { ripemd160 } from "@noble/hashes/ripemd160";
+// tslint:disable-next-line:no-submodule-imports
+import { sha256 } from "@noble/hashes/sha256";
+// tslint:disable-next-line:no-submodule-imports
+import { sha512, sha512_256 } from "@noble/hashes/sha512";
 
 import { ics23 } from "./generated/codecimpl";
-import { toHex } from "./helpers";
 
 export function applyLeaf(
   leaf: ics23.ILeafOp,
@@ -78,48 +80,20 @@ function doHashOrNoop(hashOp: ics23.HashOp, preimage: Uint8Array): Uint8Array {
   return doHash(hashOp, preimage);
 }
 
-function rp160(preimage: Uint8Array): Uint8Array {
-  // this is a bit tricky to work with besides buffer
-  return new Uint8Array(
-    // this requires string or Buffer....
-    new ripemd160().update(toHex(preimage), "hex" as any).digest()
-  );
-}
-
-function s256(preimage: Uint8Array): Uint8Array {
-  return new Uint8Array(
-    shajs("sha256")
-      .update(preimage)
-      .digest()
-  );
-}
-
-function s512(preimage: Uint8Array): Uint8Array {
-  return new Uint8Array(
-    shajs("sha512")
-      .update(preimage)
-      .digest()
-  );
-}
-
-function s512_256(preimage: Uint8Array): Uint8Array {
-  return new Uint8Array(sha512_256.arrayBuffer(preimage));
-}
-
 // doHash will preform the specified hash on the preimage.
 // if hashOp == NONE, it will return an error (use doHashOrNoop if you want different behavior)
 export function doHash(hashOp: ics23.HashOp, preimage: Uint8Array): Uint8Array {
   switch (hashOp) {
     case ics23.HashOp.SHA256:
-      return s256(preimage);
+      return sha256(preimage);
     case ics23.HashOp.SHA512:
-      return s512(preimage);
+      return sha512(preimage);
     case ics23.HashOp.RIPEMD160:
-      return rp160(preimage);
+      return ripemd160(preimage);
     case ics23.HashOp.BITCOIN:
-      return rp160(s256(preimage));
+      return ripemd160(sha256(preimage));
     case ics23.HashOp.SHA512_256:
-      return s512_256(preimage);
+      return sha512_256(preimage);
   }
   throw new Error(`Unsupported hashop: ${hashOp}`);
 }
