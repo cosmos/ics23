@@ -210,27 +210,27 @@ func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []b
 	return nil
 }
 
-// IsLeftMost returns true if this is the left-most path in the tree
+// IsLeftMost returns true if this is the left-most path in the tree, excluding placeholder (empty child) nodes
 func IsLeftMost(spec *InnerSpec, path []*InnerOp) bool {
 	minPrefix, maxPrefix, suffix := getPadding(spec, 0)
 
-	// ensure every step has a prefix and suffix defined to be leftmost
+	// ensure every step has a prefix and suffix defined to be leftmost, unless it is a placeholder node
 	for _, step := range path {
-		if !hasPadding(step, minPrefix, maxPrefix, suffix) {
+		if !hasPadding(step, minPrefix, maxPrefix, suffix) && !leftBranchesAreEmpty(spec, step, 0) {
 			return false
 		}
 	}
 	return true
 }
 
-// IsRightMost returns true if this is the left-most path in the tree
+// IsRightMost returns true if this is the left-most path in the tree, excluding placeholder (empty child) nodes
 func IsRightMost(spec *InnerSpec, path []*InnerOp) bool {
 	last := len(spec.ChildOrder) - 1
 	minPrefix, maxPrefix, suffix := getPadding(spec, int32(last))
 
-	// ensure every step has a prefix and suffix defined to be rightmost
+	// ensure every step has a prefix and suffix defined to be rightmost, unless it is a placeholder node
 	for _, step := range path {
-		if !hasPadding(step, minPrefix, maxPrefix, suffix) {
+		if !hasPadding(step, minPrefix, maxPrefix, suffix) && !rightBranchesAreEmpty(spec, step, int32(last)) {
 			return false
 		}
 	}
@@ -285,6 +285,7 @@ func isLeftStep(spec *InnerSpec, left *InnerOp, right *InnerOp) bool {
 	return rightidx == leftidx+1
 }
 
+// checks if an op has the expected padding
 func hasPadding(op *InnerOp, minPrefix, maxPrefix, suffix int) bool {
 	if len(op.Prefix) < minPrefix {
 		return false
@@ -307,6 +308,51 @@ func getPadding(spec *InnerSpec, branch int32) (minPrefix, maxPrefix, suffix int
 	// count how many children are in the suffix
 	suffix = (len(spec.ChildOrder) - 1 - idx) * int(spec.ChildSize)
 	return
+}
+
+// leftBranchesAreEmpty returns true if the padding bytes correspond to all empty children
+// on the left side of this branch, ie. it's a valid placeholder on a leftmost path
+func leftBranchesAreEmpty(spec *InnerSpec, op *InnerOp, branch int32) bool {
+	idx := getPosition(spec.ChildOrder, branch)
+	// count branches to left of this
+	leftBranches := idx
+	if leftBranches == 0 {
+		return false
+	}
+	// compare prefix with the expected number of empty branches
+	actualPrefix := len(op.Prefix) - leftBranches*int(spec.ChildSize)
+	if actualPrefix < 0 {
+		return false
+	}
+	for i := 0; i < leftBranches; i++ {
+		from := actualPrefix + i*int(spec.ChildSize)
+		if !bytes.Equal(spec.EmptyChild, op.Prefix[from:from+int(spec.ChildSize)]) {
+			return false
+		}
+	}
+	return true
+}
+
+// rightBranchesAreEmpty returns true if the padding bytes correspond to all empty children
+// on the right side of this branch, ie. it's a valid placeholder on a rightmost path
+func rightBranchesAreEmpty(spec *InnerSpec, op *InnerOp, branch int32) bool {
+	idx := getPosition(spec.ChildOrder, branch)
+	// count branches to right of this one
+	rightBranches := len(spec.ChildOrder) - 1 - idx
+	if rightBranches == 0 {
+		return false
+	}
+	// compare suffix with the expected number of empty branches
+	if len(op.Suffix) != rightBranches*int(spec.ChildSize) {
+		return false // sanity check
+	}
+	for i := 0; i < rightBranches; i++ {
+		from := i * int(spec.ChildSize)
+		if !bytes.Equal(spec.EmptyChild, op.Suffix[from:from+int(spec.ChildSize)]) {
+			return false
+		}
+	}
+	return true
 }
 
 // getPosition checks where the branch is in the order and returns

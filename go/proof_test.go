@@ -54,3 +54,25 @@ func TestCheckAgainstSpec(t *testing.T) {
 		})
 	}
 }
+
+func TestEmptyBranch(t *testing.T) {
+	cases := EmptyBranchTestData(t)
+
+	for _, tc := range cases {
+		t.Run("case", func(t *testing.T) {
+			if err := tc.Op.CheckAgainstSpec(tc.Spec); err != nil {
+				t.Errorf("Invalid InnerOp: %v", err)
+			}
+			order, err := orderFromPadding(tc.Spec.InnerSpec, tc.Op)
+			if err != nil {
+				t.Errorf("Cannot get orderFromPadding: %v", err)
+			}
+			if leftBranchesAreEmpty(tc.Spec.InnerSpec, tc.Op, order) != tc.IsLeft {
+				t.Errorf("Expected leftBranchesAreEmpty to be %t but it wasn't", tc.IsLeft)
+			}
+			if rightBranchesAreEmpty(tc.Spec.InnerSpec, tc.Op, order) != tc.IsRight {
+				t.Errorf("Expected rightBranchesAreEmpty to be %t but it wasn't", tc.IsRight)
+			}
+		})
+	}
+}
