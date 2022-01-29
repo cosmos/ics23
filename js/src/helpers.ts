@@ -1,11 +1,3 @@
-export function toHex(data: Uint8Array): string {
-  let out: string = "";
-  for (const byte of data) {
-    out += ("0" + byte.toString(16)).slice(-2);
-  }
-  return out;
-}
-
 export function fromHex(hexstring: string): Uint8Array {
   if (hexstring.length % 2 !== 0) {
     throw new Error("hex string length must be a multiple of 2");
