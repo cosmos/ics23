@@ -1,7 +1,7 @@
 import { ics23 } from "./generated/codecimpl";
 
-import { fromHex, toAscii } from "./helpers";
 import { applyInner, applyLeaf, doHash } from "./ops";
+import { fromHex, toAscii } from "./testhelpers.spec";
 
 describe("doHash", () => {
   it("sha256 hashes food", () => {

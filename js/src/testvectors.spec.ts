@@ -2,7 +2,6 @@ import { readFileSync } from "fs";
 
 import { compress } from "./compress";
 import { ics23 } from "./generated/codecimpl";
-import { fromHex } from "./helpers";
 import {
   batchVerifyMembership,
   batchVerifyNonMembership,
@@ -10,6 +9,7 @@ import {
   verifyNonMembership
 } from "./ics23";
 import { iavlSpec, tendermintSpec } from "./proofs";
+import { fromHex } from "./testhelpers.spec";
 
 describe("calculateExistenceRoot", () => {
   interface RefData {
