@@ -31,7 +31,7 @@ export function applyLeaf(
   const data = new Uint8Array([
     ...ensureBytes(leaf.prefix),
     ...pkey,
-    ...pvalue
+    ...pvalue,
   ]);
   return doHash(ensureHash(leaf.hash), data);
 }
@@ -46,7 +46,7 @@ export function applyInner(
   const preimage = new Uint8Array([
     ...ensureBytes(inner.prefix),
     ...child,
-    ...ensureBytes(inner.suffix)
+    ...ensureBytes(inner.suffix),
   ]);
   return doHash(ensureHash(inner.hash), preimage);
 }

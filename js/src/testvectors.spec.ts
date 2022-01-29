@@ -7,7 +7,7 @@ import {
   batchVerifyMembership,
   batchVerifyNonMembership,
   verifyMembership,
-  verifyNonMembership
+  verifyNonMembership,
 } from "./ics23";
 import { iavlSpec, tendermintSpec } from "./proofs";
 
@@ -35,7 +35,7 @@ describe("calculateExistenceRoot", () => {
     const data = {
       root: fromHex(root),
       key: fromHex(key),
-      value: value ? fromHex(value) : undefined
+      value: value ? fromHex(value) : undefined,
     };
 
     return { proof: commit, data };
@@ -49,7 +49,7 @@ describe("calculateExistenceRoot", () => {
   function validateTestVector(filepath: string, spec: ics23.IProofSpec): void {
     const {
       proof,
-      data: { root, key, value }
+      data: { root, key, value },
     } = loadFile(filepath);
     if (value) {
       const valid = verifyMembership(proof, spec, root, key, value);
@@ -132,13 +132,13 @@ describe("calculateExistenceRoot", () => {
     const commit: ics23.ICommitmentProof = {
       batch: {
         // tslint:disable-next-line:readonly-array
-        entries: entries as ics23.IBatchEntry[]
-      }
+        entries: entries as ics23.IBatchEntry[],
+      },
     };
 
     return {
       proof: commit,
-      data: refs
+      data: refs,
     };
   }
 
@@ -170,7 +170,7 @@ describe("calculateExistenceRoot", () => {
       "../testdata/iavl/exist_middle.json",
       "../testdata/iavl/nonexist_left.json",
       "../testdata/iavl/nonexist_right.json",
-      "../testdata/iavl/nonexist_middle.json"
+      "../testdata/iavl/nonexist_middle.json",
     ]);
     validateBatch(proof, iavlSpec, data[0]);
   });
@@ -182,7 +182,7 @@ describe("calculateExistenceRoot", () => {
       "../testdata/iavl/exist_middle.json",
       "../testdata/iavl/nonexist_left.json",
       "../testdata/iavl/nonexist_right.json",
-      "../testdata/iavl/nonexist_middle.json"
+      "../testdata/iavl/nonexist_middle.json",
     ]);
     validateBatch(proof, iavlSpec, data[5]);
   });
@@ -194,7 +194,7 @@ describe("calculateExistenceRoot", () => {
       "../testdata/iavl/exist_middle.json",
       "../testdata/iavl/nonexist_left.json",
       "../testdata/iavl/nonexist_right.json",
-      "../testdata/iavl/nonexist_middle.json"
+      "../testdata/iavl/nonexist_middle.json",
     ]);
     const small = compress(proof);
 
@@ -215,7 +215,7 @@ describe("calculateExistenceRoot", () => {
       "../testdata/iavl/exist_middle.json",
       "../testdata/iavl/nonexist_left.json",
       "../testdata/iavl/nonexist_right.json",
-      "../testdata/iavl/nonexist_middle.json"
+      "../testdata/iavl/nonexist_middle.json",
     ]);
     const small = compress(proof);
 
@@ -236,7 +236,7 @@ describe("calculateExistenceRoot", () => {
       "../testdata/tendermint/exist_middle.json",
       "../testdata/tendermint/nonexist_left.json",
       "../testdata/tendermint/nonexist_right.json",
-      "../testdata/tendermint/nonexist_middle.json"
+      "../testdata/tendermint/nonexist_middle.json",
     ]);
     validateBatch(proof, tendermintSpec, data[2]);
   });
@@ -248,7 +248,7 @@ describe("calculateExistenceRoot", () => {
       "../testdata/tendermint/exist_middle.json",
       "../testdata/tendermint/nonexist_left.json",
       "../testdata/tendermint/nonexist_right.json",
-      "../testdata/tendermint/nonexist_middle.json"
+      "../testdata/tendermint/nonexist_middle.json",
     ]);
     validateBatch(proof, tendermintSpec, data[3]);
   });

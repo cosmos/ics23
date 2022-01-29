@@ -34,8 +34,8 @@ function compress_batch(proof: ics23.IBatchProof): ics23.ICompressedBatchProof {
         nonexist: {
           key: non.key,
           left: compress_exist(non.left, lookup, registry),
-          right: compress_exist(non.right, lookup, registry)
-        }
+          right: compress_exist(non.right, lookup, registry),
+        },
       };
       centries.push(centry);
     } else {
@@ -45,7 +45,7 @@ function compress_batch(proof: ics23.IBatchProof): ics23.ICompressedBatchProof {
 
   return {
     entries: centries,
-    lookupInners: lookup
+    lookupInners: lookup,
   };
 }
 
@@ -58,7 +58,7 @@ function compress_exist(
     return undefined;
   }
 
-  const path = exist.path!.map(inner => {
+  const path = exist.path!.map((inner) => {
     const sig = ics23.InnerOp.encode(inner).finish();
     let idx = registry.get(sig);
     if (idx === undefined) {
@@ -73,7 +73,7 @@ function compress_exist(
     key: exist.key,
     value: exist.value,
     leaf: exist.leaf,
-    path
+    path,
   };
 }
 
@@ -81,7 +81,7 @@ function decompress_batch(
   proof: ics23.ICompressedBatchProof
 ): ics23.IBatchProof {
   const lookup = proof.lookupInners!;
-  const entries = proof.entries!.map(comp => {
+  const entries = proof.entries!.map((comp) => {
     if (!!comp.exist) {
       return { exist: decompress_exist(comp.exist, lookup) };
     } else if (!!comp.nonexist) {
@@ -90,15 +90,15 @@ function decompress_batch(
         nonexist: {
           key: non.key,
           left: decompress_exist(non.left, lookup),
-          right: decompress_exist(non.right, lookup)
-        }
+          right: decompress_exist(non.right, lookup),
+        },
       };
     } else {
       throw new Error("Unexpected batch entry during compress");
     }
   });
   return {
-    entries
+    entries,
   };
 }
 
@@ -110,6 +110,6 @@ function decompress_exist(
     return undefined;
   }
   const { key, value, leaf, path } = exist;
-  const newPath = (path || []).map(idx => lookup[idx]);
+  const newPath = (path || []).map((idx) => lookup[idx]);
   return { key, value, leaf, path: newPath };
 }

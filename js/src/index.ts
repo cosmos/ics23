@@ -6,5 +6,5 @@ export {
   iavlSpec,
   tendermintSpec,
   verifyExistence,
-  verifyNonExistence
+  verifyNonExistence,
 } from "./proofs";

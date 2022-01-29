@@ -116,7 +116,7 @@ function getExistForKey(
   if (match(proof.exist)) {
     return proof.exist!;
   } else if (!!proof.batch) {
-    return proof.batch.entries!.map(x => x.exist || null).find(match);
+    return proof.batch.entries!.map((x) => x.exist || null).find(match);
   }
   return undefined;
 }
@@ -135,7 +135,7 @@ function getNonExistForKey(
   if (match(proof.nonexist)) {
     return proof.nonexist!;
   } else if (!!proof.batch) {
-    return proof.batch.entries!.map(x => x.nonexist || null).find(match);
+    return proof.batch.entries!.map((x) => x.nonexist || null).find(match);
   }
   return undefined;
 }

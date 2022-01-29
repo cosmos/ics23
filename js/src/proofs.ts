@@ -5,7 +5,7 @@ import {
   ensureBytesBefore,
   ensureBytesEqual,
   ensureInner,
-  ensureLeaf
+  ensureLeaf,
 } from "./specs";
 
 export const iavlSpec: ics23.IProofSpec = {
@@ -14,15 +14,15 @@ export const iavlSpec: ics23.IProofSpec = {
     hash: ics23.HashOp.SHA256,
     prehashValue: ics23.HashOp.SHA256,
     prehashKey: ics23.HashOp.NO_HASH,
-    length: ics23.LengthOp.VAR_PROTO
+    length: ics23.LengthOp.VAR_PROTO,
   },
   innerSpec: {
     childOrder: [0, 1],
     minPrefixLength: 4,
     maxPrefixLength: 12,
     childSize: 33,
-    hash: ics23.HashOp.SHA256
-  }
+    hash: ics23.HashOp.SHA256,
+  },
 };
 
 export const tendermintSpec: ics23.IProofSpec = {
@@ -31,15 +31,15 @@ export const tendermintSpec: ics23.IProofSpec = {
     hash: ics23.HashOp.SHA256,
     prehashValue: ics23.HashOp.SHA256,
     prehashKey: ics23.HashOp.NO_HASH,
-    length: ics23.LengthOp.VAR_PROTO
+    length: ics23.LengthOp.VAR_PROTO,
   },
   innerSpec: {
     childOrder: [0, 1],
     minPrefixLength: 1,
     maxPrefixLength: 1,
     childSize: 32,
-    hash: ics23.HashOp.SHA256
-  }
+    hash: ics23.HashOp.SHA256,
+  },
 };
 
 export type CommitmentRoot = Uint8Array;
@@ -281,5 +281,5 @@ function getPosition(order: ReadonlyArray<number>, branch: number): number {
   if (branch < 0 || branch >= order.length) {
     throw new Error(`Invalid branch: ${branch}`);
   }
-  return order.findIndex(val => val === branch);
+  return order.findIndex((val) => val === branch);
 }
