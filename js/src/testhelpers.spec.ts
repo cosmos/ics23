@@ -3,7 +3,6 @@ export function fromHex(hexstring: string): Uint8Array {
     throw new Error("hex string length must be a multiple of 2");
   }
 
-  // tslint:disable-next-line:readonly-array
   const listOfInts: number[] = [];
   for (let i = 0; i < hexstring.length; i += 2) {
     const hexByteAsString = hexstring.substr(i, 2);
@@ -16,7 +15,7 @@ export function fromHex(hexstring: string): Uint8Array {
 }
 
 export function toAscii(input: string): Uint8Array {
-  const toNums = (str: string) =>
+  const toNums = (str: string): number[] =>
     str.split("").map((x: string) => {
       const charCode = x.charCodeAt(0);
       // 0x00–0x1F control characters

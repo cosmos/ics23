@@ -96,7 +96,7 @@ export function batchVerifyNonMembership(
   proof: ics23.ICommitmentProof,
   spec: ics23.IProofSpec,
   root: CommitmentRoot,
-  keys: ReadonlyArray<Uint8Array>
+  keys: readonly Uint8Array[]
 ): boolean {
   const norm = decompress(proof);
   for (const key of keys) {
@@ -111,11 +111,11 @@ function getExistForKey(
   proof: ics23.ICommitmentProof,
   key: Uint8Array
 ): ics23.IExistenceProof | undefined | null {
-  const match = (p: ics23.IExistenceProof | null | undefined) =>
+  const match = (p: ics23.IExistenceProof | null | undefined): boolean =>
     !!p && bytesEqual(key, p.key!);
   if (match(proof.exist)) {
     return proof.exist!;
-  } else if (!!proof.batch) {
+  } else if (proof.batch) {
     return proof.batch.entries!.map((x) => x.exist || null).find(match);
   }
   return undefined;
@@ -125,7 +125,7 @@ function getNonExistForKey(
   proof: ics23.ICommitmentProof,
   key: Uint8Array
 ): ics23.INonExistenceProof | undefined | null {
-  const match = (p: ics23.INonExistenceProof | null | undefined) => {
+  const match = (p: ics23.INonExistenceProof | null | undefined): boolean => {
     return (
       !!p &&
       (!p.left || bytesBefore(p.left.key!, key)) &&
@@ -134,7 +134,7 @@ function getNonExistForKey(
   };
   if (match(proof.nonexist)) {
     return proof.nonexist!;
-  } else if (!!proof.batch) {
+  } else if (proof.batch) {
     return proof.batch.entries!.map((x) => x.nonexist || null).find(match);
   }
   return undefined;

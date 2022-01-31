@@ -1,8 +1,5 @@
-// tslint:disable-next-line:no-submodule-imports
 import { ripemd160 } from "@noble/hashes/ripemd160";
-// tslint:disable-next-line:no-submodule-imports
 import { sha256 } from "@noble/hashes/sha256";
-// tslint:disable-next-line:no-submodule-imports
 import { sha512, sha512_256 } from "@noble/hashes/sha512";
 
 import { ics23 } from "./generated/codecimpl";
@@ -55,11 +52,11 @@ function ensure<T>(maybe: T | undefined | null, value: T): T {
   return maybe === undefined || maybe === null ? value : maybe;
 }
 
-const ensureHash = (h: ics23.HashOp | null | undefined) =>
+const ensureHash = (h: ics23.HashOp | null | undefined): ics23.HashOp =>
   ensure(h, ics23.HashOp.NO_HASH);
-const ensureLength = (l: ics23.LengthOp | null | undefined) =>
+const ensureLength = (l: ics23.LengthOp | null | undefined): ics23.LengthOp =>
   ensure(l, ics23.LengthOp.NO_PREFIX);
-const ensureBytes = (b: Uint8Array | null | undefined) =>
+const ensureBytes = (b: Uint8Array | null | undefined): Uint8Array =>
   ensure(b, new Uint8Array([]));
 
 function prepareLeafData(
@@ -117,7 +114,7 @@ function doLengthOp(lengthOp: ics23.LengthOp, data: Uint8Array): Uint8Array {
       }
       return data;
     case ics23.LengthOp.FIXED32_LITTLE:
-      return new Uint8Array([...encodeFixed32LE(data.length), ...data]);
+      return new Uint8Array([...encodeFixed32Le(data.length), ...data]);
     // TODO
     // case LengthOp_VAR_RLP:
     // case LengthOp_FIXED32_BIG:
@@ -128,7 +125,7 @@ function doLengthOp(lengthOp: ics23.LengthOp, data: Uint8Array): Uint8Array {
 }
 
 function encodeVarintProto(n: number): Uint8Array {
-  let enc: ReadonlyArray<number> = [];
+  let enc: readonly number[] = [];
   let l = n;
   while (l >= 128) {
     const b = (l % 128) + 128;
@@ -139,13 +136,11 @@ function encodeVarintProto(n: number): Uint8Array {
   return new Uint8Array(enc);
 }
 
-function encodeFixed32LE(n: number): Uint8Array {
+function encodeFixed32Le(n: number): Uint8Array {
   const enc = new Uint8Array(4);
   let l = n;
   for (let i = enc.length; i > 0; i--) {
-    /* tslint:disable */
     enc[Math.abs(i - enc.length)] = l % 256;
-    /* tslint:enable */
     l = Math.floor(l / 256);
   }
   return enc;

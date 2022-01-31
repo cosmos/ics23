@@ -43,7 +43,7 @@ describe("calculateExistenceRoot", () => {
 
   interface BatchResult {
     readonly proof: ics23.ICommitmentProof;
-    readonly data: ReadonlyArray<RefData>;
+    readonly data: readonly RefData[];
   }
 
   function validateTestVector(filepath: string, spec: ics23.IProofSpec): void {
@@ -116,22 +116,21 @@ describe("calculateExistenceRoot", () => {
     );
   });
 
-  function loadBatch(files: ReadonlyArray<string>): BatchResult {
-    let refs: ReadonlyArray<RefData> = [];
-    let entries: ReadonlyArray<ics23.IBatchEntry> = [];
+  function loadBatch(files: readonly string[]): BatchResult {
+    let refs: readonly RefData[] = [];
+    let entries: readonly ics23.IBatchEntry[] = [];
 
     for (const file of files) {
       const { proof, data } = loadFile(file);
       refs = [...refs, data];
-      if (!!proof.exist) {
+      if (proof.exist) {
         entries = [...entries, { exist: proof.exist }];
-      } else if (!!proof.nonexist) {
+      } else if (proof.nonexist) {
         entries = [...entries, { nonexist: proof.nonexist }];
       }
     }
     const commit: ics23.ICommitmentProof = {
       batch: {
-        // tslint:disable-next-line:readonly-array
         entries: entries as ics23.IBatchEntry[],
       },
     };
@@ -157,7 +156,7 @@ describe("calculateExistenceRoot", () => {
     } else {
       let valid = verifyNonMembership(proof, spec, root, key);
       expect(valid).toBe(true);
-      const keys: ReadonlyArray<Uint8Array> = [key];
+      const keys: readonly Uint8Array[] = [key];
       valid = batchVerifyNonMembership(proof, spec, root, keys);
       expect(valid).toBe(true);
     }
