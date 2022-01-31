@@ -14,7 +14,8 @@ library Ics23  {
     enum VerifyMembershipError {
         None,
         ExistenceProofIsNil,
-        ProofVerify
+        ProofVerify,
+        Decompress
     }
     function verifyMembership(
         Ics23ProofSpec.Data memory spec,
@@ -23,7 +24,8 @@ library Ics23  {
         bytes memory key,
         bytes memory value
     ) internal pure returns(VerifyMembershipError){
-        Ics23CommitmentProof.Data memory decoProof = Compress.decompress(proof);
+        (Ics23CommitmentProof.Data memory decoProof, Compress.DecompressEntryError erCode) = Compress.decompress(proof);
+        if (erCode != Compress.DecompressEntryError.None) return VerifyMembershipError.Decompress;
         Ics23ExistenceProof.Data memory exiProof = getExistProofForKey(decoProof, key);
         //require(Ics23ExistenceProof.isNil(exiProof) == false); // dev: getExistProofForKey not available
         if (Ics23ExistenceProof.isNil(exiProof)) return VerifyMembershipError.ExistenceProofIsNil;
@@ -36,7 +38,8 @@ library Ics23  {
     enum VerifyNonMembershipError {
         None,
         NonExistenceProofIsNil,
-        ProofVerify
+        ProofVerify,
+        Decompress
     }
 
     function verifyNonMembership(
@@ -45,7 +48,8 @@ library Ics23  {
         Ics23CommitmentProof.Data memory proof,
         bytes memory key
     ) internal pure returns(VerifyNonMembershipError) {
-        Ics23CommitmentProof.Data memory decoProof = Compress.decompress(proof);
+        (Ics23CommitmentProof.Data memory decoProof, Compress.DecompressEntryError erCode) = Compress.decompress(proof);
+        if (erCode != Compress.DecompressEntryError.None) return VerifyNonMembershipError.Decompress;
         Ics23NonExistenceProof.Data memory nonProof = getNonExistProofForKey(decoProof, key);
         //require(Ics23NonExistenceProof.isNil(nonProof) == false); // dev: getNonExistProofForKey not available
         if (Ics23NonExistenceProof.isNil(nonProof)) return VerifyNonMembershipError.NonExistenceProofIsNil;

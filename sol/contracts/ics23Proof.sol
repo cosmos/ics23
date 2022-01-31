@@ -57,7 +57,8 @@ library Proof{
         PathOp,
         BatchEntriesLength,
         BatchEntryEmpty,
-        EmptyProof
+        EmptyProof,
+        Decompress
     }
     /**
     @notice calculateRoot determines the root hash that matches the given proof. You must validate the result in what you have in a header.
@@ -218,7 +219,9 @@ library Proof{
             }
         }
         if (Ics23CompressedBatchProof._empty(proof.compressed) == false) {
-            return calculateRoot(Compress.decompress(proof));
+            (Ics23CommitmentProof.Data memory proof, Compress.DecompressEntryError erCode) = Compress.decompress(proof);
+            if (erCode != Compress.DecompressEntryError.None) return (empty, CalculateRootError.Decompress);
+            return calculateRoot(proof);
         }
         //revert(); // dev: calculateRoot(CommitmentProof) empty proof
         return (empty, CalculateRootError.EmptyProof);
