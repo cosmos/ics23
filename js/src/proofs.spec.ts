@@ -7,7 +7,7 @@ describe("calculateExistenceRoot", () => {
   it("must have at least one step", () => {
     const proof: ics23.IExistenceProof = {
       key: toAscii("foo"),
-      value: toAscii("bar")
+      value: toAscii("bar"),
     };
     expect(() => calculateExistenceRoot(proof)).toThrow();
   });
@@ -17,8 +17,8 @@ describe("calculateExistenceRoot", () => {
       value: toAscii("some longer text"),
       leaf: {
         hash: ics23.HashOp.SHA256,
-        length: ics23.LengthOp.VAR_PROTO
-      }
+        length: ics23.LengthOp.VAR_PROTO,
+      },
     };
     const expected = fromHex(
       "b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"
@@ -32,9 +32,9 @@ describe("calculateExistenceRoot", () => {
       path: [
         {
           hash: ics23.HashOp.SHA256,
-          prefix: fromHex("deadbeef00cafe00")
-        }
-      ]
+          prefix: fromHex("deadbeef00cafe00"),
+        },
+      ],
     };
     expect(() => calculateExistenceRoot(proof)).toThrow();
   });
@@ -44,16 +44,16 @@ describe("calculateExistenceRoot", () => {
       value: toAscii("some longer text"),
       leaf: {
         hash: ics23.HashOp.SHA256,
-        length: ics23.LengthOp.VAR_PROTO
+        length: ics23.LengthOp.VAR_PROTO,
       },
       // output: b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265
       path: [
         {
           hash: ics23.HashOp.SHA256,
-          prefix: fromHex("deadbeef00cafe00")
-        }
+          prefix: fromHex("deadbeef00cafe00"),
+        },
         // echo -n deadbeef00cafe00b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265 | xxd -r -p | sha256sum
-      ]
+      ],
     };
     const expected = fromHex(
       "836ea236a6902a665c2a004c920364f24cad52ded20b1e4f22c3179bfe25b2a9"
@@ -69,34 +69,34 @@ describe("ensureSpec", () => {
     hash: ics23.HashOp.SHA512,
     prehashValue: ics23.HashOp.NO_HASH,
     prehashKey: ics23.HashOp.NO_HASH,
-    length: ics23.LengthOp.VAR_PROTO
+    length: ics23.LengthOp.VAR_PROTO,
   };
 
   const validInner = {
     hash: ics23.HashOp.SHA256,
-    prefix: fromHex("deadbeef00cafe00")
+    prefix: fromHex("deadbeef00cafe00"),
     // suffix: Uint8Array.from([]),
   };
   const invalidInner = {
     hash: ics23.HashOp.SHA256,
-    prefix: fromHex("aa")
+    prefix: fromHex("aa"),
   };
   const invalidInnerHash = {
     hash: ics23.HashOp.SHA512,
-    prefix: fromHex("deadbeef00cafe00")
+    prefix: fromHex("deadbeef00cafe00"),
   };
 
   const depthLimitedSpec = {
     leafSpec: iavlSpec.leafSpec,
     innerSpec: iavlSpec.innerSpec,
     minDepth: 2,
-    maxDepth: 4
+    maxDepth: 4,
   };
 
   it("rejects empty proof", () => {
     const proof: ics23.IExistenceProof = {
       key: toAscii("foo"),
-      value: toAscii("bar")
+      value: toAscii("bar"),
     };
     expect(() => ensureSpec(proof, iavlSpec)).toThrow();
   });
@@ -105,7 +105,7 @@ describe("ensureSpec", () => {
     const proof: ics23.IExistenceProof = {
       key: toAscii("foo"),
       value: toAscii("bar"),
-      leaf: validLeaf
+      leaf: validLeaf,
     };
     // fail if this throws (invalid spec)
     ensureSpec(proof, iavlSpec);
@@ -115,7 +115,7 @@ describe("ensureSpec", () => {
     const proof: ics23.IExistenceProof = {
       key: toAscii("foo"),
       value: toAscii("bar"),
-      leaf: invalidLeaf
+      leaf: invalidLeaf,
     };
     expect(() => ensureSpec(proof, iavlSpec)).toThrow();
   });
@@ -124,7 +124,7 @@ describe("ensureSpec", () => {
     const proof: ics23.IExistenceProof = {
       key: toAscii("foo"),
       value: toAscii("bar"),
-      path: [validInner]
+      path: [validInner],
     };
     expect(() => ensureSpec(proof, iavlSpec)).toThrow();
   });
@@ -134,7 +134,7 @@ describe("ensureSpec", () => {
       key: toAscii("foo"),
       value: toAscii("bar"),
       leaf: validLeaf,
-      path: [validInner]
+      path: [validInner],
     };
     // fail if this throws (invalid spec)
     ensureSpec(proof, iavlSpec);
@@ -145,7 +145,7 @@ describe("ensureSpec", () => {
       key: toAscii("foo"),
       value: toAscii("bar"),
       leaf: validLeaf,
-      path: [invalidInner, validInner]
+      path: [invalidInner, validInner],
     };
     expect(() => ensureSpec(proof, iavlSpec)).toThrow();
   });
@@ -155,7 +155,7 @@ describe("ensureSpec", () => {
       key: toAscii("foo"),
       value: toAscii("bar"),
       leaf: validLeaf,
-      path: [validInner, invalidInnerHash]
+      path: [validInner, invalidInnerHash],
     };
     expect(() => ensureSpec(proof, iavlSpec)).toThrow();
   });
@@ -165,7 +165,7 @@ describe("ensureSpec", () => {
       key: toAscii("foo"),
       value: toAscii("bar"),
       leaf: validLeaf,
-      path: [validInner, validInner, validInner]
+      path: [validInner, validInner, validInner],
     };
     // fail if this throws (invalid spec)
     ensureSpec(proof, depthLimitedSpec);
@@ -176,7 +176,7 @@ describe("ensureSpec", () => {
       key: toAscii("foo"),
       value: toAscii("bar"),
       leaf: validLeaf,
-      path: [validInner]
+      path: [validInner],
     };
     expect(() => ensureSpec(proof, depthLimitedSpec)).toThrow();
   });
@@ -186,7 +186,7 @@ describe("ensureSpec", () => {
       key: toAscii("foo"),
       value: toAscii("bar"),
       leaf: validLeaf,
-      path: [validInner, validInner, validInner, validInner, validInner]
+      path: [validInner, validInner, validInner, validInner, validInner],
     };
     expect(() => ensureSpec(proof, depthLimitedSpec)).toThrow();
   });
