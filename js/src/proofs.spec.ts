@@ -1,7 +1,7 @@
 import { ics23 } from "./generated/codecimpl";
 
-import { fromHex, toAscii } from "./helpers";
 import { calculateExistenceRoot, ensureSpec, iavlSpec } from "./proofs";
+import { fromHex, toAscii } from "./testhelpers.spec";
 
 describe("calculateExistenceRoot", () => {
   it("must have at least one step", () => {
