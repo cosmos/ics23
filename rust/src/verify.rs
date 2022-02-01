@@ -171,7 +171,7 @@ fn ensure_left_most(spec: &ics23::InnerSpec, path: &[ics23::InnerOp]) -> Result<
     let pad = get_padding(spec, 0)?;
     // ensure every step has a prefix and suffix defined to be leftmost, unless it is a placeholder node
     for step in path {
-        if !has_padding(step, &pad) && !left_branches_are_empty(spec, step, 0)? {
+        if !has_padding(step, &pad) && !left_branches_are_empty(spec, step)? {
             bail!("step not leftmost")
         }
     }
@@ -184,7 +184,7 @@ fn ensure_right_most(spec: &ics23::InnerSpec, path: &[ics23::InnerOp]) -> Result
     let pad = get_padding(spec, idx as i32)?;
     // ensure every step has a prefix and suffix defined to be rightmost, unless it is a placeholder node
     for step in path {
-        if !has_padding(step, &pad) && !right_branches_are_empty(spec, step, idx as i32)? {
+        if !has_padding(step, &pad) && !right_branches_are_empty(spec, step)? {
             bail!("step not leftmost")
         }
     }
@@ -264,62 +264,48 @@ fn get_padding(spec: &ics23::InnerSpec, branch: i32) -> Result<Padding> {
 
 // left_branches_are_empty returns true if the padding bytes correspond to all empty children
 // on the left side of this branch, ie. it's a valid placeholder on a leftmost path
-fn left_branches_are_empty(
-    spec: &ics23::InnerSpec,
-    op: &ics23::InnerOp,
-    branch: i32,
-) -> Result<bool> {
-    if let Some(&idx) = spec.child_order.iter().find(|&&x| x == branch) {
-        // count branches to left of this
-        let left_branches = idx as usize;
-        if left_branches == 0 {
+fn left_branches_are_empty(spec: &ics23::InnerSpec, op: &ics23::InnerOp) -> Result<bool> {
+    let idx = order_from_padding(spec, op)?;
+    // count branches to left of this
+    let left_branches = idx as usize;
+    if left_branches == 0 {
+        return Ok(false);
+    }
+    let child_size = spec.child_size as usize;
+    // compare prefix with the expected number of empty branches
+    let actual_prefix = match op.prefix.len().checked_sub(left_branches * child_size) {
+        Some(n) => n,
+        _ => return Ok(false),
+    };
+    for i in 0..left_branches {
+        let from = actual_prefix + i * child_size;
+        if spec.empty_child != op.prefix[from..from + child_size] {
             return Ok(false);
         }
-        let child_size = spec.child_size as usize;
-        // compare prefix with the expected number of empty branches
-        let actual_prefix = match op.prefix.len().checked_sub(left_branches * child_size) {
-            Some(n) => n,
-            _ => return Ok(false),
-        };
-        for i in 0..left_branches {
-            let from = actual_prefix + i * child_size;
-            if spec.empty_child != op.prefix[from..from + child_size] {
-                return Ok(false);
-            }
-        }
-        Ok(true)
-    } else {
-        bail!("Branch {} not found", branch);
     }
+    Ok(true)
 }
 
 // right_branches_are_empty returns true if the padding bytes correspond to all empty children
 // on the right side of this branch, ie. it's a valid placeholder on a rightmost path
-fn right_branches_are_empty(
-    spec: &ics23::InnerSpec,
-    op: &ics23::InnerOp,
-    branch: i32,
-) -> Result<bool> {
-    if let Some(&idx) = spec.child_order.iter().find(|&&x| x == branch) {
-        // count branches to right of this one
-        let right_branches = spec.child_order.len() - 1 - idx as usize;
-        // compare suffix with the expected number of empty branches
-        if right_branches == 0 {
-            return Ok(false);
-        }
-        if op.suffix.len() != spec.child_size as usize {
-            return Ok(false);
-        }
-        for i in 0..right_branches {
-            let from = i * spec.child_size as usize;
-            if spec.empty_child != op.suffix[from..from + spec.child_size as usize] {
-                return Ok(false);
-            }
-        }
-        Ok(true)
-    } else {
-        bail!("Branch {} not found", branch);
+fn right_branches_are_empty(spec: &ics23::InnerSpec, op: &ics23::InnerOp) -> Result<bool> {
+    let idx = order_from_padding(spec, op)?;
+    // count branches to right of this one
+    let right_branches = spec.child_order.len() - 1 - idx as usize;
+    // compare suffix with the expected number of empty branches
+    if right_branches == 0 {
+        return Ok(false);
     }
+    if op.suffix.len() != spec.child_size as usize {
+        return Ok(false);
+    }
+    for i in 0..right_branches {
+        let from = i * spec.child_size as usize;
+        if spec.empty_child != op.suffix[from..from + spec.child_size as usize] {
+            return Ok(false);
+        }
+    }
+    Ok(true)
 }
 
 #[cfg(test)]
@@ -719,19 +705,15 @@ mod tests {
         for (i, case) in cases.iter().enumerate() {
             ensure_inner(&case.op, case.spec)?;
             let inner = &case.spec.inner_spec.as_ref().unwrap();
-            let order = match order_from_padding(inner, &case.op) {
-                Ok(branch) => branch,
-                _ => bail!("invalid op"),
-            };
             assert_eq!(
                 case.is_left,
-                left_branches_are_empty(inner, &case.op, order)?,
+                left_branches_are_empty(inner, &case.op)?,
                 "case {}",
                 i
             );
             assert_eq!(
                 case.is_right,
-                right_branches_are_empty(inner, &case.op, order)?,
+                right_branches_are_empty(inner, &case.op)?,
                 "case {}",
                 i
             );

@@ -216,7 +216,7 @@ func IsLeftMost(spec *InnerSpec, path []*InnerOp) bool {
 
 	// ensure every step has a prefix and suffix defined to be leftmost, unless it is a placeholder node
 	for _, step := range path {
-		if !hasPadding(step, minPrefix, maxPrefix, suffix) && !leftBranchesAreEmpty(spec, step, 0) {
+		if !hasPadding(step, minPrefix, maxPrefix, suffix) && !leftBranchesAreEmpty(spec, step) {
 			return false
 		}
 	}
@@ -230,7 +230,7 @@ func IsRightMost(spec *InnerSpec, path []*InnerOp) bool {
 
 	// ensure every step has a prefix and suffix defined to be rightmost, unless it is a placeholder node
 	for _, step := range path {
-		if !hasPadding(step, minPrefix, maxPrefix, suffix) && !rightBranchesAreEmpty(spec, step, int32(last)) {
+		if !hasPadding(step, minPrefix, maxPrefix, suffix) && !rightBranchesAreEmpty(spec, step) {
 			return false
 		}
 	}
@@ -310,12 +310,15 @@ func getPadding(spec *InnerSpec, branch int32) (minPrefix, maxPrefix, suffix int
 	return
 }
 
-// leftBranchesAreEmpty returns true if the padding bytes correspond to all empty children
-// on the left side of this branch, ie. it's a valid placeholder on a leftmost path
-func leftBranchesAreEmpty(spec *InnerSpec, op *InnerOp, branch int32) bool {
-	idx := getPosition(spec.ChildOrder, branch)
+// leftBranchesAreEmpty returns true if the padding bytes correspond to all empty siblings
+// on the left side of a branch, ie. it's a valid placeholder on a leftmost path
+func leftBranchesAreEmpty(spec *InnerSpec, op *InnerOp) bool {
+	idx, err := orderFromPadding(spec, op)
+	if err != nil {
+		return false
+	}
 	// count branches to left of this
-	leftBranches := idx
+	leftBranches := int(idx)
 	if leftBranches == 0 {
 		return false
 	}
@@ -333,12 +336,15 @@ func leftBranchesAreEmpty(spec *InnerSpec, op *InnerOp, branch int32) bool {
 	return true
 }
 
-// rightBranchesAreEmpty returns true if the padding bytes correspond to all empty children
-// on the right side of this branch, ie. it's a valid placeholder on a rightmost path
-func rightBranchesAreEmpty(spec *InnerSpec, op *InnerOp, branch int32) bool {
-	idx := getPosition(spec.ChildOrder, branch)
+// rightBranchesAreEmpty returns true if the padding bytes correspond to all empty siblings
+// on the right side of a branch, ie. it's a valid placeholder on a rightmost path
+func rightBranchesAreEmpty(spec *InnerSpec, op *InnerOp) bool {
+	idx, err := orderFromPadding(spec, op)
+	if err != nil {
+		return false
+	}
 	// count branches to right of this one
-	rightBranches := len(spec.ChildOrder) - 1 - idx
+	rightBranches := len(spec.ChildOrder) - 1 - int(idx)
 	if rightBranches == 0 {
 		return false
 	}
