@@ -20,7 +20,8 @@
     "yarn.lock"
   ],
   "scripts": {
-    "lint": "tslint -t verbose --project .",
+    "lint": "eslint --max-warnings 0 './src/**/*.ts'",
+    "lint:fix": "yarn lint --fix",
     "format": "prettier --write --loglevel warn \"./src/**/*.ts\"",
     "prebuild": "yarn lint && yarn format",
     "prepublish": "yarn build",
@@ -32,14 +33,18 @@
   },
   "devDependencies": {
     "@types/jasmine": "^3.5.0",
+    "@typescript-eslint/eslint-plugin": "^5.10.2",
+    "@typescript-eslint/parser": "^5.10.2",
+    "eslint": "^8.8.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
     "jasmine": "^3.5.0",
     "jasmine-console-reporter": "^3.1.0",
     "prettier": "^2.5.1",
     "shx": "^0.3.4",
     "source-map-support": "^0.5.16",
-    "tslint": "^5.8.0",
-    "tslint-config-prettier": "^1.18.0",
-    "tslint-immutable": "^6.0.1",
     "typescript": "^3.8.3"
   },
   "dependencies": {

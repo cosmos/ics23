@@ -13,7 +13,7 @@ workflows:
 jobs:
   typescript:
     docker:
-      - image: circleci/node:dubnium
+      - image: circleci/node:12
     working_directory: ~/proofs/js
     steps:
       # we checkout here, all other code runs in js subdir

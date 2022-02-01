@@ -110,10 +110,10 @@ export function verifyNonExistence(
     throw new Error("neither left nor right proof defined");
   }
 
-  if (!!leftKey) {
+  if (leftKey) {
     ensureBytesBefore(leftKey, key);
   }
-  if (!!rightKey) {
+  if (rightKey) {
     ensureBytesBefore(key, rightKey);
   }
 
@@ -181,7 +181,7 @@ export function ensureSpec(
 
 function ensureLeftMost(
   spec: ics23.IInnerSpec,
-  path: ReadonlyArray<ics23.IInnerOp>
+  path: readonly ics23.IInnerOp[]
 ): void {
   const { minPrefix, maxPrefix, suffix } = getPadding(spec, 0);
 
@@ -195,7 +195,7 @@ function ensureLeftMost(
 
 function ensureRightMost(
   spec: ics23.IInnerSpec,
-  path: ReadonlyArray<ics23.IInnerOp>
+  path: readonly ics23.IInnerOp[]
 ): void {
   const len = spec.childOrder!.length - 1;
   const { minPrefix, maxPrefix, suffix } = getPadding(spec, len);
@@ -210,10 +210,9 @@ function ensureRightMost(
 
 export function ensureLeftNeighbor(
   spec: ics23.IInnerSpec,
-  left: ReadonlyArray<ics23.IInnerOp>,
-  right: ReadonlyArray<ics23.IInnerOp>
+  left: readonly ics23.IInnerOp[],
+  right: readonly ics23.IInnerOp[]
 ): void {
-  // tslint:disable:readonly-array
   const mutleft: ics23.IInnerOp[] = [...left];
   const mutright: ics23.IInnerOp[] = [...right];
 
@@ -296,7 +295,7 @@ function getPadding(spec: ics23.IInnerSpec, branch: number): PaddingResult {
   return { minPrefix, maxPrefix, suffix };
 }
 
-function getPosition(order: ReadonlyArray<number>, branch: number): number {
+function getPosition(order: readonly number[], branch: number): number {
   if (branch < 0 || branch >= order.length) {
     throw new Error(`Invalid branch: ${branch}`);
   }
