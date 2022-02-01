@@ -32,6 +32,7 @@ type TestVectorsStruct struct {
 func VectorsTestData() []TestVectorsStruct {
 	iavl := filepath.Join("..", "testdata", "iavl")
 	tendermint := filepath.Join("..", "testdata", "tendermint")
+	smt := filepath.Join("..", "testdata", "smt")
 	cases := []TestVectorsStruct{
 		{Dir: iavl, Filename: "exist_left.json", Spec: IavlSpec},
 		{Dir: iavl, Filename: "exist_right.json", Spec: IavlSpec},
@@ -45,6 +46,12 @@ func VectorsTestData() []TestVectorsStruct {
 		{Dir: tendermint, Filename: "nonexist_left.json", Spec: TendermintSpec},
 		{Dir: tendermint, Filename: "nonexist_right.json", Spec: TendermintSpec},
 		{Dir: tendermint, Filename: "nonexist_middle.json", Spec: TendermintSpec},
+		{Dir: smt, Filename: "exist_left.json", Spec: SmtSpec},
+		{Dir: smt, Filename: "exist_right.json", Spec: SmtSpec},
+		{Dir: smt, Filename: "exist_middle.json", Spec: SmtSpec},
+		{Dir: smt, Filename: "nonexist_left.json", Spec: SmtSpec},
+		{Dir: smt, Filename: "nonexist_right.json", Spec: SmtSpec},
+		{Dir: smt, Filename: "nonexist_middle.json", Spec: SmtSpec},
 	}
 	return cases
 }
@@ -69,6 +76,7 @@ type BatchVectorData struct {
 func BatchVectorsTestData(t *testing.T) map[string]BatchVectorData {
 	iavl := filepath.Join("..", "testdata", "iavl")
 	tendermint := filepath.Join("..", "testdata", "tendermint")
+	smt := filepath.Join("..", "testdata", "smt")
 	// Note that each item has a different commitment root,
 	// so maybe not ideal (cannot check multiple entries)
 	batchIAVL, refsIAVL := buildBatch(t, iavl, []string{
@@ -87,10 +95,22 @@ func BatchVectorsTestData(t *testing.T) map[string]BatchVectorData {
 		"nonexist_right.json",
 		"nonexist_middle.json",
 	})
+	batchSMT, refsSMT := buildBatch(t, smt, []string{
+		"exist_left.json",
+		"exist_right.json",
+		"exist_middle.json",
+		"nonexist_left.json",
+		"nonexist_right.json",
+		"nonexist_middle.json",
+	})
+
 	batchTMExist, refsTMExist := loadBatch(t, tendermint, "batch_exist.json")
 	batchTMNonexist, refsTMNonexist := loadBatch(t, tendermint, "batch_nonexist.json")
 	batchIAVLExist, refsIAVLExist := loadBatch(t, iavl, "batch_exist.json")
 	batchIAVLNonexist, refsIAVLNonexist := loadBatch(t, iavl, "batch_nonexist.json")
+	batchSMTexist, refsSMTexist := loadBatch(t, smt, "batch_exist.json")
+	batchSMTnonexist, refsSMTnonexist := loadBatch(t, smt, "batch_nonexist.json")
+
 	return map[string]BatchVectorData{
 		"iavl 0": {Spec: IavlSpec, Proof: batchIAVL, Ref: refsIAVL[0]},
 		"iavl 1": {Spec: IavlSpec, Proof: batchIAVL, Ref: refsIAVL[1]},
@@ -114,18 +134,32 @@ func BatchVectorsTestData(t *testing.T) map[string]BatchVectorData {
 		"tm invalid 2":      {Spec: TendermintSpec, Proof: refsTML, Ref: refsIAVL[0], Invalid: true},
 		"tm batch exist":    {Spec: TendermintSpec, Proof: batchTMExist, Ref: refsTMExist[10]},
 		"tm batch nonexist": {Spec: TendermintSpec, Proof: batchTMNonexist, Ref: refsTMNonexist[3]},
+		"smt 0":             {Spec: SmtSpec, Proof: batchSMT, Ref: refsSMT[0]},
+		"smt 1":             {Spec: SmtSpec, Proof: batchSMT, Ref: refsSMT[1]},
+		"smt 2":             {Spec: SmtSpec, Proof: batchSMT, Ref: refsSMT[2]},
+		"smt 3":             {Spec: SmtSpec, Proof: batchSMT, Ref: refsSMT[3]},
+		"smt 4":             {Spec: SmtSpec, Proof: batchSMT, Ref: refsSMT[4]},
+		"smt 5":             {Spec: SmtSpec, Proof: batchSMT, Ref: refsSMT[5]},
+		// Note this spec only differs for non-existence proofs
+		"smt invalid 1":      {Spec: IavlSpec, Proof: batchSMT, Ref: refsSMT[4], Invalid: true},
+		"smt invalid 2":      {Spec: SmtSpec, Proof: batchSMT, Ref: refsIAVL[0], Invalid: true},
+		"smt batch exist":    {Spec: SmtSpec, Proof: batchSMTexist, Ref: refsSMTexist[10]},
+		"smt batch nonexist": {Spec: SmtSpec, Proof: batchSMTnonexist, Ref: refsSMTnonexist[3]},
 	}
 }
 
 func DecompressBatchVectorsTestData(t *testing.T) map[string]*CommitmentProof {
 	iavl := filepath.Join("..", "testdata", "iavl")
 	tendermint := filepath.Join("..", "testdata", "tendermint")
+	smt := filepath.Join("..", "testdata", "smt")
 	// note that these batches are already compressed
 	batchIAVL, _ := loadBatch(t, iavl, "batch_exist.json")
 	batchTM, _ := loadBatch(t, tendermint, "batch_nonexist.json")
+	batchSMT, _ := loadBatch(t, smt, "batch_nonexist.json")
 	return map[string]*CommitmentProof{
 		"iavl":       batchIAVL,
 		"tendermint": batchTM,
+		"smt":        batchSMT,
 	}
 }
 

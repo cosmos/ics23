@@ -42,6 +42,25 @@ export const tendermintSpec: ics23.IProofSpec = {
   },
 };
 
+export const smtSpec: ics23.IProofSpec = {
+  leafSpec: {
+    hash: ics23.HashOp.SHA256,
+    prehashKey: ics23.HashOp.NO_HASH,
+    prehashValue: ics23.HashOp.SHA256,
+    length: ics23.LengthOp.NO_PREFIX,
+    prefix: Uint8Array.from([0]),
+  },
+  innerSpec: {
+    childOrder: [0, 1],
+    childSize: 32,
+    minPrefixLength: 1,
+    maxPrefixLength: 1,
+    emptyChild: new Uint8Array(32),
+    hash: ics23.HashOp.SHA256
+  },
+  maxDepth: 256,
+};
+
 export type CommitmentRoot = Uint8Array;
 
 // verifyExistence will throw an error if the proof doesn't link key, value -> root

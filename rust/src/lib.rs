@@ -15,7 +15,7 @@ mod verify;
 
 pub use crate::ics23::*;
 pub use api::{
-    iavl_spec, tendermint_spec, verify_batch_membership, verify_batch_non_membership,
+    iavl_spec, smt_spec, tendermint_spec, verify_batch_membership, verify_batch_non_membership,
     verify_membership, verify_non_membership,
 };
 pub use compress::{compress, decompress, is_compressed};
