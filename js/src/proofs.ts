@@ -56,7 +56,7 @@ export const smtSpec: ics23.IProofSpec = {
     minPrefixLength: 1,
     maxPrefixLength: 1,
     emptyChild: new Uint8Array(32),
-    hash: ics23.HashOp.SHA256
+    hash: ics23.HashOp.SHA256,
   },
   maxDepth: 256,
 };
