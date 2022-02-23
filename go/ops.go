@@ -24,11 +24,11 @@ func (op *LeafOp) Apply(key []byte, value []byte) ([]byte, error) {
 	if len(value) == 0 {
 		return nil, errors.New("Leaf op needs value")
 	}
-	pkey, err := prepareLeafData(op.PrehashKey, op.Length, key)
+	pkey, err := prepareLeafData(op.PrehashKey, op.Length, op.PrefixPrehashKey, key)
 	if err != nil {
 		return nil, errors.Wrap(err, "prehash key")
 	}
-	pvalue, err := prepareLeafData(op.PrehashValue, op.Length, value)
+	pvalue, err := prepareLeafData(op.PrehashValue, op.Length, op.PrefixPrehashValue, value)
 	if err != nil {
 		return nil, errors.Wrap(err, "prehash value")
 	}
@@ -55,6 +55,12 @@ func (op *LeafOp) CheckAgainstSpec(spec *ProofSpec) error {
 	}
 	if !bytes.HasPrefix(op.Prefix, lspec.Prefix) {
 		return errors.Errorf("Leaf Prefix doesn't start with %X", lspec.Prefix)
+	}
+	if !bytes.HasPrefix(op.PrefixPrehashKey, lspec.PrefixPrehashKey) {
+		return errors.Errorf("Leaf PrefixPrehashKey doesn't start with %X", lspec.PrefixPrehashKey)
+	}
+	if !bytes.HasPrefix(op.PrefixPrehashValue, lspec.PrefixPrehashKey) {
+		return errors.Errorf("Leaf PrefixPrehashValue doesn't start with %X", lspec.PrefixPrehashValue)
 	}
 	return nil
 }
@@ -89,9 +95,11 @@ func (op *InnerOp) CheckAgainstSpec(spec *ProofSpec) error {
 	return nil
 }
 
-func prepareLeafData(hashOp HashOp, lengthOp LengthOp, data []byte) ([]byte, error) {
-	// TODO: lengthop before or after hash ???
-	hdata, err := doHashOrNoop(hashOp, data)
+func prepareLeafData(hashOp HashOp, lengthOp LengthOp, prefix []byte, data []byte) ([]byte, error) {
+	prefixed := make([]byte, 0, len(prefix)+len(data))
+	prefixed = append(prefixed, prefix...)
+	prefixed = append(prefixed, data...)
+	hdata, err := doHashOrNoop(hashOp, prefixed)
 	if err != nil {
 		return nil, err
 	}

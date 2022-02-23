@@ -57,6 +57,18 @@
     "IsErr": false,
     "Expected": "h+BIPo+2JK7y4vexP0FmzaSFuqjjn0N8g9dMlL7bFI8="
   },
+  "hash with prefixed prehash and length prefix": {
+    "Op": {
+      "hash": 1,
+      "prehash_value": 1,
+      "length": 1,
+      "prefix_prehash_value": "eWU="
+    },
+    "Key": "Zm9vZA==",
+    "Value": "dCBhbm90aGVyIGxvbmcgc3RyaW5n",
+    "IsErr": false,
+    "Expected": "h+BIPo+2JK7y4vexP0FmzaSFuqjjn0N8g9dMlL7bFI8="
+  },
   "requires key": {
     "Op": {
       "hash": 1
