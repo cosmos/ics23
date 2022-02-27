@@ -348,7 +348,8 @@ func leftBranchesAreEmpty(spec *InnerSpec, op *InnerOp) bool {
 		return false
 	}
 	for i := 0; i < leftBranches; i++ {
-		from := actualPrefix + i*int(spec.ChildSize)
+		idx := getPosition(spec.ChildOrder, int32(i))
+		from := actualPrefix + idx*int(spec.ChildSize)
 		if !bytes.Equal(spec.EmptyChild, op.Prefix[from:from+int(spec.ChildSize)]) {
 			return false
 		}
@@ -373,7 +374,8 @@ func rightBranchesAreEmpty(spec *InnerSpec, op *InnerOp) bool {
 		return false // sanity check
 	}
 	for i := 0; i < rightBranches; i++ {
-		from := i * int(spec.ChildSize)
+		idx := getPosition(spec.ChildOrder, int32(i))
+		from := idx * int(spec.ChildSize)
 		if !bytes.Equal(spec.EmptyChild, op.Suffix[from:from+int(spec.ChildSize)]) {
 			return false
 		}
