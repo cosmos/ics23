@@ -278,7 +278,9 @@ fn left_branches_are_empty(spec: &ics23::InnerSpec, op: &ics23::InnerOp) -> Resu
         _ => return Ok(false),
     };
     for i in 0..left_branches {
-        let from = actual_prefix + i * child_size;
+        let idx = spec.child_order.iter().find(|&&x| x == i as i32).unwrap();
+        let idx = *idx as usize;
+        let from = actual_prefix + idx * child_size;
         if spec.empty_child != op.prefix[from..from + child_size] {
             return Ok(false);
         }
@@ -300,7 +302,9 @@ fn right_branches_are_empty(spec: &ics23::InnerSpec, op: &ics23::InnerOp) -> Res
         return Ok(false);
     }
     for i in 0..right_branches {
-        let from = i * spec.child_size as usize;
+        let idx = spec.child_order.iter().find(|&&x| x == i as i32).unwrap();
+        let idx = *idx as usize;
+        let from = idx * spec.child_size as usize;
         if spec.empty_child != op.suffix[from..from + spec.child_size as usize] {
             return Ok(false);
         }
