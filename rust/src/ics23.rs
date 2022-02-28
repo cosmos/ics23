@@ -74,8 +74,8 @@ pub mod commitment_proof {
 ///leafOp(key, value) -> output
 ///
 ///To process this, first prehash the keys and values if needed (ANY means no hash in this case):
-///hkey = prehashKey(key)
-///hvalue = prehashValue(value)
+///hkey = prehashKey(prefix_prehash_key || key)
+///hvalue = prehashValue(prefix_prehash_value || value)
 ///
 ///Then combine the bytes, and hash it
 ///output = hash(prefix || length(hkey) || hkey || length(hvalue) || hvalue)
@@ -93,6 +93,12 @@ pub struct LeafOp {
     /// a leaf node from an inner node.
     #[prost(bytes = "vec", tag = "5")]
     pub prefix: ::prost::alloc::vec::Vec<u8>,
+    /// fixed bytes that act as a domain separator for prehash_key
+    #[prost(bytes = "vec", tag = "6")]
+    pub prefix_prehash_key: ::prost::alloc::vec::Vec<u8>,
+    /// fixed bytes that act as a domain separator for prehash_value
+    #[prost(bytes = "vec", tag = "7")]
+    pub prefix_prehash_value: ::prost::alloc::vec::Vec<u8>,
 }
 ///*
 ///InnerOp represents a merkle-proof step that is not a leaf.

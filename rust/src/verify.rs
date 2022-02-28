@@ -125,6 +125,14 @@ fn ensure_leaf(leaf: &ics23::LeafOp, leaf_spec: &ics23::LeafOp) -> Result<()> {
         has_prefix(&leaf_spec.prefix, &leaf.prefix),
         "Incorrect prefix on leaf"
     );
+    ensure!(
+        has_prefix(&leaf_spec.prefix_prehash_key, &leaf.prefix_prehash_key),
+        "Incorrect prefix_prehash_key on leaf"
+    );
+    ensure!(
+        has_prefix(&leaf_spec.prefix_prehash_value, &leaf.prefix_prehash_value),
+        "Incorrect prefix_prehash_value on leaf"
+    );
     Ok(())
 }
 
@@ -329,6 +337,7 @@ mod tests {
             prehash_value: 0,
             length: LengthOp::VarProto.into(),
             prefix: vec![],
+            ..Default::default()
         };
 
         let proof = ics23::ExistenceProof {
@@ -356,6 +365,7 @@ mod tests {
             prehash_value: 0,
             length: LengthOp::VarProto.into(),
             prefix: vec![],
+            ..Default::default()
         };
 
         let inner = ics23::InnerOp {
@@ -396,6 +406,7 @@ mod tests {
             prehash_value: HashOp::Sha256.into(),
             length: LengthOp::VarProto.into(),
             prefix: vec![0_u8],
+            ..Default::default()
         };
         let invalid_leaf = LeafOp {
             hash: HashOp::Sha512.into(),
@@ -403,6 +414,7 @@ mod tests {
             prehash_value: 0,
             length: LengthOp::VarProto.into(),
             prefix: vec![0_u8],
+            ..Default::default()
         };
 
         let valid_inner = InnerOp {
@@ -588,6 +600,7 @@ mod tests {
             prehash_value: ics23::HashOp::Sha256.into(),
             length: 0,
             prefix: vec![0_u8],
+            ..Default::default()
         };
         let inner = InnerSpec {
             child_order: vec![0, 1],

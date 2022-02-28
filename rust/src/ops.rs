@@ -19,16 +19,33 @@ pub fn apply_inner(inner: &InnerOp, child: &[u8]) -> Result<Hash> {
 // apply_leaf will take a key, value pair and a LeafOp and return a LeafHash
 pub fn apply_leaf(leaf: &LeafOp, key: &[u8], value: &[u8]) -> Result<Hash> {
     let mut hash = leaf.prefix.clone();
-    let prekey = prepare_leaf_data(leaf.prehash_key(), leaf.length(), key)?;
+    let prekey = prepare_leaf_data(
+        leaf.prehash_key(),
+        leaf.length(),
+        &leaf.prefix_prehash_key,
+        key,
+    )?;
     hash.extend(prekey);
-    let preval = prepare_leaf_data(leaf.prehash_value(), leaf.length(), value)?;
+    let preval = prepare_leaf_data(
+        leaf.prehash_value(),
+        leaf.length(),
+        &leaf.prefix_prehash_value,
+        value,
+    )?;
     hash.extend(preval);
     Ok(do_hash(leaf.hash(), &hash))
 }
 
-fn prepare_leaf_data(prehash: HashOp, length: LengthOp, data: &[u8]) -> Result<Hash> {
+fn prepare_leaf_data(
+    prehash: HashOp,
+    length: LengthOp,
+    prefix: &[u8],
+    data: &[u8],
+) -> Result<Hash> {
     ensure!(!data.is_empty(), "Input to prepare_leaf_data missing");
-    let h = do_hash(prehash, data);
+    let mut prefixed = prefix.to_vec();
+    prefixed.extend_from_slice(data);
+    let h = do_hash(prehash, &prefixed);
     do_length(length, &h)
 }
 
@@ -146,6 +163,7 @@ mod tests {
             prehash_value: 0,
             length: 0,
             prefix: vec![],
+            ..Default::default()
         };
         let key = b"foo";
         let val = b"bar";
@@ -164,6 +182,7 @@ mod tests {
             prehash_value: 0,
             length: 0,
             prefix: vec![],
+            ..Default::default()
         };
         let key = b"f";
         let val = b"oobaz";
@@ -182,6 +201,7 @@ mod tests {
             prehash_value: 0,
             length: LengthOp::VarProto.into(),
             prefix: vec![],
+            ..Default::default()
         };
         let key = b"food";
         let val = b"some longer text";
@@ -200,12 +220,45 @@ mod tests {
             prehash_value: HashOp::Sha256.into(),
             length: LengthOp::VarProto.into(),
             prefix: vec![],
+            ..Default::default()
         };
         let key = b"food";
         let val = b"yet another long string";
         let hash = decode("87e0483e8fb624aef2e2f7b13f4166cda485baa8e39f437c83d74c94bedb148f");
         assert!(
             hash == apply_leaf(&leaf, key, val).unwrap(),
+            "unexpected leaf hash"
+        );
+    }
+
+    #[test]
+    fn apply_leaf_prefix() {
+        let leaf1 = LeafOp {
+            hash: HashOp::Sha256.into(),
+            prehash_key: 0,
+            prehash_value: HashOp::Sha256.into(),
+            length: LengthOp::VarProto.into(),
+            prefix: vec![],
+            ..Default::default()
+        };
+        let leaf2 = LeafOp {
+            hash: HashOp::Sha256.into(),
+            prehash_key: 0,
+            prehash_value: HashOp::Sha256.into(),
+            length: LengthOp::VarProto.into(),
+            prefix: vec![],
+            prefix_prehash_key: b"fo".to_vec(),
+            prefix_prehash_value: b"ye".to_vec(),
+        };
+        let key = b"food";
+        let val = b"yet another long string";
+        let hash = decode("87e0483e8fb624aef2e2f7b13f4166cda485baa8e39f437c83d74c94bedb148f");
+        assert!(
+            hash == apply_leaf(&leaf1, key, val).unwrap(),
+            "unexpected leaf hash"
+        );
+        assert!(
+            hash == apply_leaf(&leaf2, &key[2..], &val[2..]).unwrap(),
             "unexpected leaf hash"
         );
     }

@@ -163,6 +163,7 @@ pub fn iavl_spec() -> ics23::ProofSpec {
         prehash_value: ics23::HashOp::Sha256.into(),
         length: ics23::LengthOp::VarProto.into(),
         prefix: vec![0_u8],
+        ..Default::default()
     };
     let inner = ics23::InnerSpec {
         child_order: vec![0, 1],
@@ -187,6 +188,7 @@ pub fn tendermint_spec() -> ics23::ProofSpec {
         prehash_value: ics23::HashOp::Sha256.into(),
         length: ics23::LengthOp::VarProto.into(),
         prefix: vec![0_u8],
+        ..Default::default()
     };
     let inner = ics23::InnerSpec {
         child_order: vec![0, 1],
@@ -211,6 +213,7 @@ pub fn smt_spec() -> ics23::ProofSpec {
         prehash_value: ics23::HashOp::Sha256.into(),
         length: 0,
         prefix: vec![0_u8],
+        ..Default::default()
     };
     let inner = ics23::InnerSpec {
         child_order: vec![0, 1],
