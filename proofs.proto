@@ -101,8 +101,8 @@ key and value are passed in. So that the signature of this operation is:
   leafOp(key, value) -> output
 
 To process this, first prehash the keys and values if needed (ANY means no hash in this case):
-  hkey = prehashKey(key)
-  hvalue = prehashValue(value)
+  hkey = prehashKey(prefix_prehash_key || key)
+  hvalue = prehashValue(prefix_prehash_value || value)
 
 Then combine the bytes, and hash it
   output = hash(prefix || length(hkey) || hkey || length(hvalue) || hvalue)
@@ -115,6 +115,10 @@ message LeafOp {
     // prefix is a fixed bytes that may optionally be included at the beginning to differentiate
     // a leaf node from an inner node.
     bytes prefix = 5;
+    // fixed bytes that act as a domain separator for prehash_key
+    bytes prefix_prehash_key = 6;
+    // fixed bytes that act as a domain separator for prehash_value
+    bytes prefix_prehash_value = 7;
 }
 
 /**
