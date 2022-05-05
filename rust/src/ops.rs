@@ -1,4 +1,3 @@
-use alloc::format;
 use anyhow::{bail, ensure};
 use ripemd160::Ripemd160;
 use sha2::{Digest, Sha256, Sha512, Sha512Trunc256};

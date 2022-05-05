@@ -6,7 +6,6 @@ use anyhow::{bail, ensure};
 use crate::helpers::Result;
 use crate::ics23;
 use crate::ops::{apply_inner, apply_leaf};
-use alloc::format;
 use std::vec::Vec;
 
 pub type CommitmentRoot = ::std::vec::Vec<u8>;
