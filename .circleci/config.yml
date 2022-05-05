@@ -61,7 +61,7 @@ jobs:
           command: rustc --version; cargo --version; rustup --version
       - restore_cache:
           keys:
-            - v4-cargo-cache-rust:1.51.0-{{ arch }}-{{ checksum "Cargo.lock" }}
+            - v4-cargo-cache-rust:1.51.0-{{ arch }}-{{ checksum "Cargo.toml" }}
       - run:
           name: Check all targets in std
           command: cargo check --all
@@ -86,7 +86,7 @@ jobs:
             - target/debug/.fingerprint
             - target/debug/build
             - target/debug/deps
-          key: v4-cargo-cache-rust:1.51.0-{{ arch }}-{{ checksum "Cargo.lock" }}
+          key: v4-cargo-cache-rust:1.51.0-{{ arch }}-{{ checksum "Cargo.toml" }}
       - run:
           name: Run all tests
           command: cargo test --all
@@ -103,7 +103,7 @@ jobs:
           command: rustc --version; cargo --version; rustup --version; rustup target list --installed
       - restore_cache:
           keys:
-            - cargocache-v2-lint-rust:1.51.0-{{ checksum "Cargo.lock" }}
+            - cargocache-v2-lint-rust:1.51.0-{{ checksum "Cargo.toml" }}
       - run:
           name: Add rustfmt component
           command: rustup component add rustfmt
@@ -125,4 +125,4 @@ jobs:
             - target/debug/.fingerprint
             - target/debug/build
             - target/debug/deps
-          key: cargocache-v2-lint-rust:1.51.0-{{ checksum "Cargo.lock" }}
+          key: cargocache-v2-lint-rust:1.51.0-{{ checksum "Cargo.toml" }}
