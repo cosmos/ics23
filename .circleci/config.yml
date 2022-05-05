@@ -54,6 +54,11 @@ jobs:
       - image: rust:1.51.0
     working_directory: ~/proofs/rust
     steps:
+      - run:
+          name: install protobuf dependencies
+          command: |
+            apt update
+            apt install -y libprotobuf-dev protobuf-compiler
       - checkout:
           path: ~/proofs
       - run:
