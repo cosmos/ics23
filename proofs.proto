@@ -162,6 +162,10 @@ message ProofSpec {
   int32 max_depth = 3;
   // min_depth (if > 0) is the minimum number of InnerOps allowed (mainly for fixed-depth tries)
   int32 min_depth = 4;
+  // HashOp to validate the given key
+  HashOp prehash_compared_key = 5;
+  // HashOp to valiudate the given value
+  HashOp prehash_compared_value = 6;
 }
 
 /*

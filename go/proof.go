@@ -97,10 +97,18 @@ func (p *ExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte
 		return err
 	}
 
-	if !bytes.Equal(key, p.Key) {
+	comparedKey, err := DoHashOrNoop(spec.GetPrehashComparedKey(), key)
+	if err != nil {
+		return errors.Wrap(err, "Error calculating hash")
+	}
+	if !bytes.Equal(comparedKey, p.Key) {
 		return errors.Errorf("Provided key doesn't match proof")
 	}
-	if !bytes.Equal(value, p.Value) {
+	comparedValue, err := DoHashOrNoop(spec.GetPrehashComparedValue(), value)
+	if err != nil {
+		return errors.Wrap(err, "Error calculating hash")
+	}
+	if !bytes.Equal(comparedValue, p.Value) {
 		return errors.Errorf("Provided value doesn't match proof")
 	}
 
@@ -203,13 +211,17 @@ func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []b
 	}
 
 	// Ensure in valid range
+	comparedKey, err := DoHashOrNoop(spec.GetPrehashComparedKey(), key)
+	if err != nil {
+		return errors.Wrap(err, "Error calculating hash")
+	}
 	if rightKey != nil {
-		if bytes.Compare(key, rightKey) >= 0 {
+		if bytes.Compare(comparedKey, rightKey) >= 0 {
 			return errors.New("key is not left of right proof")
 		}
 	}
 	if leftKey != nil {
-		if bytes.Compare(key, leftKey) <= 0 {
+		if bytes.Compare(comparedKey, leftKey) <= 0 {
 			return errors.New("key is not right of left proof")
 		}
 	}

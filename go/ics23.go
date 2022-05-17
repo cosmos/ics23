@@ -36,11 +36,15 @@ type CommitmentRoot []byte
 func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, key []byte, value []byte) bool {
 	// decompress it before running code (no-op if not compressed)
 	proof = Decompress(proof)
-	ep := getExistProofForKey(proof, key)
+	comparedKey, err := DoHashOrNoop(spec.GetPrehashComparedKey(), key)
+	if err != nil {
+		return false
+	}
+	ep := getExistProofForKey(proof, comparedKey)
 	if ep == nil {
 		return false
 	}
-	err := ep.Verify(spec, root, key, value)
+	err = ep.Verify(spec, root, key, value)
 	return err == nil
 }
 
@@ -52,11 +56,15 @@ func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentPro
 func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, key []byte) bool {
 	// decompress it before running code (no-op if not compressed)
 	proof = Decompress(proof)
-	np := getNonExistProofForKey(proof, key)
+	comparedKey, err := DoHashOrNoop(spec.GetPrehashComparedKey(), key)
+	if err != nil {
+		return false
+	}
+	np := getNonExistProofForKey(proof, comparedKey)
 	if np == nil {
 		return false
 	}
-	err := np.Verify(spec, root, key)
+	err = np.Verify(spec, root, key)
 	return err == nil
 }
 

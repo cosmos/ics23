@@ -144,6 +144,10 @@ pub struct ProofSpec {
     /// min_depth (if > 0) is the minimum number of InnerOps allowed (mainly for fixed-depth tries)
     #[prost(int32, tag = "4")]
     pub min_depth: i32,
+    #[prost(enumeration = "HashOp", tag = "5")]
+    pub prehash_compared_key: i32,
+    #[prost(enumeration = "HashOp", tag = "6")]
+    pub prehash_compared_value: i32,
 }
 ///
 /// InnerSpec contains all store-specific structure info to determine if two proofs from a

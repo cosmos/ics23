@@ -6,7 +6,7 @@ use anyhow::{bail, ensure};
 use crate::helpers::Result;
 use crate::host_functions::HostFunctionsProvider;
 use crate::ics23;
-use crate::ops::{apply_inner, apply_leaf};
+use crate::ops::{apply_inner, apply_leaf, do_hash};
 use alloc::vec::Vec;
 
 pub type CommitmentRoot = Vec<u8>;
@@ -19,7 +19,9 @@ pub fn verify_existence<H: HostFunctionsProvider>(
     value: &[u8],
 ) -> Result<()> {
     check_existence_spec(proof, spec)?;
+    let key = do_hash::<H>(spec.prehash_compared_key(), key);
     ensure!(proof.key == key, "Provided key doesn't match proof");
+    let value = do_hash::<H>(spec.prehash_compared_value(), value);
     ensure!(proof.value == value, "Provided value doesn't match proof");
 
     let calc = calculate_existence_root::<H>(proof)?;
@@ -33,13 +35,14 @@ pub fn verify_non_existence<H: HostFunctionsProvider>(
     root: &[u8],
     key: &[u8],
 ) -> Result<()> {
+    let compared_key = do_hash::<H>(spec.prehash_compared_key(), key);
     if let Some(left) = &proof.left {
         verify_existence::<H>(left, spec, root, &left.key, &left.value)?;
-        ensure!(key > left.key.as_slice(), "left key isn't before key");
+        ensure!(compared_key > left.key, "left key isn't before key");
     }
     if let Some(right) = &proof.right {
         verify_existence::<H>(right, spec, root, &right.key, &right.value)?;
-        ensure!(key < right.key.as_slice(), "right key isn't after key");
+        ensure!(compared_key < right.key, "right key isn't after key");
     }
 
     if let Some(inner) = &spec.inner_spec {
@@ -606,6 +609,8 @@ mod tests {
             inner_spec: Some(inner),
             min_depth: 0,
             max_depth: 0,
+            prehash_compared_key: ics23::HashOp::NoHash.into(),
+            prehash_compared_value: ics23::HashOp::NoHash.into(),
         }
     }
 

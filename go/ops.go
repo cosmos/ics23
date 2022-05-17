@@ -91,7 +91,7 @@ func (op *InnerOp) CheckAgainstSpec(spec *ProofSpec) error {
 
 func prepareLeafData(hashOp HashOp, lengthOp LengthOp, data []byte) ([]byte, error) {
 	// TODO: lengthop before or after hash ???
-	hdata, err := doHashOrNoop(hashOp, data)
+	hdata, err := DoHashOrNoop(hashOp, data)
 	if err != nil {
 		return nil, err
 	}
@@ -99,9 +99,9 @@ func prepareLeafData(hashOp HashOp, lengthOp LengthOp, data []byte) ([]byte, err
 	return ldata, err
 }
 
-// doHashOrNoop will return the preimage untouched if hashOp == NONE,
+// DoHashOrNoop will return the preimage untouched if hashOp == NONE,
 // otherwise, perform doHash
-func doHashOrNoop(hashOp HashOp, preimage []byte) ([]byte, error) {
+func DoHashOrNoop(hashOp HashOp, preimage []byte) ([]byte, error) {
 	if hashOp == HashOp_NO_HASH {
 		return preimage, nil
 	}
@@ -109,7 +109,7 @@ func doHashOrNoop(hashOp HashOp, preimage []byte) ([]byte, error) {
 }
 
 // doHash will preform the specified hash on the preimage.
-// if hashOp == NONE, it will return an error (use doHashOrNoop if you want different behavior)
+// if hashOp == NONE, it will return an error (use DoHashOrNoop if you want different behavior)
 func doHash(hashOp HashOp, preimage []byte) ([]byte, error) {
 	switch hashOp {
 	case HashOp_SHA256:

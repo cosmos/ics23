@@ -4,6 +4,7 @@ use alloc::vec;
 use crate::compress::{decompress, is_compressed};
 use crate::host_functions::HostFunctionsProvider;
 use crate::ics23;
+use crate::ops::do_hash;
 use crate::verify::{verify_existence, verify_non_existence, CommitmentRoot};
 
 // Use CommitmentRoot vs &[u8] to stick with ics naming
@@ -27,8 +28,8 @@ pub fn verify_membership<H: HostFunctionsProvider>(
         }
     }
 
-    //    if let Some(ics23::commitment_proof::Proof::Exist(ex)) = &proof.proof {
-    if let Some(ex) = get_exist_proof(proof, key) {
+    let compared_key = do_hash::<H>(spec.prehash_compared_key(), key);
+    if let Some(ex) = get_exist_proof(proof, &compared_key) {
         let valid = verify_existence::<H>(ex, spec, root, key, value);
         valid.is_ok()
     } else {
@@ -56,7 +57,8 @@ pub fn verify_non_membership<H: HostFunctionsProvider>(
         }
     }
 
-    if let Some(non) = get_nonexist_proof(proof, key) {
+    let compared_key = do_hash::<H>(spec.prehash_compared_key(), key);
+    if let Some(non) = get_nonexist_proof(proof, &compared_key) {
         let valid = verify_non_existence::<H>(non, spec, root, key);
         valid.is_ok()
     } else {
@@ -140,10 +142,7 @@ fn get_nonexist_proof<'a>(
         Some(ics23::commitment_proof::Proof::Batch(batch)) => {
             for entry in &batch.entries {
                 if let Some(ics23::batch_entry::Proof::Nonexist(non)) = &entry.proof {
-                    // use iter/all - true if None, must check if Some
-                    if non.left.iter().all(|x| x.key.as_slice() < key)
-                        && non.right.iter().all(|x| x.key.as_slice() > key)
-                    {
+                    if non.key == key {
                         return Some(non);
                     }
                 }
@@ -176,6 +175,8 @@ pub fn iavl_spec() -> ics23::ProofSpec {
         inner_spec: Some(inner),
         min_depth: 0,
         max_depth: 0,
+        prehash_compared_key: ics23::HashOp::NoHash.into(),
+        prehash_compared_value: ics23::HashOp::NoHash.into(),
     }
 }
 
@@ -200,6 +201,8 @@ pub fn tendermint_spec() -> ics23::ProofSpec {
         inner_spec: Some(inner),
         min_depth: 0,
         max_depth: 0,
+        prehash_compared_key: ics23::HashOp::NoHash.into(),
+        prehash_compared_value: ics23::HashOp::NoHash.into(),
     }
 }
 
@@ -224,6 +227,8 @@ pub fn smt_spec() -> ics23::ProofSpec {
         inner_spec: Some(inner),
         min_depth: 0,
         max_depth: 0,
+        prehash_compared_key: ics23::HashOp::NoHash.into(),
+        prehash_compared_value: ics23::HashOp::NoHash.into(),
     }
 }
 
