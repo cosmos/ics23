@@ -1,5 +1,6 @@
 import { decompress } from "./compress";
 import { ics23 } from "./generated/codecimpl";
+import { doHashOrNoop } from "./ops";
 import { CommitmentRoot, verifyExistence, verifyNonExistence } from "./proofs";
 import { bytesBefore, bytesEqual } from "./specs";
 
@@ -37,7 +38,11 @@ export function verifyMembership(
   value: Uint8Array
 ): boolean {
   const norm = decompress(proof);
-  const exist = getExistForKey(norm, key);
+  const comparedKey = doHashOrNoop(
+    spec.prehashComparedKey ?? ics23.HashOp.NO_HASH,
+    key
+  );
+  const exist = getExistForKey(norm, comparedKey);
   if (!exist) {
     return false;
   }
@@ -59,7 +64,11 @@ export function verifyNonMembership(
   key: Uint8Array
 ): boolean {
   const norm = decompress(proof);
-  const nonexist = getNonExistForKey(norm, key);
+  const comparedKey = doHashOrNoop(
+    spec.prehashComparedKey ?? ics23.HashOp.NO_HASH,
+    key
+  );
+  const nonexist = getNonExistForKey(norm, comparedKey);
   if (!nonexist) {
     return false;
   }

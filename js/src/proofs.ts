@@ -1,5 +1,5 @@
 import { ics23 } from "./generated/codecimpl";
-import { applyInner, applyLeaf } from "./ops";
+import { applyInner, applyLeaf, doHashOrNoop } from "./ops";
 import {
   bytesEqual,
   ensureBytesBefore,
@@ -75,8 +75,16 @@ export function verifyExistence(
   ensureSpec(proof, spec);
   const calc = calculateExistenceRoot(proof);
   ensureBytesEqual(calc, root);
-  ensureBytesEqual(key, proof.key!);
-  ensureBytesEqual(value, proof.value!);
+  const comparedKey = doHashOrNoop(
+    spec.prehashComparedKey ?? ics23.HashOp.NO_HASH,
+    key
+  );
+  ensureBytesEqual(comparedKey, proof.key!);
+  const comparedValue = doHashOrNoop(
+    spec.prehashComparedValue ?? ics23.HashOp.NO_HASH,
+    value
+  );
+  ensureBytesEqual(comparedValue, proof.value!);
 }
 
 // Verify does all checks to ensure the proof has valid non-existence proofs,
@@ -110,11 +118,15 @@ export function verifyNonExistence(
     throw new Error("neither left nor right proof defined");
   }
 
+  const comparedKey = doHashOrNoop(
+    spec.prehashComparedKey ?? ics23.HashOp.NO_HASH,
+    key
+  );
   if (leftKey) {
-    ensureBytesBefore(leftKey, key);
+    ensureBytesBefore(leftKey, comparedKey);
   }
   if (rightKey) {
-    ensureBytesBefore(key, rightKey);
+    ensureBytesBefore(comparedKey, rightKey);
   }
 
   if (!spec.innerSpec) {

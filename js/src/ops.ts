@@ -70,7 +70,10 @@ function prepareLeafData(
 
 // doHashOrNoop will return the preimage untouched if hashOp == NONE,
 // otherwise, perform doHash
-function doHashOrNoop(hashOp: ics23.HashOp, preimage: Uint8Array): Uint8Array {
+export function doHashOrNoop(
+  hashOp: ics23.HashOp,
+  preimage: Uint8Array
+): Uint8Array {
   if (hashOp === ics23.HashOp.NO_HASH) {
     return preimage;
   }

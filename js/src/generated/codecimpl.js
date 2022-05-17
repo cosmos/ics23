@@ -1726,6 +1726,8 @@ $root.ics23 = (function() {
          * @property {ics23.IInnerSpec|null} [innerSpec] ProofSpec innerSpec
          * @property {number|null} [maxDepth] ProofSpec maxDepth
          * @property {number|null} [minDepth] ProofSpec minDepth
+         * @property {ics23.HashOp|null} [prehashComparedKey] ProofSpec prehashComparedKey
+         * @property {ics23.HashOp|null} [prehashComparedValue] ProofSpec prehashComparedValue
          */
 
         /**
@@ -1785,6 +1787,22 @@ $root.ics23 = (function() {
         ProofSpec.prototype.minDepth = 0;
 
         /**
+         * ProofSpec prehashComparedKey.
+         * @member {ics23.HashOp} prehashComparedKey
+         * @memberof ics23.ProofSpec
+         * @instance
+         */
+        ProofSpec.prototype.prehashComparedKey = 0;
+
+        /**
+         * ProofSpec prehashComparedValue.
+         * @member {ics23.HashOp} prehashComparedValue
+         * @memberof ics23.ProofSpec
+         * @instance
+         */
+        ProofSpec.prototype.prehashComparedValue = 0;
+
+        /**
          * Creates a new ProofSpec instance using the specified properties.
          * @function create
          * @memberof ics23.ProofSpec
@@ -1816,6 +1834,10 @@ $root.ics23 = (function() {
                 writer.uint32(/* id 3, wireType 0 =*/24).int32(message.maxDepth);
             if (message.minDepth != null && message.hasOwnProperty("minDepth"))
                 writer.uint32(/* id 4, wireType 0 =*/32).int32(message.minDepth);
+            if (message.prehashComparedKey != null && message.hasOwnProperty("prehashComparedKey"))
+                writer.uint32(/* id 5, wireType 0 =*/40).int32(message.prehashComparedKey);
+            if (message.prehashComparedValue != null && message.hasOwnProperty("prehashComparedValue"))
+                writer.uint32(/* id 6, wireType 0 =*/48).int32(message.prehashComparedValue);
             return writer;
         };
 
@@ -1861,6 +1883,12 @@ $root.ics23 = (function() {
                     break;
                 case 4:
                     message.minDepth = reader.int32();
+                    break;
+                case 5:
+                    message.prehashComparedKey = reader.int32();
+                    break;
+                case 6:
+                    message.prehashComparedValue = reader.int32();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1913,6 +1941,32 @@ $root.ics23 = (function() {
             if (message.minDepth != null && message.hasOwnProperty("minDepth"))
                 if (!$util.isInteger(message.minDepth))
                     return "minDepth: integer expected";
+            if (message.prehashComparedKey != null && message.hasOwnProperty("prehashComparedKey"))
+                switch (message.prehashComparedKey) {
+                default:
+                    return "prehashComparedKey: enum value expected";
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                    break;
+                }
+            if (message.prehashComparedValue != null && message.hasOwnProperty("prehashComparedValue"))
+                switch (message.prehashComparedValue) {
+                default:
+                    return "prehashComparedValue: enum value expected";
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                    break;
+                }
             return null;
         };
 
@@ -1942,6 +1996,66 @@ $root.ics23 = (function() {
                 message.maxDepth = object.maxDepth | 0;
             if (object.minDepth != null)
                 message.minDepth = object.minDepth | 0;
+            switch (object.prehashComparedKey) {
+            case "NO_HASH":
+            case 0:
+                message.prehashComparedKey = 0;
+                break;
+            case "SHA256":
+            case 1:
+                message.prehashComparedKey = 1;
+                break;
+            case "SHA512":
+            case 2:
+                message.prehashComparedKey = 2;
+                break;
+            case "KECCAK":
+            case 3:
+                message.prehashComparedKey = 3;
+                break;
+            case "RIPEMD160":
+            case 4:
+                message.prehashComparedKey = 4;
+                break;
+            case "BITCOIN":
+            case 5:
+                message.prehashComparedKey = 5;
+                break;
+            case "SHA512_256":
+            case 6:
+                message.prehashComparedKey = 6;
+                break;
+            }
+            switch (object.prehashComparedValue) {
+            case "NO_HASH":
+            case 0:
+                message.prehashComparedValue = 0;
+                break;
+            case "SHA256":
+            case 1:
+                message.prehashComparedValue = 1;
+                break;
+            case "SHA512":
+            case 2:
+                message.prehashComparedValue = 2;
+                break;
+            case "KECCAK":
+            case 3:
+                message.prehashComparedValue = 3;
+                break;
+            case "RIPEMD160":
+            case 4:
+                message.prehashComparedValue = 4;
+                break;
+            case "BITCOIN":
+            case 5:
+                message.prehashComparedValue = 5;
+                break;
+            case "SHA512_256":
+            case 6:
+                message.prehashComparedValue = 6;
+                break;
+            }
             return message;
         };
 
@@ -1963,6 +2077,8 @@ $root.ics23 = (function() {
                 object.innerSpec = null;
                 object.maxDepth = 0;
                 object.minDepth = 0;
+                object.prehashComparedKey = options.enums === String ? "NO_HASH" : 0;
+                object.prehashComparedValue = options.enums === String ? "NO_HASH" : 0;
             }
             if (message.leafSpec != null && message.hasOwnProperty("leafSpec"))
                 object.leafSpec = $root.ics23.LeafOp.toObject(message.leafSpec, options);
@@ -1972,6 +2088,10 @@ $root.ics23 = (function() {
                 object.maxDepth = message.maxDepth;
             if (message.minDepth != null && message.hasOwnProperty("minDepth"))
                 object.minDepth = message.minDepth;
+            if (message.prehashComparedKey != null && message.hasOwnProperty("prehashComparedKey"))
+                object.prehashComparedKey = options.enums === String ? $root.ics23.HashOp[message.prehashComparedKey] : message.prehashComparedKey;
+            if (message.prehashComparedValue != null && message.hasOwnProperty("prehashComparedValue"))
+                object.prehashComparedValue = options.enums === String ? $root.ics23.HashOp[message.prehashComparedValue] : message.prehashComparedValue;
             return object;
         };
 
