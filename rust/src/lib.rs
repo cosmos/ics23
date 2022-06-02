@@ -3,12 +3,11 @@
 
 extern crate alloc;
 extern crate core;
-#[cfg(not(feature = "std"))]
-extern crate sp_std as std;
 
 mod api;
 mod compress;
 mod helpers;
+mod host_functions;
 mod ics23;
 mod ops;
 mod verify;
@@ -21,3 +20,4 @@ pub use api::{
 pub use compress::{compress, decompress, is_compressed};
 pub use helpers::{Hash, Result};
 pub use verify::calculate_existence_root;
+pub use host_functions::HostFunctionsProvider;

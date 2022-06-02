@@ -4,13 +4,14 @@
 use anyhow::{bail, ensure};
 
 use crate::helpers::Result;
+use crate::host_functions::HostFunctionsProvider;
 use crate::ics23;
 use crate::ops::{apply_inner, apply_leaf};
-use std::vec::Vec;
+use sp_std::vec::Vec;
 
-pub type CommitmentRoot = ::std::vec::Vec<u8>;
+pub type CommitmentRoot = Vec<u8>;
 
-pub fn verify_existence(
+pub fn verify_existence<H: HostFunctionsProvider>(
     proof: &ics23::ExistenceProof,
     spec: &ics23::ProofSpec,
     root: &[u8],
@@ -21,23 +22,23 @@ pub fn verify_existence(
     ensure!(proof.key == key, "Provided key doesn't match proof");
     ensure!(proof.value == value, "Provided value doesn't match proof");
 
-    let calc = calculate_existence_root(proof)?;
+    let calc = calculate_existence_root::<H>(proof)?;
     ensure!(calc == root, "Root hash doesn't match");
     Ok(())
 }
 
-pub fn verify_non_existence(
+pub fn verify_non_existence<H: HostFunctionsProvider>(
     proof: &ics23::NonExistenceProof,
     spec: &ics23::ProofSpec,
     root: &[u8],
     key: &[u8],
 ) -> Result<()> {
     if let Some(left) = &proof.left {
-        verify_existence(left, spec, root, &left.key, &left.value)?;
+        verify_existence::<H>(left, spec, root, &left.key, &left.value)?;
         ensure!(key > left.key.as_slice(), "left key isn't before key");
     }
     if let Some(right) = &proof.right {
-        verify_existence(right, spec, root, &right.key, &right.value)?;
+        verify_existence::<H>(right, spec, root, &right.key, &right.value)?;
         ensure!(key < right.key.as_slice(), "right key isn't after key");
     }
 
@@ -56,7 +57,9 @@ pub fn verify_non_existence(
 // Calculate determines the root hash that matches the given proof.
 // You must validate the result is what you have in a header.
 // Returns error if the calculations cannot be performed.
-pub fn calculate_existence_root(proof: &ics23::ExistenceProof) -> Result<CommitmentRoot> {
+pub fn calculate_existence_root<H: HostFunctionsProvider>(
+    proof: &ics23::ExistenceProof,
+) -> Result<CommitmentRoot> {
     ensure!(!proof.key.is_empty(), "Existence proof must have key set");
     ensure!(
         !proof.value.is_empty(),
@@ -64,9 +67,9 @@ pub fn calculate_existence_root(proof: &ics23::ExistenceProof) -> Result<Commitm
     );
 
     if let Some(leaf_node) = &proof.leaf {
-        let mut hash = apply_leaf(leaf_node, &proof.key, &proof.value)?;
+        let mut hash = apply_leaf::<H>(leaf_node, &proof.key, &proof.value)?;
         for step in &proof.path {
-            hash = apply_inner(step, &hash)?;
+            hash = apply_inner::<H>(step, &hash)?;
         }
         Ok(hash)
     } else {
@@ -315,10 +318,11 @@ fn right_branches_are_empty(spec: &ics23::InnerSpec, op: &ics23::InnerOp) -> Res
 mod tests {
     use super::*;
     use crate::api;
+    use crate::host_functions::test_helper::HostFunctionsManager;
     use crate::ics23::{ExistenceProof, HashOp, InnerOp, InnerSpec, LeafOp, LengthOp, ProofSpec};
-    use std::collections::btree_map::BTreeMap as HashMap;
+    use sp_std::collections::btree_map::BTreeMap as HashMap;
     #[cfg(not(feature = "std"))]
-    use std::prelude::*;
+    use sp_std::prelude::*;
 
     #[test]
     fn calculate_root_from_leaf() {
@@ -342,7 +346,7 @@ mod tests {
                 .unwrap();
         assert_eq!(
             expected,
-            calculate_existence_root(&proof).unwrap(),
+            calculate_existence_root::<HostFunctionsManager>(&proof).unwrap(),
             "invalid root hash"
         );
     }
@@ -375,7 +379,7 @@ mod tests {
                 .unwrap();
         assert_eq!(
             expected,
-            calculate_existence_root(&proof).unwrap(),
+            calculate_existence_root::<HostFunctionsManager>(&proof).unwrap(),
             "invalid root hash"
         );
     }
