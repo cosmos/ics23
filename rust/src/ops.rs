@@ -80,7 +80,7 @@ fn proto_len(length: usize) -> Result<Hash> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::host_functions::test_helper::HostFunctionsManager;
+    use crate::host_functions::host_functions_impl::HostFunctionsManager;
     use sp_std::vec::Vec;
 
     fn decode(input: &str) -> Vec<u8> {

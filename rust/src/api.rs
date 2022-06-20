@@ -244,7 +244,7 @@ mod tests {
 
     use crate::compress::compress;
     use crate::helpers::Result;
-    use crate::host_functions::test_helper::HostFunctionsManager;
+    use crate::host_functions::host_functions_impl::HostFunctionsManager;
 
     #[derive(Deserialize, Debug)]
     struct TestVector {
