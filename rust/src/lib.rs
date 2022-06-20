@@ -21,3 +21,6 @@ pub use compress::{compress, decompress, is_compressed};
 pub use helpers::{Hash, Result};
 pub use verify::calculate_existence_root;
 pub use host_functions::HostFunctionsProvider;
+
+#[cfg(feature  ="std")]
+pub use host_functions::host_functions_impl::HostFunctionsManager;
