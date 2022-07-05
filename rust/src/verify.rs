@@ -7,7 +7,7 @@ use crate::helpers::Result;
 use crate::host_functions::HostFunctionsProvider;
 use crate::ics23;
 use crate::ops::{apply_inner, apply_leaf};
-use sp_std::vec::Vec;
+use alloc::vec::Vec;
 
 pub type CommitmentRoot = Vec<u8>;
 
@@ -320,9 +320,7 @@ mod tests {
     use crate::api;
     use crate::host_functions::host_functions_impl::HostFunctionsManager;
     use crate::ics23::{ExistenceProof, HashOp, InnerOp, InnerSpec, LeafOp, LengthOp, ProofSpec};
-    use sp_std::collections::btree_map::BTreeMap as HashMap;
-    #[cfg(not(feature = "std"))]
-    use sp_std::prelude::*;
+    use alloc::collections::btree_map::BTreeMap as HashMap;
 
     #[test]
     fn calculate_root_from_leaf() {

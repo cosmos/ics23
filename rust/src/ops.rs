@@ -1,5 +1,5 @@
 use anyhow::{bail, ensure};
-use sp_std::convert::TryInto;
+use core::convert::TryInto;
 
 use crate::helpers::{Hash, Result};
 use crate::host_functions::HostFunctionsProvider;
@@ -81,7 +81,7 @@ fn proto_len(length: usize) -> Result<Hash> {
 mod tests {
     use super::*;
     use crate::host_functions::host_functions_impl::HostFunctionsManager;
-    use sp_std::vec::Vec;
+    use alloc::vec::Vec;
 
     fn decode(input: &str) -> Vec<u8> {
         hex::decode(input).unwrap()
