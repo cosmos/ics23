@@ -42,12 +42,12 @@ export function verifyMembership(
     spec.prehashComparedKey ?? ics23.HashOp.NO_HASH,
     key
   );
-  const exist = getExistForKey(norm, comparedKey);
+  const exist = getExistForKey(norm, comparedKey, value);
   if (!exist) {
     return false;
   }
   try {
-    verifyExistence(exist, spec, root, key, value);
+    verifyExistence(exist, spec, root);
     return true;
   } catch {
     return false;
@@ -73,7 +73,7 @@ export function verifyNonMembership(
     return false;
   }
   try {
-    verifyNonExistence(nonexist, spec, root, key);
+    verifyNonExistence(nonexist, spec, root);
     return true;
   } catch {
     return false;
@@ -118,10 +118,11 @@ export function batchVerifyNonMembership(
 
 function getExistForKey(
   proof: ics23.ICommitmentProof,
-  key: Uint8Array
+  key: Uint8Array,
+  value: Uint8Array
 ): ics23.IExistenceProof | undefined | null {
   const match = (p: ics23.IExistenceProof | null | undefined): boolean =>
-    !!p && bytesEqual(key, p.key!);
+    !!p && bytesEqual(key, p.key!) && bytesEqual(value, p.value!);
   if (match(proof.exist)) {
     return proof.exist!;
   } else if (proof.batch) {

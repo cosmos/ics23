@@ -29,9 +29,9 @@ pub fn verify_membership<H: HostFunctionsProvider>(
     }
 
     let compared_key = do_hash::<H>(spec.prehash_compared_key(), key);
-    if let Some(ex) = get_exist_proof(proof, &compared_key) {
-        let valid = verify_existence::<H>(ex, spec, root, key, value);
-        valid.is_ok()
+    let compared_value = do_hash::<H>(spec.prehash_compared_value(), value);
+    if let Some(ex) = get_exist_proof(proof, &compared_key, &compared_value) {
+        verify_existence::<H>(ex, spec, root).is_ok()
     } else {
         false
     }
@@ -59,8 +59,7 @@ pub fn verify_non_membership<H: HostFunctionsProvider>(
 
     let compared_key = do_hash::<H>(spec.prehash_compared_key(), key);
     if let Some(non) = get_nonexist_proof(proof, &compared_key) {
-        let valid = verify_non_existence::<H>(non, spec, root, key);
-        valid.is_ok()
+        verify_non_existence::<H>(non, spec, root).is_ok()
     } else {
         false
     }
@@ -116,13 +115,20 @@ pub fn verify_batch_non_membership<H: HostFunctionsProvider>(
 fn get_exist_proof<'a>(
     proof: &'a ics23::CommitmentProof,
     key: &[u8],
+    value: &[u8],
 ) -> Option<&'a ics23::ExistenceProof> {
     match &proof.proof {
-        Some(ics23::commitment_proof::Proof::Exist(ex)) => Some(ex),
+        Some(ics23::commitment_proof::Proof::Exist(ex)) => {
+            if ex.key == key && ex.value == value {
+                Some(ex)
+            } else {
+                None
+            }
+        }
         Some(ics23::commitment_proof::Proof::Batch(batch)) => {
             for entry in &batch.entries {
                 if let Some(ics23::batch_entry::Proof::Exist(ex)) = &entry.proof {
-                    if ex.key == key {
+                    if ex.key == key && ex.value == value {
                         return Some(ex);
                     }
                 }
@@ -143,6 +149,16 @@ fn get_nonexist_proof<'a>(
             for entry in &batch.entries {
                 if let Some(ics23::batch_entry::Proof::Nonexist(non)) = &entry.proof {
                     if non.key == key {
+                        if let Some(left) = &non.left {
+                            if key.to_vec() <= left.key {
+                                return None;
+                            }
+                        }
+                        if let Some(right) = &non.right {
+                            if key.to_vec() >= right.key {
+                                return None;
+                            }
+                        }
                         return Some(non);
                     }
                 }

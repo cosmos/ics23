@@ -1,12 +1,6 @@
 import { ics23 } from "./generated/codecimpl";
-import { applyInner, applyLeaf, doHashOrNoop } from "./ops";
-import {
-  bytesEqual,
-  ensureBytesBefore,
-  ensureBytesEqual,
-  ensureInner,
-  ensureLeaf,
-} from "./specs";
+import { applyInner, applyLeaf } from "./ops";
+import { bytesEqual, ensureBytesEqual, ensureInner, ensureLeaf } from "./specs";
 
 export const iavlSpec: ics23.IProofSpec = {
   leafSpec: {
@@ -68,23 +62,11 @@ export type CommitmentRoot = Uint8Array;
 export function verifyExistence(
   proof: ics23.IExistenceProof,
   spec: ics23.IProofSpec,
-  root: CommitmentRoot,
-  key: Uint8Array,
-  value: Uint8Array
+  root: CommitmentRoot
 ): void {
   ensureSpec(proof, spec);
   const calc = calculateExistenceRoot(proof);
   ensureBytesEqual(calc, root);
-  const comparedKey = doHashOrNoop(
-    spec.prehashComparedKey ?? ics23.HashOp.NO_HASH,
-    key
-  );
-  ensureBytesEqual(comparedKey, proof.key!);
-  const comparedValue = doHashOrNoop(
-    spec.prehashComparedValue ?? ics23.HashOp.NO_HASH,
-    value
-  );
-  ensureBytesEqual(comparedValue, proof.value!);
 }
 
 // Verify does all checks to ensure the proof has valid non-existence proofs,
@@ -93,40 +75,22 @@ export function verifyExistence(
 export function verifyNonExistence(
   proof: ics23.INonExistenceProof,
   spec: ics23.IProofSpec,
-  root: CommitmentRoot,
-  key: Uint8Array
+  root: CommitmentRoot
 ): void {
   let leftKey: Uint8Array | undefined;
   let rightKey: Uint8Array | undefined;
 
   if (proof.left) {
-    verifyExistence(proof.left, spec, root, proof.left.key!, proof.left.value!);
+    verifyExistence(proof.left, spec, root);
     leftKey = proof.left.key!;
   }
   if (proof.right) {
-    verifyExistence(
-      proof.right,
-      spec,
-      root,
-      proof.right.key!,
-      proof.right.value!
-    );
+    verifyExistence(proof.right, spec, root);
     rightKey = proof.right.key!;
   }
 
   if (!leftKey && !rightKey) {
     throw new Error("neither left nor right proof defined");
-  }
-
-  const comparedKey = doHashOrNoop(
-    spec.prehashComparedKey ?? ics23.HashOp.NO_HASH,
-    key
-  );
-  if (leftKey) {
-    ensureBytesBefore(leftKey, comparedKey);
-  }
-  if (rightKey) {
-    ensureBytesBefore(comparedKey, rightKey);
   }
 
   if (!spec.innerSpec) {

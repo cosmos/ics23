@@ -40,11 +40,15 @@ func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentPro
 	if err != nil {
 		return false
 	}
-	ep := getExistProofForKey(proof, comparedKey)
+	comparedValue, err := DoHashOrNoop(spec.GetPrehashComparedValue(), value)
+	if err != nil {
+		return false
+	}
+	ep := getExistProofForKey(proof, comparedKey, comparedValue)
 	if ep == nil {
 		return false
 	}
-	err = ep.Verify(spec, root, key, value)
+	err = ep.Verify(spec, root)
 	return err == nil
 }
 
@@ -64,7 +68,7 @@ func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *Commitment
 	if np == nil {
 		return false
 	}
-	err = np.Verify(spec, root, key)
+	err = np.Verify(spec, root)
 	return err == nil
 }
 
@@ -139,16 +143,16 @@ func CombineProofs(proofs []*CommitmentProof) (*CommitmentProof, error) {
 	return Compress(batch), nil
 }
 
-func getExistProofForKey(proof *CommitmentProof, key []byte) *ExistenceProof {
+func getExistProofForKey(proof *CommitmentProof, key []byte, value []byte) *ExistenceProof {
 	switch p := proof.Proof.(type) {
 	case *CommitmentProof_Exist:
 		ep := p.Exist
-		if bytes.Equal(ep.Key, key) {
+		if bytes.Equal(ep.Key, key) && bytes.Equal(ep.Value, value) {
 			return ep
 		}
 	case *CommitmentProof_Batch:
 		for _, sub := range p.Batch.Entries {
-			if ep := sub.GetExist(); ep != nil && bytes.Equal(ep.Key, key) {
+			if ep := sub.GetExist(); ep != nil && bytes.Equal(ep.Key, key) && bytes.Equal(ep.Value, value) {
 				return ep
 			}
 		}

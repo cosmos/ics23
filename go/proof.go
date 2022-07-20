@@ -92,24 +92,9 @@ func (p *CommitmentProof) Calculate() (CommitmentRoot, error) {
 
 // Verify does all checks to ensure this proof proves this key, value -> root
 // and matches the spec.
-func (p *ExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte, value []byte) error {
+func (p *ExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot) error {
 	if err := p.CheckAgainstSpec(spec); err != nil {
 		return err
-	}
-
-	comparedKey, err := DoHashOrNoop(spec.GetPrehashComparedKey(), key)
-	if err != nil {
-		return errors.Wrap(err, "Error calculating hash")
-	}
-	if !bytes.Equal(comparedKey, p.Key) {
-		return errors.Errorf("Provided key doesn't match proof")
-	}
-	comparedValue, err := DoHashOrNoop(spec.GetPrehashComparedValue(), value)
-	if err != nil {
-		return errors.Wrap(err, "Error calculating hash")
-	}
-	if !bytes.Equal(comparedValue, p.Value) {
-		return errors.Errorf("Provided value doesn't match proof")
 	}
 
 	calc, err := p.Calculate()
@@ -189,17 +174,17 @@ func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
 
 // Verify does all checks to ensure the proof has valid non-existence proofs,
 // and they ensure the given key is not in the CommitmentState
-func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte) error {
+func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot) error {
 	// ensure the existence proofs are valid
 	var leftKey, rightKey []byte
 	if p.Left != nil {
-		if err := p.Left.Verify(spec, root, p.Left.Key, p.Left.Value); err != nil {
+		if err := p.Left.Verify(spec, root); err != nil {
 			return errors.Wrap(err, "left proof")
 		}
 		leftKey = p.Left.Key
 	}
 	if p.Right != nil {
-		if err := p.Right.Verify(spec, root, p.Right.Key, p.Right.Value); err != nil {
+		if err := p.Right.Verify(spec, root); err != nil {
 			return errors.Wrap(err, "right proof")
 		}
 		rightKey = p.Right.Key
@@ -208,22 +193,6 @@ func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []b
 	// If both proofs are missing, this is not a valid proof
 	if leftKey == nil && rightKey == nil {
 		return errors.New("both left and right proofs missing")
-	}
-
-	// Ensure in valid range
-	comparedKey, err := DoHashOrNoop(spec.GetPrehashComparedKey(), key)
-	if err != nil {
-		return errors.Wrap(err, "Error calculating hash")
-	}
-	if rightKey != nil {
-		if bytes.Compare(comparedKey, rightKey) >= 0 {
-			return errors.New("key is not left of right proof")
-		}
-	}
-	if leftKey != nil {
-		if bytes.Compare(comparedKey, leftKey) <= 0 {
-			return errors.New("key is not right of left proof")
-		}
 	}
 
 	if leftKey == nil {
