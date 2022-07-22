@@ -243,7 +243,7 @@ pub fn smt_spec() -> ics23::ProofSpec {
         inner_spec: Some(inner),
         min_depth: 0,
         max_depth: 0,
-        prehash_compared_key: ics23::HashOp::NoHash.into(),
+        prehash_compared_key: ics23::HashOp::Sha256.into(),
         prehash_compared_value: ics23::HashOp::NoHash.into(),
     }
 }

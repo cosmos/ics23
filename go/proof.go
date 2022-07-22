@@ -58,6 +58,7 @@ var SmtSpec = &ProofSpec{
 		Hash:            HashOp_SHA256,
 	},
 	MaxDepth: 256,
+  PrehashComparedKey: HashOp_SHA256,
 }
 
 // Calculate determines the root hash that matches a given Commitment proof
