@@ -14,7 +14,7 @@ members = ["codegen"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
-prost = { version = "0.10", default-features = false, features = ["prost-derive"] }
+prost = { version = "0.11", default-features = false, features = ["prost-derive"] }
 bytes = { version = "1.0.1", default-features = false }
 hex = { version = "0.4.3", default-features = false, features = [ "alloc" ] }
 anyhow = { version = "1.0.40", default-features = false }
