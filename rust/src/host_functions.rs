@@ -22,13 +22,16 @@ pub trait HostFunctionsProvider {
 pub mod host_functions_impl {
     use crate::host_functions::HostFunctionsProvider;
     use ripemd160::Ripemd160;
-    use sha2::{Digest, Sha512, Sha512Trunc256};
+    use sha2::{Digest, Sha256, Sha512, Sha512Trunc256};
     use sha3::Sha3_512;
 
     pub struct HostFunctionsManager;
     impl HostFunctionsProvider for HostFunctionsManager {
         fn sha2_256(message: &[u8]) -> [u8; 32] {
-            sp_core::hashing::sha2_256(message)
+            let digest = Sha256::digest(message);
+            let mut buf = [0u8; 32];
+            buf.copy_from_slice(&digest);
+            buf
         }
 
         fn sha2_512(message: &[u8]) -> [u8; 64] {
