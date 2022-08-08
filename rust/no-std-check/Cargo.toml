@@ -1,0 +1,11 @@
+[package]
+name = "no-std-check"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+
+[dependencies]
+ics23 = { path = "../", default-features = false }
+
+[features]
+panic-handler = []
