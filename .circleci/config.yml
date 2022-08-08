@@ -51,7 +51,7 @@ jobs:
             - "/go/pkg/mod"
   rust:
     docker:
-      - image: rust:1.51.0
+      - image: rust:1.56.1
     working_directory: ~/proofs/rust
     steps:
       - checkout:
@@ -61,7 +61,7 @@ jobs:
           command: rustc --version; cargo --version; rustup --version
       - restore_cache:
           keys:
-            - v4-cargo-cache-rust:1.51.0-{{ arch }}-{{ checksum "Cargo.toml" }}
+            - v4-cargo-cache-rust:1.56.1-{{ arch }}-{{ checksum "Cargo.toml" }}
       - run:
           name: install protobuf dependencies
           command: |
@@ -91,14 +91,14 @@ jobs:
             - target/debug/.fingerprint
             - target/debug/build
             - target/debug/deps
-          key: v4-cargo-cache-rust:1.51.0-{{ arch }}-{{ checksum "Cargo.toml" }}
+          key: v4-cargo-cache-rust:1.56.1-{{ arch }}-{{ checksum "Cargo.toml" }}
       - run:
           name: Run all tests
           command: cargo test --all
 
   lint-rust:
     docker:
-      - image: rust:1.51.0
+      - image: rust:1.56.1
     working_directory: ~/proofs/rust
     steps:
       - checkout:
@@ -108,7 +108,7 @@ jobs:
           command: rustc --version; cargo --version; rustup --version; rustup target list --installed
       - restore_cache:
           keys:
-            - cargocache-v2-lint-rust:1.51.0-{{ checksum "Cargo.toml" }}
+            - cargocache-v2-lint-rust:1.56.1-{{ checksum "Cargo.toml" }}
       - run:
           name: Add rustfmt component
           command: rustup component add rustfmt
@@ -130,4 +130,4 @@ jobs:
             - target/debug/.fingerprint
             - target/debug/build
             - target/debug/deps
-          key: cargocache-v2-lint-rust:1.51.0-{{ checksum "Cargo.toml" }}
+          key: cargocache-v2-lint-rust:1.56.1-{{ checksum "Cargo.toml" }}

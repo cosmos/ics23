@@ -2,11 +2,12 @@
 name = "ics23"
 version = "0.8.0-alpha"
 authors = ["Ethan Frey <ethanfrey@users.noreply.github.com>"]
-edition = "2018"
+edition = "2021"
 exclude = ["codegen"]
 description = "Merkle proof verification library - implements Cosmos ICS23 Spec"
 repository = "https://github.com/confio/ics23/tree/master/rust"
 license = "Apache-2.0"
+rust-version = "1.56.1"
 
 [workspace]
 members = ["codegen"]
