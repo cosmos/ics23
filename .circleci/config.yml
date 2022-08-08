@@ -95,6 +95,9 @@ jobs:
       - run:
           name: Run all tests
           command: cargo test --all
+      - run:
+          name: Check no_std compatibility
+          command: cd no-std-check/; make setup; make all
 
   lint-rust:
     docker:
