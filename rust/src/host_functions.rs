@@ -21,8 +21,8 @@ pub trait HostFunctionsProvider {
 #[cfg(any(feature = "std", test))]
 pub mod host_functions_impl {
     use crate::host_functions::HostFunctionsProvider;
-    use ripemd160::Ripemd160;
-    use sha2::{Digest, Sha256, Sha512, Sha512Trunc256};
+    use ripemd::Ripemd160;
+    use sha2::{Digest, Sha256, Sha512, Sha512_256};
     use sha3::Sha3_512;
 
     pub struct HostFunctionsManager;
@@ -42,7 +42,7 @@ pub mod host_functions_impl {
         }
 
         fn sha2_512_truncated(message: &[u8]) -> [u8; 32] {
-            let digest = Sha512Trunc256::digest(message);
+            let digest = Sha512_256::digest(message);
             let mut buf = [0u8; 32];
             buf.copy_from_slice(&digest);
             buf
