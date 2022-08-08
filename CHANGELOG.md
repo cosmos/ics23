@@ -1,5 +1,12 @@
 # Changelog
 
+# 0.8.1
+
+## Rust ([`ics23`](https://crates.io/crates/ics23))
+
+- Fix no\_std compatibility and add check for this on CI
+  ([#104](https://github.com/confio/ics23/pull/104))
+
 # 0.8.0
 
 ## Rust ([`ics23`](https://crates.io/crates/ics23))
