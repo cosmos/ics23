@@ -30,12 +30,14 @@ serde = { version = "1.0.125", features = ["derive"] }
 serde_json = "1.0.64"
 
 [features]
-default = ["std"]
+default = ["std", "host-functions"]
 std = [
     "prost/std",
     "bytes/std",
     "hex/std",
     "anyhow/std",
+]
+host-functions = [
     "sha2",
     "sha3",
     "ripemd",

@@ -119,11 +119,14 @@ jobs:
           name: Check formatting of workspace
           command: cargo fmt -- --check
       - run:
-          name: Clippy linting on workspace
+          name: Clippy linting on workspace (host-functions + std)
           command: cargo clippy --tests -- -D warnings
       - run:
           name: Clippy linting on workspace (no-std)
           command: cargo clippy --tests --no-default-features -- -D warnings
+      - run:
+          name: Clippy linting on workspace (host functions only)
+          command: cargo clippy --tests --no-default-features --features host-functions -- -D warnings
       - save_cache:
           paths:
             - /usr/local/cargo/registry

@@ -18,7 +18,7 @@ pub trait HostFunctionsProvider {
     fn ripemd160(message: &[u8]) -> [u8; 20];
 }
 
-#[cfg(any(feature = "std", test))]
+#[cfg(any(feature = "host-functions", test))]
 pub mod host_functions_impl {
     use crate::host_functions::HostFunctionsProvider;
     use ripemd::Ripemd160;
