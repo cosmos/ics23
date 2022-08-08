@@ -11,7 +11,8 @@ all: ## Run all checks
 
 setup: ## Setup the required nightly toolchain and the wasm32 target
 	rustup install $(NIGHTLY_VERSION)
-	rustup target add wasm32-unknown-unknown --toolchain $(NIGHTLY_VERSION)
+	rustup target    add wasm32-unknown-unknown --toolchain $(NIGHTLY_VERSION)
+	rustup component add rust-src               --toolchain $(NIGHTLY_VERSION)
 
 check-panic-conflict: ## Check for `no_std` compliance by installing a panic handler, and any other crate importing `std` will cause a conflict. Runs on default target.
 	cargo build \
