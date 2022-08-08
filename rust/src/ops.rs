@@ -40,12 +40,12 @@ fn prepare_leaf_data<H: HostFunctionsProvider>(
 fn do_hash<H: HostFunctionsProvider>(hash: HashOp, data: &[u8]) -> Hash {
     match hash {
         HashOp::NoHash => Hash::from(data),
-        HashOp::Sha256 => Hash::from(H::sha2_256(data).as_slice()),
-        HashOp::Sha512 => Hash::from(H::sha2_512(data).as_slice()),
-        HashOp::Keccak => Hash::from(H::sha3_512(data).as_slice()),
-        HashOp::Ripemd160 => Hash::from(H::ripemd160(data).as_slice()),
-        HashOp::Bitcoin => Hash::from(H::ripemd160(H::sha2_256(data).as_slice()).as_slice()),
-        HashOp::Sha512256 => Hash::from(H::sha2_512_truncated(data).as_slice()),
+        HashOp::Sha256 => Hash::from(H::sha2_256(data)),
+        HashOp::Sha512 => Hash::from(H::sha2_512(data)),
+        HashOp::Keccak => Hash::from(H::sha3_512(data)),
+        HashOp::Ripemd160 => Hash::from(H::ripemd160(data)),
+        HashOp::Bitcoin => Hash::from(H::ripemd160(&H::sha2_256(data)[..])),
+        HashOp::Sha512256 => Hash::from(H::sha2_512_truncated(data)),
     }
 }
 
