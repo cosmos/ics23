@@ -22,5 +22,5 @@ pub use helpers::{Hash, Result};
 pub use host_functions::HostFunctionsProvider;
 pub use verify::calculate_existence_root;
 
-#[cfg(feature = "std")]
+#[cfg(feature = "host-functions")]
 pub use host_functions::host_functions_impl::HostFunctionsManager;
