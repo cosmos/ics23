@@ -1,5 +1,5 @@
-use sp_std::collections::btree_map::BTreeMap;
-use sp_std::vec;
+use alloc::collections::btree_map::BTreeMap;
+use alloc::vec;
 
 use crate::compress::{decompress, is_compressed};
 use crate::host_functions::HostFunctionsProvider;
@@ -233,10 +233,10 @@ mod tests {
     use super::*;
 
     use alloc::string::String;
+    use alloc::vec::Vec;
     use anyhow::{bail, ensure};
     use prost::Message;
     use serde::Deserialize;
-    use sp_std::vec::Vec;
     #[cfg(feature = "std")]
     use std::fs::File;
     #[cfg(feature = "std")]

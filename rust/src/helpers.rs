@@ -1,2 +1,2 @@
 pub type Result<T> = anyhow::Result<T>;
-pub type Hash = sp_std::vec::Vec<u8>;
+pub type Hash = alloc::vec::Vec<u8>;
