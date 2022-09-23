@@ -159,7 +159,7 @@ fn ensure_inner(inner: &ics23::InnerOp, spec: &ics23::ProofSpec) -> Result<()> {
             ensure!(
                 inner.prefix.len()
                     <= (inner_spec.max_prefix_length + max_left_child_bytes) as usize,
-                "Inner prefix too short: {}",
+                "Inner prefix too long: {}",
                 inner.prefix.len(),
             );
             Ok(())
