@@ -39,7 +39,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - run: cd rust
+      - run: cd rust && pwd
       - name: Check all target in std
         uses: actions-rs/cargo@v1
         with:
