@@ -11,44 +11,8 @@ workflows:
       - lint-rust
 
 jobs:
-  typescript:
-    docker:
-      - image: circleci/node:12
-    working_directory: ~/proofs/js
-    steps:
-      # we checkout here, all other code runs in js subdir
-      - checkout:
-          path: ~/proofs
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-      - run: yarn install
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
-      - run: yarn test
-  golang:
-    docker:
-      # specify the version
-      - image: circleci/golang:1.14
-    environment:
-      GO111MODULE=on
-    working_directory: ~/proofs/go
-    steps:
-      # we checkout here, all other code runs in go subdir
-      - checkout:
-          path: ~/proofs
-      - restore_cache:
-          keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
-      - run: make test
-      - save_cache:
-          key: go-mod-v1-{{ checksum "go.sum" }}
-          paths:
-            - "/go/pkg/mod"
+
+
   rust:
     docker:
       - image: rust:1.56.1

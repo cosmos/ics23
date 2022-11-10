@@ -1,6 +1,4 @@
-name: Tests / Code Coverage
-#  Tests / Code Coverage workflow runs unit tests and uploads a code coverage report
-#  This workflow is run on pushes to main & every Pull Requests where a .go, .mod, .sum have been changed
+name: Tests 
 on:
   pull_request:
   push:
@@ -25,3 +23,11 @@ jobs:
       - name: test & coverage report creation
         run: |
           cd go && make test
+
+  ts-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: test
+        run: |
+          cd js && yarn && yarn test
