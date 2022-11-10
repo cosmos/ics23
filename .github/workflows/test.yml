@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  go-tests:
+  go:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -24,7 +24,7 @@ jobs:
         working-directory: ./go
         run: make test
 
-  ts-tests:
+  ts:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -42,21 +42,27 @@ jobs:
       - name: Check all target in std
         working-directory: ./rust  
         run: cargo check --all
+
       - name: Check all target in no_std    
         working-directory: ./rust  
         run: cargo check --no-default-features --all
+
       - name: Build all targets in std   
         working-directory: ./rust  
         run: cargo build --all --all-targets
+
       - name: Build all targets in no_std  
         working-directory: ./rust  
         run: cargo build --all  --no-default-features
+
       - name: Run all tests with no-std
         working-directory: ./rust  
         run: cargo test --all --no-default-features
+
       - name: Run all tests with std
         working-directory: ./rust  
         run: cargo test --all
+        
       - name: check no_std compatibility
         run: cd no-std-check/; make setup; make all
 
