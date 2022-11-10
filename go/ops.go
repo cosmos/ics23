@@ -18,7 +18,7 @@ import (
 )
 
 // validate the IAVL Ops
-func z(op opType, b int) error {
+func validateIavlOps(op opType, b int) error {
 	r := bytes.NewReader(op.GetPrefix())
 
 	values := []int64{}
@@ -89,8 +89,8 @@ func (op *InnerOp) Apply(child []byte) ([]byte, error) {
 func (op *LeafOp) CheckAgainstSpec(spec *ProofSpec) error {
 	lspec := spec.LeafSpec
 
-	if g(spec) {
-		err := z(op, 0)
+	if validateSpec(spec) {
+		err := validateIavlOps(op, 0)
 		if err != nil {
 			return err
 		}
@@ -120,8 +120,8 @@ func (op *InnerOp) CheckAgainstSpec(spec *ProofSpec, b int) error {
 		return fmt.Errorf("Unexpected HashOp: %d", op.Hash)
 	}
 
-	if g(spec) {
-		err := z(op, b)
+	if validateSpec(spec) {
+		err := validateIavlOps(op, b)
 		if err != nil {
 			return err
 		}
@@ -193,7 +193,7 @@ func prepareLeafData(hashOp HashOp, lengthOp LengthOp, data []byte) ([]byte, err
 	return ldata, err
 }
 
-func g(spec *ProofSpec) bool {
+func validateSpec(spec *ProofSpec) bool {
 	return spec.SpecEquals(IavlSpec)
 }
 
