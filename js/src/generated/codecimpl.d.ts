@@ -9,7 +9,7 @@ export namespace ics23 {
     KECCAK = 3,
     RIPEMD160 = 4,
     BITCOIN = 5,
-    SHA512_256 = 6
+    SHA512_256 = 6,
   }
 
   /**
@@ -27,7 +27,7 @@ export namespace ics23 {
     FIXED64_BIG = 5,
     FIXED64_LITTLE = 6,
     REQUIRE_32_BYTES = 7,
-    REQUIRE_64_BYTES = 8
+    REQUIRE_64_BYTES = 8,
   }
 
   /** Properties of an ExistenceProof. */

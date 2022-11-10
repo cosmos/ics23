@@ -5,7 +5,7 @@ import {
   ensureBytesBefore,
   ensureBytesEqual,
   ensureInner,
-  ensureLeaf
+  ensureLeaf,
 } from "./specs";
 
 export const iavlSpec: ics23.IProofSpec = {
@@ -14,15 +14,15 @@ export const iavlSpec: ics23.IProofSpec = {
     hash: ics23.HashOp.SHA256,
     prehashValue: ics23.HashOp.SHA256,
     prehashKey: ics23.HashOp.NO_HASH,
-    length: ics23.LengthOp.VAR_PROTO
+    length: ics23.LengthOp.VAR_PROTO,
   },
   innerSpec: {
     childOrder: [0, 1],
     minPrefixLength: 4,
     maxPrefixLength: 12,
     childSize: 33,
-    hash: ics23.HashOp.SHA256
-  }
+    hash: ics23.HashOp.SHA256,
+  },
 };
 
 export const tendermintSpec: ics23.IProofSpec = {
@@ -31,15 +31,34 @@ export const tendermintSpec: ics23.IProofSpec = {
     hash: ics23.HashOp.SHA256,
     prehashValue: ics23.HashOp.SHA256,
     prehashKey: ics23.HashOp.NO_HASH,
-    length: ics23.LengthOp.VAR_PROTO
+    length: ics23.LengthOp.VAR_PROTO,
   },
   innerSpec: {
     childOrder: [0, 1],
     minPrefixLength: 1,
     maxPrefixLength: 1,
     childSize: 32,
-    hash: ics23.HashOp.SHA256
-  }
+    hash: ics23.HashOp.SHA256,
+  },
+};
+
+export const smtSpec: ics23.IProofSpec = {
+  leafSpec: {
+    hash: ics23.HashOp.SHA256,
+    prehashKey: ics23.HashOp.NO_HASH,
+    prehashValue: ics23.HashOp.SHA256,
+    length: ics23.LengthOp.NO_PREFIX,
+    prefix: Uint8Array.from([0]),
+  },
+  innerSpec: {
+    childOrder: [0, 1],
+    childSize: 32,
+    minPrefixLength: 1,
+    maxPrefixLength: 1,
+    emptyChild: new Uint8Array(32),
+    hash: ics23.HashOp.SHA256,
+  },
+  maxDepth: 256,
 };
 
 export type CommitmentRoot = Uint8Array;
@@ -91,10 +110,10 @@ export function verifyNonExistence(
     throw new Error("neither left nor right proof defined");
   }
 
-  if (!!leftKey) {
+  if (leftKey) {
     ensureBytesBefore(leftKey, key);
   }
-  if (!!rightKey) {
+  if (rightKey) {
     ensureBytesBefore(key, rightKey);
   }
 
@@ -162,7 +181,7 @@ export function ensureSpec(
 
 function ensureLeftMost(
   spec: ics23.IInnerSpec,
-  path: ReadonlyArray<ics23.IInnerOp>
+  path: readonly ics23.IInnerOp[]
 ): void {
   const { minPrefix, maxPrefix, suffix } = getPadding(spec, 0);
 
@@ -176,7 +195,7 @@ function ensureLeftMost(
 
 function ensureRightMost(
   spec: ics23.IInnerSpec,
-  path: ReadonlyArray<ics23.IInnerOp>
+  path: readonly ics23.IInnerOp[]
 ): void {
   const len = spec.childOrder!.length - 1;
   const { minPrefix, maxPrefix, suffix } = getPadding(spec, len);
@@ -191,10 +210,9 @@ function ensureRightMost(
 
 export function ensureLeftNeighbor(
   spec: ics23.IInnerSpec,
-  left: ReadonlyArray<ics23.IInnerOp>,
-  right: ReadonlyArray<ics23.IInnerOp>
+  left: readonly ics23.IInnerOp[],
+  right: readonly ics23.IInnerOp[]
 ): void {
-  // tslint:disable:readonly-array
   const mutleft: ics23.IInnerOp[] = [...left];
   const mutright: ics23.IInnerOp[] = [...right];
 
@@ -277,9 +295,9 @@ function getPadding(spec: ics23.IInnerSpec, branch: number): PaddingResult {
   return { minPrefix, maxPrefix, suffix };
 }
 
-function getPosition(order: ReadonlyArray<number>, branch: number): number {
+function getPosition(order: readonly number[], branch: number): number {
   if (branch < 0 || branch >= order.length) {
     throw new Error(`Invalid branch: ${branch}`);
   }
-  return order.findIndex(val => val === branch);
+  return order.findIndex((val) => val === branch);
 }

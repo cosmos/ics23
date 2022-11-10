@@ -1,15 +1,14 @@
-use std::collections::btree_map::BTreeMap;
-
-#[cfg(not(feature = "std"))]
-use std::prelude::*;
+use alloc::collections::btree_map::BTreeMap;
+use alloc::vec;
 
 use crate::compress::{decompress, is_compressed};
+use crate::host_functions::HostFunctionsProvider;
 use crate::ics23;
 use crate::verify::{verify_existence, verify_non_existence, CommitmentRoot};
 
 // Use CommitmentRoot vs &[u8] to stick with ics naming
 #[allow(clippy::ptr_arg)]
-pub fn verify_membership(
+pub fn verify_membership<H: HostFunctionsProvider>(
     proof: &ics23::CommitmentProof,
     spec: &ics23::ProofSpec,
     root: &CommitmentRoot,
@@ -30,7 +29,7 @@ pub fn verify_membership(
 
     //    if let Some(ics23::commitment_proof::Proof::Exist(ex)) = &proof.proof {
     if let Some(ex) = get_exist_proof(proof, key) {
-        let valid = verify_existence(ex, spec, root, key, value);
+        let valid = verify_existence::<H>(ex, spec, root, key, value);
         valid.is_ok()
     } else {
         false
@@ -39,7 +38,7 @@ pub fn verify_membership(
 
 // Use CommitmentRoot vs &[u8] to stick with ics naming
 #[allow(clippy::ptr_arg)]
-pub fn verify_non_membership(
+pub fn verify_non_membership<H: HostFunctionsProvider>(
     proof: &ics23::CommitmentProof,
     spec: &ics23::ProofSpec,
     root: &CommitmentRoot,
@@ -58,7 +57,7 @@ pub fn verify_non_membership(
     }
 
     if let Some(non) = get_nonexist_proof(proof, key) {
-        let valid = verify_non_existence(non, spec, root, key);
+        let valid = verify_non_existence::<H>(non, spec, root, key);
         valid.is_ok()
     } else {
         false
@@ -66,7 +65,7 @@ pub fn verify_non_membership(
 }
 
 #[allow(clippy::ptr_arg)]
-pub fn verify_batch_membership(
+pub fn verify_batch_membership<H: HostFunctionsProvider>(
     proof: &ics23::CommitmentProof,
     spec: &ics23::ProofSpec,
     root: &CommitmentRoot,
@@ -86,11 +85,11 @@ pub fn verify_batch_membership(
 
     items
         .iter()
-        .all(|(key, value)| verify_membership(proof, spec, root, key, value))
+        .all(|(key, value)| verify_membership::<H>(proof, spec, root, key, value))
 }
 
 #[allow(clippy::ptr_arg)]
-pub fn verify_batch_non_membership(
+pub fn verify_batch_non_membership<H: HostFunctionsProvider>(
     proof: &ics23::CommitmentProof,
     spec: &ics23::ProofSpec,
     root: &CommitmentRoot,
@@ -109,7 +108,7 @@ pub fn verify_batch_non_membership(
     }
 
     keys.iter()
-        .all(|key| verify_non_membership(proof, spec, root, key))
+        .all(|key| verify_non_membership::<H>(proof, spec, root, key))
 }
 
 fn get_exist_proof<'a>(
@@ -204,24 +203,48 @@ pub fn tendermint_spec() -> ics23::ProofSpec {
     }
 }
 
+pub fn smt_spec() -> ics23::ProofSpec {
+    let leaf = ics23::LeafOp {
+        hash: ics23::HashOp::Sha256.into(),
+        prehash_key: 0,
+        prehash_value: ics23::HashOp::Sha256.into(),
+        length: 0,
+        prefix: vec![0_u8],
+    };
+    let inner = ics23::InnerSpec {
+        child_order: vec![0, 1],
+        min_prefix_length: 1,
+        max_prefix_length: 1,
+        child_size: 32,
+        empty_child: vec![0; 32],
+        hash: ics23::HashOp::Sha256.into(),
+    };
+    ics23::ProofSpec {
+        leaf_spec: Some(leaf),
+        inner_spec: Some(inner),
+        min_depth: 0,
+        max_depth: 0,
+    }
+}
+
 #[cfg(feature = "std")]
 #[cfg(test)]
 mod tests {
-    extern crate std as _std;
     use super::*;
 
-    #[cfg(feature = "std")]
-    use _std::fs::File;
-    #[cfg(feature = "std")]
-    use _std::io::prelude::*;
     use alloc::string::String;
+    use alloc::vec::Vec;
     use anyhow::{bail, ensure};
     use prost::Message;
     use serde::Deserialize;
-    use std::vec::Vec;
+    #[cfg(feature = "std")]
+    use std::fs::File;
+    #[cfg(feature = "std")]
+    use std::io::prelude::*;
 
     use crate::compress::compress;
     use crate::helpers::Result;
+    use crate::host_functions::host_functions_impl::HostFunctionsManager;
 
     #[derive(Deserialize, Debug)]
     struct TestVector {
@@ -265,11 +288,14 @@ mod tests {
         let (proof, data) = load_file(filename)?;
 
         if let Some(value) = data.value {
-            let valid = super::verify_membership(&proof, spec, &data.root, &data.key, &value);
+            let valid = verify_membership::<HostFunctionsManager>(
+                &proof, spec, &data.root, &data.key, &value,
+            );
             ensure!(valid, "invalid test vector");
             Ok(())
         } else {
-            let valid = super::verify_non_membership(&proof, spec, &data.root, &data.key);
+            let valid =
+                verify_non_membership::<HostFunctionsManager>(&proof, spec, &data.root, &data.key);
             ensure!(valid, "invalid test vector");
             Ok(())
         }
@@ -359,6 +385,48 @@ mod tests {
         verify_test_vector("../testdata/tendermint/nonexist_middle.json", &spec)
     }
 
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_left() -> Result<()> {
+        let spec = smt_spec();
+        verify_test_vector("../testdata/smt/exist_left.json", &spec)
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_right() -> Result<()> {
+        let spec = smt_spec();
+        verify_test_vector("../testdata/smt/exist_right.json", &spec)
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_middle() -> Result<()> {
+        let spec = smt_spec();
+        verify_test_vector("../testdata/smt/exist_middle.json", &spec)
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_left_non() -> Result<()> {
+        let spec = smt_spec();
+        verify_test_vector("../testdata/smt/nonexist_left.json", &spec)
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_right_non() -> Result<()> {
+        let spec = smt_spec();
+        verify_test_vector("../testdata/smt/nonexist_right.json", &spec)
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_middle_non() -> Result<()> {
+        let spec = smt_spec();
+        verify_test_vector("../testdata/smt/nonexist_middle.json", &spec)
+    }
+
     #[cfg(feature = "std")]
     fn load_batch(files: &[&str]) -> Result<(ics23::CommitmentProof, Vec<RefData>)> {
         let mut entries = Vec::new();
@@ -397,18 +465,23 @@ mod tests {
         data: &RefData,
     ) -> Result<()> {
         if let Some(value) = &data.value {
-            let valid = super::verify_membership(proof, spec, &data.root, &data.key, value);
+            let valid = verify_membership::<HostFunctionsManager>(
+                proof, spec, &data.root, &data.key, value,
+            );
             ensure!(valid, "invalid test vector");
             let mut items = BTreeMap::new();
             items.insert(data.key.as_slice(), value.as_slice());
-            let valid = super::verify_batch_membership(proof, spec, &data.root, items);
+            let valid =
+                verify_batch_membership::<HostFunctionsManager>(proof, spec, &data.root, items);
             ensure!(valid, "invalid test vector");
             Ok(())
         } else {
-            let valid = super::verify_non_membership(proof, spec, &data.root, &data.key);
+            let valid =
+                verify_non_membership::<HostFunctionsManager>(proof, spec, &data.root, &data.key);
             ensure!(valid, "invalid test vector");
             let keys = &[data.key.as_slice()];
-            let valid = super::verify_batch_non_membership(proof, spec, &data.root, keys);
+            let valid =
+                verify_batch_non_membership::<HostFunctionsManager>(proof, spec, &data.root, keys);
             ensure!(valid, "invalid test vector");
             Ok(())
         }
@@ -504,5 +577,67 @@ mod tests {
             "../testdata/tendermint/nonexist_middle.json",
         ])?;
         verify_batch(&spec, &proof, &data[5])
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_batch_exist() -> Result<()> {
+        let spec = smt_spec();
+        let (proof, data) = load_batch(&[
+            "../testdata/smt/exist_left.json",
+            "../testdata/smt/exist_right.json",
+            "../testdata/smt/exist_middle.json",
+            "../testdata/smt/nonexist_left.json",
+            "../testdata/smt/nonexist_right.json",
+            "../testdata/smt/nonexist_middle.json",
+        ])?;
+        verify_batch(&spec, &proof, &data[0])
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn compressed_smt_batch_exist() -> Result<()> {
+        let spec = smt_spec();
+        let (proof, data) = load_batch(&[
+            "../testdata/smt/exist_left.json",
+            "../testdata/smt/exist_right.json",
+            "../testdata/smt/exist_middle.json",
+            "../testdata/smt/nonexist_left.json",
+            "../testdata/smt/nonexist_right.json",
+            "../testdata/smt/nonexist_middle.json",
+        ])?;
+        let comp = compress(&proof)?;
+        verify_batch(&spec, &comp, &data[0])
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_batch_nonexist() -> Result<()> {
+        let spec = smt_spec();
+        let (proof, data) = load_batch(&[
+            "../testdata/smt/exist_left.json",
+            "../testdata/smt/exist_right.json",
+            "../testdata/smt/exist_middle.json",
+            "../testdata/smt/nonexist_left.json",
+            "../testdata/smt/nonexist_right.json",
+            "../testdata/smt/nonexist_middle.json",
+        ])?;
+        verify_batch(&spec, &proof, &data[4])
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn compressed_smt_batch_nonexist() -> Result<()> {
+        let spec = smt_spec();
+        let (proof, data) = load_batch(&[
+            "../testdata/smt/exist_left.json",
+            "../testdata/smt/exist_right.json",
+            "../testdata/smt/exist_middle.json",
+            "../testdata/smt/nonexist_left.json",
+            "../testdata/smt/nonexist_right.json",
+            "../testdata/smt/nonexist_middle.json",
+        ])?;
+        let comp = compress(&proof)?;
+        verify_batch(&spec, &comp, &data[4])
     }
 }

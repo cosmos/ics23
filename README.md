@@ -10,7 +10,7 @@ proofs of blockchains, but more specifically for proofs that accompany IBC
 
 ## Feature Set
 
-The features and naming follow the [ICS23: Vector Commitments](https://github.com/cosmos/ics/tree/master/spec/ics-023-vector-commitments) Specification
+The features and naming follow the [ICS23: Vector Commitments](https://github.com/cosmos/ibc/tree/master/spec/core/ics-023-vector-commitments) Specification
 
 * Proof of Existence (key-value pair linked to root hash)
 * Hold Existence Proof to db-specific spec (avoid reinterpretation of bytes to different key-value pair)

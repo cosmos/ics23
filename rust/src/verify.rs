@@ -4,14 +4,14 @@
 use anyhow::{bail, ensure};
 
 use crate::helpers::Result;
+use crate::host_functions::HostFunctionsProvider;
 use crate::ics23;
 use crate::ops::{apply_inner, apply_leaf};
-use alloc::format;
-use std::vec::Vec;
+use alloc::vec::Vec;
 
-pub type CommitmentRoot = ::std::vec::Vec<u8>;
+pub type CommitmentRoot = Vec<u8>;
 
-pub fn verify_existence(
+pub fn verify_existence<H: HostFunctionsProvider>(
     proof: &ics23::ExistenceProof,
     spec: &ics23::ProofSpec,
     root: &[u8],
@@ -22,23 +22,23 @@ pub fn verify_existence(
     ensure!(proof.key == key, "Provided key doesn't match proof");
     ensure!(proof.value == value, "Provided value doesn't match proof");
 
-    let calc = calculate_existence_root(proof)?;
+    let calc = calculate_existence_root::<H>(proof)?;
     ensure!(calc == root, "Root hash doesn't match");
     Ok(())
 }
 
-pub fn verify_non_existence(
+pub fn verify_non_existence<H: HostFunctionsProvider>(
     proof: &ics23::NonExistenceProof,
     spec: &ics23::ProofSpec,
     root: &[u8],
     key: &[u8],
 ) -> Result<()> {
     if let Some(left) = &proof.left {
-        verify_existence(left, spec, root, &left.key, &left.value)?;
+        verify_existence::<H>(left, spec, root, &left.key, &left.value)?;
         ensure!(key > left.key.as_slice(), "left key isn't before key");
     }
     if let Some(right) = &proof.right {
-        verify_existence(right, spec, root, &right.key, &right.value)?;
+        verify_existence::<H>(right, spec, root, &right.key, &right.value)?;
         ensure!(key < right.key.as_slice(), "right key isn't after key");
     }
 
@@ -57,7 +57,9 @@ pub fn verify_non_existence(
 // Calculate determines the root hash that matches the given proof.
 // You must validate the result is what you have in a header.
 // Returns error if the calculations cannot be performed.
-pub fn calculate_existence_root(proof: &ics23::ExistenceProof) -> Result<CommitmentRoot> {
+pub fn calculate_existence_root<H: HostFunctionsProvider>(
+    proof: &ics23::ExistenceProof,
+) -> Result<CommitmentRoot> {
     ensure!(!proof.key.is_empty(), "Existence proof must have key set");
     ensure!(
         !proof.value.is_empty(),
@@ -65,9 +67,9 @@ pub fn calculate_existence_root(proof: &ics23::ExistenceProof) -> Result<Commitm
     );
 
     if let Some(leaf_node) = &proof.leaf {
-        let mut hash = apply_leaf(leaf_node, &proof.key, &proof.value)?;
+        let mut hash = apply_leaf::<H>(leaf_node, &proof.key, &proof.value)?;
         for step in &proof.path {
-            hash = apply_inner(step, &hash)?;
+            hash = apply_inner::<H>(step, &hash)?;
         }
         Ok(hash)
     } else {
@@ -157,7 +159,7 @@ fn ensure_inner(inner: &ics23::InnerOp, spec: &ics23::ProofSpec) -> Result<()> {
             ensure!(
                 inner.prefix.len()
                     <= (inner_spec.max_prefix_length + max_left_child_bytes) as usize,
-                "Inner prefix too short: {}",
+                "Inner prefix too long: {}",
                 inner.prefix.len(),
             );
             Ok(())
@@ -166,21 +168,25 @@ fn ensure_inner(inner: &ics23::InnerOp, spec: &ics23::ProofSpec) -> Result<()> {
     }
 }
 
+// ensure_left_most fails unless this is the left-most path in the tree, excluding placeholder (empty child) nodes
 fn ensure_left_most(spec: &ics23::InnerSpec, path: &[ics23::InnerOp]) -> Result<()> {
     let pad = get_padding(spec, 0)?;
+    // ensure every step has a prefix and suffix defined to be leftmost, unless it is a placeholder node
     for step in path {
-        if !has_padding(step, &pad) {
+        if !has_padding(step, &pad) && !left_branches_are_empty(spec, step)? {
             bail!("step not leftmost")
         }
     }
     Ok(())
 }
 
+// ensure_right_most returns true if this is the right-most path in the tree, excluding placeholder (empty child) nodes
 fn ensure_right_most(spec: &ics23::InnerSpec, path: &[ics23::InnerOp]) -> Result<()> {
     let idx = spec.child_order.len() - 1;
     let pad = get_padding(spec, idx as i32)?;
+    // ensure every step has a prefix and suffix defined to be rightmost, unless it is a placeholder node
     for step in path {
-        if !has_padding(step, &pad) {
+        if !has_padding(step, &pad) && !right_branches_are_empty(spec, step)? {
             bail!("step not leftmost")
         }
     }
@@ -258,14 +264,66 @@ fn get_padding(spec: &ics23::InnerSpec, branch: i32) -> Result<Padding> {
     }
 }
 
+// left_branches_are_empty returns true if the padding bytes correspond to all empty children
+// on the left side of this branch, ie. it's a valid placeholder on a leftmost path
+fn left_branches_are_empty(spec: &ics23::InnerSpec, op: &ics23::InnerOp) -> Result<bool> {
+    let idx = order_from_padding(spec, op)?;
+    // count branches to left of this
+    let left_branches = idx as usize;
+    if left_branches == 0 {
+        return Ok(false);
+    }
+    let child_size = spec.child_size as usize;
+    // compare prefix with the expected number of empty branches
+    let actual_prefix = match op.prefix.len().checked_sub(left_branches * child_size) {
+        Some(n) => n,
+        _ => return Ok(false),
+    };
+    for i in 0..left_branches {
+        let idx = spec.child_order.iter().find(|&&x| x == i as i32).unwrap();
+        let idx = *idx as usize;
+        let from = actual_prefix + idx * child_size;
+        if spec.empty_child != op.prefix[from..from + child_size] {
+            return Ok(false);
+        }
+    }
+    Ok(true)
+}
+
+// right_branches_are_empty returns true if the padding bytes correspond to all empty children
+// on the right side of this branch, ie. it's a valid placeholder on a rightmost path
+fn right_branches_are_empty(spec: &ics23::InnerSpec, op: &ics23::InnerOp) -> Result<bool> {
+    let idx = order_from_padding(spec, op)?;
+    // count branches to right of this one
+    let right_branches = spec.child_order.len() - 1 - idx as usize;
+    // compare suffix with the expected number of empty branches
+    if right_branches == 0 {
+        return Ok(false);
+    }
+    if op.suffix.len() != spec.child_size as usize {
+        return Ok(false);
+    }
+    for i in 0..right_branches {
+        let idx = spec.child_order.iter().find(|&&x| x == i as i32).unwrap();
+        let idx = *idx as usize;
+        let from = idx * spec.child_size as usize;
+        if spec.empty_child != op.suffix[from..from + spec.child_size as usize] {
+            return Ok(false);
+        }
+    }
+    Ok(true)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
     use crate::api;
-    use crate::ics23::{ExistenceProof, HashOp, InnerOp, LeafOp, LengthOp, ProofSpec};
-    use std::collections::btree_map::BTreeMap as HashMap;
-    #[cfg(not(feature = "std"))]
-    use std::prelude::*;
+    use crate::host_functions::host_functions_impl::HostFunctionsManager;
+    use crate::ics23::{ExistenceProof, HashOp, InnerOp, InnerSpec, LeafOp, LengthOp, ProofSpec};
+
+    use alloc::collections::btree_map::BTreeMap as HashMap;
+    use alloc::vec;
 
     #[test]
     fn calculate_root_from_leaf() {
@@ -289,7 +347,7 @@ mod tests {
                 .unwrap();
         assert_eq!(
             expected,
-            calculate_existence_root(&proof).unwrap(),
+            calculate_existence_root::<HostFunctionsManager>(&proof).unwrap(),
             "invalid root hash"
         );
     }
@@ -322,7 +380,7 @@ mod tests {
                 .unwrap();
         assert_eq!(
             expected,
-            calculate_existence_root(&proof).unwrap(),
+            calculate_existence_root::<HostFunctionsManager>(&proof).unwrap(),
             "invalid root hash"
         );
     }
@@ -525,5 +583,149 @@ mod tests {
                 assert!(check.is_err(), "{} should be an error", name);
             }
         }
+    }
+
+    fn spec_with_empty_child() -> ProofSpec {
+        let leaf = LeafOp {
+            hash: ics23::HashOp::Sha256.into(),
+            prehash_key: 0,
+            prehash_value: ics23::HashOp::Sha256.into(),
+            length: 0,
+            prefix: vec![0_u8],
+        };
+        let inner = InnerSpec {
+            child_order: vec![0, 1],
+            child_size: 32,
+            min_prefix_length: 1,
+            max_prefix_length: 1,
+            empty_child: b"32_empty_child_placeholder_bytes".to_vec(),
+            hash: ics23::HashOp::Sha256.into(),
+        };
+        ProofSpec {
+            leaf_spec: Some(leaf),
+            inner_spec: Some(inner),
+            min_depth: 0,
+            max_depth: 0,
+        }
+    }
+
+    struct EmptyBranchCase<'a> {
+        op: InnerOp,
+        spec: &'a ProofSpec,
+        is_left: bool,
+        is_right: bool,
+    }
+
+    #[test]
+    fn check_empty_branch() -> Result<()> {
+        let spec = &spec_with_empty_child();
+        let inner_spec = spec.inner_spec.as_ref().unwrap();
+        let empty_child = inner_spec.empty_child.clone();
+
+        let non_empty_spec = &api::tendermint_spec();
+        let non_empty_inner = non_empty_spec.inner_spec.as_ref().unwrap();
+
+        let cases = vec![
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: [&[1u8], &empty_child[..]].concat().to_vec(),
+                    suffix: vec![],
+                    hash: inner_spec.hash,
+                },
+                spec,
+                is_left: true,
+                is_right: false,
+            },
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: vec![1u8],
+                    suffix: empty_child.clone(),
+                    hash: inner_spec.hash,
+                },
+                spec,
+                is_left: false,
+                is_right: true,
+            },
+            // non-empty cases
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: [&[1u8], &[0u8; 32] as &[u8]].concat().to_vec(),
+                    suffix: vec![],
+                    hash: inner_spec.hash,
+                },
+                spec,
+                is_left: false,
+                is_right: false,
+            },
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: vec![1u8],
+                    suffix: vec![0u8; 32],
+                    hash: inner_spec.hash,
+                },
+                spec,
+                is_left: false,
+                is_right: false,
+            },
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: [&[1u8], &empty_child[..28], b"xxxx"].concat().to_vec(),
+                    suffix: vec![],
+                    hash: inner_spec.hash,
+                },
+                spec,
+                is_left: false,
+                is_right: false,
+            },
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: vec![1u8],
+                    suffix: [&empty_child[..28], b"xxxx"].concat().to_vec(),
+                    hash: inner_spec.hash,
+                },
+                spec,
+                is_left: false,
+                is_right: false,
+            },
+            // some cases using a spec with no empty child
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: [&[1u8], &[0u8; 32] as &[u8]].concat().to_vec(),
+                    suffix: vec![],
+                    hash: non_empty_inner.hash,
+                },
+                spec: non_empty_spec,
+                is_left: false,
+                is_right: false,
+            },
+            EmptyBranchCase {
+                op: ics23::InnerOp {
+                    prefix: vec![1u8],
+                    suffix: vec![0u8; 32],
+                    hash: non_empty_inner.hash,
+                },
+                spec: non_empty_spec,
+                is_left: false,
+                is_right: false,
+            },
+        ];
+
+        for (i, case) in cases.iter().enumerate() {
+            ensure_inner(&case.op, case.spec)?;
+            let inner = &case.spec.inner_spec.as_ref().unwrap();
+            assert_eq!(
+                case.is_left,
+                left_branches_are_empty(inner, &case.op)?,
+                "case {}",
+                i
+            );
+            assert_eq!(
+                case.is_right,
+                right_branches_are_empty(inner, &case.op)?,
+                "case {}",
+                i
+            );
+        }
+        Ok(())
     }
 }

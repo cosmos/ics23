@@ -14,7 +14,6 @@ Unless you modify the protobuf file, you can ignore this step.
 
 `cargo fmt`
 
-
 ## Testing
 
 `cargo test`
@@ -22,3 +21,7 @@ Unless you modify the protobuf file, you can ignore this step.
 ## Linting
 
 `cargo clippy -- --test -W clippy::pedantic`
+
+## MSRV
+
+The minimum supported Rust version (MSRV) is 1.56.1.

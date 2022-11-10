@@ -1,0 +1,5 @@
+# Generated protobuf code
+generated/
+
+build/
+node_modules/

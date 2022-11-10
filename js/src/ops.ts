@@ -1,9 +1,8 @@
-import { sha512_256 } from "js-sha512";
-import ripemd160 from "ripemd160";
-import shajs from "sha.js";
+import { ripemd160 } from "@noble/hashes/ripemd160";
+import { sha256 } from "@noble/hashes/sha256";
+import { sha512, sha512_256 } from "@noble/hashes/sha512";
 
 import { ics23 } from "./generated/codecimpl";
-import { toHex } from "./helpers";
 
 export function applyLeaf(
   leaf: ics23.ILeafOp,
@@ -29,7 +28,7 @@ export function applyLeaf(
   const data = new Uint8Array([
     ...ensureBytes(leaf.prefix),
     ...pkey,
-    ...pvalue
+    ...pvalue,
   ]);
   return doHash(ensureHash(leaf.hash), data);
 }
@@ -44,7 +43,7 @@ export function applyInner(
   const preimage = new Uint8Array([
     ...ensureBytes(inner.prefix),
     ...child,
-    ...ensureBytes(inner.suffix)
+    ...ensureBytes(inner.suffix),
   ]);
   return doHash(ensureHash(inner.hash), preimage);
 }
@@ -53,11 +52,11 @@ function ensure<T>(maybe: T | undefined | null, value: T): T {
   return maybe === undefined || maybe === null ? value : maybe;
 }
 
-const ensureHash = (h: ics23.HashOp | null | undefined) =>
+const ensureHash = (h: ics23.HashOp | null | undefined): ics23.HashOp =>
   ensure(h, ics23.HashOp.NO_HASH);
-const ensureLength = (l: ics23.LengthOp | null | undefined) =>
+const ensureLength = (l: ics23.LengthOp | null | undefined): ics23.LengthOp =>
   ensure(l, ics23.LengthOp.NO_PREFIX);
-const ensureBytes = (b: Uint8Array | null | undefined) =>
+const ensureBytes = (b: Uint8Array | null | undefined): Uint8Array =>
   ensure(b, new Uint8Array([]));
 
 function prepareLeafData(
@@ -78,40 +77,20 @@ function doHashOrNoop(hashOp: ics23.HashOp, preimage: Uint8Array): Uint8Array {
   return doHash(hashOp, preimage);
 }
 
-function rp160(preimage: Uint8Array): Uint8Array {
-  // this is a bit tricky to work with besides buffer
-  return new Uint8Array(
-    new ripemd160().update(toHex(preimage), "hex" as any).digest()
-  );
-}
-
-function s256(preimage: Uint8Array): Uint8Array {
-  return new Uint8Array(
-    shajs("sha256")
-      .update(preimage)
-      .digest()
-  );
-}
-
 // doHash will preform the specified hash on the preimage.
 // if hashOp == NONE, it will return an error (use doHashOrNoop if you want different behavior)
 export function doHash(hashOp: ics23.HashOp, preimage: Uint8Array): Uint8Array {
   switch (hashOp) {
     case ics23.HashOp.SHA256:
-      return s256(preimage);
+      return sha256(preimage);
     case ics23.HashOp.SHA512:
-      return new Uint8Array(
-        shajs("sha512")
-          .update(preimage)
-          .digest()
-      );
+      return sha512(preimage);
     case ics23.HashOp.RIPEMD160:
-      // this requires string or Buffer....
-      return rp160(preimage);
+      return ripemd160(preimage);
     case ics23.HashOp.BITCOIN:
-      return rp160(s256(preimage));
+      return ripemd160(sha256(preimage));
     case ics23.HashOp.SHA512_256:
-      return new Uint8Array(sha512_256.arrayBuffer(preimage));
+      return sha512_256(preimage);
   }
   throw new Error(`Unsupported hashop: ${hashOp}`);
 }
@@ -135,7 +114,7 @@ function doLengthOp(lengthOp: ics23.LengthOp, data: Uint8Array): Uint8Array {
       }
       return data;
     case ics23.LengthOp.FIXED32_LITTLE:
-      return new Uint8Array([...encodeFixed32LE(data.length), ...data]);
+      return new Uint8Array([...encodeFixed32Le(data.length), ...data]);
     // TODO
     // case LengthOp_VAR_RLP:
     // case LengthOp_FIXED32_BIG:
@@ -146,7 +125,7 @@ function doLengthOp(lengthOp: ics23.LengthOp, data: Uint8Array): Uint8Array {
 }
 
 function encodeVarintProto(n: number): Uint8Array {
-  let enc: ReadonlyArray<number> = [];
+  let enc: readonly number[] = [];
   let l = n;
   while (l >= 128) {
     const b = (l % 128) + 128;
@@ -157,13 +136,11 @@ function encodeVarintProto(n: number): Uint8Array {
   return new Uint8Array(enc);
 }
 
-function encodeFixed32LE(n: number): Uint8Array {
+function encodeFixed32Le(n: number): Uint8Array {
   const enc = new Uint8Array(4);
   let l = n;
   for (let i = enc.length; i > 0; i--) {
-    /* tslint:disable */
     enc[Math.abs(i - enc.length)] = l % 256;
-    /* tslint:enable */
     l = Math.floor(l / 256);
   }
   return enc;
