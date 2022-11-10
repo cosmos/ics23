@@ -3,7 +3,7 @@ on:
   pull_request:
   push:
     branches:
-      - main
+      - master
 
 permissions:
   contents: read
@@ -62,7 +62,7 @@ jobs:
       - name: Run all tests with std
         working-directory: ./rust  
         run: cargo test --all
-        
+
       - name: check no_std compatibility
         run: cd no-std-check/; make setup; make all
 
