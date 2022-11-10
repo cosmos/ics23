@@ -122,22 +122,25 @@ func decompress(comp *CompressedBatchProof) *BatchProof {
 	}
 }
 
-// TendermintSpec constrains the format from proofs-tendermint (crypto/merkle SimpleProof)
-var TendermintSpec = &ProofSpec{
-	LeafSpec: &LeafOp{
-		Prefix:       []byte{0},
-		PrehashKey:   HashOp_NO_HASH,
-		Hash:         HashOp_SHA256,
-		PrehashValue: HashOp_SHA256,
-		Length:       LengthOp_VAR_PROTO,
-	},
-	InnerSpec: &InnerSpec{
-		ChildOrder:      []int32{0, 1},
-		MinPrefixLength: 1,
-		MaxPrefixLength: 1,
-		ChildSize:       32, // (no length byte)
-		Hash:            HashOp_SHA256,
-	},
+func decompressEntry(entry *CompressedBatchEntry, lookup []*InnerOp) *BatchEntry {
+	if exist := entry.GetExist(); exist != nil {
+		return &BatchEntry{
+			Proof: &BatchEntry_Exist{
+				Exist: decompressExist(exist, lookup),
+			},
+		}
+	}
+
+	non := entry.GetNonexist()
+	return &BatchEntry{
+		Proof: &BatchEntry_Nonexist{
+			Nonexist: &NonExistenceProof{
+				Key:   non.Key,
+				Left:  decompressExist(non.Left, lookup),
+				Right: decompressExist(non.Right, lookup),
+			},
+		},
+	}
 }
 
 func decompressExist(exist *CompressedExistenceProof, lookup []*InnerOp) *ExistenceProof {
