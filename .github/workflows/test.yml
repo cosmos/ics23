@@ -64,6 +64,6 @@ jobs:
         run: cargo test --all
 
       - name: check no_std compatibility
-        run: cd no-std-check/; make setup; make all
+        run: cd rust/no-std-check/; make setup; make all
 
         
