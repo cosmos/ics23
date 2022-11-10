@@ -1,40 +1,44 @@
 [package]
 name = "ics23"
-version = "0.7.0"
+version = "0.8.1"
 authors = ["Ethan Frey <ethanfrey@users.noreply.github.com>"]
-edition = "2018"
-exclude = ["codegen"]
+edition = "2021"
+exclude = ["codegen", "no-std-check"]
 description = "Merkle proof verification library - implements Cosmos ICS23 Spec"
 repository = "https://github.com/confio/ics23/tree/master/rust"
 license = "Apache-2.0"
+rust-version = "1.56.1"
 
 [workspace]
-members = ["codegen"]
+members = ["codegen", "no-std-check"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
-prost = { version = "0.10", default-features = false, features = ["prost-derive"] }
+prost = { version = "0.11", default-features = false, features = ["prost-derive"] }
 bytes = { version = "1.0.1", default-features = false }
 hex = { version = "0.4.3", default-features = false, features = [ "alloc" ] }
-sha2 = { version = "0.9.3", default-features = false }
-sha3 = { version = "0.9.1", default-features = false }
-ripemd160 = { version = "0.9.1", default-features = false }
 anyhow = { version = "1.0.40", default-features = false }
-sp-std = {version = "3.0.0", default-features = false }
+sha2 = { version = "0.10.2", optional = true, default-features = false }
+sha3 = { version = "0.10.2", optional = true, default-features = false }
+ripemd = { version = "0.1.1", optional = true, default-features = false }
 
 [dev-dependencies]
+sha2 = { version = "0.10.2" }
+sha3 = { version = "0.10.2" }
+ripemd = { version = "0.1.1" }
 serde = { version = "1.0.125", features = ["derive"] }
-serde_json = "1.0.64"
+serde_json = { version = "1.0.64" }
 
 [features]
-default = ["std"]
+default = ["std", "host-functions"]
 std = [
     "prost/std",
     "bytes/std",
     "hex/std",
-    "sha2/std",
-    "sha3/std",
-    "ripemd160/std",
     "anyhow/std",
-    "sp-std/std",
+]
+host-functions = [
+    "sha2",
+    "sha3",
+    "ripemd",
 ]

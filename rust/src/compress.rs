@@ -1,7 +1,7 @@
+use alloc::borrow::ToOwned;
+use alloc::collections::btree_map::BTreeMap as HashMap;
+use alloc::vec::Vec;
 use prost::Message;
-use std::borrow::ToOwned;
-use std::collections::btree_map::BTreeMap as HashMap;
-use std::vec::Vec;
 
 use crate::helpers::Result;
 use crate::ics23;

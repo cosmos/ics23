@@ -1,0 +1,69 @@
+name: Tests 
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}-tests
+  cancel-in-progress: true
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19.2
+      - name: test
+        working-directory: ./go
+        run: make test
+
+  ts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: test
+        working-directory: ./js
+        run: yarn && yarn test
+
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Check all target in std
+        working-directory: ./rust  
+        run: cargo check --all
+
+      - name: Check all target in no_std    
+        working-directory: ./rust  
+        run: cargo check --no-default-features --all
+
+      - name: Build all targets in std   
+        working-directory: ./rust  
+        run: cargo build --all --all-targets
+
+      - name: Build all targets in no_std  
+        working-directory: ./rust  
+        run: cargo build --all  --no-default-features
+
+      - name: Run all tests with no-std
+        working-directory: ./rust  
+        run: cargo test --all --no-default-features
+
+      - name: Run all tests with std
+        working-directory: ./rust  
+        run: cargo test --all
+
+      - name: check no_std compatibility
+        run: cd rust/no-std-check/; make setup; make all
+
+        
