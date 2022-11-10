@@ -39,7 +39,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - run: cd rust && pwd
+      - run: cd rust
       - name: Check all target in std
         uses: actions-rs/cargo@v1
         with:
@@ -50,6 +50,7 @@ jobs:
         with:
           command: check
           args: --no-default-features --all
+          working-directory: rust  
       - name: Build all targets in std   
         uses: actions-rs/cargo@v1
         with:
