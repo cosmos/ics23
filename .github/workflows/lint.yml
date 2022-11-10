@@ -1,0 +1,38 @@
+name: Lint 
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}-tests
+  cancel-in-progress: true
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Check formatting of workspace
+        working-directory: ./rust  
+        run: cargo fmt -- --check
+
+      - name: Clippy linting on workspace (host-functions + std)
+        working-directory: ./rust  
+        run: cargo clippy --tests -- -D warnings
+
+      - name: Clippy linting on workspace (no-std) 
+        working-directory: ./rust  
+        run: cargo clippy --tests --no-default-features -- -D warnings
+
+      - name: Clippy linting on workspace (host functions only)
+        working-directory: ./rust  
+        run: cargo clippy --tests --no-default-features --features host-functions -- -D warnings
+        
