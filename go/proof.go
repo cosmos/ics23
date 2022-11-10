@@ -2,8 +2,8 @@ package ics23
 
 import (
 	"bytes"
-
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
 )
 
 // IavlSpec constrains the format from proofs-iavl (iavl merkle proofs)
@@ -98,18 +98,18 @@ func (p *ExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte
 	}
 
 	if !bytes.Equal(key, p.Key) {
-		return errors.Errorf("Provided key doesn't match proof")
+		return fmt.Errorf("Provided key doesn't match proof")
 	}
 	if !bytes.Equal(value, p.Value) {
-		return errors.Errorf("Provided value doesn't match proof")
+		return fmt.Errorf("Provided value doesn't match proof")
 	}
 
 	calc, err := p.Calculate()
 	if err != nil {
-		return errors.Wrap(err, "Error calculating root")
+		return fmt.Errorf("Error calculating root, %w", err)
 	}
 	if !bytes.Equal(root, calc) {
-		return errors.Errorf("Calculcated root doesn't match provided root")
+		return fmt.Errorf("Calculcated root doesn't match provided root")
 	}
 
 	return nil
@@ -127,14 +127,14 @@ func (p *ExistenceProof) Calculate() (CommitmentRoot, error) {
 	// leaf step takes the key and value as input
 	res, err := p.Leaf.Apply(p.Key, p.Value)
 	if err != nil {
-		return nil, errors.WithMessage(err, "leaf")
+		return nil, fmt.Errorf("leaf, %w", err)
 	}
 
 	// the rest just take the output of the last step (reducing it)
 	for _, step := range p.Path {
 		res, err = step.Apply(res)
 		if err != nil {
-			return nil, errors.WithMessage(err, "inner")
+			return nil, fmt.Errorf("inner, %w", err)
 		}
 	}
 	return res, nil
@@ -162,18 +162,18 @@ func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
 	}
 	err := p.Leaf.CheckAgainstSpec(spec)
 	if err != nil {
-		return errors.WithMessage(err, "leaf")
+		return fmt.Errorf("leaf, %w", err)
 	}
 	if spec.MinDepth > 0 && len(p.Path) < int(spec.MinDepth) {
-		return errors.Errorf("InnerOps depth too short: %d", len(p.Path))
+		return fmt.Errorf("InnerOps depth too short: %d", len(p.Path))
 	}
 	if spec.MaxDepth > 0 && len(p.Path) > int(spec.MaxDepth) {
-		return errors.Errorf("InnerOps depth too long: %d", len(p.Path))
+		return fmt.Errorf("InnerOps depth too long: %d", len(p.Path))
 	}
 
 	for _, inner := range p.Path {
 		if err := inner.CheckAgainstSpec(spec); err != nil {
-			return errors.WithMessage(err, "inner")
+			return fmt.Errorf("inner, %w", err)
 		}
 	}
 	return nil
@@ -186,13 +186,13 @@ func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []b
 	var leftKey, rightKey []byte
 	if p.Left != nil {
 		if err := p.Left.Verify(spec, root, p.Left.Key, p.Left.Value); err != nil {
-			return errors.Wrap(err, "left proof")
+			return fmt.Errorf("left proof, %w", err)
 		}
 		leftKey = p.Left.Key
 	}
 	if p.Right != nil {
 		if err := p.Right.Verify(spec, root, p.Right.Key, p.Right.Value); err != nil {
-			return errors.Wrap(err, "right proof")
+			return fmt.Errorf("right proof, %w", err)
 		}
 		rightKey = p.Right.Key
 	}
@@ -259,10 +259,10 @@ func IsRightMost(spec *InnerSpec, path []*InnerOp) bool {
 
 // IsLeftNeighbor returns true if `right` is the next possible path right of `left`
 //
-//   Find the common suffix from the Left.Path and Right.Path and remove it. We have LPath and RPath now, which must be neighbors.
-//   Validate that LPath[len-1] is the left neighbor of RPath[len-1]
-//   For step in LPath[0..len-1], validate step is right-most node
-//   For step in RPath[0..len-1], validate step is left-most node
+//	Find the common suffix from the Left.Path and Right.Path and remove it. We have LPath and RPath now, which must be neighbors.
+//	Validate that LPath[len-1] is the left neighbor of RPath[len-1]
+//	For step in LPath[0..len-1], validate step is right-most node
+//	For step in RPath[0..len-1], validate step is left-most node
 func IsLeftNeighbor(spec *InnerSpec, left []*InnerOp, right []*InnerOp) bool {
 	// count common tail (from end, near root)
 	left, topleft := left[:len(left)-1], left[len(left)-1]
@@ -387,14 +387,14 @@ func rightBranchesAreEmpty(spec *InnerSpec, op *InnerOp) bool {
 // the index of this branch
 func getPosition(order []int32, branch int32) int {
 	if branch < 0 || int(branch) >= len(order) {
-		panic(errors.Errorf("Invalid branch: %d", branch))
+		panic(fmt.Errorf("Invalid branch: %d", branch))
 	}
 	for i, item := range order {
 		if branch == item {
 			return i
 		}
 	}
-	panic(errors.Errorf("Branch %d not found in order %v", branch, order))
+	panic(fmt.Errorf("Branch %d not found in order %v", branch, order))
 }
 
 // This will look at the proof and determine which order it is...
