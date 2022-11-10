@@ -21,16 +21,16 @@ jobs:
         with:
           go-version: 1.19.2
       - name: test
-        run: |
-          cd go && make test
+        working-directory: ./go
+        run: make test
 
   ts-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: test
-        run: |
-          cd js && yarn && yarn test
+        working-directory: ./js
+        run: yarn && yarn test
 
   rust:
     runs-on: ubuntu-latest
@@ -39,7 +39,6 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - run: cd rust
       - name: Check all target in std
         working-directory: ./rust  
         run: cargo check --all
@@ -47,25 +46,17 @@ jobs:
         working-directory: ./rust  
         run: cargo check --no-default-features --all
       - name: Build all targets in std   
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --all --all-targets
-      - name: Build all targets in no_std    
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --all --no-default-features
+        working-directory: ./rust  
+        run: cargo build --all --all-targets
+      - name: Build all targets in no_std  
+        working-directory: ./rust  
+        run: cargo build --all  --no-default-features
       - name: Run all tests with no-std
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --all --no-default-features
+        working-directory: ./rust  
+        run: cargo test --all --no-default-features
       - name: Run all tests with std
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --all 
+        working-directory: ./rust  
+        run: cargo test --all
       - name: check no_std compatibility
         run: cd no-std-check/; make setup; make all
 
