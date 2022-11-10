@@ -41,10 +41,8 @@ jobs:
           toolchain: stable
       - run: cd rust
       - name: Check all target in std
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
-          args: --all
+        working-directory: ./rust  
+        run: cargo check --all
       - name: Check all target in no_std    
         working-directory: ./rust  
         run: cargo check --no-default-features --all
