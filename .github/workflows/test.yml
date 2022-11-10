@@ -46,11 +46,8 @@ jobs:
           command: check
           args: --all
       - name: Check all target in no_std    
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
-          args: --no-default-features --all
-          working-directory: rust  
+        working-directory: ./rust  
+        run: cargo check --no-default-features --all
       - name: Build all targets in std   
         uses: actions-rs/cargo@v1
         with:
