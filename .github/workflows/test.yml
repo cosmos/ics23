@@ -1,0 +1,27 @@
+name: Tests / Code Coverage
+#  Tests / Code Coverage workflow runs unit tests and uploads a code coverage report
+#  This workflow is run on pushes to main & every Pull Requests where a .go, .mod, .sum have been changed
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}-tests
+  cancel-in-progress: true
+
+jobs:
+  go-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19.2
+      - name: test & coverage report creation
+        run: |
+          cd go && make test
