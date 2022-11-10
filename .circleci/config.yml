@@ -12,57 +12,6 @@ workflows:
 
 jobs:
 
-
-  rust:
-    docker:
-      - image: rust:1.56.1
-    working_directory: ~/proofs/rust
-    steps:
-      - checkout:
-          path: ~/proofs
-      - run:
-          name: Version information
-          command: rustc --version; cargo --version; rustup --version
-      - restore_cache:
-          keys:
-            - v4-cargo-cache-rust:1.56.1-{{ arch }}-{{ checksum "Cargo.toml" }}
-      - run:
-          name: install protobuf dependencies
-          command: |
-            apt update
-            apt install -y libprotobuf-dev protobuf-compiler
-      - run:
-          name: Check all targets in std
-          command: cargo check --all
-      - run:
-          name: Check all target in no_std
-          command: cargo check --no-default-features --all
-      - run:
-          name: Build all targets in std
-          command: cargo build --all --all-targets
-      - run:
-          name: Build all targets in no_std
-          command: cargo build --all --no-default-features
-      - run:
-          name: Run all tests with no-std
-          command: cargo test --all --no-default-features
-      - run:
-          name: Run all tests with std
-          command: cargo test --all
-      - save_cache:
-          paths:
-            - /usr/local/cargo/registry
-            - target/debug/.fingerprint
-            - target/debug/build
-            - target/debug/deps
-          key: v4-cargo-cache-rust:1.56.1-{{ arch }}-{{ checksum "Cargo.toml" }}
-      - run:
-          name: Run all tests
-          command: cargo test --all
-      - run:
-          name: Check no_std compatibility
-          command: cd no-std-check/; make setup; make all
-
   lint-rust:
     docker:
       - image: rust:1.56.1
