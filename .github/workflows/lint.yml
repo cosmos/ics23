@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}-tests
+  group: ci-${{ github.ref }}-linting
   cancel-in-progress: true
 
 jobs:
