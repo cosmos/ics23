@@ -39,6 +39,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
+      - run: cd rust
       - name: Check all target in std
         uses: actions-rs/cargo@v1
         with:
@@ -70,6 +71,6 @@ jobs:
           command: test
           args: --all 
       - name: check no_std compatibility
-        run: cd rust/no-std-check/; make setup; make all
+        run: cd no-std-check/; make setup; make all
 
         
