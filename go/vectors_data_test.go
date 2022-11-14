@@ -233,7 +233,7 @@ func loadBatch(t *testing.T, dir string, filename string) (*CommitmentProof, []*
 		t.Fatalf("Unmarshal protobuf: %+v", err)
 	}
 	root := mustHex(t, data.RootHash)
-	var refs = make([]*RefData, len(data.Items))
+	refs := make([]*RefData, len(data.Items))
 	for i, item := range data.Items {
 		refs[i] = &RefData{
 			RootHash: root,

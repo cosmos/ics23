@@ -106,7 +106,6 @@ func TestDecompressBatchVectors(t *testing.T) {
 			if !bytes.Equal(resmall, small) {
 				t.Fatal("Decompressed batch proof differs from original")
 			}
-
 		})
 	}
 }

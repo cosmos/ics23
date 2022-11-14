@@ -6,10 +6,13 @@ In particular:
 
 	// Assumes ExistenceProof
 	type verifyMembership = (root: CommitmentRoot, proof: CommitmentProof, key: Key, value: Value) => boolean
+
 	// Assumes NonExistenceProof
 	type verifyNonMembership = (root: CommitmentRoot, proof: CommitmentProof, key: Key) => boolean
+
 	// Assumes BatchProof - required ExistenceProofs may be a subset of all items proven
 	type batchVerifyMembership = (root: CommitmentRoot, proof: CommitmentProof, items: Map<Key, Value>) => boolean
+
 	// Assumes BatchProof - required NonExistenceProofs may be a subset of all items proven
 	type batchVerifyNonMembership = (root: CommitmentRoot, proof: CommitmentProof, keys: Set<Key>) => boolean
 

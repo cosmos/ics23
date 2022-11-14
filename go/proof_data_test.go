@@ -94,7 +94,7 @@ type EmptyBranchTestStruct struct {
 }
 
 func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
-	var emptyChild = SpecWithEmptyChild.InnerSpec.EmptyChild
+	emptyChild := SpecWithEmptyChild.InnerSpec.EmptyChild
 
 	return []EmptyBranchTestStruct{
 		{
