@@ -13,16 +13,16 @@ import (
 	_ "crypto/sha512"
 
 	// adds ripemd160 capability to crypto.RIPEMD160
-	_ "golang.org/x/crypto/ripemd160"
+	_ "golang.org/x/crypto/ripemd160" //nolint:staticcheck
 )
 
 // Apply will calculate the leaf hash given the key and value being proven
 func (op *LeafOp) Apply(key []byte, value []byte) ([]byte, error) {
 	if len(key) == 0 {
-		return nil, errors.New("Leaf op needs key")
+		return nil, errors.New("leaf op needs key")
 	}
 	if len(value) == 0 {
-		return nil, errors.New("Leaf op needs value")
+		return nil, errors.New("leaf op needs value")
 	}
 	pkey, err := prepareLeafData(op.PrehashKey, op.Length, key)
 	if err != nil {
@@ -32,8 +32,11 @@ func (op *LeafOp) Apply(key []byte, value []byte) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("prehash value, %w", err)
 	}
-	data := append(op.Prefix, pkey...)
+
+	data := op.Prefix
+	data = append(data, pkey...)
 	data = append(data, pvalue...)
+
 	return doHash(op.Hash, data)
 }
 
@@ -42,19 +45,19 @@ func (op *LeafOp) CheckAgainstSpec(spec *ProofSpec) error {
 	lspec := spec.LeafSpec
 
 	if op.Hash != lspec.Hash {
-		return fmt.Errorf("Unexpected HashOp: %d", op.Hash)
+		return fmt.Errorf("unexpected HashOp: %d", op.Hash)
 	}
 	if op.PrehashKey != lspec.PrehashKey {
-		return fmt.Errorf("Unexpected PrehashKey: %d", op.PrehashKey)
+		return fmt.Errorf("unexpected PrehashKey: %d", op.PrehashKey)
 	}
 	if op.PrehashValue != lspec.PrehashValue {
-		return fmt.Errorf("Unexpected PrehashValue: %d", op.PrehashValue)
+		return fmt.Errorf("unexpected PrehashValue: %d", op.PrehashValue)
 	}
 	if op.Length != lspec.Length {
-		return fmt.Errorf("Unexpected LengthOp: %d", op.Length)
+		return fmt.Errorf("unexpected LengthOp: %d", op.Length)
 	}
 	if !bytes.HasPrefix(op.Prefix, lspec.Prefix) {
-		return fmt.Errorf("Leaf Prefix doesn't start with %X", lspec.Prefix)
+		return fmt.Errorf("leaf Prefix doesn't start with %X", lspec.Prefix)
 	}
 	return nil
 }
@@ -62,29 +65,32 @@ func (op *LeafOp) CheckAgainstSpec(spec *ProofSpec) error {
 // Apply will calculate the hash of the next step, given the hash of the previous step
 func (op *InnerOp) Apply(child []byte) ([]byte, error) {
 	if len(child) == 0 {
-		return nil, errors.New("Inner op needs child value")
+		return nil, errors.New("inner op needs child value")
 	}
-	preimage := append(op.Prefix, child...)
+
+	preimage := op.Prefix
+	preimage = append(preimage, child...)
 	preimage = append(preimage, op.Suffix...)
+
 	return doHash(op.Hash, preimage)
 }
 
 // CheckAgainstSpec will verify the InnerOp is in the format defined in spec
 func (op *InnerOp) CheckAgainstSpec(spec *ProofSpec) error {
 	if op.Hash != spec.InnerSpec.Hash {
-		return fmt.Errorf("Unexpected HashOp: %d", op.Hash)
+		return fmt.Errorf("unexpected HashOp: %d", op.Hash)
 	}
 
 	leafPrefix := spec.LeafSpec.Prefix
 	if bytes.HasPrefix(op.Prefix, leafPrefix) {
-		return fmt.Errorf("Inner Prefix starts with %X", leafPrefix)
+		return fmt.Errorf("inner Prefix starts with %X", leafPrefix)
 	}
 	if len(op.Prefix) < int(spec.InnerSpec.MinPrefixLength) {
-		return fmt.Errorf("InnerOp prefix too short (%d)", len(op.Prefix))
+		return fmt.Errorf("innerOp prefix too short (%d)", len(op.Prefix))
 	}
 	maxLeftChildBytes := (len(spec.InnerSpec.ChildOrder) - 1) * int(spec.InnerSpec.ChildSize)
 	if len(op.Prefix) > int(spec.InnerSpec.MaxPrefixLength)+maxLeftChildBytes {
-		return fmt.Errorf("InnerOp prefix too long (%d)", len(op.Prefix))
+		return fmt.Errorf("innerOp prefix too long (%d)", len(op.Prefix))
 	}
 	return nil
 }
@@ -137,7 +143,7 @@ func doHash(hashOp HashOp, preimage []byte) ([]byte, error) {
 		hash.Write(preimage)
 		return hash.Sum(nil), nil
 	}
-	return nil, fmt.Errorf("Unsupported hashop: %d", hashOp)
+	return nil, fmt.Errorf("unsupported hashop: %d", hashOp)
 }
 
 // doLengthOp will calculate the proper prefix and return it prepended
@@ -152,12 +158,12 @@ func doLengthOp(lengthOp LengthOp, data []byte) ([]byte, error) {
 		return res, nil
 	case LengthOp_REQUIRE_32_BYTES:
 		if len(data) != 32 {
-			return nil, fmt.Errorf("Data was %d bytes, not 32", len(data))
+			return nil, fmt.Errorf("data was %d bytes, not 32", len(data))
 		}
 		return data, nil
 	case LengthOp_REQUIRE_64_BYTES:
 		if len(data) != 64 {
-			return nil, fmt.Errorf("Data was %d bytes, not 64", len(data))
+			return nil, fmt.Errorf("data was %d bytes, not 64", len(data))
 		}
 		return data, nil
 	case LengthOp_FIXED32_LITTLE:
@@ -171,7 +177,7 @@ func doLengthOp(lengthOp LengthOp, data []byte) ([]byte, error) {
 		// case LengthOp_FIXED64_BIG:
 		// case LengthOp_FIXED64_LITTLE:
 	}
-	return nil, fmt.Errorf("Unsupported lengthop: %d", lengthOp)
+	return nil, fmt.Errorf("unsupported lengthop: %d", lengthOp)
 }
 
 func encodeVarintProto(l int) []byte {

@@ -98,22 +98,21 @@ func (p *ExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte
 	}
 
 	if !bytes.Equal(key, p.Key) {
-		return fmt.Errorf("Provided key doesn't match proof")
+		return fmt.Errorf("provided key doesn't match proof")
 	}
 	if !bytes.Equal(value, p.Value) {
-		return fmt.Errorf("Provided value doesn't match proof")
+		return fmt.Errorf("provided value doesn't match proof")
 	}
 
 	calc, err := p.Calculate()
 	if err != nil {
-		return fmt.Errorf("Error calculating root, %w", err)
+		return fmt.Errorf("error calculating root, %w", err)
 	}
 	if !bytes.Equal(root, calc) {
-		return fmt.Errorf("Calculcated root doesn't match provided root")
+		return fmt.Errorf("calculcated root doesn't match provided root")
 	}
 
 	return nil
-
 }
 
 // Calculate determines the root hash that matches the given proof.
@@ -121,7 +120,7 @@ func (p *ExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte
 // Returns error if the calculations cannot be performed.
 func (p *ExistenceProof) Calculate() (CommitmentRoot, error) {
 	if p.GetLeaf() == nil {
-		return nil, errors.New("Existence Proof needs defined LeafOp")
+		return nil, errors.New("existence Proof needs defined LeafOp")
 	}
 
 	// leaf step takes the key and value as input
@@ -151,24 +150,24 @@ func (p *NonExistenceProof) Calculate() (CommitmentRoot, error) {
 	case p.Right != nil:
 		return p.Right.Calculate()
 	default:
-		return nil, errors.New("Nonexistence proof has empty Left and Right proof")
+		return nil, errors.New("nonexistence proof has empty Left and Right proof")
 	}
 }
 
 // CheckAgainstSpec will verify the leaf and all path steps are in the format defined in spec
 func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
 	if p.GetLeaf() == nil {
-		return errors.New("Existence Proof needs defined LeafOp")
+		return errors.New("existence Proof needs defined LeafOp")
 	}
 	err := p.Leaf.CheckAgainstSpec(spec)
 	if err != nil {
 		return fmt.Errorf("leaf, %w", err)
 	}
 	if spec.MinDepth > 0 && len(p.Path) < int(spec.MinDepth) {
-		return fmt.Errorf("InnerOps depth too short: %d", len(p.Path))
+		return fmt.Errorf("innerOps depth too short: %d", len(p.Path))
 	}
 	if spec.MaxDepth > 0 && len(p.Path) > int(spec.MaxDepth) {
-		return fmt.Errorf("InnerOps depth too long: %d", len(p.Path))
+		return fmt.Errorf("innerOps depth too long: %d", len(p.Path))
 	}
 
 	for _, inner := range p.Path {
@@ -208,25 +207,28 @@ func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []b
 			return errors.New("key is not left of right proof")
 		}
 	}
+
 	if leftKey != nil {
 		if bytes.Compare(key, leftKey) <= 0 {
 			return errors.New("key is not right of left proof")
 		}
 	}
 
-	if leftKey == nil {
+	switch {
+	case leftKey == nil:
 		if !IsLeftMost(spec.InnerSpec, p.Right.Path) {
 			return errors.New("left proof missing, right proof must be left-most")
 		}
-	} else if rightKey == nil {
+	case rightKey == nil:
 		if !IsRightMost(spec.InnerSpec, p.Left.Path) {
 			return errors.New("right proof missing, left proof must be right-most")
 		}
-	} else { // in the middle
+	default:
 		if !IsLeftNeighbor(spec.InnerSpec, p.Left.Path, p.Right.Path) {
 			return errors.New("right proof missing, left proof must be right-most")
 		}
 	}
+
 	return nil
 }
 
@@ -387,14 +389,14 @@ func rightBranchesAreEmpty(spec *InnerSpec, op *InnerOp) bool {
 // the index of this branch
 func getPosition(order []int32, branch int32) int {
 	if branch < 0 || int(branch) >= len(order) {
-		panic(fmt.Errorf("Invalid branch: %d", branch))
+		panic(fmt.Errorf("invalid branch: %d", branch))
 	}
 	for i, item := range order {
 		if branch == item {
 			return i
 		}
 	}
-	panic(fmt.Errorf("Branch %d not found in order %v", branch, order))
+	panic(fmt.Errorf("branch %d not found in order %v", branch, order))
 }
 
 // This will look at the proof and determine which order it is...
@@ -407,5 +409,5 @@ func orderFromPadding(spec *InnerSpec, inner *InnerOp) (int32, error) {
 			return branch, nil
 		}
 	}
-	return 0, errors.New("Cannot find any valid spacing for this node")
+	return 0, errors.New("cannot find any valid spacing for this node")
 }

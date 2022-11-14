@@ -94,10 +94,10 @@ type EmptyBranchTestStruct struct {
 }
 
 func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
-	var emptyChild = SpecWithEmptyChild.InnerSpec.EmptyChild
+	emptyChild := SpecWithEmptyChild.InnerSpec.EmptyChild
 
 	return []EmptyBranchTestStruct{
-		EmptyBranchTestStruct{
+		{
 			Op: &InnerOp{
 				Prefix: append([]byte{1}, emptyChild...),
 				Suffix: nil,
@@ -107,7 +107,7 @@ func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
 			IsLeft:  true,
 			IsRight: false,
 		},
-		EmptyBranchTestStruct{
+		{
 			Op: &InnerOp{
 				Prefix: []byte{1},
 				Suffix: emptyChild,
@@ -118,7 +118,7 @@ func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
 			IsRight: true,
 		},
 		// non-empty cases
-		EmptyBranchTestStruct{
+		{
 			Op: &InnerOp{
 				Prefix: append([]byte{1}, make([]byte, 32)...),
 				Suffix: nil,
@@ -128,7 +128,7 @@ func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
 			IsLeft:  false,
 			IsRight: false,
 		},
-		EmptyBranchTestStruct{
+		{
 			Op: &InnerOp{
 				Prefix: []byte{1},
 				Suffix: make([]byte, 32),
@@ -138,7 +138,7 @@ func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
 			IsLeft:  false,
 			IsRight: false,
 		},
-		EmptyBranchTestStruct{
+		{
 			Op: &InnerOp{
 				Prefix: append(append([]byte{1}, emptyChild[0:28]...), []byte("xxxx")...),
 				Suffix: nil,
@@ -148,7 +148,7 @@ func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
 			IsLeft:  false,
 			IsRight: false,
 		},
-		EmptyBranchTestStruct{
+		{
 			Op: &InnerOp{
 				Prefix: []byte{1},
 				Suffix: append(append([]byte(nil), emptyChild[0:28]...), []byte("xxxx")...),
@@ -159,7 +159,7 @@ func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
 			IsRight: false,
 		},
 		// some cases using a spec with no empty child
-		EmptyBranchTestStruct{
+		{
 			Op: &InnerOp{
 				Prefix: append([]byte{1}, make([]byte, 32)...),
 				Suffix: nil,
@@ -169,7 +169,7 @@ func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
 			IsLeft:  false,
 			IsRight: false,
 		},
-		EmptyBranchTestStruct{
+		{
 			Op: &InnerOp{
 				Prefix: []byte{1},
 				Suffix: make([]byte, 32),
