@@ -35,4 +35,20 @@ jobs:
       - name: Clippy linting on workspace (host functions only)
         working-directory: ./rust  
         run: cargo clippy --tests --no-default-features --features host-functions -- -D warnings
+
+  golangci:
+    name: golangci-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          # ci is set to go1.19 to match developer setups
+          go-version: 1.19.2
+      - uses: actions/checkout@v3
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
+          version: v1.50.0
+          working-directory: go
         
