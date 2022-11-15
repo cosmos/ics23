@@ -25,14 +25,14 @@ func Compress(proof *CommitmentProof) *CommitmentProof {
 // This is safe to call multiple times (idempotent)
 func Decompress(proof *CommitmentProof) *CommitmentProof {
 	comp := proof.GetCompressed()
-	if comp == nil {
-		return proof
+	if comp != nil {
+		return &CommitmentProof{
+			Proof: &CommitmentProof_Batch{
+				Batch: decompress(comp),
+			},
+		}
 	}
-	return &CommitmentProof{
-		Proof: &CommitmentProof_Batch{
-			Batch: decompress(comp),
-		},
-	}
+	return proof
 }
 
 func compress(batch *BatchProof) *CompressedBatchProof {
