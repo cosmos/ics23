@@ -1,0 +1,11 @@
+version: v1
+
+lint:
+  use:
+     - DEFAULT
+  except: 
+    - ENUM_ZERO_VALUE_SUFFIX
+    - ENUM_VALUE_PREFIX
+breaking:
+   use:
+     - FILE

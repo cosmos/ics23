@@ -35,7 +35,7 @@ live alongside the various merkle tree representations (eg. not in this reposito
 
 ### Planned Support
 
-* Solidity - [thanks to Mossid](https://github.com/confio/proofs/pull/12)
+* Solidity - [thanks to Mossid](https://github.com/cosmos/proofs/pull/12)
 
 ## Supported Merkle Stores
 
@@ -72,5 +72,3 @@ tries (such as Ethereum's Patricia Trie) do not store the key in the leaf, but r
 every step along the path in order to reconstruct the path, these are not supported. Doing so would
 require a much more complex format and most likely custom code for each such database. The design goal
 was to be able to add new data sources with only configuration (spec object), rather than custom code.
-
-
