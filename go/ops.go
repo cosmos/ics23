@@ -81,9 +81,10 @@ func (op *LeafOp) Apply(key []byte, value []byte) ([]byte, error) {
 // Apply will calculate the hash of the next step, given the hash of the previous step
 func (op *InnerOp) Apply(child []byte) ([]byte, error) {
 	if len(child) == 0 {
-		return nil, errors.New("Inner op needs child value")
+		return nil, errors.New("inner op needs child value")
 	}
-	preimage := append(op.Prefix, child...)
+	preimage := op.Prefix
+	preimage = append(preimage, child...)
 	preimage = append(preimage, op.Suffix...)
 	return doHash(op.Hash, preimage)
 }
