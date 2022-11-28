@@ -1,13 +1,15 @@
 // we want to name functions verify_* to match ics23
 #![allow(clippy::module_name_repetitions)]
 
+use alloc::vec::Vec;
+
 use anyhow::{bail, ensure};
 
+use crate::api::{ensure_inner_prefix, ensure_leaf_prefix};
 use crate::helpers::Result;
 use crate::host_functions::HostFunctionsProvider;
 use crate::ics23;
 use crate::ops::{apply_inner, apply_leaf};
-use alloc::vec::Vec;
 
 pub type CommitmentRoot = Vec<u8>;
 
@@ -22,7 +24,7 @@ pub fn verify_existence<H: HostFunctionsProvider>(
     ensure!(proof.key == key, "Provided key doesn't match proof");
     ensure!(proof.value == value, "Provided value doesn't match proof");
 
-    let calc = calculate_existence_root::<H>(proof)?;
+    let calc = calculate_existence_root_for_spec::<H>(proof, Some(spec))?;
     ensure!(calc == root, "Root hash doesn't match");
     Ok(())
 }
@@ -60,6 +62,13 @@ pub fn verify_non_existence<H: HostFunctionsProvider>(
 pub fn calculate_existence_root<H: HostFunctionsProvider>(
     proof: &ics23::ExistenceProof,
 ) -> Result<CommitmentRoot> {
+    calculate_existence_root_for_spec::<H>(proof, None)
+}
+
+fn calculate_existence_root_for_spec<H: HostFunctionsProvider>(
+    proof: &ics23::ExistenceProof,
+    spec: Option<&ics23::ProofSpec>,
+) -> Result<CommitmentRoot> {
     ensure!(!proof.key.is_empty(), "Existence proof must have key set");
     ensure!(
         !proof.value.is_empty(),
@@ -70,6 +79,12 @@ pub fn calculate_existence_root<H: HostFunctionsProvider>(
         let mut hash = apply_leaf::<H>(leaf_node, &proof.key, &proof.value)?;
         for step in &proof.path {
             hash = apply_inner::<H>(step, &hash)?;
+
+            if let Some(inner_spec) = spec.and_then(|spec| spec.inner_spec.as_ref()) {
+                if hash.len() > inner_spec.child_size as usize && inner_spec.child_size >= 32 {
+                    bail!("Invalid inner operation (child_size)")
+                }
+            }
         }
         Ok(hash)
     } else {
@@ -79,6 +94,7 @@ pub fn calculate_existence_root<H: HostFunctionsProvider>(
 
 fn check_existence_spec(proof: &ics23::ExistenceProof, spec: &ics23::ProofSpec) -> Result<()> {
     if let (Some(leaf), Some(leaf_spec)) = (&proof.leaf, &spec.leaf_spec) {
+        ensure_leaf_prefix(&leaf.prefix, spec)?;
         ensure_leaf(leaf, leaf_spec)?;
         // ensure min/max depths
         if spec.min_depth != 0 {
@@ -93,7 +109,8 @@ fn check_existence_spec(proof: &ics23::ExistenceProof, spec: &ics23::ProofSpec) 
                 proof.path.len(),
             );
         }
-        for step in &proof.path {
+        for (idx, step) in proof.path.iter().enumerate() {
+            ensure_inner_prefix(&step.prefix, spec, (idx as i64) + 1, step.hash)?;
             ensure_inner(step, spec)?;
         }
         Ok(())
@@ -161,6 +178,10 @@ fn ensure_inner(inner: &ics23::InnerOp, spec: &ics23::ProofSpec) -> Result<()> {
                     <= (inner_spec.max_prefix_length + max_left_child_bytes) as usize,
                 "Inner prefix too long: {}",
                 inner.prefix.len(),
+            );
+            ensure!(
+                inner.suffix.len() % (inner_spec.child_size as usize) == 0,
+                "InnerOp suffix malformed"
             );
             Ok(())
         }
@@ -394,12 +415,19 @@ mod tests {
 
     #[test]
     fn enforce_existence_spec() {
+        impl InnerOp {
+            fn with_height(mut self, height: u8) -> InnerOp {
+                self.prefix[0] = height;
+                self
+            }
+        }
+
         let leaf = LeafOp {
             hash: HashOp::Sha256.into(),
             prehash_key: 0,
             prehash_value: HashOp::Sha256.into(),
             length: LengthOp::VarProto.into(),
-            prefix: vec![0_u8],
+            prefix: vec![0u8, 2, 2],
         };
         let invalid_leaf = LeafOp {
             hash: HashOp::Sha512.into(),
@@ -411,7 +439,7 @@ mod tests {
 
         let valid_inner = InnerOp {
             hash: HashOp::Sha256.into(),
-            prefix: hex::decode("deadbeef00cafe00").unwrap(),
+            prefix: vec![2u8, 2, 2, 0],
             suffix: vec![],
         };
         let invalid_inner = InnerOp {
@@ -530,8 +558,8 @@ mod tests {
                         leaf: Some(leaf.clone()),
                         path: vec![
                             valid_inner.clone(),
-                            valid_inner.clone(),
-                            valid_inner.clone(),
+                            valid_inner.clone().with_height(4),
+                            valid_inner.clone().with_height(6),
                         ],
                     },
                     spec: depth_limited_spec.clone(),
