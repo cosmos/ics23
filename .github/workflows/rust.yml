@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: rust-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   clippy:
     runs-on: ubuntu-latest
