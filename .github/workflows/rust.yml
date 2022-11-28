@@ -71,3 +71,28 @@ jobs:
 
       - name: Check no_std compatibility
         run: cd rust/no-std-check/; make setup; make all
+
+  coverage:
+    runs-on: ubuntu-latest
+    env:
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@nextest
+      - name: Generate code coverage
+        working-directory: ./rust
+        run: cargo llvm-cov nextest --all-features --workspace --lcov --output-path lcov.info
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        working-directory: ./rust
+        with:
+          files: lcov.info
+          fail_ci_if_error: true
