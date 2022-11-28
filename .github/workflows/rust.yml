@@ -16,6 +16,7 @@ concurrency:
 
 jobs:
   clippy:
+    name: Clippy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -39,6 +40,7 @@ jobs:
         run: cargo clippy --tests --no-default-features --features host-functions -- -D warnings
 
   test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -73,6 +75,7 @@ jobs:
         run: cd rust/no-std-check/; make setup; make all
 
   coverage:
+    name: Code Coverage
     runs-on: ubuntu-latest
     env:
       CARGO_TERM_COLOR: always
