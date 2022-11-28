@@ -43,3 +43,20 @@ jobs:
         working-directory: ./go
         run: make test
 
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19.2
+      - name: Run coverage
+        working-directory: ./go
+        run: go test -race -coverprofile=coverage.txt -covermode=atomic
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: go/coverage.txt
+          fail_ci_if_error: true
+
