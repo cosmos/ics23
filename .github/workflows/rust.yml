@@ -92,7 +92,6 @@ jobs:
         run: cargo llvm-cov nextest --all-features --workspace --lcov --output-path lcov.info
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
-        working-directory: ./rust
         with:
-          files: lcov.info
+          files: rust/lcov.info
           fail_ci_if_error: true
