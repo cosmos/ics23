@@ -1,0 +1,100 @@
+name: Rust
+on:
+  pull_request:
+    paths:
+      - rust/**
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rust-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Check formatting
+        working-directory: ./rust
+        run: cargo fmt -- --check
+
+      - name: Clippy (host-functions + std)
+        working-directory: ./rust
+        run: cargo clippy --tests -- -D warnings
+
+      - name: Clippy (no-std)
+        working-directory: ./rust
+        run: cargo clippy --tests --no-default-features -- -D warnings
+
+      - name: Clippy (host functions only)
+        working-directory: ./rust
+        run: cargo clippy --tests --no-default-features --features host-functions -- -D warnings
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Check all target in std
+        working-directory: ./rust
+        run: cargo check --all
+
+      - name: Check all target in no_std
+        working-directory: ./rust
+        run: cargo check --no-default-features --all
+
+      - name: Build all targets in std
+        working-directory: ./rust
+        run: cargo build --all --all-targets
+
+      - name: Build all targets in no_std
+        working-directory: ./rust
+        run: cargo build --all  --no-default-features
+
+      - name: Run all tests with no-std
+        working-directory: ./rust
+        run: cargo test --all --no-default-features
+
+      - name: Run all tests with std
+        working-directory: ./rust
+        run: cargo test --all
+
+      - name: Check no_std compatibility
+        run: cd rust/no-std-check/; make setup; make all
+
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    env:
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@nextest
+      - name: Generate code coverage
+        working-directory: ./rust
+        run: cargo llvm-cov nextest --all-features --lcov --output-path lcov.info
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: rust/lcov.info
+          fail_ci_if_error: true

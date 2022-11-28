@@ -13,6 +13,7 @@ jasmine.loadConfig({
   seed: null,
   stopSpecOnExpectationFailure: false
 });
+
 jasmine.jasmine.DEFAULT_TIMEOUT_INTERVAL = 15*1000;
 
 // setup console reporter

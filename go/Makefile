@@ -38,4 +38,5 @@ format:
 	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(golangci_version)
 	find . -name '*.go' -type f -not -name "*.pb.go"  | xargs gofumpt -w -l
 	$(golangci_lint_cmd) run --fix
+
 .PHONY: format
