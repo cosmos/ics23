@@ -49,7 +49,7 @@ fn do_hash<H: HostFunctionsProvider>(hash: HashOp, data: &[u8]) -> Hash {
     }
 }
 
-fn do_length(length: LengthOp, data: &[u8]) -> Result<Hash> {
+pub(crate) fn do_length(length: LengthOp, data: &[u8]) -> Result<Hash> {
     match length {
         LengthOp::NoPrefix => {}
         LengthOp::Require32Bytes => ensure!(data.len() == 32, "Invalid length"),
@@ -70,7 +70,7 @@ fn do_length(length: LengthOp, data: &[u8]) -> Result<Hash> {
     Ok(data.to_vec())
 }
 
-fn proto_len(length: usize) -> Result<Hash> {
+pub(crate) fn proto_len(length: usize) -> Result<Hash> {
     let size: u64 = length.try_into().map_err(anyhow::Error::msg)?;
     let mut len = Hash::new();
     prost::encoding::encode_varint(size, &mut len);
