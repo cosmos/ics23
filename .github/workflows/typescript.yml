@@ -17,9 +17,25 @@ concurrency:
 
 jobs:
   test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: test
+      - name: Run test suite
         working-directory: ./js
         run: yarn && yarn test
+
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Generate code coverage
+        working-directory: ./js
+        run: yarn && yarn coverage
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: js/coverage/lcov.info
+          flags: typescript
+          fail_ci_if_error: true
