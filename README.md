@@ -1,13 +1,26 @@
-[![Cosmos ecosystem][cosmos-shield]](https://cosmos.network)
+[![Cosmos ecosystem][cosmos-shield]][cosmos-link]
 
-# ICS 23
+# ICS 23 [![Apache 2.0 Licensed][license-badge]][license-link]
 
-[![Go](https://github.com/cosmos/ics23/actions/workflows/go.yml/badge.svg?branch=master)](https://github.com/cosmos/ics23/actions/workflows/go.yml)
-[![Go coverage](https://codecov.io/github/cosmos/ics23/branch/master/graph/badge.svg?token=xlGriS907o&flag=go)](https://codecov.io/gh/cosmos/ics23/tree/master/go)
-[![Rust](https://github.com/cosmos/ics23/actions/workflows/rust.yml/badge.svg?branch=master)](https://github.com/cosmos/ics23/actions/workflows/rust.yml)
-[![Rust coverage](https://codecov.io/github/cosmos/ics23/branch/master/graph/badge.svg?token=xlGriS907o&flag=rust)](https://codecov.io/gh/cosmos/ics23/tree/master/rust)
-[![TypeScript](https://github.com/cosmos/ics23/actions/workflows/typescript.yml/badge.svg?branch=master)](https://github.com/cosmos/ics23/actions/workflows/typescript.yml)
-[![Apache 2.0 Licensed](https://img.shields.io/badge/license-Apache2.0-blue.svg)](https://github.com/cosmos/ics23/blob/master/LICENSE)
+| Language           | Test Suite                                        | Code Coverage                                |
+| ------------------ | ------------------------------------------------- | -------------------------------------------- |
+| [Go](./go)         | [![Go Test][go-test-badge]][go-test-link]         | [![Go Cov][go-cov-badge]][go-cov-link]       |
+| [Rust](./rust)     | [![Rust Test][rust-test-badge]][rust-test-link]   | [![Rust Cov][rust-cov-badge]][rust-cov-link] |
+| [TypeScript](./ts) | [![TypeScript Test][ts-test-badge]][ts-test-link] | _Not measured yet_                           |
+
+[cosmos-link]: https://cosmos.network
+[go-test-link]: https://github.com/cosmos/ics23/actions/workflows/go.yml
+[go-test-badge]: https://github.com/cosmos/ics23/actions/workflows/go.yml/badge.svg?branch=master
+[go-cov-link]: https://codecov.io/gh/cosmos/ics23/tree/master/go
+[go-cov-badge]: https://codecov.io/github/cosmos/ics23/branch/master/graph/badge.svg?token=xlGriS907o&flag=go
+[rust-test-link]: https://github.com/cosmos/ics23/actions/workflows/rust.yml
+[rust-test-badge]: https://github.com/cosmos/ics23/actions/workflows/rust.yml/badge.svg?branch=master
+[rust-cov-link]: https://codecov.io/gh/cosmos/ics23/tree/master/rust
+[rust-cov-badge]: https://codecov.io/github/cosmos/ics23/branch/master/graph/badge.svg?token=xlGriS907o&flag=rust
+[ts-test-link]: https://github.com/cosmos/ics23/actions/workflows/typescript.yml
+[ts-test-badge]: https://github.com/cosmos/ics23/actions/workflows/typescript.yml/badge.svg?branch=master
+[license-link]: https://github.com/cosmos/ics23/blob/master/LICENSE
+[license-badge]: https://img.shields.io/badge/license-Apache2.0-blue.svg
 
 ## Proofs
 
