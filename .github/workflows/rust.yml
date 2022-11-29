@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - rust/**
+      - .github/workflows/rust.yml
   push:
     branches:
       - master
@@ -97,4 +98,5 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           files: rust/lcov.info
+          flags: rust
           fail_ci_if_error: true

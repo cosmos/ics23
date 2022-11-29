@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - js/**
+      - .github/workflows/typescript.yml
   push:
     branches:
       - master

@@ -40,3 +40,4 @@ format:
 	$(golangci_lint_cmd) run --fix
 
 .PHONY: format
+
