@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - go/**
+      - .github/workflows/go.yml
   push:
     branches:
       - master
