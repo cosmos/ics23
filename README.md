@@ -2,11 +2,11 @@
 
 # ICS 23 [![Apache 2.0 Licensed][license-badge]][license-link]
 
-| Language           | Test Suite                                        | Code Coverage                                |
-| ------------------ | ------------------------------------------------- | -------------------------------------------- |
-| [Go](./go)         | [![Go Test][go-test-badge]][go-test-link]         | [![Go Cov][go-cov-badge]][go-cov-link]       |
-| [Rust](./rust)     | [![Rust Test][rust-test-badge]][rust-test-link]   | [![Rust Cov][rust-cov-badge]][rust-cov-link] |
-| [TypeScript](./ts) | [![TypeScript Test][ts-test-badge]][ts-test-link] | _Not measured yet_                           |
+| Language           | Test Suite                                        | Code Coverage                                  |
+| ------------------ | ------------------------------------------------- | ---------------------------------------------- |
+| [Go](./go)         | [![Go Test][go-test-badge]][go-test-link]         | [![Go Cov][go-cov-badge]][go-cov-link]         |
+| [Rust](./rust)     | [![Rust Test][rust-test-badge]][rust-test-link]   | [![Rust Cov][rust-cov-badge]][rust-cov-link]   |
+| [TypeScript](./ts) | [![TypeScript Test][ts-test-badge]][ts-test-link] | [![TypeScript Cov][ts-cov-badge]][ts-cov-link] |
 
 [cosmos-link]: https://cosmos.network
 [go-test-link]: https://github.com/cosmos/ics23/actions/workflows/go.yml
@@ -19,6 +19,8 @@
 [rust-cov-badge]: https://codecov.io/github/cosmos/ics23/branch/master/graph/badge.svg?token=xlGriS907o&flag=rust
 [ts-test-link]: https://github.com/cosmos/ics23/actions/workflows/typescript.yml
 [ts-test-badge]: https://github.com/cosmos/ics23/actions/workflows/typescript.yml/badge.svg?branch=master
+[ts-cov-link]: https://codecov.io/gh/cosmos/ics23/tree/master/js
+[ts-cov-badge]: https://codecov.io/github/cosmos/ics23/branch/master/graph/badge.svg?token=xlGriS907o&flag=typescript
 [license-link]: https://github.com/cosmos/ics23/blob/master/LICENSE
 [license-badge]: https://img.shields.io/badge/license-Apache2.0-blue.svg
 
