@@ -98,5 +98,5 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           files: rust/lcov.info
-          tags: rust
+          flags: rust
           fail_ci_if_error: true

@@ -59,6 +59,6 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           files: go/coverage.txt
-          tags: go
+          flags: go
           fail_ci_if_error: true
 
