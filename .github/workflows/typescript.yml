@@ -17,10 +17,11 @@ concurrency:
 
 jobs:
   test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Test
+      - name: Run test suite
         working-directory: ./js
         run: yarn && yarn test
 
