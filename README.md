@@ -61,7 +61,7 @@ live alongside the various merkle tree representations (eg. not in this reposito
 
 ### Planned Support
 
-* Solidity - [thanks to Mossid](https://github.com/confio/proofs/pull/12)
+* Solidity - [thanks to Mossid](https://github.com/cosmos/proofs/pull/12)
 
 ## Supported Merkle Stores
 
