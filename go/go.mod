@@ -1,4 +1,4 @@
-module github.com/confio/ics23/go
+module github.com/cosmos/ics23/go
 
 go 1.19
 

@@ -1,7 +1,11 @@
 use alloc::collections::btree_map::BTreeMap;
 use alloc::vec;
 
+use anyhow::{anyhow, ensure};
+use bytes::{Buf, Bytes};
+
 use crate::compress::{decompress, is_compressed};
+use crate::helpers::Result;
 use crate::host_functions::HostFunctionsProvider;
 use crate::ics23;
 use crate::verify::{verify_existence, verify_non_existence, CommitmentRoot};
@@ -179,6 +183,115 @@ pub fn iavl_spec() -> ics23::ProofSpec {
     }
 }
 
+fn read_varint<B: Buf>(buf: &mut B) -> Option<i64> {
+    let ux = prost::encoding::decode_varint(buf).ok()?;
+    let mut x: i64 = (ux >> 1).try_into().ok()?;
+    if ux & 1 != 0 {
+        x = !x;
+    }
+    Some(x)
+}
+
+fn ensure_iavl_prefix(prefix: &[u8], min_height: i64) -> Result<Option<usize>> {
+    let mut prefix = Bytes::copy_from_slice(prefix);
+
+    let height = read_varint(&mut prefix)
+        .ok_or_else(|| anyhow!("error decoding height in IAVL prefix encoding"))?;
+    ensure!(height >= min_height, "wrong height in IAVL prefix encoding");
+
+    let size = read_varint(&mut prefix)
+        .ok_or_else(|| anyhow!("error decoding size in IAVL prefix encoding"))?;
+    ensure!(size >= 0, "wrong size in IAVL prefix encoding");
+
+    let version = read_varint(&mut prefix)
+        .ok_or_else(|| anyhow!("error decoding version in IAVL prefix encoding"))?;
+    ensure!(version >= 0, "wrong version in IAVL prefix encoding");
+
+    Ok(Some(prefix.remaining()))
+}
+
+fn is_iavl_spec(spec: &ics23::ProofSpec) -> bool {
+    // we use a relaxed impl that over-declares equality
+    spec_equals(spec, &iavl_spec())
+}
+
+fn spec_equals(left: &ics23::ProofSpec, right: &ics23::ProofSpec) -> bool {
+    match (
+        &left.leaf_spec,
+        &left.inner_spec,
+        &right.leaf_spec,
+        &right.inner_spec,
+    ) {
+        (
+            Some(left_leaf_spec),
+            Some(left_inner_spec),
+            Some(right_leaf_spec),
+            Some(right_inner_spec),
+        ) => {
+            leaf_spec_equals(left_leaf_spec, right_leaf_spec)
+                && inner_spec_equals(left_inner_spec, right_inner_spec)
+        }
+        _ => false,
+    }
+}
+
+fn leaf_spec_equals(left: &ics23::LeafOp, right: &ics23::LeafOp) -> bool {
+    left.hash == right.hash
+        && left.prehash_key == right.prehash_key
+        && left.prehash_value == right.prehash_value
+        && left.length == right.length
+}
+
+fn inner_spec_equals(left: &ics23::InnerSpec, right: &ics23::InnerSpec) -> bool {
+    left.hash == right.hash
+        && left.min_prefix_length == right.min_prefix_length
+        && left.max_prefix_length == right.max_prefix_length
+        && left.child_size == right.child_size
+        && left.child_order.len() == right.child_order.len()
+}
+
+pub(crate) fn ensure_leaf_prefix(prefix: &[u8], spec: &ics23::ProofSpec) -> Result<()> {
+    if !is_iavl_spec(spec) {
+        return Ok(());
+    }
+
+    let remaining = ensure_iavl_prefix(prefix, 0)?;
+    match remaining {
+        None => Ok(()),
+        Some(remaining_bytes) => {
+            ensure!(remaining_bytes == 0, "bad prefix in leaf");
+            Ok(())
+        }
+    }
+}
+
+pub(crate) fn ensure_inner_prefix(
+    prefix: &[u8],
+    spec: &ics23::ProofSpec,
+    min_height: i64,
+    hash_op: i32,
+) -> Result<()> {
+    if !is_iavl_spec(spec) {
+        return Ok(());
+    }
+
+    let remaining = ensure_iavl_prefix(prefix, min_height)?;
+    match remaining {
+        None => Ok(()),
+        Some(remaining_bytes) => {
+            // 1 byte due to containing length prefix for left hash.
+            // 33 bytes due to IAVL length prefix + left hash + next IAVL legnth prefix
+            ensure!(
+                remaining_bytes == 1 || remaining_bytes == 34,
+                "bad prefix in layer {}",
+                min_height
+            );
+            ensure!(hash_op == ics23::HashOp::Sha256 as i32, "bad hash op");
+            Ok(())
+        }
+    }
+}
+
 pub fn tendermint_spec() -> ics23::ProofSpec {
     let leaf = ics23::LeafOp {
         hash: ics23::HashOp::Sha256.into(),
@@ -235,6 +348,7 @@ mod tests {
     use alloc::string::String;
     use alloc::vec::Vec;
     use anyhow::{bail, ensure};
+    use bytes::{BufMut, BytesMut};
     use prost::Message;
     use serde::Deserialize;
     #[cfg(feature = "std")]
@@ -639,5 +753,56 @@ mod tests {
         ])?;
         let comp = compress(&proof)?;
         verify_batch(&spec, &comp, &data[4])
+    }
+
+    #[test]
+    fn test_read_varint() {
+        fn put_varint<B: BufMut>(x: i64, buf: &mut B) {
+            let mut ux = (x as u64) << 1;
+            if x < 0 {
+                ux = !ux;
+            }
+            prost::encoding::encode_varint(ux, buf);
+        }
+
+        fn test_varint(x: i64) {
+            let mut buf = BytesMut::new();
+            put_varint(x, &mut buf);
+            let y = read_varint(&mut buf).unwrap();
+            assert_eq!(x, y)
+        }
+
+        const TESTS: [i64; 18] = [
+            -1i64 << 63,
+            (-1 << 63) + 1,
+            -1,
+            0,
+            1,
+            2,
+            10,
+            20,
+            63,
+            64,
+            65,
+            127,
+            128,
+            129,
+            255,
+            256,
+            257,
+            1 << (63 - 1),
+        ];
+
+        for x in TESTS {
+            test_varint(x);
+            test_varint(0i64.wrapping_sub(x));
+        }
+
+        let mut x = 0x7i64;
+        while x != 0 {
+            test_varint(x);
+            test_varint(0i64.wrapping_sub(x));
+            x <<= 1;
+        }
     }
 }

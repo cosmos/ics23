@@ -1,0 +1,41 @@
+name: TypeScript
+on:
+  pull_request:
+    paths:
+      - js/**
+      - .github/workflows/typescript.yml
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ts-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run test suite
+        working-directory: ./js
+        run: yarn && yarn test
+
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Generate code coverage
+        working-directory: ./js
+        run: yarn && yarn coverage
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: js/coverage/lcov.info
+          flags: typescript
+          fail_ci_if_error: true
