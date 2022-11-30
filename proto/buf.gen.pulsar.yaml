@@ -1,9 +1,0 @@
-version: v1
-managed:
-  enabled: true
-  go_package_prefix:
-    default: cosmossdk.io/api
-plugins:
-  - name: go-pulsar
-    out: ../api
-    opt: paths=source_relative
