@@ -1,4 +1,5 @@
 DOCKER := $(shell which docker)
+HTTPS_GIT := https://github.com/cosmos/cosmos-sdk.git
 
 ##### GO commands #####
 
@@ -32,6 +33,6 @@ proto-lint:
 	@$(protoImage) buf lint --error-format=json
 
 proto-check-breaking:
-	@$(protoImage) buf breaking --against $(HTTPS_GIT)#branch=main
+	@$(protoImage) buf breaking --against $(HTTPS_GIT)#branch=master
 
 .PHONY: proto-all proto-gen-go proto-gen-rust proto-format proto-lint proto-check-breaking
