@@ -11,9 +11,12 @@ fn main() {
     }
 
     let out_dir: &str = &format!("{}{}", root, "/rust/src");
-    let input: &str = &format!("{}{}", root, "/proofs.proto");
+    let input: &str = &format!("{}{}", root, "/proto/cosmos/ics23/v1/proofs.proto");
 
-    let mut cfg = prost_build::Config::new();
-    cfg.out_dir(&out_dir);
-    cfg.compile_protos(&[input], &[root]).unwrap();
+    prost_build::Config::new()
+        .out_dir(&out_dir)
+        .format(true)
+        .type_attribute(".", "#[derive(Eq)]")
+        .compile_protos(&[input], &[root])
+        .unwrap();
 }

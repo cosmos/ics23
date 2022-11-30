@@ -8,9 +8,12 @@ mod api;
 mod compress;
 mod helpers;
 mod host_functions;
-mod ics23;
 mod ops;
 mod verify;
+
+mod ics23 {
+    include!("cosmos.ics23.v1.rs");
+}
 
 pub use crate::ics23::*;
 pub use api::{
