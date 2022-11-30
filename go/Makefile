@@ -1,11 +1,7 @@
-.PHONY: test 
-
-# PROTOC_FLAGS := -I=.. -I=./vendor -I=$(GOPATH)/src
-PROTOC_FLAGS := -I=.. -I=$(GOPATH)/src
-
 test:
 	go test .
 
+.PHONY: test 
 ##### Linting #####
 
 golangci_lint_cmd=golangci-lint
@@ -29,25 +25,3 @@ format:
 	find . -name '*.go' -type f -not -name "*.pb.go"  | xargs gofumpt -w -l
 	$(golangci_lint_cmd) run --fix
 .PHONY: format
-
-##### Protobuf #####
-protoVer=0.11.2
-protoImageName=ghcr.io/cosmos/proto-builder:$(protoVer)
-protoImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(protoImageName)
-
-proto-all: proto-format proto-lint proto-gen
-
-proto-gen:
-	@echo "Generating Protobuf files"
-	@cd .. & $(protoImage) sh ./scripts/protocgen_go.sh
-
-proto-format:
-	@$(protoImage) find ./ -name "*.proto" -exec clang-format -i {} \;
-
-proto-lint:
-	@$(protoImage) buf lint --error-format=json
-
-proto-check-breaking:
-	@$(protoImage) buf breaking --against $(HTTPS_GIT)#branch=main
-
-.PHONY: proto-all proto-gen proto-format proto-lint proto-check-breaking

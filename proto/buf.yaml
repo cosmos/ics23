@@ -1,5 +1,8 @@
 version: v1
-
+name: buf.build/cosmos/ics23
+deps:
+  - buf.build/cosmos/cosmos-proto
+  - buf.build/cosmos/gogo-proto
 lint:
   use:
      - DEFAULT
