@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package cosmos.ics23.v1;
 
-option go_package = "github.com/cosmos/ics23";
+option go_package = "github.com/cosmos/ics23/go;ics23";
 
 enum HashOp {
   // NO_HASH is the default if no data passed. Note this is an illegal argument some places.
