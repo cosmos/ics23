@@ -11,7 +11,7 @@ enum HashOp {
   SHA512     = 2;
   KECCAK     = 3;
   RIPEMD160  = 4;
-  BITCOIN    = 5;  // ripemd160(sha256(x))
+  BITCOIN    = 5; // ripemd160(sha256(x))
   SHA512_256 = 6;
 }
 
@@ -76,7 +76,7 @@ one right of the desired key. If both proofs are valid AND they are neighbors,
 then there is no valid proof for the given key.
 */
 message NonExistenceProof {
-  bytes          key   = 1;  // TODO: remove this as unnecessary??? we prove a range
+  bytes          key   = 1; // TODO: remove this as unnecessary??? we prove a range
   ExistenceProof left  = 2;
   ExistenceProof right = 3;
 }
@@ -228,7 +228,7 @@ message CompressedExistenceProof {
 }
 
 message CompressedNonExistenceProof {
-  bytes                    key   = 1;  // TODO: remove this as unnecessary??? we prove a range
+  bytes                    key   = 1; // TODO: remove this as unnecessary??? we prove a range
   CompressedExistenceProof left  = 2;
   CompressedExistenceProof right = 3;
 }
