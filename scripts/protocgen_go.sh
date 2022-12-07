@@ -13,5 +13,5 @@ done
 
 cd ..
 
-cp -r github.com/cosmos/ics23/* ./go
+cp -r github.com/cosmos/ics23/go/* ./go
 rm -rf github.com
