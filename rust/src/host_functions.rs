@@ -66,8 +66,8 @@ pub mod host_functions_impl {
         }
 
         fn blake3hash(message: &[u8]) -> [u8; 32] {
-           let hash= blake3::hash(message);
-           *hash.as_bytes()
+            let hash = blake3::hash(message);
+            *hash.as_bytes()
         }
     }
 }

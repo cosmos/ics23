@@ -46,7 +46,7 @@ fn do_hash<H: HostFunctionsProvider>(hash: HashOp, data: &[u8]) -> Hash {
         HashOp::Ripemd160 => Hash::from(H::ripemd160(data)),
         HashOp::Bitcoin => Hash::from(H::ripemd160(&H::sha2_256(data)[..])),
         HashOp::Sha512256 => Hash::from(H::sha2_512_truncated(data)),
-        HashOp::Blake3 => Hash::from(H::blake3hash (data)),
+        HashOp::Blake3 => Hash::from(H::blake3hash(data)),
     }
 }
 
@@ -124,7 +124,7 @@ mod tests {
         );
 
         let hash = do_hash::<HostFunctionsManager>(HashOp::Blake3, b"food");
-        assert!( hash == decode("f775a8ccf8cb78cd1c63ade4e9802de4ead836b36cea35242accf31d2c6a3697"));
+        assert!(hash == decode("f775a8ccf8cb78cd1c63ade4e9802de4ead836b36cea35242accf31d2c6a3697"),);
     }
 
     #[test]
@@ -269,5 +269,4 @@ mod tests {
             "unexpected inner hash"
         );
     }
-
 }
