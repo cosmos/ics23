@@ -16,6 +16,9 @@ pub trait HostFunctionsProvider {
 
     /// Ripemd160 hash function.
     fn ripemd160(message: &[u8]) -> [u8; 20];
+
+    /// blake3 hash function.
+    fn blake3hash(message: &[u8]) -> [u8; 32];
 }
 
 #[cfg(any(feature = "host-functions", test))]
@@ -60,6 +63,11 @@ pub mod host_functions_impl {
             let mut buf = [0u8; 20];
             buf.copy_from_slice(&digest);
             buf
+        }
+
+        fn blake3hash(message: &[u8]) -> [u8; 32] {
+           let hash= blake3::hash(message);
+           *hash.as_bytes()
         }
     }
 }

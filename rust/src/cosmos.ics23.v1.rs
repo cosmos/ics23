@@ -258,7 +258,6 @@ pub struct CompressedNonExistenceProof {
     #[prost(message, optional, tag = "3")]
     pub right: ::core::option::Option<CompressedExistenceProof>,
 }
-#[derive(Eq)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum HashOp {
@@ -271,6 +270,7 @@ pub enum HashOp {
     /// ripemd160(sha256(x))
     Bitcoin = 5,
     Sha512256 = 6,
+    Blake3 = 7,
 }
 impl HashOp {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -286,6 +286,7 @@ impl HashOp {
             HashOp::Ripemd160 => "RIPEMD160",
             HashOp::Bitcoin => "BITCOIN",
             HashOp::Sha512256 => "SHA512_256",
+            HashOp::Blake3 => "Blake3"
         }
     }
 }
@@ -294,7 +295,6 @@ impl HashOp {
 /// to include length information. After encoding the length with the given
 /// algorithm, the length will be prepended to the key and value bytes.
 /// (Each one with it's own encoded length)
-#[derive(Eq)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum LengthOp {
