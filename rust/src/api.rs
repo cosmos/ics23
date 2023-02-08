@@ -325,26 +325,32 @@ mod tests {
                 &proof, spec, &data.root, &data.key, &value,
             );
             ensure!(valid, "invalid test vector");
-            let invalid = !verify_membership::<HostFunctionsManager>(
+            let proof_with_forged_key_is_valid = verify_membership::<HostFunctionsManager>(
                 &proof,
                 spec,
                 &data.root,
                 b"thiskeydoesnotexist",
                 &value,
             );
-            ensure!(invalid, "test vector passed with modified key");
+            ensure!(
+                !proof_with_forged_key_is_valid,
+                "test vector passed with modified key"
+            );
             Ok(())
         } else {
             let valid =
                 verify_non_membership::<HostFunctionsManager>(&proof, spec, &data.root, &data.key);
             ensure!(valid, "invalid test vector");
-            let invalid = !verify_non_membership::<HostFunctionsManager>(
+            let proof_with_forged_key_is_valid = verify_non_membership::<HostFunctionsManager>(
                 &proof,
                 spec,
                 &data.root,
                 b"thiskeydoesnotexist",
             );
-            ensure!(invalid, "test vector passed with modified key");
+            ensure!(
+                !proof_with_forged_key_is_valid,
+                "test vector passed with modified key"
+            );
             Ok(())
         }
     }

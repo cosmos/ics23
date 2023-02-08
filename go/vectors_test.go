@@ -28,10 +28,20 @@ func TestVectors(t *testing.T) {
 				if !valid {
 					t.Fatal("Invalid proof")
 				}
+
+				proofWithForgedKey := VerifyNonMembership(tc.Spec, ref.RootHash, proof, []byte("thiskeydoesnotexist"))
+				if proofWithForgedKey {
+					t.Fatal("Proof with forged key verified")
+				}
 			} else {
 				valid := VerifyMembership(tc.Spec, ref.RootHash, proof, ref.Key, ref.Value)
 				if !valid {
 					t.Fatal("Invalid proof")
+				}
+
+				proofWithForgedKey := VerifyMembership(tc.Spec, ref.RootHash, proof, []byte("thiskeydoesnotexist"), ref.Value)
+				if proofWithForgedKey {
+					t.Fatal("Proof with forged key verified")
 				}
 			}
 		})
