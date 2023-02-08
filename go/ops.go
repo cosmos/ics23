@@ -141,7 +141,8 @@ func doHash(hashOp HashOp, preimage []byte) ([]byte, error) {
 }
 
 // doLengthOp will calculate the proper prefix and return it prepended
-//   doLengthOp(op, data) -> length(data) || data
+//
+//	doLengthOp(op, data) -> length(data) || data
 func doLengthOp(lengthOp LengthOp, data []byte) ([]byte, error) {
 	switch lengthOp {
 	case LengthOp_NO_PREFIX:
