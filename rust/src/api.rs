@@ -144,18 +144,30 @@ fn get_nonexist_proof<'a>(
     key: &[u8],
 ) -> Option<&'a ics23::NonExistenceProof> {
     match &proof.proof {
-        Some(ics23::commitment_proof::Proof::Nonexist(non)) => Some(non),
+        Some(ics23::commitment_proof::Proof::Nonexist(non)) => {
+            if let Some(left) = &non.left {
+                if key <= &left.key[..] {
+                    return None;
+                }
+            }
+            if let Some(right) = &non.right {
+                if key >= &right.key[..] {
+                    return None;
+                }
+            }
+            Some(non)
+        }
         Some(ics23::commitment_proof::Proof::Batch(batch)) => {
             for entry in &batch.entries {
                 if let Some(ics23::batch_entry::Proof::Nonexist(non)) = &entry.proof {
                     if non.key == key {
                         if let Some(left) = &non.left {
-                            if key.to_vec() <= left.key {
+                            if key <= &left.key[..] {
                                 return None;
                             }
                         }
                         if let Some(right) = &non.right {
-                            if key.to_vec() >= right.key {
+                            if key >= &right.key[..] {
                                 return None;
                             }
                         }
@@ -313,11 +325,26 @@ mod tests {
                 &proof, spec, &data.root, &data.key, &value,
             );
             ensure!(valid, "invalid test vector");
+            let invalid = !verify_membership::<HostFunctionsManager>(
+                &proof,
+                spec,
+                &data.root,
+                b"thiskeydoesnotexist",
+                &value,
+            );
+            ensure!(invalid, "test vector passed with modified key");
             Ok(())
         } else {
             let valid =
                 verify_non_membership::<HostFunctionsManager>(&proof, spec, &data.root, &data.key);
             ensure!(valid, "invalid test vector");
+            let invalid = !verify_non_membership::<HostFunctionsManager>(
+                &proof,
+                spec,
+                &data.root,
+                b"thiskeydoesnotexist",
+            );
+            ensure!(invalid, "test vector passed with modified key");
             Ok(())
         }
     }
