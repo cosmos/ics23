@@ -204,6 +204,14 @@ func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
 	return nil
 }
 
+func keyForComparison(spec *ProofSpec, key []byte) []byte {
+	if !spec.PrehashCompareKey {
+		return key
+	}
+	hash, _ := doHashOrNoop(spec.LeafSpec.PrehashKey, key)
+	return hash
+}
+
 // Verify does all checks to ensure the proof has valid non-existence proofs,
 // and they ensure the given key is not in the CommitmentState
 func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte) error {
@@ -229,13 +237,13 @@ func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []b
 
 	// Ensure in valid range
 	if rightKey != nil {
-		if bytes.Compare(key, rightKey) >= 0 {
+		if bytes.Compare(keyForComparison(spec, key), keyForComparison(spec, rightKey)) >= 0 {
 			return errors.New("key is not left of right proof")
 		}
 	}
 
 	if leftKey != nil {
-		if bytes.Compare(key, leftKey) <= 0 {
+		if bytes.Compare(keyForComparison(spec, key), keyForComparison(spec, leftKey)) <= 0 {
 			return errors.New("key is not right of left proof")
 		}
 	}

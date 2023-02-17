@@ -1,5 +1,6 @@
 import { decompress } from "./compress";
 import { ics23 } from "./generated/codecimpl";
+import { doHash } from "./ops";
 import { CommitmentRoot, verifyExistence, verifyNonExistence } from "./proofs";
 import { bytesBefore, bytesEqual } from "./specs";
 
@@ -59,7 +60,7 @@ export function verifyNonMembership(
   key: Uint8Array
 ): boolean {
   const norm = decompress(proof);
-  const nonexist = getNonExistForKey(norm, key);
+  const nonexist = getNonExistForKey(spec, norm, key);
   if (!nonexist) {
     return false;
   }
@@ -121,15 +122,32 @@ function getExistForKey(
   return undefined;
 }
 
+function keyForComparison(spec: ics23.IProofSpec, key: Uint8Array): Uint8Array {
+  if (!spec.prehashComparedKey) {
+    return key;
+  }
+
+  return doHash(spec.leafSpec!.prehashKey!, key);
+}
+
 function getNonExistForKey(
+  spec: ics23.IProofSpec,
   proof: ics23.ICommitmentProof,
   key: Uint8Array
 ): ics23.INonExistenceProof | undefined | null {
   const match = (p: ics23.INonExistenceProof | null | undefined): boolean => {
     return (
       !!p &&
-      (!p.left || bytesBefore(p.left.key!, key)) &&
-      (!p.right || bytesBefore(key, p.right.key!))
+      (!p.left ||
+        bytesBefore(
+          keyForComparison(spec, p.left.key!),
+          keyForComparison(spec, key)
+        )) &&
+      (!p.right ||
+        bytesBefore(
+          keyForComparison(spec, key),
+          keyForComparison(spec, p.right.key!)
+        ))
     );
   };
   if (match(proof.nonexist)) {

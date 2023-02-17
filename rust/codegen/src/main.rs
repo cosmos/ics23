@@ -16,7 +16,6 @@ fn main() {
     prost_build::Config::new()
         .out_dir(&out_dir)
         .format(true)
-        .type_attribute(".", "#[derive(Eq)]")
         .compile_protos(&[input], &[root])
         .unwrap();
 }
