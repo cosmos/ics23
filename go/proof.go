@@ -57,8 +57,8 @@ var SmtSpec = &ProofSpec{
 		EmptyChild:      make([]byte, 32),
 		Hash:            HashOp_SHA256,
 	},
-	MaxDepth: 256,
-  PrehashComparedKey: HashOp_SHA256,
+	MaxDepth:           256,
+	PrehashComparedKey: HashOp_SHA256,
 }
 
 // Calculate determines the root hash that matches a given Commitment proof
@@ -241,10 +241,10 @@ func IsRightMost(spec *InnerSpec, path []*InnerOp) bool {
 
 // IsLeftNeighbor returns true if `right` is the next possible path right of `left`
 //
-//   Find the common suffix from the Left.Path and Right.Path and remove it. We have LPath and RPath now, which must be neighbors.
-//   Validate that LPath[len-1] is the left neighbor of RPath[len-1]
-//   For step in LPath[0..len-1], validate step is right-most node
-//   For step in RPath[0..len-1], validate step is left-most node
+//	Find the common suffix from the Left.Path and Right.Path and remove it. We have LPath and RPath now, which must be neighbors.
+//	Validate that LPath[len-1] is the left neighbor of RPath[len-1]
+//	For step in LPath[0..len-1], validate step is right-most node
+//	For step in RPath[0..len-1], validate step is left-most node
 func IsLeftNeighbor(spec *InnerSpec, left []*InnerOp, right []*InnerOp) bool {
 	// count common tail (from end, near root)
 	left, topleft := left[:len(left)-1], left[len(left)-1]

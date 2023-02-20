@@ -1,3 +1,4 @@
+import { utf8ToBytes } from "@noble/hashes/utils";
 import { readFileSync } from "fs";
 
 import { compress } from "./compress";
@@ -10,6 +11,8 @@ import {
 } from "./ics23";
 import { iavlSpec, tendermintSpec } from "./proofs";
 import { fromHex } from "./testhelpers.spec";
+
+const nonExistentKey = utf8ToBytes("thiskeydoesnotexist");
 
 describe("calculateExistenceRoot", () => {
   interface RefData {
@@ -54,9 +57,23 @@ describe("calculateExistenceRoot", () => {
     if (value) {
       const valid = verifyMembership(proof, spec, root, key, value);
       expect(valid).toBe(true);
+      const forgedKeyIsValid = verifyNonMembership(
+        proof,
+        spec,
+        root,
+        nonExistentKey
+      );
+      expect(forgedKeyIsValid).toBe(false);
     } else {
       const valid = verifyNonMembership(proof, spec, root, key);
       expect(valid).toBe(true);
+      const forgedKeyIsValid = verifyNonMembership(
+        proof,
+        spec,
+        root,
+        nonExistentKey
+      );
+      expect(forgedKeyIsValid).toBe(false);
     }
   }
 
