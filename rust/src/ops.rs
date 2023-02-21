@@ -124,7 +124,7 @@ mod tests {
         );
 
         let hash = do_hash::<HostFunctionsManager>(HashOp::Blake3, b"food");
-        assert!(hash == decode("f775a8ccf8cb78cd1c63ade4e9802de4ead836b36cea35242accf31d2c6a3697"),);
+        assert!(hash == decode("f775a8ccf8cb78cd1c63ade4e9802de4ead836b36cea35242accf31d2c6a3697"), "blake3 hash fails");
     }
 
     #[test]
