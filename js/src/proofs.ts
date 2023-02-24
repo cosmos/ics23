@@ -1,5 +1,6 @@
 import { ics23 } from "./generated/codecimpl";
 import { applyInner, applyLeaf } from "./ops";
+import { doHash } from "./ops";
 import {
   bytesEqual,
   ensureBytesBefore,
@@ -63,6 +64,17 @@ export const smtSpec: ics23.IProofSpec = {
 
 export type CommitmentRoot = Uint8Array;
 
+export function keyForComparison(
+  spec: ics23.IProofSpec,
+  key: Uint8Array
+): Uint8Array {
+  if (!spec.prehashComparedKey) {
+    return key;
+  }
+
+  return doHash(spec.leafSpec!.prehashKey!, key);
+}
+
 // verifyExistence will throw an error if the proof doesn't link key, value -> root
 // or if it doesn't fulfill the spec
 export function verifyExistence(
@@ -111,10 +123,16 @@ export function verifyNonExistence(
   }
 
   if (leftKey) {
-    ensureBytesBefore(leftKey, key);
+    ensureBytesBefore(
+      keyForComparison(spec, leftKey),
+      keyForComparison(spec, key)
+    );
   }
   if (rightKey) {
-    ensureBytesBefore(key, rightKey);
+    ensureBytesBefore(
+      keyForComparison(spec, key),
+      keyForComparison(spec, rightKey)
+    );
   }
 
   if (!spec.innerSpec) {

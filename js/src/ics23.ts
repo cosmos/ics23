@@ -1,9 +1,8 @@
 import { decompress } from "./compress";
 import { ics23 } from "./generated/codecimpl";
-import { doHash } from "./ops";
 import { CommitmentRoot, verifyExistence, verifyNonExistence } from "./proofs";
+import { keyForComparison } from "./proofs";
 import { bytesBefore, bytesEqual } from "./specs";
-
 /*
 This implements the client side functions as specified in
 https://github.com/cosmos/ics/tree/master/spec/ics-023-vector-commitments
@@ -120,14 +119,6 @@ function getExistForKey(
     return proof.batch.entries!.map((x) => x.exist || null).find(match);
   }
   return undefined;
-}
-
-function keyForComparison(spec: ics23.IProofSpec, key: Uint8Array): Uint8Array {
-  if (!spec.prehashComparedKey) {
-    return key;
-  }
-
-  return doHash(spec.leafSpec!.prehashKey!, key);
 }
 
 function getNonExistForKey(
