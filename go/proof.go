@@ -47,7 +47,7 @@ var TendermintSpec = &ProofSpec{
 var SmtSpec = &ProofSpec{
 	LeafSpec: &LeafOp{
 		Hash:         HashOp_SHA256,
-		PrehashKey:   HashOp_NO_HASH,
+		PrehashKey:   HashOp_SHA256,
 		PrehashValue: HashOp_SHA256,
 		Length:       LengthOp_NO_PREFIX,
 		Prefix:       []byte{0},
@@ -60,7 +60,8 @@ var SmtSpec = &ProofSpec{
 		EmptyChild:      make([]byte, 32),
 		Hash:            HashOp_SHA256,
 	},
-	MaxDepth: 256,
+	MaxDepth:          256,
+	PrehashCompareKey: true,
 }
 
 func encodeVarintProto(l int) []byte {

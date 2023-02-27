@@ -46,7 +46,7 @@ export const tendermintSpec: ics23.IProofSpec = {
 export const smtSpec: ics23.IProofSpec = {
   leafSpec: {
     hash: ics23.HashOp.SHA256,
-    prehashKey: ics23.HashOp.NO_HASH,
+    prehashKey: ics23.HashOp.SHA256,
     prehashValue: ics23.HashOp.SHA256,
     length: ics23.LengthOp.NO_PREFIX,
     prefix: Uint8Array.from([0]),
@@ -60,6 +60,7 @@ export const smtSpec: ics23.IProofSpec = {
     hash: ics23.HashOp.SHA256,
   },
   maxDepth: 256,
+  prehashComparedKey: true,
 };
 
 export type CommitmentRoot = Uint8Array;

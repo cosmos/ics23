@@ -353,7 +353,7 @@ pub fn tendermint_spec() -> ics23::ProofSpec {
 pub fn smt_spec() -> ics23::ProofSpec {
     let leaf = ics23::LeafOp {
         hash: ics23::HashOp::Sha256.into(),
-        prehash_key: 0,
+        prehash_key: ics23::HashOp::Sha256.into(),
         prehash_value: ics23::HashOp::Sha256.into(),
         length: 0,
         prefix: vec![0_u8],
@@ -371,7 +371,7 @@ pub fn smt_spec() -> ics23::ProofSpec {
         inner_spec: Some(inner),
         min_depth: 0,
         max_depth: 0,
-        prehash_compare_key: false,
+        prehash_compare_key: true,
     }
 }
 
