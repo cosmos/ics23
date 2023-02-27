@@ -1726,7 +1726,7 @@ $root.ics23 = (function() {
          * @property {ics23.IInnerSpec|null} [innerSpec] ProofSpec innerSpec
          * @property {number|null} [maxDepth] ProofSpec maxDepth
          * @property {number|null} [minDepth] ProofSpec minDepth
-         * @property {boolean|null} [prehashComparedKey] ProofSpec prehashComparedKey
+         * @property {boolean|null} [prehashKeyBeforeComparison] ProofSpec prehashKeyBeforeComparison
          */
 
         /**
@@ -1786,12 +1786,12 @@ $root.ics23 = (function() {
         ProofSpec.prototype.minDepth = 0;
 
         /**
-         * ProofSpec prehashComparedKey.
-         * @member {boolean} prehashComparedKey
+         * ProofSpec prehashKeyBeforeComparison.
+         * @member {boolean} prehashKeyBeforeComparison
          * @memberof ics23.ProofSpec
          * @instance
          */
-        ProofSpec.prototype.prehashComparedKey = false;
+        ProofSpec.prototype.prehashKeyBeforeComparison = false;
 
         /**
          * Creates a new ProofSpec instance using the specified properties.
@@ -1825,8 +1825,8 @@ $root.ics23 = (function() {
                 writer.uint32(/* id 3, wireType 0 =*/24).int32(message.maxDepth);
             if (message.minDepth != null && Object.hasOwnProperty.call(message, "minDepth"))
                 writer.uint32(/* id 4, wireType 0 =*/32).int32(message.minDepth);
-            if (message.prehashComparedKey != null && Object.hasOwnProperty.call(message, "prehashComparedKey"))
-                writer.uint32(/* id 5, wireType 0 =*/40).bool(message.prehashComparedKey);
+            if (message.prehashKeyBeforeComparison != null && Object.hasOwnProperty.call(message, "prehashKeyBeforeComparison"))
+                writer.uint32(/* id 5, wireType 0 =*/40).bool(message.prehashKeyBeforeComparison);
             return writer;
         };
 
@@ -1874,7 +1874,7 @@ $root.ics23 = (function() {
                     message.minDepth = reader.int32();
                     break;
                 case 5:
-                    message.prehashComparedKey = reader.bool();
+                    message.prehashKeyBeforeComparison = reader.bool();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1927,9 +1927,9 @@ $root.ics23 = (function() {
             if (message.minDepth != null && message.hasOwnProperty("minDepth"))
                 if (!$util.isInteger(message.minDepth))
                     return "minDepth: integer expected";
-            if (message.prehashComparedKey != null && message.hasOwnProperty("prehashComparedKey"))
-                if (typeof message.prehashComparedKey !== "boolean")
-                    return "prehashComparedKey: boolean expected";
+            if (message.prehashKeyBeforeComparison != null && message.hasOwnProperty("prehashKeyBeforeComparison"))
+                if (typeof message.prehashKeyBeforeComparison !== "boolean")
+                    return "prehashKeyBeforeComparison: boolean expected";
             return null;
         };
 
@@ -1959,8 +1959,8 @@ $root.ics23 = (function() {
                 message.maxDepth = object.maxDepth | 0;
             if (object.minDepth != null)
                 message.minDepth = object.minDepth | 0;
-            if (object.prehashComparedKey != null)
-                message.prehashComparedKey = Boolean(object.prehashComparedKey);
+            if (object.prehashKeyBeforeComparison != null)
+                message.prehashKeyBeforeComparison = Boolean(object.prehashKeyBeforeComparison);
             return message;
         };
 
@@ -1982,7 +1982,7 @@ $root.ics23 = (function() {
                 object.innerSpec = null;
                 object.maxDepth = 0;
                 object.minDepth = 0;
-                object.prehashComparedKey = false;
+                object.prehashKeyBeforeComparison = false;
             }
             if (message.leafSpec != null && message.hasOwnProperty("leafSpec"))
                 object.leafSpec = $root.ics23.LeafOp.toObject(message.leafSpec, options);
@@ -1992,8 +1992,8 @@ $root.ics23 = (function() {
                 object.maxDepth = message.maxDepth;
             if (message.minDepth != null && message.hasOwnProperty("minDepth"))
                 object.minDepth = message.minDepth;
-            if (message.prehashComparedKey != null && message.hasOwnProperty("prehashComparedKey"))
-                object.prehashComparedKey = message.prehashComparedKey;
+            if (message.prehashKeyBeforeComparison != null && message.hasOwnProperty("prehashKeyBeforeComparison"))
+                object.prehashKeyBeforeComparison = message.prehashKeyBeforeComparison;
             return object;
         };
 

@@ -60,7 +60,7 @@ export const smtSpec: ics23.IProofSpec = {
     hash: ics23.HashOp.SHA256,
   },
   maxDepth: 256,
-  prehashComparedKey: true,
+  prehashKeyBeforeComparison: true,
 };
 
 export type CommitmentRoot = Uint8Array;
@@ -69,7 +69,7 @@ export function keyForComparison(
   spec: ics23.IProofSpec,
   key: Uint8Array
 ): Uint8Array {
-  if (!spec.prehashComparedKey) {
+  if (!spec.prehashKeyBeforeComparison) {
     return key;
   }
 

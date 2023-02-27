@@ -144,11 +144,11 @@ pub struct ProofSpec {
     /// min_depth (if > 0) is the minimum number of InnerOps allowed (mainly for fixed-depth tries)
     #[prost(int32, tag = "4")]
     pub min_depth: i32,
-    /// prehash_compare_key is a flag that indicates whether to use the
+    /// prehash_key_before_comparison is a flag that indicates whether to use the
     /// prehash_key specified by LeafOp to compare lexical ordering of keys for
     /// non-existence proofs.
     #[prost(bool, tag = "5")]
-    pub prehash_compare_key: bool,
+    pub prehash_key_before_comparison: bool,
 }
 ///
 /// InnerSpec contains all store-specific structure info to determine if two proofs from a

@@ -37,7 +37,7 @@ pub fn verify_non_existence<H: HostFunctionsProvider>(
     key: &[u8],
 ) -> Result<()> {
     let key_for_comparison = |key: &[u8]| -> Vec<u8> {
-        match spec.prehash_compare_key {
+        match spec.prehash_key_before_comparison {
             true => do_hash::<H>(
                 spec.leaf_spec.clone().unwrap_or_default().prehash_key(),
                 key,
@@ -651,7 +651,7 @@ mod tests {
             inner_spec: Some(inner),
             min_depth: 0,
             max_depth: 0,
-            prehash_compare_key: false,
+            prehash_key_before_comparison: false,
         }
     }
 

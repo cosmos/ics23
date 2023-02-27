@@ -60,8 +60,8 @@ var SmtSpec = &ProofSpec{
 		EmptyChild:      make([]byte, 32),
 		Hash:            HashOp_SHA256,
 	},
-	MaxDepth:          256,
-	PrehashCompareKey: true,
+	MaxDepth:                   256,
+	PrehashKeyBeforeComparison: true,
 }
 
 func encodeVarintProto(l int) []byte {
@@ -206,7 +206,7 @@ func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
 }
 
 func keyForComparison(spec *ProofSpec, key []byte) []byte {
-	if !spec.PrehashCompareKey {
+	if !spec.PrehashKeyBeforeComparison {
 		return key
 	}
 	hash, _ := doHashOrNoop(spec.LeafSpec.PrehashKey, key)
