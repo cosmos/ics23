@@ -141,14 +141,12 @@ fn get_nonexist_proof<'a, H: HostFunctionsProvider>(
     key: &[u8],
     spec: &ics23::ProofSpec,
 ) -> Option<&'a ics23::NonExistenceProof> {
-    let key_for_comparison = |key: &[u8]| -> Vec<u8> {
-        match spec.prehash_key_before_comparison {
-            true => do_hash::<H>(
-                spec.leaf_spec.clone().unwrap_or_default().prehash_key(),
-                key,
-            ),
-            false => key.to_vec(),
-        }
+    let key_for_comparison = |key: &[u8]| match spec.prehash_key_before_comparison {
+        true => do_hash::<H>(
+            spec.leaf_spec.clone().unwrap_or_default().prehash_key(),
+            key,
+        ),
+        false => key.to_vec(),
     };
 
     match &proof.proof {
