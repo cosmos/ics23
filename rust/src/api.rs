@@ -141,7 +141,9 @@ fn get_nonexist_proof<'a, H: HostFunctionsProvider>(
     key: &[u8],
     spec: &ics23::ProofSpec,
 ) -> Option<&'a ics23::NonExistenceProof> {
-    // If we should prehash the key before comparison, do so; otherwise, return the key
+    // If we should prehash the key before comparison, do so; otherwise, return the key. Prehashing
+    // changes lexical comparison, so if the spec sets `prehash_key_before_comparison` to true, we
+    // should compare keys on their hashes by prehashing them before comparison.
     let key_for_comparison = |key: &[u8]| match spec.prehash_key_before_comparison {
         true => do_hash::<H>(
             spec.leaf_spec.clone().unwrap_or_default().prehash_key(),
