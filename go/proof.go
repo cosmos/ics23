@@ -205,6 +205,7 @@ func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
 	return nil
 }
 
+// If we should prehash the key before comparison, do so; otherwise, return the key
 func keyForComparison(spec *ProofSpec, key []byte) []byte {
 	if !spec.PrehashKeyBeforeComparison {
 		return key
