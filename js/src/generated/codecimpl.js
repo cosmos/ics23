@@ -21,7 +21,7 @@ $root.ics23 = (function() {
     /**
      * HashOp enum.
      * @name ics23.HashOp
-     * @enum {string}
+     * @enum {number}
      * @property {number} NO_HASH=0 NO_HASH value
      * @property {number} SHA256=1 SHA256 value
      * @property {number} SHA512=2 SHA512 value
@@ -48,7 +48,7 @@ $root.ics23 = (function() {
      * algorithm, the length will be prepended to the key and value bytes.
      * (Each one with it's own encoded length)
      * @name ics23.LengthOp
-     * @enum {string}
+     * @enum {number}
      * @property {number} NO_PREFIX=0 NO_PREFIX value
      * @property {number} VAR_PROTO=1 VAR_PROTO value
      * @property {number} VAR_RLP=2 VAR_RLP value
@@ -175,11 +175,11 @@ $root.ics23 = (function() {
         ExistenceProof.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.key != null && message.hasOwnProperty("key"))
+            if (message.key != null && Object.hasOwnProperty.call(message, "key"))
                 writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.key);
-            if (message.value != null && message.hasOwnProperty("value"))
+            if (message.value != null && Object.hasOwnProperty.call(message, "value"))
                 writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.value);
-            if (message.leaf != null && message.hasOwnProperty("leaf"))
+            if (message.leaf != null && Object.hasOwnProperty.call(message, "leaf"))
                 $root.ics23.LeafOp.encode(message.leaf, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
             if (message.path != null && message.path.length)
                 for (var i = 0; i < message.path.length; ++i)
@@ -464,11 +464,11 @@ $root.ics23 = (function() {
         NonExistenceProof.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.key != null && message.hasOwnProperty("key"))
+            if (message.key != null && Object.hasOwnProperty.call(message, "key"))
                 writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.key);
-            if (message.left != null && message.hasOwnProperty("left"))
+            if (message.left != null && Object.hasOwnProperty.call(message, "left"))
                 $root.ics23.ExistenceProof.encode(message.left, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            if (message.right != null && message.hasOwnProperty("right"))
+            if (message.right != null && Object.hasOwnProperty.call(message, "right"))
                 $root.ics23.ExistenceProof.encode(message.right, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
             return writer;
         };
@@ -738,13 +738,13 @@ $root.ics23 = (function() {
         CommitmentProof.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.exist != null && message.hasOwnProperty("exist"))
+            if (message.exist != null && Object.hasOwnProperty.call(message, "exist"))
                 $root.ics23.ExistenceProof.encode(message.exist, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.nonexist != null && message.hasOwnProperty("nonexist"))
+            if (message.nonexist != null && Object.hasOwnProperty.call(message, "nonexist"))
                 $root.ics23.NonExistenceProof.encode(message.nonexist, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            if (message.batch != null && message.hasOwnProperty("batch"))
+            if (message.batch != null && Object.hasOwnProperty.call(message, "batch"))
                 $root.ics23.BatchProof.encode(message.batch, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-            if (message.compressed != null && message.hasOwnProperty("compressed"))
+            if (message.compressed != null && Object.hasOwnProperty.call(message, "compressed"))
                 $root.ics23.CompressedBatchProof.encode(message.compressed, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
             return writer;
         };
@@ -1059,15 +1059,15 @@ $root.ics23 = (function() {
         LeafOp.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.hash != null && message.hasOwnProperty("hash"))
+            if (message.hash != null && Object.hasOwnProperty.call(message, "hash"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.hash);
-            if (message.prehashKey != null && message.hasOwnProperty("prehashKey"))
+            if (message.prehashKey != null && Object.hasOwnProperty.call(message, "prehashKey"))
                 writer.uint32(/* id 2, wireType 0 =*/16).int32(message.prehashKey);
-            if (message.prehashValue != null && message.hasOwnProperty("prehashValue"))
+            if (message.prehashValue != null && Object.hasOwnProperty.call(message, "prehashValue"))
                 writer.uint32(/* id 3, wireType 0 =*/24).int32(message.prehashValue);
-            if (message.length != null && message.hasOwnProperty("length"))
+            if (message.length != null && Object.hasOwnProperty.call(message, "length"))
                 writer.uint32(/* id 4, wireType 0 =*/32).int32(message.length);
-            if (message.prefix != null && message.hasOwnProperty("prefix"))
+            if (message.prefix != null && Object.hasOwnProperty.call(message, "prefix"))
                 writer.uint32(/* id 5, wireType 2 =*/42).bytes(message.prefix);
             return writer;
         };
@@ -1502,11 +1502,11 @@ $root.ics23 = (function() {
         InnerOp.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.hash != null && message.hasOwnProperty("hash"))
+            if (message.hash != null && Object.hasOwnProperty.call(message, "hash"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.hash);
-            if (message.prefix != null && message.hasOwnProperty("prefix"))
+            if (message.prefix != null && Object.hasOwnProperty.call(message, "prefix"))
                 writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.prefix);
-            if (message.suffix != null && message.hasOwnProperty("suffix"))
+            if (message.suffix != null && Object.hasOwnProperty.call(message, "suffix"))
                 writer.uint32(/* id 3, wireType 2 =*/26).bytes(message.suffix);
             return writer;
         };
@@ -1726,6 +1726,7 @@ $root.ics23 = (function() {
          * @property {ics23.IInnerSpec|null} [innerSpec] ProofSpec innerSpec
          * @property {number|null} [maxDepth] ProofSpec maxDepth
          * @property {number|null} [minDepth] ProofSpec minDepth
+         * @property {boolean|null} [prehashKeyBeforeComparison] ProofSpec prehashKeyBeforeComparison
          */
 
         /**
@@ -1785,6 +1786,14 @@ $root.ics23 = (function() {
         ProofSpec.prototype.minDepth = 0;
 
         /**
+         * ProofSpec prehashKeyBeforeComparison.
+         * @member {boolean} prehashKeyBeforeComparison
+         * @memberof ics23.ProofSpec
+         * @instance
+         */
+        ProofSpec.prototype.prehashKeyBeforeComparison = false;
+
+        /**
          * Creates a new ProofSpec instance using the specified properties.
          * @function create
          * @memberof ics23.ProofSpec
@@ -1808,14 +1817,16 @@ $root.ics23 = (function() {
         ProofSpec.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.leafSpec != null && message.hasOwnProperty("leafSpec"))
+            if (message.leafSpec != null && Object.hasOwnProperty.call(message, "leafSpec"))
                 $root.ics23.LeafOp.encode(message.leafSpec, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.innerSpec != null && message.hasOwnProperty("innerSpec"))
+            if (message.innerSpec != null && Object.hasOwnProperty.call(message, "innerSpec"))
                 $root.ics23.InnerSpec.encode(message.innerSpec, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            if (message.maxDepth != null && message.hasOwnProperty("maxDepth"))
+            if (message.maxDepth != null && Object.hasOwnProperty.call(message, "maxDepth"))
                 writer.uint32(/* id 3, wireType 0 =*/24).int32(message.maxDepth);
-            if (message.minDepth != null && message.hasOwnProperty("minDepth"))
+            if (message.minDepth != null && Object.hasOwnProperty.call(message, "minDepth"))
                 writer.uint32(/* id 4, wireType 0 =*/32).int32(message.minDepth);
+            if (message.prehashKeyBeforeComparison != null && Object.hasOwnProperty.call(message, "prehashKeyBeforeComparison"))
+                writer.uint32(/* id 5, wireType 0 =*/40).bool(message.prehashKeyBeforeComparison);
             return writer;
         };
 
@@ -1861,6 +1872,9 @@ $root.ics23 = (function() {
                     break;
                 case 4:
                     message.minDepth = reader.int32();
+                    break;
+                case 5:
+                    message.prehashKeyBeforeComparison = reader.bool();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1913,6 +1927,9 @@ $root.ics23 = (function() {
             if (message.minDepth != null && message.hasOwnProperty("minDepth"))
                 if (!$util.isInteger(message.minDepth))
                     return "minDepth: integer expected";
+            if (message.prehashKeyBeforeComparison != null && message.hasOwnProperty("prehashKeyBeforeComparison"))
+                if (typeof message.prehashKeyBeforeComparison !== "boolean")
+                    return "prehashKeyBeforeComparison: boolean expected";
             return null;
         };
 
@@ -1942,6 +1959,8 @@ $root.ics23 = (function() {
                 message.maxDepth = object.maxDepth | 0;
             if (object.minDepth != null)
                 message.minDepth = object.minDepth | 0;
+            if (object.prehashKeyBeforeComparison != null)
+                message.prehashKeyBeforeComparison = Boolean(object.prehashKeyBeforeComparison);
             return message;
         };
 
@@ -1963,6 +1982,7 @@ $root.ics23 = (function() {
                 object.innerSpec = null;
                 object.maxDepth = 0;
                 object.minDepth = 0;
+                object.prehashKeyBeforeComparison = false;
             }
             if (message.leafSpec != null && message.hasOwnProperty("leafSpec"))
                 object.leafSpec = $root.ics23.LeafOp.toObject(message.leafSpec, options);
@@ -1972,6 +1992,8 @@ $root.ics23 = (function() {
                 object.maxDepth = message.maxDepth;
             if (message.minDepth != null && message.hasOwnProperty("minDepth"))
                 object.minDepth = message.minDepth;
+            if (message.prehashKeyBeforeComparison != null && message.hasOwnProperty("prehashKeyBeforeComparison"))
+                object.prehashKeyBeforeComparison = message.prehashKeyBeforeComparison;
             return object;
         };
 
@@ -2097,15 +2119,15 @@ $root.ics23 = (function() {
                     writer.int32(message.childOrder[i]);
                 writer.ldelim();
             }
-            if (message.childSize != null && message.hasOwnProperty("childSize"))
+            if (message.childSize != null && Object.hasOwnProperty.call(message, "childSize"))
                 writer.uint32(/* id 2, wireType 0 =*/16).int32(message.childSize);
-            if (message.minPrefixLength != null && message.hasOwnProperty("minPrefixLength"))
+            if (message.minPrefixLength != null && Object.hasOwnProperty.call(message, "minPrefixLength"))
                 writer.uint32(/* id 3, wireType 0 =*/24).int32(message.minPrefixLength);
-            if (message.maxPrefixLength != null && message.hasOwnProperty("maxPrefixLength"))
+            if (message.maxPrefixLength != null && Object.hasOwnProperty.call(message, "maxPrefixLength"))
                 writer.uint32(/* id 4, wireType 0 =*/32).int32(message.maxPrefixLength);
-            if (message.emptyChild != null && message.hasOwnProperty("emptyChild"))
+            if (message.emptyChild != null && Object.hasOwnProperty.call(message, "emptyChild"))
                 writer.uint32(/* id 5, wireType 2 =*/42).bytes(message.emptyChild);
-            if (message.hash != null && message.hasOwnProperty("hash"))
+            if (message.hash != null && Object.hasOwnProperty.call(message, "hash"))
                 writer.uint32(/* id 6, wireType 0 =*/48).int32(message.hash);
             return writer;
         };
@@ -2646,9 +2668,9 @@ $root.ics23 = (function() {
         BatchEntry.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.exist != null && message.hasOwnProperty("exist"))
+            if (message.exist != null && Object.hasOwnProperty.call(message, "exist"))
                 $root.ics23.ExistenceProof.encode(message.exist, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.nonexist != null && message.hasOwnProperty("nonexist"))
+            if (message.nonexist != null && Object.hasOwnProperty.call(message, "nonexist"))
                 $root.ics23.NonExistenceProof.encode(message.nonexist, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             return writer;
         };
@@ -3143,9 +3165,9 @@ $root.ics23 = (function() {
         CompressedBatchEntry.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.exist != null && message.hasOwnProperty("exist"))
+            if (message.exist != null && Object.hasOwnProperty.call(message, "exist"))
                 $root.ics23.CompressedExistenceProof.encode(message.exist, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.nonexist != null && message.hasOwnProperty("nonexist"))
+            if (message.nonexist != null && Object.hasOwnProperty.call(message, "nonexist"))
                 $root.ics23.CompressedNonExistenceProof.encode(message.nonexist, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             return writer;
         };
@@ -3393,11 +3415,11 @@ $root.ics23 = (function() {
         CompressedExistenceProof.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.key != null && message.hasOwnProperty("key"))
+            if (message.key != null && Object.hasOwnProperty.call(message, "key"))
                 writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.key);
-            if (message.value != null && message.hasOwnProperty("value"))
+            if (message.value != null && Object.hasOwnProperty.call(message, "value"))
                 writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.value);
-            if (message.leaf != null && message.hasOwnProperty("leaf"))
+            if (message.leaf != null && Object.hasOwnProperty.call(message, "leaf"))
                 $root.ics23.LeafOp.encode(message.leaf, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
             if (message.path != null && message.path.length) {
                 writer.uint32(/* id 4, wireType 2 =*/34).fork();
@@ -3685,11 +3707,11 @@ $root.ics23 = (function() {
         CompressedNonExistenceProof.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.key != null && message.hasOwnProperty("key"))
+            if (message.key != null && Object.hasOwnProperty.call(message, "key"))
                 writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.key);
-            if (message.left != null && message.hasOwnProperty("left"))
+            if (message.left != null && Object.hasOwnProperty.call(message, "left"))
                 $root.ics23.CompressedExistenceProof.encode(message.left, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            if (message.right != null && message.hasOwnProperty("right"))
+            if (message.right != null && Object.hasOwnProperty.call(message, "right"))
                 $root.ics23.CompressedExistenceProof.encode(message.right, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
             return writer;
         };

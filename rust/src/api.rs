@@ -8,6 +8,7 @@ use crate::compress::{decompress, is_compressed};
 use crate::helpers::Result;
 use crate::host_functions::HostFunctionsProvider;
 use crate::ics23;
+use crate::ops::do_hash;
 use crate::verify::{verify_existence, verify_non_existence, CommitmentRoot};
 
 // Use CommitmentRoot vs &[u8] to stick with ics naming
@@ -60,7 +61,7 @@ pub fn verify_non_membership<H: HostFunctionsProvider>(
         }
     }
 
-    if let Some(non) = get_nonexist_proof(proof, key) {
+    if let Some(non) = get_nonexist_proof::<H>(proof, key, spec) {
         let valid = verify_non_existence::<H>(non, spec, root, key);
         valid.is_ok()
     } else {
@@ -135,18 +136,53 @@ fn get_exist_proof<'a>(
     }
 }
 
-fn get_nonexist_proof<'a>(
+fn get_nonexist_proof<'a, H: HostFunctionsProvider>(
     proof: &'a ics23::CommitmentProof,
     key: &[u8],
+    spec: &ics23::ProofSpec,
 ) -> Option<&'a ics23::NonExistenceProof> {
+    // If we should prehash the key before comparison, do so; otherwise, return the key. Prehashing
+    // changes lexical comparison, so if the spec sets `prehash_key_before_comparison` to true, we
+    // should compare keys on their hashes by prehashing them before comparison.
+    let key_for_comparison = |key: &[u8]| match spec.prehash_key_before_comparison {
+        true => do_hash::<H>(
+            spec.leaf_spec
+                .as_ref()
+                .map(|leaf_spec| leaf_spec.prehash_key())
+                .unwrap_or_default(),
+            key,
+        ),
+        false => key.to_vec(),
+    };
+
     match &proof.proof {
-        Some(ics23::commitment_proof::Proof::Nonexist(non)) => Some(non),
+        Some(ics23::commitment_proof::Proof::Nonexist(non)) => {
+            // use iter/all - true if None, must check if Some
+            if non
+                .left
+                .iter()
+                .all(|x| key_for_comparison(&x.key) < key_for_comparison(key))
+                && non
+                    .right
+                    .iter()
+                    .all(|x| key_for_comparison(&x.key) > key_for_comparison(key))
+            {
+                return Some(non);
+            }
+            None
+        }
         Some(ics23::commitment_proof::Proof::Batch(batch)) => {
             for entry in &batch.entries {
                 if let Some(ics23::batch_entry::Proof::Nonexist(non)) = &entry.proof {
                     // use iter/all - true if None, must check if Some
-                    if non.left.iter().all(|x| x.key.as_slice() < key)
-                        && non.right.iter().all(|x| x.key.as_slice() > key)
+                    if non
+                        .left
+                        .iter()
+                        .all(|x| key_for_comparison(&x.key) < key_for_comparison(key))
+                        && non
+                            .right
+                            .iter()
+                            .all(|x| key_for_comparison(&x.key) > key_for_comparison(key))
                     {
                         return Some(non);
                     }
@@ -180,6 +216,7 @@ pub fn iavl_spec() -> ics23::ProofSpec {
         inner_spec: Some(inner),
         min_depth: 0,
         max_depth: 0,
+        prehash_key_before_comparison: false,
     }
 }
 
@@ -313,13 +350,14 @@ pub fn tendermint_spec() -> ics23::ProofSpec {
         inner_spec: Some(inner),
         min_depth: 0,
         max_depth: 0,
+        prehash_key_before_comparison: false,
     }
 }
 
 pub fn smt_spec() -> ics23::ProofSpec {
     let leaf = ics23::LeafOp {
         hash: ics23::HashOp::Sha256.into(),
-        prehash_key: 0,
+        prehash_key: ics23::HashOp::Sha256.into(),
         prehash_value: ics23::HashOp::Sha256.into(),
         length: 0,
         prefix: vec![0_u8],
@@ -337,6 +375,7 @@ pub fn smt_spec() -> ics23::ProofSpec {
         inner_spec: Some(inner),
         min_depth: 0,
         max_depth: 0,
+        prehash_key_before_comparison: true,
     }
 }
 
