@@ -9,7 +9,8 @@ on:
       - master
 
 permissions:
-  contents: read
+  contents: write
+  deployments: write
 
 concurrency:
   group: go-ci-${{ github.ref }}
@@ -62,3 +63,26 @@ jobs:
           flags: go
           fail_ci_if_error: true
 
+  benchmark:
+    name: Benchmark
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+      - name: Run benchmark
+        working-directory: ./go
+        run: make bench | tee output.txt
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: Go Benchmark
+          tool: 'go'
+          output-file-path: ./go/output.txt
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          # Show alert with commit comment on detecting possible performance regression
+          alert-threshold: '50%'
+          comment-on-alert: true
+          fail-on-alert: true
+          alert-comment-cc-users: '@crodriguezvega'

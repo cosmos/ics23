@@ -2,6 +2,13 @@ test:
 	go test .
 
 .PHONY: test 
+
+bench:
+	cd benchmarks && \
+		go test -bench=.
+
+.PHONY: bench
+
 ##### Linting #####
 
 golangci_lint_cmd=golangci-lint
