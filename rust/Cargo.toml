@@ -7,7 +7,7 @@ license = "Apache-2.0"
 name = "ics23"
 repository = "https://github.com/cosmos/ics23/tree/master/rust"
 rust-version = "1.56.1"
-version = "0.9.0"
+version = "0.10.0"
 
 [workspace]
 members = ["codegen", "no-std-check"]
