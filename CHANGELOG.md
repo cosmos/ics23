@@ -1,5 +1,19 @@
 # Changelog
 
+# 0.10.0
+
+## Go / Rust / JavaScript
+
+This release introduces one single boolean new parameter to the top-level `ProofSpec`: `prehash_compare_key`.
+When set to `true`, this flag causes keys to be consistently compared lexicographically according to their hashes
+within nonexistence proof verification, using the same hash function as specified by the already-extant `prehash_key` field.
+
+This is a backwards-compatible change, as it requires opt-in via setting the `prehash_compare_key` flag to `true` in the `ProofSpec`.
+All existing ProofSpecs will continue to behave identically.
+
+- feat: Add `prehash_compare_key` to allow proving nonexistence in sparse trees
+  ([\#136](https://github.com/cosmos/ics23/pull/136))
+
 # 0.9.0
 
 ## Go
