@@ -8,7 +8,7 @@ import {
   verifyMembership,
   verifyNonMembership,
 } from "./ics23";
-import { iavlSpec, tendermintSpec } from "./proofs";
+import { iavlSpec, smtSpec, tendermintSpec } from "./proofs";
 import { fromHex } from "./testhelpers.spec";
 
 describe("calculateExistenceRoot", () => {
@@ -250,5 +250,29 @@ describe("calculateExistenceRoot", () => {
       "../testdata/tendermint/nonexist_middle.json",
     ]);
     validateBatch(proof, tendermintSpec, data[3]);
+  });
+
+  it("should validate smt batch exist", () => {
+    const { proof, data } = loadBatch([
+      "../testdata/smt/exist_left.json",
+      "../testdata/smt/exist_right.json",
+      "../testdata/smt/exist_middle.json",
+      "../testdata/smt/nonexist_left.json",
+      "../testdata/smt/nonexist_right.json",
+      "../testdata/smt/nonexist_middle.json",
+    ]);
+    validateBatch(proof, smtSpec, data[2]);
+  });
+
+  it("should validate smt batch nonexist", () => {
+    const { proof, data } = loadBatch([
+      "../testdata/smt/exist_left.json",
+      "../testdata/smt/exist_right.json",
+      "../testdata/smt/exist_middle.json",
+      "../testdata/smt/nonexist_left.json",
+      "../testdata/smt/nonexist_right.json",
+      "../testdata/smt/nonexist_middle.json",
+    ]);
+    validateBatch(proof, smtSpec, data[3]);
   });
 });

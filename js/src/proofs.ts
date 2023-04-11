@@ -1,5 +1,6 @@
 import { ics23 } from "./generated/codecimpl";
 import { applyInner, applyLeaf } from "./ops";
+import { doHash } from "./ops";
 import {
   bytesEqual,
   ensureBytesBefore,
@@ -45,7 +46,7 @@ export const tendermintSpec: ics23.IProofSpec = {
 export const smtSpec: ics23.IProofSpec = {
   leafSpec: {
     hash: ics23.HashOp.SHA256,
-    prehashKey: ics23.HashOp.NO_HASH,
+    prehashKey: ics23.HashOp.SHA256,
     prehashValue: ics23.HashOp.SHA256,
     length: ics23.LengthOp.NO_PREFIX,
     prefix: Uint8Array.from([0]),
@@ -59,9 +60,21 @@ export const smtSpec: ics23.IProofSpec = {
     hash: ics23.HashOp.SHA256,
   },
   maxDepth: 256,
+  prehashKeyBeforeComparison: true,
 };
 
 export type CommitmentRoot = Uint8Array;
+
+export function keyForComparison(
+  spec: ics23.IProofSpec,
+  key: Uint8Array
+): Uint8Array {
+  if (!spec.prehashKeyBeforeComparison) {
+    return key;
+  }
+
+  return doHash(spec.leafSpec!.prehashKey!, key);
+}
 
 // verifyExistence will throw an error if the proof doesn't link key, value -> root
 // or if it doesn't fulfill the spec
@@ -111,10 +124,16 @@ export function verifyNonExistence(
   }
 
   if (leftKey) {
-    ensureBytesBefore(leftKey, key);
+    ensureBytesBefore(
+      keyForComparison(spec, leftKey),
+      keyForComparison(spec, key)
+    );
   }
   if (rightKey) {
-    ensureBytesBefore(key, rightKey);
+    ensureBytesBefore(
+      keyForComparison(spec, key),
+      keyForComparison(spec, rightKey)
+    );
   }
 
   if (!spec.innerSpec) {
