@@ -2,7 +2,7 @@
 
 # 0.10.0
 
-## Go / Rust / JavaScript
+## Go / Rust / TypeScript
 
 This release introduces one single boolean new parameter to the top-level `ProofSpec`: `prehash_compare_key`.
 When set to `true`, this flag causes keys to be consistently compared lexicographically according to their hashes
@@ -10,6 +10,9 @@ within nonexistence proof verification, using the same hash function as specifie
 
 This is a backwards-compatible change, as it requires opt-in via setting the `prehash_compare_key` flag to `true` in the `ProofSpec`.
 All existing ProofSpecs will continue to behave identically.
+
+Please note that the version of the TypeScript library has been bump from 0.6.8 to 0.10.0 to align it with 
+the Go and Rust implementations.
 
 ## Full changes
 
