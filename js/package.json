@@ -1,6 +1,6 @@
 {
   "name": "@confio/ics23",
-  "version": "0.6.8",
+  "version": "0.10.0",
   "description": "Merkle proof verification library - implements Cosmos ICS23 Spec",
   "main": "build/index.js",
   "types": "build/index.d.ts",
