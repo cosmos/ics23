@@ -21,24 +21,21 @@ prost = {version = "0.11", default-features = false, features = ["prost-derive"]
 ripemd = {version = "0.1.1", optional = true, default-features = false}
 sha2 = {version = "0.10.2", optional = true, default-features = false}
 sha3 = {version = "0.10.2", optional = true, default-features = false}
+serde = {version = "1.0", optional = true, default-features = false}
+pbjson = "0.5.1"
 
 [dev-dependencies]
 ripemd = {version = "0.1.1"}
-serde = {version = "1.0.125", features = ["derive"]}
+serde = {version = "1.0", features = ["derive"]}
 serde_json = {version = "1.0.64"}
 sha2 = {version = "0.10.2"}
 sha3 = {version = "0.10.2"}
 
 [features]
-default = ["std", "host-functions"]
-host-functions = [
-  "sha2",
-  "sha3",
-  "ripemd",
-]
-std = [
-  "prost/std",
-  "bytes/std",
-  "hex/std",
-  "anyhow/std",
-]
+default = ["std", "host-functions", "serde"]
+
+std = ["prost/std", "bytes/std", "hex/std", "anyhow/std"]
+
+host-functions = ["sha2", "sha3", "ripemd"]
+
+serde = ["serde/std"]
