@@ -16,8 +16,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  clippy:
-    name: Clippy
+  fmt:
+    name: Format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -28,17 +28,23 @@ jobs:
         working-directory: ./rust
         run: cargo fmt -- --check
 
-      - name: Clippy (host-functions + std)
-        working-directory: ./rust
-        run: cargo clippy --tests -- -D warnings
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: taiki-e/install-action@cargo-hack
 
-      - name: Clippy (no-std)
+      - name: Clippy (features powerset)
         working-directory: ./rust
-        run: cargo clippy --tests --no-default-features -- -D warnings
+        run: cargo hack clippy --feature-powerset --no-dev-deps -- -D warnings
 
-      - name: Clippy (host functions only)
+      - name: Clippy (features powerset, tests)
         working-directory: ./rust
-        run: cargo clippy --tests --no-default-features --features host-functions -- -D warnings
+        run: cargo hack clippy --tests --feature-powerset -- -D warnings
 
   test:
     name: Test
