@@ -844,4 +844,35 @@ mod tests {
             x <<= 1;
         }
     }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn serde_roundtrip() -> Result<()> {
+        let tests = [
+            "exist_left",
+            "exist_right",
+            "exist_middle",
+            "nonexist_left",
+            "nonexist_right",
+            "nonexist_middle",
+        ];
+
+        let specs = ["tendermint", "iavl", "smt"];
+
+        let files = tests
+            .iter()
+            .flat_map(|test| specs.iter().map(move |spec| (test, spec)))
+            .map(|(test, spec)| format!("../testdata/{}/{}.json", spec, test));
+
+        for file in files {
+            let (proof, _) = load_file(&file)?;
+
+            let json = serde_json::to_string(&proof)?;
+            let parsed = serde_json::from_str(&json)?;
+
+            assert_eq!(proof, parsed);
+        }
+
+        Ok(())
+    }
 }

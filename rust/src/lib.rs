@@ -13,7 +13,12 @@ mod verify;
 
 mod ics23 {
     include!("cosmos.ics23.v1.rs");
+
+    #[cfg(feature = "serde")]
+    include!("cosmos.ics23.v1.serde.rs");
 }
+
+pub const FILE_DESCRIPTOR_SET: &[u8] = include_bytes!("proto_descriptor.bin");
 
 pub use crate::ics23::*;
 pub use api::{
