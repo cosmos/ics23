@@ -1,5 +1,17 @@
 # Changelog
 
+# 0.10.1
+
+## Rust
+
+The only change in this release of the `ics23` crate is the addition of a `serde` feature
+which adds ProtoJSON-compatible `Serialize` and `Deserialize` instances on all Protobuf definitions via
+the [`pbjson-build`](https://docs.rs/pbjson-build/latest/pbjson_build/) crate.
+
+## Full changes
+
+- feat(rust): Add ProtoJSON-compatible `Serialize` and `Deserialize` instances on all Protobuf definitions via `pbjson` ([#146](https://github.com/cosmos/ics23/pull/146))
+
 # 0.10.0
 
 ## Go / Rust / TypeScript
