@@ -52,11 +52,24 @@ func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentPro
 func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, key []byte) bool {
 	// decompress it before running code (no-op if not compressed)
 	proof = Decompress(proof)
-	np := getNonExistProofForKey(spec, proof, key)
-	if np == nil {
+	var err error
+	switch proof.Proof.(type) {
+	case *CommitmentProof_Nonexist:
+		np := getNonExistProofForKey(spec, proof, key)
+		if np == nil {
+			return false
+		}
+		err = np.Verify(spec, root, key)
+	case *CommitmentProof_Exclusion:
+		ex := getExclusionProofForKey(proof, key)
+		if ex == nil {
+			return false
+		}
+		err = ex.Verify(spec, root, key)
+	default:
 		return false
 	}
-	err := np.Verify(spec, root, key)
+
 	return err == nil
 }
 
@@ -103,6 +116,13 @@ func CombineProofs(proofs []*CommitmentProof) (*CommitmentProof, error) {
 				},
 			}
 			entries = append(entries, entry)
+		} else if excl := proof.GetExclusion(); excl != nil {
+			entry := &BatchEntry{
+				Proof: &BatchEntry_Exclusion{
+					Exclusion: excl,
+				},
+			}
+			entries = append(entries, entry)
 		} else if non := proof.GetNonexist(); non != nil {
 			entry := &BatchEntry{
 				Proof: &BatchEntry_Nonexist{
@@ -141,6 +161,23 @@ func getExistProofForKey(proof *CommitmentProof, key []byte) *ExistenceProof {
 	case *CommitmentProof_Batch:
 		for _, sub := range p.Batch.Entries {
 			if ep := sub.GetExist(); ep != nil && bytes.Equal(ep.Key, key) {
+				return ep
+			}
+		}
+	}
+	return nil
+}
+
+func getExclusionProofForKey(proof *CommitmentProof, key []byte) *ExclusionProof {
+	switch p := proof.Proof.(type) {
+	case *CommitmentProof_Exclusion:
+		ep := p.Exclusion
+		if bytes.Equal(ep.Key, key) {
+			return ep
+		}
+	case *CommitmentProof_Batch:
+		for _, sub := range p.Batch.Entries {
+			if ep := sub.GetExclusion(); ep != nil && bytes.Equal(ep.Key, key) {
 				return ep
 			}
 		}

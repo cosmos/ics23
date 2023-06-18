@@ -18,6 +18,9 @@ impl serde::Serialize for BatchEntry {
                 batch_entry::Proof::Nonexist(v) => {
                     struct_ser.serialize_field("nonexist", v)?;
                 }
+                batch_entry::Proof::Exclusion(v) => {
+                    struct_ser.serialize_field("exclusion", v)?;
+                }
             }
         }
         struct_ser.end()
@@ -32,12 +35,14 @@ impl<'de> serde::Deserialize<'de> for BatchEntry {
         const FIELDS: &[&str] = &[
             "exist",
             "nonexist",
+            "exclusion",
         ];
 
         #[allow(clippy::enum_variant_names)]
         enum GeneratedField {
             Exist,
             Nonexist,
+            Exclusion,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -61,6 +66,7 @@ impl<'de> serde::Deserialize<'de> for BatchEntry {
                         match value {
                             "exist" => Ok(GeneratedField::Exist),
                             "nonexist" => Ok(GeneratedField::Nonexist),
+                            "exclusion" => Ok(GeneratedField::Exclusion),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -95,6 +101,13 @@ impl<'de> serde::Deserialize<'de> for BatchEntry {
                                 return Err(serde::de::Error::duplicate_field("nonexist"));
                             }
                             proof__ = map.next_value::<::std::option::Option<_>>()?.map(batch_entry::Proof::Nonexist)
+;
+                        }
+                        GeneratedField::Exclusion => {
+                            if proof__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("exclusion"));
+                            }
+                            proof__ = map.next_value::<::std::option::Option<_>>()?.map(batch_entry::Proof::Exclusion)
 ;
                         }
                     }
@@ -218,6 +231,9 @@ impl serde::Serialize for CommitmentProof {
                 commitment_proof::Proof::Nonexist(v) => {
                     struct_ser.serialize_field("nonexist", v)?;
                 }
+                commitment_proof::Proof::Exclusion(v) => {
+                    struct_ser.serialize_field("exclusion", v)?;
+                }
                 commitment_proof::Proof::Batch(v) => {
                     struct_ser.serialize_field("batch", v)?;
                 }
@@ -238,6 +254,7 @@ impl<'de> serde::Deserialize<'de> for CommitmentProof {
         const FIELDS: &[&str] = &[
             "exist",
             "nonexist",
+            "exclusion",
             "batch",
             "compressed",
         ];
@@ -246,6 +263,7 @@ impl<'de> serde::Deserialize<'de> for CommitmentProof {
         enum GeneratedField {
             Exist,
             Nonexist,
+            Exclusion,
             Batch,
             Compressed,
         }
@@ -271,6 +289,7 @@ impl<'de> serde::Deserialize<'de> for CommitmentProof {
                         match value {
                             "exist" => Ok(GeneratedField::Exist),
                             "nonexist" => Ok(GeneratedField::Nonexist),
+                            "exclusion" => Ok(GeneratedField::Exclusion),
                             "batch" => Ok(GeneratedField::Batch),
                             "compressed" => Ok(GeneratedField::Compressed),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
@@ -307,6 +326,13 @@ impl<'de> serde::Deserialize<'de> for CommitmentProof {
                                 return Err(serde::de::Error::duplicate_field("nonexist"));
                             }
                             proof__ = map.next_value::<::std::option::Option<_>>()?.map(commitment_proof::Proof::Nonexist)
+;
+                        }
+                        GeneratedField::Exclusion => {
+                            if proof__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("exclusion"));
+                            }
+                            proof__ = map.next_value::<::std::option::Option<_>>()?.map(commitment_proof::Proof::Exclusion)
 ;
                         }
                         GeneratedField::Batch => {
@@ -353,6 +379,9 @@ impl serde::Serialize for CompressedBatchEntry {
                 compressed_batch_entry::Proof::Nonexist(v) => {
                     struct_ser.serialize_field("nonexist", v)?;
                 }
+                compressed_batch_entry::Proof::Exclusion(v) => {
+                    struct_ser.serialize_field("exclusion", v)?;
+                }
             }
         }
         struct_ser.end()
@@ -367,12 +396,14 @@ impl<'de> serde::Deserialize<'de> for CompressedBatchEntry {
         const FIELDS: &[&str] = &[
             "exist",
             "nonexist",
+            "exclusion",
         ];
 
         #[allow(clippy::enum_variant_names)]
         enum GeneratedField {
             Exist,
             Nonexist,
+            Exclusion,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -396,6 +427,7 @@ impl<'de> serde::Deserialize<'de> for CompressedBatchEntry {
                         match value {
                             "exist" => Ok(GeneratedField::Exist),
                             "nonexist" => Ok(GeneratedField::Nonexist),
+                            "exclusion" => Ok(GeneratedField::Exclusion),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -430,6 +462,13 @@ impl<'de> serde::Deserialize<'de> for CompressedBatchEntry {
                                 return Err(serde::de::Error::duplicate_field("nonexist"));
                             }
                             proof__ = map.next_value::<::std::option::Option<_>>()?.map(compressed_batch_entry::Proof::Nonexist)
+;
+                        }
+                        GeneratedField::Exclusion => {
+                            if proof__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("exclusion"));
+                            }
+                            proof__ = map.next_value::<::std::option::Option<_>>()?.map(compressed_batch_entry::Proof::Exclusion)
 ;
                         }
                     }
@@ -549,6 +588,176 @@ impl<'de> serde::Deserialize<'de> for CompressedBatchProof {
             }
         }
         deserializer.deserialize_struct("cosmos.ics23.v1.CompressedBatchProof", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for CompressedExclusionProof {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if !self.key.is_empty() {
+            len += 1;
+        }
+        if !self.actual_path.is_empty() {
+            len += 1;
+        }
+        if !self.actual_value_hash.is_empty() {
+            len += 1;
+        }
+        if self.leaf.is_some() {
+            len += 1;
+        }
+        if !self.path.is_empty() {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("cosmos.ics23.v1.CompressedExclusionProof", len)?;
+        if !self.key.is_empty() {
+            struct_ser.serialize_field("key", pbjson::private::base64::encode(&self.key).as_str())?;
+        }
+        if !self.actual_path.is_empty() {
+            struct_ser.serialize_field("actualPath", pbjson::private::base64::encode(&self.actual_path).as_str())?;
+        }
+        if !self.actual_value_hash.is_empty() {
+            struct_ser.serialize_field("actualValueHash", pbjson::private::base64::encode(&self.actual_value_hash).as_str())?;
+        }
+        if let Some(v) = self.leaf.as_ref() {
+            struct_ser.serialize_field("leaf", v)?;
+        }
+        if !self.path.is_empty() {
+            struct_ser.serialize_field("path", &self.path)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for CompressedExclusionProof {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "key",
+            "actual_path",
+            "actualPath",
+            "actual_valueHash",
+            "actualValueHash",
+            "leaf",
+            "path",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            Key,
+            ActualPath,
+            ActualValueHash,
+            Leaf,
+            Path,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "key" => Ok(GeneratedField::Key),
+                            "actualPath" | "actual_path" => Ok(GeneratedField::ActualPath),
+                            "actualValueHash" | "actual_valueHash" => Ok(GeneratedField::ActualValueHash),
+                            "leaf" => Ok(GeneratedField::Leaf),
+                            "path" => Ok(GeneratedField::Path),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = CompressedExclusionProof;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct cosmos.ics23.v1.CompressedExclusionProof")
+            }
+
+            fn visit_map<V>(self, mut map: V) -> std::result::Result<CompressedExclusionProof, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut key__ = None;
+                let mut actual_path__ = None;
+                let mut actual_value_hash__ = None;
+                let mut leaf__ = None;
+                let mut path__ = None;
+                while let Some(k) = map.next_key()? {
+                    match k {
+                        GeneratedField::Key => {
+                            if key__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("key"));
+                            }
+                            key__ = 
+                                Some(map.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                            ;
+                        }
+                        GeneratedField::ActualPath => {
+                            if actual_path__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("actualPath"));
+                            }
+                            actual_path__ = 
+                                Some(map.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                            ;
+                        }
+                        GeneratedField::ActualValueHash => {
+                            if actual_value_hash__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("actualValueHash"));
+                            }
+                            actual_value_hash__ = 
+                                Some(map.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                            ;
+                        }
+                        GeneratedField::Leaf => {
+                            if leaf__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("leaf"));
+                            }
+                            leaf__ = map.next_value()?;
+                        }
+                        GeneratedField::Path => {
+                            if path__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("path"));
+                            }
+                            path__ = 
+                                Some(map.next_value::<Vec<::pbjson::private::NumberDeserialize<_>>>()?
+                                    .into_iter().map(|x| x.0).collect())
+                            ;
+                        }
+                    }
+                }
+                Ok(CompressedExclusionProof {
+                    key: key__.unwrap_or_default(),
+                    actual_path: actual_path__.unwrap_or_default(),
+                    actual_value_hash: actual_value_hash__.unwrap_or_default(),
+                    leaf: leaf__,
+                    path: path__.unwrap_or_default(),
+                })
+            }
+        }
+        deserializer.deserialize_struct("cosmos.ics23.v1.CompressedExclusionProof", FIELDS, GeneratedVisitor)
     }
 }
 impl serde::Serialize for CompressedExistenceProof {
@@ -825,6 +1034,173 @@ impl<'de> serde::Deserialize<'de> for CompressedNonExistenceProof {
             }
         }
         deserializer.deserialize_struct("cosmos.ics23.v1.CompressedNonExistenceProof", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for ExclusionProof {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if !self.key.is_empty() {
+            len += 1;
+        }
+        if !self.actual_path.is_empty() {
+            len += 1;
+        }
+        if !self.actual_value_hash.is_empty() {
+            len += 1;
+        }
+        if self.leaf.is_some() {
+            len += 1;
+        }
+        if !self.path.is_empty() {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("cosmos.ics23.v1.ExclusionProof", len)?;
+        if !self.key.is_empty() {
+            struct_ser.serialize_field("key", pbjson::private::base64::encode(&self.key).as_str())?;
+        }
+        if !self.actual_path.is_empty() {
+            struct_ser.serialize_field("actualPath", pbjson::private::base64::encode(&self.actual_path).as_str())?;
+        }
+        if !self.actual_value_hash.is_empty() {
+            struct_ser.serialize_field("actualValueHash", pbjson::private::base64::encode(&self.actual_value_hash).as_str())?;
+        }
+        if let Some(v) = self.leaf.as_ref() {
+            struct_ser.serialize_field("leaf", v)?;
+        }
+        if !self.path.is_empty() {
+            struct_ser.serialize_field("path", &self.path)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for ExclusionProof {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "key",
+            "actual_path",
+            "actualPath",
+            "actual_valueHash",
+            "actualValueHash",
+            "leaf",
+            "path",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            Key,
+            ActualPath,
+            ActualValueHash,
+            Leaf,
+            Path,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "key" => Ok(GeneratedField::Key),
+                            "actualPath" | "actual_path" => Ok(GeneratedField::ActualPath),
+                            "actualValueHash" | "actual_valueHash" => Ok(GeneratedField::ActualValueHash),
+                            "leaf" => Ok(GeneratedField::Leaf),
+                            "path" => Ok(GeneratedField::Path),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = ExclusionProof;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct cosmos.ics23.v1.ExclusionProof")
+            }
+
+            fn visit_map<V>(self, mut map: V) -> std::result::Result<ExclusionProof, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut key__ = None;
+                let mut actual_path__ = None;
+                let mut actual_value_hash__ = None;
+                let mut leaf__ = None;
+                let mut path__ = None;
+                while let Some(k) = map.next_key()? {
+                    match k {
+                        GeneratedField::Key => {
+                            if key__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("key"));
+                            }
+                            key__ = 
+                                Some(map.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                            ;
+                        }
+                        GeneratedField::ActualPath => {
+                            if actual_path__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("actualPath"));
+                            }
+                            actual_path__ = 
+                                Some(map.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                            ;
+                        }
+                        GeneratedField::ActualValueHash => {
+                            if actual_value_hash__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("actualValueHash"));
+                            }
+                            actual_value_hash__ = 
+                                Some(map.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                            ;
+                        }
+                        GeneratedField::Leaf => {
+                            if leaf__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("leaf"));
+                            }
+                            leaf__ = map.next_value()?;
+                        }
+                        GeneratedField::Path => {
+                            if path__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("path"));
+                            }
+                            path__ = Some(map.next_value()?);
+                        }
+                    }
+                }
+                Ok(ExclusionProof {
+                    key: key__.unwrap_or_default(),
+                    actual_path: actual_path__.unwrap_or_default(),
+                    actual_value_hash: actual_value_hash__.unwrap_or_default(),
+                    leaf: leaf__,
+                    path: path__.unwrap_or_default(),
+                })
+            }
+        }
+        deserializer.deserialize_struct("cosmos.ics23.v1.ExclusionProof", FIELDS, GeneratedVisitor)
     }
 }
 impl serde::Serialize for ExistenceProof {

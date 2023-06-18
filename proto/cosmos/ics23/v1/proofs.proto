@@ -82,14 +82,33 @@ message NonExistenceProof {
 }
 
 /*
+ExclusionProof takes the actual path and valueHash for a leaf node found while
+traversing the tree looking for a given key. They actual_path may be the same
+as the path of the key, but its valueHash may be nil (the key was not in the
+tree). However, the actual_path may be different but have a common prefix with
+the key's path. In this case the key was not in the tree as an unrelated leaf
+was found in its place.
+*/
+message ExclusionProof {
+    bytes            key              = 1;
+    bytes            actual_path      = 2;
+    bytes            actual_valueHash = 3;
+    // As the actual_path and actual_valueHash are already hashed both the
+    // prehash_key and prehash_value fields should be set to HashOp_NO_HASH.
+    LeafOp           leaf             = 4;
+    repeated InnerOp path             = 5;
+}
+
+/*
 CommitmentProof is either an ExistenceProof or a NonExistenceProof, or a Batch of such messages
 */
 message CommitmentProof {
   oneof proof {
     ExistenceProof       exist      = 1;
     NonExistenceProof    nonexist   = 2;
-    BatchProof           batch      = 3;
-    CompressedBatchProof compressed = 4;
+    ExclusionProof       exclusion  = 3;
+    BatchProof           batch      = 4;
+    CompressedBatchProof compressed = 5;
   }
 }
 
@@ -203,8 +222,9 @@ message BatchProof {
 // Use BatchEntry not CommitmentProof, to avoid recursion
 message BatchEntry {
   oneof proof {
-    ExistenceProof    exist    = 1;
-    NonExistenceProof nonexist = 2;
+    ExistenceProof    exist     = 1;
+    NonExistenceProof nonexist  = 2;
+    ExclusionProof    exclusion = 3;
   }
 }
 
@@ -218,8 +238,9 @@ message CompressedBatchProof {
 // Use BatchEntry not CommitmentProof, to avoid recursion
 message CompressedBatchEntry {
   oneof proof {
-    CompressedExistenceProof    exist    = 1;
-    CompressedNonExistenceProof nonexist = 2;
+    CompressedExistenceProof    exist     = 1;
+    CompressedNonExistenceProof nonexist  = 2;
+    CompressedExclusionProof    exclusion = 3;
   }
 }
 
@@ -235,4 +256,13 @@ message CompressedNonExistenceProof {
   bytes                    key   = 1; // TODO: remove this as unnecessary??? we prove a range
   CompressedExistenceProof left  = 2;
   CompressedExistenceProof right = 3;
+}
+
+message CompressedExclusionProof {
+    bytes          key              = 1;
+    bytes          actual_path      = 2;
+    bytes          actual_valueHash = 3;
+    LeafOp         leaf             = 4;
+    // these are indexes into the lookup_inners table in CompressedBatchProof
+    repeated int32 path             = 5;
 }

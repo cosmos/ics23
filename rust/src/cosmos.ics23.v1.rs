@@ -46,11 +46,34 @@ pub struct NonExistenceProof {
     pub right: ::core::option::Option<ExistenceProof>,
 }
 ///
+/// ExclusionProof takes the actual path and valueHash for a leaf node found while
+/// traversing the tree looking for a given key. They actual_path may be the same
+/// as the path of the key, but its valueHash may be nil (the key was not in the
+/// tree). However, the actual_path may be different but have a common prefix with
+/// the key's path. In this case the key was not in the tree as an unrelated leaf
+/// was found in its place.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExclusionProof {
+    #[prost(bytes = "vec", tag = "1")]
+    pub key: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes = "vec", tag = "2")]
+    pub actual_path: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes = "vec", tag = "3")]
+    pub actual_value_hash: ::prost::alloc::vec::Vec<u8>,
+    /// As the actual_path and actual_valueHash are already hashed both the
+    /// prehash_key and prehash_value fields should be set to HashOp_NO_HASH.
+    #[prost(message, optional, tag = "4")]
+    pub leaf: ::core::option::Option<LeafOp>,
+    #[prost(message, repeated, tag = "5")]
+    pub path: ::prost::alloc::vec::Vec<InnerOp>,
+}
+///
 /// CommitmentProof is either an ExistenceProof or a NonExistenceProof, or a Batch of such messages
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CommitmentProof {
-    #[prost(oneof = "commitment_proof::Proof", tags = "1, 2, 3, 4")]
+    #[prost(oneof = "commitment_proof::Proof", tags = "1, 2, 3, 4, 5")]
     pub proof: ::core::option::Option<commitment_proof::Proof>,
 }
 /// Nested message and enum types in `CommitmentProof`.
@@ -63,8 +86,10 @@ pub mod commitment_proof {
         #[prost(message, tag = "2")]
         Nonexist(super::NonExistenceProof),
         #[prost(message, tag = "3")]
-        Batch(super::BatchProof),
+        Exclusion(super::ExclusionProof),
         #[prost(message, tag = "4")]
+        Batch(super::BatchProof),
+        #[prost(message, tag = "5")]
         Compressed(super::CompressedBatchProof),
     }
 }
@@ -199,7 +224,7 @@ pub struct BatchProof {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct BatchEntry {
-    #[prost(oneof = "batch_entry::Proof", tags = "1, 2")]
+    #[prost(oneof = "batch_entry::Proof", tags = "1, 2, 3")]
     pub proof: ::core::option::Option<batch_entry::Proof>,
 }
 /// Nested message and enum types in `BatchEntry`.
@@ -211,6 +236,8 @@ pub mod batch_entry {
         Exist(super::ExistenceProof),
         #[prost(message, tag = "2")]
         Nonexist(super::NonExistenceProof),
+        #[prost(message, tag = "3")]
+        Exclusion(super::ExclusionProof),
     }
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -225,7 +252,7 @@ pub struct CompressedBatchProof {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CompressedBatchEntry {
-    #[prost(oneof = "compressed_batch_entry::Proof", tags = "1, 2")]
+    #[prost(oneof = "compressed_batch_entry::Proof", tags = "1, 2, 3")]
     pub proof: ::core::option::Option<compressed_batch_entry::Proof>,
 }
 /// Nested message and enum types in `CompressedBatchEntry`.
@@ -237,6 +264,8 @@ pub mod compressed_batch_entry {
         Exist(super::CompressedExistenceProof),
         #[prost(message, tag = "2")]
         Nonexist(super::CompressedNonExistenceProof),
+        #[prost(message, tag = "3")]
+        Exclusion(super::CompressedExclusionProof),
     }
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -262,6 +291,21 @@ pub struct CompressedNonExistenceProof {
     pub left: ::core::option::Option<CompressedExistenceProof>,
     #[prost(message, optional, tag = "3")]
     pub right: ::core::option::Option<CompressedExistenceProof>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CompressedExclusionProof {
+    #[prost(bytes = "vec", tag = "1")]
+    pub key: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes = "vec", tag = "2")]
+    pub actual_path: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes = "vec", tag = "3")]
+    pub actual_value_hash: ::prost::alloc::vec::Vec<u8>,
+    #[prost(message, optional, tag = "4")]
+    pub leaf: ::core::option::Option<LeafOp>,
+    /// these are indexes into the lookup_inners table in CompressedBatchProof
+    #[prost(int32, repeated, tag = "5")]
+    pub path: ::prost::alloc::vec::Vec<i32>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

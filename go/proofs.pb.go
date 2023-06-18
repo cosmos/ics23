@@ -63,6 +63,7 @@ func (HashOp) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_5e599a3f914c9389, []int{0}
 }
 
+// *
 // LengthOp defines how to process the key and value of the LeafOp
 // to include length information. After encoding the length with the given
 // algorithm, the length will be prepended to the key and value bytes.
@@ -122,6 +123,7 @@ func (LengthOp) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_5e599a3f914c9389, []int{1}
 }
 
+// *
 // ExistenceProof takes a key and a value and a set of steps to perform on it.
 // The result of peforming all these steps will provide a "root hash", which can
 // be compared to the value in a header.
@@ -272,12 +274,97 @@ func (m *NonExistenceProof) GetRight() *ExistenceProof {
 	return nil
 }
 
+// ExclusionProof takes the actual path and valueHash for a leaf node found while
+// traversing the tree looking for a given key. They actual_path may be the same
+// as the path of the key, but its valueHash may be nil (the key was not in the
+// tree). However, the actual_path may be different but have a common prefix with
+// the key's path. In this case the key was not in the tree as an unrelated leaf
+// was found in its place.
+type ExclusionProof struct {
+	Key             []byte `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	ActualPath      []byte `protobuf:"bytes,2,opt,name=actual_path,json=actualPath,proto3" json:"actual_path,omitempty"`
+	ActualValueHash []byte `protobuf:"bytes,3,opt,name=actual_valueHash,json=actualValueHash,proto3" json:"actual_valueHash,omitempty"`
+	// As the actual_path and actual_valueHash are already hashed both the
+	// prehash_key and prehash_value fields should be set to HashOp_NO_HASH.
+	Leaf *LeafOp    `protobuf:"bytes,4,opt,name=leaf,proto3" json:"leaf,omitempty"`
+	Path []*InnerOp `protobuf:"bytes,5,rep,name=path,proto3" json:"path,omitempty"`
+}
+
+func (m *ExclusionProof) Reset()         { *m = ExclusionProof{} }
+func (m *ExclusionProof) String() string { return proto.CompactTextString(m) }
+func (*ExclusionProof) ProtoMessage()    {}
+func (*ExclusionProof) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5e599a3f914c9389, []int{2}
+}
+func (m *ExclusionProof) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ExclusionProof) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ExclusionProof.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ExclusionProof) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ExclusionProof.Merge(m, src)
+}
+func (m *ExclusionProof) XXX_Size() int {
+	return m.Size()
+}
+func (m *ExclusionProof) XXX_DiscardUnknown() {
+	xxx_messageInfo_ExclusionProof.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ExclusionProof proto.InternalMessageInfo
+
+func (m *ExclusionProof) GetKey() []byte {
+	if m != nil {
+		return m.Key
+	}
+	return nil
+}
+
+func (m *ExclusionProof) GetActualPath() []byte {
+	if m != nil {
+		return m.ActualPath
+	}
+	return nil
+}
+
+func (m *ExclusionProof) GetActualValueHash() []byte {
+	if m != nil {
+		return m.ActualValueHash
+	}
+	return nil
+}
+
+func (m *ExclusionProof) GetLeaf() *LeafOp {
+	if m != nil {
+		return m.Leaf
+	}
+	return nil
+}
+
+func (m *ExclusionProof) GetPath() []*InnerOp {
+	if m != nil {
+		return m.Path
+	}
+	return nil
+}
+
 // CommitmentProof is either an ExistenceProof or a NonExistenceProof, or a Batch of such messages
 type CommitmentProof struct {
 	// Types that are valid to be assigned to Proof:
 	//
 	//	*CommitmentProof_Exist
 	//	*CommitmentProof_Nonexist
+	//	*CommitmentProof_Exclusion
 	//	*CommitmentProof_Batch
 	//	*CommitmentProof_Compressed
 	Proof isCommitmentProof_Proof `protobuf_oneof:"proof"`
@@ -287,7 +374,7 @@ func (m *CommitmentProof) Reset()         { *m = CommitmentProof{} }
 func (m *CommitmentProof) String() string { return proto.CompactTextString(m) }
 func (*CommitmentProof) ProtoMessage()    {}
 func (*CommitmentProof) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5e599a3f914c9389, []int{2}
+	return fileDescriptor_5e599a3f914c9389, []int{3}
 }
 func (m *CommitmentProof) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -328,15 +415,19 @@ type CommitmentProof_Exist struct {
 type CommitmentProof_Nonexist struct {
 	Nonexist *NonExistenceProof `protobuf:"bytes,2,opt,name=nonexist,proto3,oneof" json:"nonexist,omitempty"`
 }
+type CommitmentProof_Exclusion struct {
+	Exclusion *ExclusionProof `protobuf:"bytes,3,opt,name=exclusion,proto3,oneof" json:"exclusion,omitempty"`
+}
 type CommitmentProof_Batch struct {
-	Batch *BatchProof `protobuf:"bytes,3,opt,name=batch,proto3,oneof" json:"batch,omitempty"`
+	Batch *BatchProof `protobuf:"bytes,4,opt,name=batch,proto3,oneof" json:"batch,omitempty"`
 }
 type CommitmentProof_Compressed struct {
-	Compressed *CompressedBatchProof `protobuf:"bytes,4,opt,name=compressed,proto3,oneof" json:"compressed,omitempty"`
+	Compressed *CompressedBatchProof `protobuf:"bytes,5,opt,name=compressed,proto3,oneof" json:"compressed,omitempty"`
 }
 
 func (*CommitmentProof_Exist) isCommitmentProof_Proof()      {}
 func (*CommitmentProof_Nonexist) isCommitmentProof_Proof()   {}
+func (*CommitmentProof_Exclusion) isCommitmentProof_Proof()  {}
 func (*CommitmentProof_Batch) isCommitmentProof_Proof()      {}
 func (*CommitmentProof_Compressed) isCommitmentProof_Proof() {}
 
@@ -361,6 +452,13 @@ func (m *CommitmentProof) GetNonexist() *NonExistenceProof {
 	return nil
 }
 
+func (m *CommitmentProof) GetExclusion() *ExclusionProof {
+	if x, ok := m.GetProof().(*CommitmentProof_Exclusion); ok {
+		return x.Exclusion
+	}
+	return nil
+}
+
 func (m *CommitmentProof) GetBatch() *BatchProof {
 	if x, ok := m.GetProof().(*CommitmentProof_Batch); ok {
 		return x.Batch
@@ -380,11 +478,13 @@ func (*CommitmentProof) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
 		(*CommitmentProof_Exist)(nil),
 		(*CommitmentProof_Nonexist)(nil),
+		(*CommitmentProof_Exclusion)(nil),
 		(*CommitmentProof_Batch)(nil),
 		(*CommitmentProof_Compressed)(nil),
 	}
 }
 
+// *
 // LeafOp represents the raw key-value data we wish to prove, and
 // must be flexible to represent the internal transformation from
 // the original key-value pairs into the basis hash, for many existing
@@ -413,7 +513,7 @@ func (m *LeafOp) Reset()         { *m = LeafOp{} }
 func (m *LeafOp) String() string { return proto.CompactTextString(m) }
 func (*LeafOp) ProtoMessage()    {}
 func (*LeafOp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5e599a3f914c9389, []int{3}
+	return fileDescriptor_5e599a3f914c9389, []int{4}
 }
 func (m *LeafOp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -477,6 +577,7 @@ func (m *LeafOp) GetPrefix() []byte {
 	return nil
 }
 
+// *
 // InnerOp represents a merkle-proof step that is not a leaf.
 // It represents concatenating two children and hashing them to provide the next result.
 //
@@ -502,7 +603,7 @@ func (m *InnerOp) Reset()         { *m = InnerOp{} }
 func (m *InnerOp) String() string { return proto.CompactTextString(m) }
 func (*InnerOp) ProtoMessage()    {}
 func (*InnerOp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5e599a3f914c9389, []int{4}
+	return fileDescriptor_5e599a3f914c9389, []int{5}
 }
 func (m *InnerOp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -552,6 +653,7 @@ func (m *InnerOp) GetSuffix() []byte {
 	return nil
 }
 
+// *
 // ProofSpec defines what the expected parameters are for a given proof type.
 // This can be stored in the client and used to validate any incoming proofs.
 //
@@ -581,7 +683,7 @@ func (m *ProofSpec) Reset()         { *m = ProofSpec{} }
 func (m *ProofSpec) String() string { return proto.CompactTextString(m) }
 func (*ProofSpec) ProtoMessage()    {}
 func (*ProofSpec) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5e599a3f914c9389, []int{5}
+	return fileDescriptor_5e599a3f914c9389, []int{6}
 }
 func (m *ProofSpec) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -671,7 +773,7 @@ func (m *InnerSpec) Reset()         { *m = InnerSpec{} }
 func (m *InnerSpec) String() string { return proto.CompactTextString(m) }
 func (*InnerSpec) ProtoMessage()    {}
 func (*InnerSpec) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5e599a3f914c9389, []int{6}
+	return fileDescriptor_5e599a3f914c9389, []int{7}
 }
 func (m *InnerSpec) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -751,7 +853,7 @@ func (m *BatchProof) Reset()         { *m = BatchProof{} }
 func (m *BatchProof) String() string { return proto.CompactTextString(m) }
 func (*BatchProof) ProtoMessage()    {}
 func (*BatchProof) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5e599a3f914c9389, []int{7}
+	return fileDescriptor_5e599a3f914c9389, []int{8}
 }
 func (m *BatchProof) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -793,6 +895,7 @@ type BatchEntry struct {
 	//
 	//	*BatchEntry_Exist
 	//	*BatchEntry_Nonexist
+	//	*BatchEntry_Exclusion
 	Proof isBatchEntry_Proof `protobuf_oneof:"proof"`
 }
 
@@ -800,7 +903,7 @@ func (m *BatchEntry) Reset()         { *m = BatchEntry{} }
 func (m *BatchEntry) String() string { return proto.CompactTextString(m) }
 func (*BatchEntry) ProtoMessage()    {}
 func (*BatchEntry) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5e599a3f914c9389, []int{8}
+	return fileDescriptor_5e599a3f914c9389, []int{9}
 }
 func (m *BatchEntry) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -841,9 +944,13 @@ type BatchEntry_Exist struct {
 type BatchEntry_Nonexist struct {
 	Nonexist *NonExistenceProof `protobuf:"bytes,2,opt,name=nonexist,proto3,oneof" json:"nonexist,omitempty"`
 }
+type BatchEntry_Exclusion struct {
+	Exclusion *ExclusionProof `protobuf:"bytes,3,opt,name=exclusion,proto3,oneof" json:"exclusion,omitempty"`
+}
 
-func (*BatchEntry_Exist) isBatchEntry_Proof()    {}
-func (*BatchEntry_Nonexist) isBatchEntry_Proof() {}
+func (*BatchEntry_Exist) isBatchEntry_Proof()     {}
+func (*BatchEntry_Nonexist) isBatchEntry_Proof()  {}
+func (*BatchEntry_Exclusion) isBatchEntry_Proof() {}
 
 func (m *BatchEntry) GetProof() isBatchEntry_Proof {
 	if m != nil {
@@ -866,11 +973,19 @@ func (m *BatchEntry) GetNonexist() *NonExistenceProof {
 	return nil
 }
 
+func (m *BatchEntry) GetExclusion() *ExclusionProof {
+	if x, ok := m.GetProof().(*BatchEntry_Exclusion); ok {
+		return x.Exclusion
+	}
+	return nil
+}
+
 // XXX_OneofWrappers is for the internal use of the proto package.
 func (*BatchEntry) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
 		(*BatchEntry_Exist)(nil),
 		(*BatchEntry_Nonexist)(nil),
+		(*BatchEntry_Exclusion)(nil),
 	}
 }
 
@@ -883,7 +998,7 @@ func (m *CompressedBatchProof) Reset()         { *m = CompressedBatchProof{} }
 func (m *CompressedBatchProof) String() string { return proto.CompactTextString(m) }
 func (*CompressedBatchProof) ProtoMessage()    {}
 func (*CompressedBatchProof) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5e599a3f914c9389, []int{9}
+	return fileDescriptor_5e599a3f914c9389, []int{10}
 }
 func (m *CompressedBatchProof) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -932,6 +1047,7 @@ type CompressedBatchEntry struct {
 	//
 	//	*CompressedBatchEntry_Exist
 	//	*CompressedBatchEntry_Nonexist
+	//	*CompressedBatchEntry_Exclusion
 	Proof isCompressedBatchEntry_Proof `protobuf_oneof:"proof"`
 }
 
@@ -939,7 +1055,7 @@ func (m *CompressedBatchEntry) Reset()         { *m = CompressedBatchEntry{} }
 func (m *CompressedBatchEntry) String() string { return proto.CompactTextString(m) }
 func (*CompressedBatchEntry) ProtoMessage()    {}
 func (*CompressedBatchEntry) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5e599a3f914c9389, []int{10}
+	return fileDescriptor_5e599a3f914c9389, []int{11}
 }
 func (m *CompressedBatchEntry) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -980,9 +1096,13 @@ type CompressedBatchEntry_Exist struct {
 type CompressedBatchEntry_Nonexist struct {
 	Nonexist *CompressedNonExistenceProof `protobuf:"bytes,2,opt,name=nonexist,proto3,oneof" json:"nonexist,omitempty"`
 }
+type CompressedBatchEntry_Exclusion struct {
+	Exclusion *CompressedExclusionProof `protobuf:"bytes,3,opt,name=exclusion,proto3,oneof" json:"exclusion,omitempty"`
+}
 
-func (*CompressedBatchEntry_Exist) isCompressedBatchEntry_Proof()    {}
-func (*CompressedBatchEntry_Nonexist) isCompressedBatchEntry_Proof() {}
+func (*CompressedBatchEntry_Exist) isCompressedBatchEntry_Proof()     {}
+func (*CompressedBatchEntry_Nonexist) isCompressedBatchEntry_Proof()  {}
+func (*CompressedBatchEntry_Exclusion) isCompressedBatchEntry_Proof() {}
 
 func (m *CompressedBatchEntry) GetProof() isCompressedBatchEntry_Proof {
 	if m != nil {
@@ -1005,11 +1125,19 @@ func (m *CompressedBatchEntry) GetNonexist() *CompressedNonExistenceProof {
 	return nil
 }
 
+func (m *CompressedBatchEntry) GetExclusion() *CompressedExclusionProof {
+	if x, ok := m.GetProof().(*CompressedBatchEntry_Exclusion); ok {
+		return x.Exclusion
+	}
+	return nil
+}
+
 // XXX_OneofWrappers is for the internal use of the proto package.
 func (*CompressedBatchEntry) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
 		(*CompressedBatchEntry_Exist)(nil),
 		(*CompressedBatchEntry_Nonexist)(nil),
+		(*CompressedBatchEntry_Exclusion)(nil),
 	}
 }
 
@@ -1025,7 +1153,7 @@ func (m *CompressedExistenceProof) Reset()         { *m = CompressedExistencePro
 func (m *CompressedExistenceProof) String() string { return proto.CompactTextString(m) }
 func (*CompressedExistenceProof) ProtoMessage()    {}
 func (*CompressedExistenceProof) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5e599a3f914c9389, []int{11}
+	return fileDescriptor_5e599a3f914c9389, []int{12}
 }
 func (m *CompressedExistenceProof) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1092,7 +1220,7 @@ func (m *CompressedNonExistenceProof) Reset()         { *m = CompressedNonExiste
 func (m *CompressedNonExistenceProof) String() string { return proto.CompactTextString(m) }
 func (*CompressedNonExistenceProof) ProtoMessage()    {}
 func (*CompressedNonExistenceProof) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5e599a3f914c9389, []int{12}
+	return fileDescriptor_5e599a3f914c9389, []int{13}
 }
 func (m *CompressedNonExistenceProof) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1142,11 +1270,89 @@ func (m *CompressedNonExistenceProof) GetRight() *CompressedExistenceProof {
 	return nil
 }
 
+type CompressedExclusionProof struct {
+	Key             []byte  `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	ActualPath      []byte  `protobuf:"bytes,2,opt,name=actual_path,json=actualPath,proto3" json:"actual_path,omitempty"`
+	ActualValueHash []byte  `protobuf:"bytes,3,opt,name=actual_valueHash,json=actualValueHash,proto3" json:"actual_valueHash,omitempty"`
+	Leaf            *LeafOp `protobuf:"bytes,4,opt,name=leaf,proto3" json:"leaf,omitempty"`
+	// these are indexes into the lookup_inners table in CompressedBatchProof
+	Path []int32 `protobuf:"varint,5,rep,packed,name=path,proto3" json:"path,omitempty"`
+}
+
+func (m *CompressedExclusionProof) Reset()         { *m = CompressedExclusionProof{} }
+func (m *CompressedExclusionProof) String() string { return proto.CompactTextString(m) }
+func (*CompressedExclusionProof) ProtoMessage()    {}
+func (*CompressedExclusionProof) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5e599a3f914c9389, []int{14}
+}
+func (m *CompressedExclusionProof) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *CompressedExclusionProof) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_CompressedExclusionProof.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *CompressedExclusionProof) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CompressedExclusionProof.Merge(m, src)
+}
+func (m *CompressedExclusionProof) XXX_Size() int {
+	return m.Size()
+}
+func (m *CompressedExclusionProof) XXX_DiscardUnknown() {
+	xxx_messageInfo_CompressedExclusionProof.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CompressedExclusionProof proto.InternalMessageInfo
+
+func (m *CompressedExclusionProof) GetKey() []byte {
+	if m != nil {
+		return m.Key
+	}
+	return nil
+}
+
+func (m *CompressedExclusionProof) GetActualPath() []byte {
+	if m != nil {
+		return m.ActualPath
+	}
+	return nil
+}
+
+func (m *CompressedExclusionProof) GetActualValueHash() []byte {
+	if m != nil {
+		return m.ActualValueHash
+	}
+	return nil
+}
+
+func (m *CompressedExclusionProof) GetLeaf() *LeafOp {
+	if m != nil {
+		return m.Leaf
+	}
+	return nil
+}
+
+func (m *CompressedExclusionProof) GetPath() []int32 {
+	if m != nil {
+		return m.Path
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterEnum("cosmos.ics23.v1.HashOp", HashOp_name, HashOp_value)
 	proto.RegisterEnum("cosmos.ics23.v1.LengthOp", LengthOp_name, LengthOp_value)
 	proto.RegisterType((*ExistenceProof)(nil), "cosmos.ics23.v1.ExistenceProof")
 	proto.RegisterType((*NonExistenceProof)(nil), "cosmos.ics23.v1.NonExistenceProof")
+	proto.RegisterType((*ExclusionProof)(nil), "cosmos.ics23.v1.ExclusionProof")
 	proto.RegisterType((*CommitmentProof)(nil), "cosmos.ics23.v1.CommitmentProof")
 	proto.RegisterType((*LeafOp)(nil), "cosmos.ics23.v1.LeafOp")
 	proto.RegisterType((*InnerOp)(nil), "cosmos.ics23.v1.InnerOp")
@@ -1158,76 +1364,84 @@ func init() {
 	proto.RegisterType((*CompressedBatchEntry)(nil), "cosmos.ics23.v1.CompressedBatchEntry")
 	proto.RegisterType((*CompressedExistenceProof)(nil), "cosmos.ics23.v1.CompressedExistenceProof")
 	proto.RegisterType((*CompressedNonExistenceProof)(nil), "cosmos.ics23.v1.CompressedNonExistenceProof")
+	proto.RegisterType((*CompressedExclusionProof)(nil), "cosmos.ics23.v1.CompressedExclusionProof")
 }
 
 func init() { proto.RegisterFile("cosmos/ics23/v1/proofs.proto", fileDescriptor_5e599a3f914c9389) }
 
 var fileDescriptor_5e599a3f914c9389 = []byte{
-	// 1024 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x56, 0xcd, 0x6e, 0x22, 0x47,
-	0x10, 0xa6, 0x81, 0xe1, 0xa7, 0xf0, 0xcf, 0x6c, 0xcb, 0x4a, 0x26, 0xeb, 0x2c, 0x46, 0x23, 0x45,
-	0x72, 0x9c, 0x15, 0x0e, 0x60, 0x3b, 0xbf, 0xab, 0x0d, 0xe0, 0xd9, 0x85, 0xd8, 0x31, 0xa4, 0x21,
-	0xab, 0x4d, 0x2e, 0xa3, 0x31, 0x6e, 0xcc, 0x68, 0x99, 0x1f, 0xcd, 0x8c, 0x2d, 0xbc, 0xd7, 0xbc,
-	0xc0, 0x46, 0x2b, 0xe5, 0x25, 0x22, 0x25, 0xaf, 0x91, 0xe3, 0x1e, 0x73, 0x8c, 0xec, 0x27, 0xc8,
-	0x2d, 0xb9, 0x45, 0xdd, 0x3d, 0x60, 0x30, 0x18, 0xbc, 0x87, 0x28, 0xb7, 0xae, 0xaa, 0xef, 0xab,
-	0xa9, 0xae, 0xfe, 0xba, 0x6b, 0xe0, 0xfd, 0x8e, 0xe3, 0x5b, 0x8e, 0xbf, 0x6d, 0x76, 0xfc, 0x62,
-	0x69, 0xfb, 0xbc, 0xb0, 0xed, 0x7a, 0x8e, 0xd3, 0xf5, 0xf3, 0xae, 0xe7, 0x04, 0x0e, 0x5e, 0x15,
-	0xd1, 0x3c, 0x8f, 0xe6, 0xcf, 0x0b, 0xea, 0x6b, 0x04, 0x2b, 0xda, 0xc0, 0xf4, 0x03, 0x6a, 0x77,
-	0x68, 0x93, 0x41, 0xb1, 0x0c, 0xb1, 0x17, 0xf4, 0x42, 0x41, 0x39, 0xb4, 0xb9, 0x44, 0xd8, 0x12,
-	0xaf, 0x81, 0x74, 0x6e, 0xf4, 0xcf, 0xa8, 0x12, 0xe5, 0x3e, 0x61, 0xe0, 0x8f, 0x20, 0xde, 0xa7,
-	0x46, 0x57, 0x89, 0xe5, 0xd0, 0x66, 0xa6, 0xf8, 0x6e, 0xfe, 0x46, 0xea, 0xfc, 0x21, 0x35, 0xba,
-	0x0d, 0x97, 0x70, 0x10, 0x7e, 0x08, 0x71, 0xd7, 0x08, 0x7a, 0x4a, 0x3c, 0x17, 0xdb, 0xcc, 0x14,
-	0x95, 0x29, 0x70, 0xdd, 0xb6, 0xa9, 0xc7, 0xd0, 0x0c, 0xa5, 0xfe, 0x84, 0xe0, 0xde, 0x91, 0x63,
-	0x2f, 0x2c, 0xac, 0xc4, 0x4a, 0xe8, 0x06, 0xbc, 0xae, 0x4c, 0x71, 0x63, 0x2a, 0xeb, 0x64, 0x02,
-	0xc2, 0xc1, 0x78, 0x17, 0x24, 0xcf, 0x3c, 0xed, 0x05, 0x61, 0xe1, 0x0b, 0x59, 0x02, 0xad, 0xbe,
-	0x8e, 0xc2, 0x6a, 0xd5, 0xb1, 0x2c, 0x33, 0xb0, 0xa8, 0x1d, 0x88, 0x8a, 0x3e, 0x01, 0x89, 0x32,
-	0x30, 0xaf, 0x69, 0x71, 0xaa, 0x5a, 0x84, 0x08, 0x3c, 0xfe, 0x0a, 0x52, 0xb6, 0x63, 0x0b, 0xae,
-	0x28, 0x5e, 0x9d, 0xe2, 0x4e, 0x35, 0xa0, 0x16, 0x21, 0x23, 0x16, 0x2e, 0x81, 0x74, 0x6c, 0x04,
-	0x9d, 0x5e, 0xb8, 0x8b, 0xf5, 0x29, 0x7a, 0x85, 0x45, 0x47, 0x9f, 0xe5, 0x58, 0xfc, 0x14, 0xa0,
-	0xe3, 0x58, 0xae, 0x47, 0x7d, 0x9f, 0x9e, 0x28, 0x71, 0xce, 0xfc, 0x60, 0x8a, 0x59, 0x1d, 0x41,
-	0x26, 0x72, 0x8c, 0x51, 0x2b, 0x49, 0x90, 0xb8, 0xae, 0xd4, 0xbf, 0x11, 0x24, 0xc4, 0x41, 0x33,
-	0x3d, 0xf4, 0x0c, 0xbf, 0xc7, 0x7b, 0xb1, 0x32, 0x43, 0x0f, 0x35, 0xc3, 0xef, 0xb1, 0x13, 0x66,
-	0x20, 0xfc, 0x29, 0x64, 0x5c, 0x8f, 0xb2, 0xa5, 0xce, 0xce, 0x34, 0x3a, 0x9f, 0x03, 0x21, 0xf6,
-	0x80, 0x5e, 0xe0, 0x2f, 0x61, 0x79, 0xc8, 0x14, 0xa2, 0x8c, 0xcd, 0xe7, 0x2e, 0x85, 0xe8, 0x67,
-	0x5c, 0xb4, 0x05, 0x48, 0xf4, 0xa9, 0x7d, 0xca, 0x95, 0xc8, 0x68, 0xef, 0xcd, 0x90, 0x2d, 0x0b,
-	0x37, 0x5c, 0x12, 0x02, 0xf1, 0x3b, 0x90, 0x70, 0x3d, 0xda, 0x35, 0x07, 0x8a, 0xc4, 0x95, 0x17,
-	0x5a, 0x6a, 0x17, 0x92, 0xa1, 0x6a, 0xdf, 0x6e, 0xeb, 0xd7, 0xf9, 0xa2, 0xe3, 0xf9, 0x98, 0xdf,
-	0x3f, 0xeb, 0x32, 0x7f, 0x4c, 0xf8, 0x85, 0xa5, 0xfe, 0x83, 0x20, 0xcd, 0xcf, 0xa0, 0xe5, 0xd2,
-	0x0e, 0xde, 0x81, 0x34, 0xbb, 0x50, 0xba, 0xef, 0xd2, 0x4e, 0x28, 0xbb, 0x5b, 0xaf, 0x5e, 0x8a,
-	0x21, 0x39, 0xeb, 0x33, 0x00, 0x93, 0xd5, 0x2a, 0x68, 0x42, 0x71, 0xf7, 0x67, 0x5f, 0x42, 0x86,
-	0x27, 0x69, 0x73, 0xb8, 0xc4, 0xeb, 0x90, 0xb6, 0x8c, 0x81, 0x7e, 0x42, 0xdd, 0x40, 0x88, 0x4d,
-	0x22, 0x29, 0xcb, 0x18, 0xec, 0x33, 0x9b, 0x07, 0x4d, 0x3b, 0x0c, 0xc6, 0xc3, 0xa0, 0x69, 0x8b,
-	0x60, 0x19, 0x1e, 0x8c, 0x9d, 0xb1, 0x7e, 0x4c, 0xbb, 0x8e, 0x47, 0x75, 0xa6, 0x22, 0xc3, 0x33,
-	0x7d, 0xc7, 0xe6, 0xfd, 0x4c, 0x91, 0xfb, 0xd7, 0x87, 0x5b, 0xe1, 0x90, 0xea, 0x08, 0xa1, 0xfe,
-	0x85, 0x20, 0x3d, 0xaa, 0x0a, 0x6f, 0x40, 0xa6, 0xd3, 0x33, 0xfb, 0x27, 0xba, 0xe3, 0x9d, 0x50,
-	0x4f, 0x41, 0xb9, 0xd8, 0xa6, 0x44, 0x80, 0xbb, 0x1a, 0xcc, 0x83, 0x1f, 0x80, 0xb0, 0x74, 0xdf,
-	0x7c, 0x29, 0x5e, 0x2b, 0x89, 0xa4, 0xb9, 0xa7, 0x65, 0xbe, 0xa4, 0x78, 0x0b, 0xee, 0xb1, 0x6a,
-	0x45, 0xbf, 0xf5, 0x50, 0x07, 0x62, 0x4b, 0xab, 0x96, 0x69, 0x37, 0xb9, 0x5f, 0x9c, 0x3f, 0xc7,
-	0x1a, 0x83, 0x1b, 0xd8, 0x78, 0x88, 0x35, 0x06, 0x13, 0xd8, 0x0d, 0xc8, 0x50, 0xcb, 0x0d, 0x2e,
-	0x74, 0xfe, 0xa9, 0x50, 0x26, 0xc0, 0x5d, 0x55, 0xe6, 0x19, 0xe9, 0x23, 0x71, 0x07, 0x7d, 0xa8,
-	0x55, 0x80, 0xeb, 0x7b, 0x87, 0x77, 0x21, 0x49, 0xed, 0xc0, 0x33, 0xa9, 0xcf, 0xf7, 0x7b, 0xeb,
-	0x4d, 0xd7, 0xec, 0xc0, 0xbb, 0x20, 0x43, 0xac, 0xfa, 0x0a, 0x85, 0x59, 0xb8, 0xff, 0x7f, 0x7c,
-	0xa8, 0xae, 0x9f, 0x8a, 0x9f, 0x11, 0xac, 0xcd, 0x7a, 0x5a, 0xf0, 0xe3, 0x9b, 0x5b, 0x5c, 0xf8,
-	0x24, 0x4d, 0x6e, 0x16, 0x3f, 0x82, 0xe5, 0xbe, 0xe3, 0xbc, 0x38, 0x73, 0x75, 0x2e, 0x5b, 0x5f,
-	0x89, 0x2e, 0x98, 0x32, 0x4b, 0x02, 0xce, 0x4d, 0x5f, 0xfd, 0x75, 0xba, 0x30, 0xd1, 0xb5, 0xf2,
-	0x64, 0xd7, 0x3e, 0x9c, 0x53, 0xd6, 0x6d, 0xfd, 0xfb, 0x7a, 0xaa, 0x7f, 0x0f, 0xe7, 0x64, 0xb9,
-	0x63, 0x27, 0x7f, 0x44, 0xa0, 0xdc, 0xf6, 0xe9, 0xff, 0x66, 0x7c, 0xe3, 0xb1, 0xf1, 0x2d, 0x85,
-	0x43, 0xfa, 0x37, 0x04, 0xeb, 0x73, 0x4a, 0x9f, 0x51, 0xc8, 0xa3, 0x89, 0x71, 0x7d, 0xf7, 0x76,
-	0x86, 0x83, 0xfb, 0xf1, 0xe4, 0xe0, 0x7e, 0x0b, 0xbe, 0xe0, 0x6d, 0x51, 0x48, 0x88, 0x9b, 0x86,
-	0x33, 0x90, 0x3c, 0x6a, 0xe8, 0xb5, 0x72, 0xab, 0x26, 0x47, 0x30, 0x40, 0xa2, 0x55, 0x2b, 0x17,
-	0x77, 0xf7, 0x64, 0x14, 0xae, 0x77, 0x0b, 0x45, 0x39, 0xca, 0xd6, 0x07, 0x5a, 0xb5, 0x5a, 0x3e,
-	0x90, 0x63, 0x78, 0x19, 0xd2, 0xa4, 0xde, 0xd4, 0xbe, 0xd9, 0x2f, 0xec, 0x7d, 0x2c, 0xc7, 0x19,
-	0xbf, 0x52, 0x6f, 0x57, 0x1b, 0xf5, 0x23, 0x59, 0xc2, 0x2b, 0x00, 0x82, 0xa3, 0xb3, 0x1c, 0x89,
-	0xad, 0x5f, 0x10, 0xa4, 0x86, 0x53, 0x84, 0x11, 0x8f, 0x1a, 0x7a, 0x93, 0x68, 0x4f, 0xea, 0xcf,
-	0xe5, 0x08, 0x33, 0x9f, 0x95, 0x89, 0xde, 0x24, 0x8d, 0x76, 0x43, 0x46, 0x2c, 0x0f, 0x33, 0xc9,
-	0x61, 0x53, 0x8e, 0xe2, 0x55, 0xc8, 0x3c, 0xa9, 0x3f, 0xd7, 0xf6, 0x4b, 0x45, 0xbd, 0x52, 0x7f,
-	0x2a, 0xc7, 0x30, 0x86, 0x95, 0xa1, 0xe3, 0xb0, 0xde, 0x6e, 0x1f, 0x6a, 0x72, 0x7c, 0x04, 0xda,
-	0xdb, 0xe1, 0x20, 0x69, 0x04, 0xda, 0xdb, 0x19, 0x82, 0x12, 0x78, 0x0d, 0x64, 0xa2, 0x7d, 0xfb,
-	0x5d, 0x9d, 0x68, 0x3a, 0x4b, 0xf6, 0x7d, 0x5b, 0x6b, 0xc9, 0xc9, 0x71, 0x2f, 0x63, 0x73, 0x6f,
-	0xaa, 0xf2, 0xf9, 0xef, 0x97, 0x59, 0xf4, 0xe6, 0x32, 0x8b, 0xfe, 0xbc, 0xcc, 0xa2, 0x57, 0x57,
-	0xd9, 0xc8, 0x9b, 0xab, 0x6c, 0xe4, 0x8f, 0xab, 0x6c, 0xe4, 0x87, 0xdc, 0xa9, 0x19, 0xf4, 0xce,
-	0x8e, 0xf3, 0x1d, 0xc7, 0xda, 0x9e, 0xf8, 0xab, 0x3c, 0x75, 0xbe, 0xe0, 0x8b, 0xe3, 0x04, 0xff,
-	0xab, 0x2c, 0xfd, 0x1b, 0x00, 0x00, 0xff, 0xff, 0xf3, 0x9d, 0xc3, 0xd4, 0x75, 0x0a, 0x00, 0x00,
+	// 1122 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x57, 0xcb, 0x6e, 0x23, 0x45,
+	0x14, 0x75, 0xdb, 0x6e, 0xc7, 0xbe, 0xce, 0xa3, 0xa7, 0x14, 0x81, 0x99, 0x30, 0x4e, 0xd4, 0x12,
+	0x52, 0x26, 0x8c, 0x1c, 0xe2, 0x3c, 0x78, 0x8e, 0x82, 0xed, 0xf4, 0x8c, 0x9b, 0x84, 0xd8, 0x54,
+	0xc2, 0x68, 0x60, 0xd3, 0xea, 0x74, 0xca, 0x71, 0x6b, 0xdc, 0x0f, 0x75, 0xb7, 0x23, 0x67, 0xb6,
+	0xfc, 0x00, 0x08, 0x89, 0x9f, 0x60, 0xc1, 0x9a, 0x3f, 0x80, 0xdd, 0x20, 0xb1, 0x60, 0x89, 0x92,
+	0x2f, 0x60, 0x07, 0x3b, 0x54, 0x0f, 0x3b, 0x76, 0xfc, 0x4a, 0x16, 0x48, 0xcc, 0xae, 0xea, 0xd6,
+	0x39, 0xd7, 0xb7, 0xce, 0xb9, 0x55, 0x5d, 0x86, 0xb7, 0x2d, 0x2f, 0x74, 0xbc, 0x70, 0xdd, 0xb6,
+	0xc2, 0xe2, 0xe6, 0xfa, 0xf9, 0xc6, 0xba, 0x1f, 0x78, 0x5e, 0x23, 0x2c, 0xf8, 0x81, 0x17, 0x79,
+	0x68, 0x81, 0xaf, 0x16, 0xd8, 0x6a, 0xe1, 0x7c, 0x43, 0xfd, 0x5e, 0x82, 0x79, 0xad, 0x63, 0x87,
+	0x11, 0x71, 0x2d, 0x52, 0xa7, 0x50, 0xa4, 0x40, 0xe2, 0x05, 0xb9, 0xc8, 0x49, 0x2b, 0xd2, 0xea,
+	0x2c, 0xa6, 0x43, 0xb4, 0x08, 0xf2, 0xb9, 0xd9, 0x6a, 0x93, 0x5c, 0x9c, 0xc5, 0xf8, 0x04, 0xbd,
+	0x0b, 0xc9, 0x16, 0x31, 0x1b, 0xb9, 0xc4, 0x8a, 0xb4, 0x9a, 0x2d, 0xbe, 0x59, 0xb8, 0x91, 0xba,
+	0x70, 0x40, 0xcc, 0x46, 0xcd, 0xc7, 0x0c, 0x84, 0x1e, 0x41, 0xd2, 0x37, 0xa3, 0x66, 0x2e, 0xb9,
+	0x92, 0x58, 0xcd, 0x16, 0x73, 0x43, 0x60, 0xdd, 0x75, 0x49, 0x40, 0xd1, 0x14, 0xa5, 0x7e, 0x27,
+	0xc1, 0xbd, 0x43, 0xcf, 0x9d, 0x5a, 0xd8, 0x26, 0x2d, 0xa1, 0x11, 0xb1, 0xba, 0xb2, 0xc5, 0xe5,
+	0xa1, 0xac, 0x83, 0x09, 0x30, 0x03, 0xa3, 0x6d, 0x90, 0x03, 0xfb, 0xac, 0x19, 0x89, 0xc2, 0xa7,
+	0xb2, 0x38, 0x5a, 0xfd, 0x95, 0x29, 0x65, 0xb5, 0xda, 0xa1, 0xed, 0xb9, 0xe3, 0x0a, 0x5a, 0x86,
+	0xac, 0x69, 0x45, 0x6d, 0xb3, 0x65, 0xb0, 0xdd, 0x72, 0xbd, 0x80, 0x87, 0xea, 0x66, 0xd4, 0x44,
+	0x0f, 0x41, 0x11, 0x00, 0x26, 0x62, 0xd5, 0x0c, 0x9b, 0xac, 0x8e, 0x59, 0xbc, 0xc0, 0xe3, 0xcf,
+	0xba, 0xe1, 0x9e, 0xbe, 0xc9, 0xbb, 0xe8, 0x2b, 0xdf, 0x4a, 0xdf, 0xdf, 0xe3, 0xb0, 0x50, 0xf1,
+	0x1c, 0xc7, 0x8e, 0x1c, 0xe2, 0x46, 0x7c, 0x33, 0xef, 0x83, 0x4c, 0xe8, 0xc6, 0xd9, 0x76, 0xa6,
+	0xcb, 0x52, 0x8d, 0x61, 0x8e, 0x47, 0x9f, 0x42, 0xda, 0xf5, 0x5c, 0xce, 0xe5, 0x46, 0xa8, 0x43,
+	0xdc, 0x21, 0x33, 0xab, 0x31, 0xdc, 0x63, 0xa1, 0x5d, 0xc8, 0x90, 0xae, 0xb2, 0x13, 0x5c, 0xe9,
+	0xd7, 0xbe, 0x1a, 0xc3, 0xd7, 0x1c, 0xb4, 0x09, 0xf2, 0x89, 0x19, 0x59, 0x4d, 0xa1, 0xd5, 0xd2,
+	0x10, 0xb9, 0x4c, 0x57, 0x7b, 0x75, 0x33, 0x2c, 0x7a, 0x0a, 0x60, 0x79, 0x8e, 0x1f, 0x90, 0x30,
+	0x24, 0xa7, 0x39, 0x99, 0x31, 0xdf, 0x19, 0x62, 0x56, 0x7a, 0x90, 0x81, 0x1c, 0x7d, 0xd4, 0xf2,
+	0x0c, 0xc8, 0xec, 0x90, 0xa9, 0x7f, 0x4b, 0x90, 0xe2, 0xae, 0x50, 0xf3, 0x9a, 0xd4, 0x5b, 0x2a,
+	0xe6, 0xfc, 0x08, 0xf3, 0xa8, 0xc3, 0xd4, 0x0e, 0x0a, 0x42, 0x1f, 0x40, 0xd6, 0x0f, 0x08, 0x1d,
+	0x1a, 0xb4, 0x9f, 0xe2, 0x93, 0x39, 0x20, 0xb0, 0xfb, 0xe4, 0x02, 0x7d, 0x02, 0x73, 0x5d, 0x26,
+	0x3f, 0xa1, 0x89, 0xc9, 0xdc, 0x59, 0x81, 0x66, 0x5d, 0x86, 0x36, 0x20, 0xd5, 0x22, 0xee, 0x59,
+	0xc4, 0x75, 0x9b, 0x2f, 0xbe, 0x35, 0xa2, 0xc7, 0xe8, 0x72, 0xcd, 0xc7, 0x02, 0x88, 0xde, 0x80,
+	0x94, 0x1f, 0x90, 0x86, 0xdd, 0x61, 0x82, 0xcd, 0x62, 0x31, 0x53, 0x1b, 0x30, 0x23, 0x5a, 0xec,
+	0x6e, 0x5b, 0xbf, 0xce, 0x17, 0xef, 0xcf, 0x47, 0xe3, 0x61, 0xbb, 0x41, 0xe3, 0xfc, 0x74, 0x88,
+	0x99, 0xfa, 0x8f, 0x04, 0x19, 0xe6, 0xc1, 0x91, 0x4f, 0x2c, 0xb4, 0x05, 0x19, 0xda, 0xfd, 0x46,
+	0xe8, 0x13, 0x4b, 0xf4, 0xed, 0xd8, 0x73, 0x92, 0xa6, 0x48, 0xc6, 0xfa, 0x10, 0xc0, 0xa6, 0xb5,
+	0x72, 0x1a, 0x6f, 0xd9, 0xfb, 0xa3, 0x4f, 0x0c, 0xc5, 0xe3, 0x8c, 0xdd, 0x1d, 0xa2, 0x25, 0xc8,
+	0x38, 0x66, 0xc7, 0x38, 0x25, 0x7e, 0xc4, 0xcf, 0xad, 0x8c, 0xd3, 0x8e, 0xd9, 0xd9, 0xa3, 0x73,
+	0xb6, 0x68, 0xbb, 0x62, 0x31, 0x29, 0x16, 0x6d, 0x97, 0x2f, 0x96, 0xe0, 0x41, 0x9f, 0xc7, 0xc6,
+	0x09, 0x69, 0x78, 0x01, 0x31, 0x68, 0x17, 0x99, 0x81, 0x1d, 0x7a, 0x2e, 0xd3, 0x33, 0x8d, 0xef,
+	0x5f, 0x9b, 0x5b, 0x66, 0x90, 0x4a, 0x0f, 0xa1, 0xfe, 0x25, 0x41, 0xa6, 0x57, 0x15, 0xbd, 0x6a,
+	0xac, 0xa6, 0xdd, 0x3a, 0x35, 0xbc, 0xe0, 0x94, 0x04, 0x39, 0x69, 0x25, 0xb1, 0x2a, 0x63, 0x60,
+	0xa1, 0x1a, 0x8d, 0xa0, 0x07, 0xc0, 0x67, 0x46, 0x68, 0xbf, 0xe4, 0x57, 0xb7, 0x8c, 0x33, 0x2c,
+	0x72, 0x64, 0xbf, 0x24, 0x68, 0x0d, 0xee, 0xd1, 0x6a, 0xb9, 0xde, 0x86, 0xe8, 0x03, 0xbe, 0xa5,
+	0x05, 0xc7, 0x76, 0xeb, 0x2c, 0xce, 0xfd, 0x67, 0x58, 0xb3, 0x73, 0x03, 0x9b, 0x14, 0x58, 0xb3,
+	0x33, 0x80, 0x5d, 0x86, 0x2c, 0x71, 0xfc, 0xe8, 0xc2, 0x60, 0x3f, 0x25, 0xda, 0x04, 0x58, 0xa8,
+	0x42, 0x23, 0xbd, 0xfe, 0x48, 0xdd, 0xa2, 0x3f, 0xd4, 0x0a, 0xc0, 0xf5, 0xb9, 0x43, 0xdb, 0x30,
+	0x43, 0xdc, 0x28, 0xb0, 0x49, 0xc8, 0xf6, 0x3b, 0xf6, 0xa4, 0x6b, 0x6e, 0x14, 0x5c, 0xe0, 0x2e,
+	0x56, 0xfd, 0x4d, 0x12, 0x59, 0x58, 0xfc, 0x75, 0xbe, 0xe9, 0xae, 0xef, 0x9a, 0x1f, 0x24, 0x58,
+	0x1c, 0x75, 0x37, 0xa1, 0xdd, 0x9b, 0x1a, 0x4d, 0xbd, 0xd3, 0x06, 0xd5, 0x42, 0x8f, 0x61, 0xae,
+	0xe5, 0x79, 0x2f, 0xda, 0xbe, 0xc1, 0xfa, 0x3e, 0xcc, 0xc5, 0xa7, 0x7c, 0x53, 0x66, 0x39, 0x9c,
+	0x4d, 0x43, 0x7a, 0x42, 0x17, 0x47, 0xfd, 0x00, 0x2a, 0x0d, 0xca, 0xfe, 0x70, 0x42, 0x59, 0xe3,
+	0x0c, 0xf8, 0x6c, 0xc8, 0x80, 0x47, 0x13, 0xb2, 0x4c, 0xb6, 0x42, 0x1f, 0xb6, 0x62, 0x72, 0x49,
+	0xb7, 0x30, 0xe5, 0x1b, 0x09, 0x72, 0xe3, 0x76, 0xf1, 0xdf, 0xbc, 0xab, 0x50, 0xdf, 0xbb, 0x4a,
+	0x16, 0x5f, 0xf7, 0x9f, 0x24, 0x58, 0x9a, 0xa0, 0xc2, 0x88, 0x42, 0x1e, 0x0f, 0xbc, 0xa3, 0x6e,
+	0xef, 0x8c, 0x78, 0x51, 0xed, 0x0e, 0xbe, 0xa8, 0xee, 0xc0, 0x17, 0x6f, 0xab, 0x9f, 0x6f, 0xe8,
+	0xf6, 0x7f, 0x7d, 0x65, 0xa1, 0xbe, 0x57, 0x96, 0x50, 0x7b, 0x8d, 0x40, 0x8a, 0xdf, 0x58, 0x28,
+	0x0b, 0x33, 0x87, 0x35, 0xa3, 0x5a, 0x3a, 0xaa, 0x2a, 0x31, 0x04, 0x90, 0x3a, 0xaa, 0x96, 0x8a,
+	0xdb, 0x3b, 0x8a, 0x24, 0xc6, 0xdb, 0x1b, 0x45, 0x25, 0x4e, 0xc7, 0xfb, 0x5a, 0xa5, 0x52, 0xda,
+	0x57, 0x12, 0x68, 0x0e, 0x32, 0x58, 0xaf, 0x6b, 0x9f, 0xef, 0x6d, 0xec, 0xbc, 0xa7, 0x24, 0x29,
+	0xbf, 0xac, 0x1f, 0x57, 0x6a, 0xfa, 0xa1, 0x22, 0xa3, 0x79, 0x00, 0xce, 0x31, 0x68, 0x8e, 0xd4,
+	0xda, 0x8f, 0x12, 0xa4, 0xbb, 0x5f, 0x63, 0x4a, 0x3c, 0xac, 0x19, 0x75, 0xac, 0x3d, 0xd1, 0x9f,
+	0x2b, 0x31, 0x3a, 0x7d, 0x56, 0xc2, 0x46, 0x1d, 0xd7, 0x8e, 0x6b, 0x8a, 0x44, 0xf3, 0xd0, 0x29,
+	0x3e, 0xa8, 0x2b, 0x71, 0xb4, 0x00, 0xd9, 0x27, 0xfa, 0x73, 0x6d, 0x6f, 0xb3, 0x68, 0x94, 0xf5,
+	0xa7, 0x4a, 0x02, 0x21, 0x98, 0xef, 0x06, 0x0e, 0xf4, 0xe3, 0xe3, 0x03, 0x4d, 0x49, 0xf6, 0x40,
+	0x3b, 0x5b, 0x0c, 0x24, 0xf7, 0x40, 0x3b, 0x5b, 0x5d, 0x50, 0x0a, 0x2d, 0x82, 0x82, 0xb5, 0x2f,
+	0xbe, 0xd4, 0xb1, 0x66, 0xd0, 0x64, 0x5f, 0x1d, 0x6b, 0x47, 0xca, 0x4c, 0x7f, 0x94, 0xb2, 0x59,
+	0x34, 0x5d, 0xfe, 0xe8, 0x97, 0xcb, 0xbc, 0xf4, 0xea, 0x32, 0x2f, 0xfd, 0x79, 0x99, 0x97, 0xbe,
+	0xbd, 0xca, 0xc7, 0x5e, 0x5d, 0xe5, 0x63, 0x7f, 0x5c, 0xe5, 0x63, 0x5f, 0xaf, 0x9c, 0xd9, 0x51,
+	0xb3, 0x7d, 0x52, 0xb0, 0x3c, 0x67, 0x7d, 0xe0, 0xaf, 0xca, 0x99, 0xf7, 0x31, 0x1b, 0x9c, 0xa4,
+	0xd8, 0x5f, 0x95, 0xcd, 0x7f, 0x03, 0x00, 0x00, 0xff, 0xff, 0xb7, 0xe8, 0x89, 0x1d, 0xca, 0x0c,
+	0x00, 0x00,
 }
 
 func (m *ExistenceProof) Marshal() (dAtA []byte, err error) {
@@ -1347,6 +1561,76 @@ func (m *NonExistenceProof) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *ExclusionProof) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ExclusionProof) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ExclusionProof) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Path) > 0 {
+		for iNdEx := len(m.Path) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Path[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintProofs(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x2a
+		}
+	}
+	if m.Leaf != nil {
+		{
+			size, err := m.Leaf.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.ActualValueHash) > 0 {
+		i -= len(m.ActualValueHash)
+		copy(dAtA[i:], m.ActualValueHash)
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.ActualValueHash)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.ActualPath) > 0 {
+		i -= len(m.ActualPath)
+		copy(dAtA[i:], m.ActualPath)
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.ActualPath)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Key) > 0 {
+		i -= len(m.Key)
+		copy(dAtA[i:], m.Key)
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.Key)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *CommitmentProof) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1421,6 +1705,27 @@ func (m *CommitmentProof_Nonexist) MarshalToSizedBuffer(dAtA []byte) (int, error
 	}
 	return len(dAtA) - i, nil
 }
+func (m *CommitmentProof_Exclusion) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CommitmentProof_Exclusion) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.Exclusion != nil {
+		{
+			size, err := m.Exclusion.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	return len(dAtA) - i, nil
+}
 func (m *CommitmentProof_Batch) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -1438,7 +1743,7 @@ func (m *CommitmentProof_Batch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintProofs(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x22
 	}
 	return len(dAtA) - i, nil
 }
@@ -1459,7 +1764,7 @@ func (m *CommitmentProof_Compressed) MarshalToSizedBuffer(dAtA []byte) (int, err
 			i = encodeVarintProofs(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x2a
 	}
 	return len(dAtA) - i, nil
 }
@@ -1670,21 +1975,21 @@ func (m *InnerSpec) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x10
 	}
 	if len(m.ChildOrder) > 0 {
-		dAtA11 := make([]byte, len(m.ChildOrder)*10)
-		var j10 int
+		dAtA13 := make([]byte, len(m.ChildOrder)*10)
+		var j12 int
 		for _, num1 := range m.ChildOrder {
 			num := uint64(num1)
 			for num >= 1<<7 {
-				dAtA11[j10] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA13[j12] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j10++
+				j12++
 			}
-			dAtA11[j10] = uint8(num)
-			j10++
+			dAtA13[j12] = uint8(num)
+			j12++
 		}
-		i -= j10
-		copy(dAtA[i:], dAtA11[:j10])
-		i = encodeVarintProofs(dAtA, i, uint64(j10))
+		i -= j12
+		copy(dAtA[i:], dAtA13[:j12])
+		i = encodeVarintProofs(dAtA, i, uint64(j12))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -1799,6 +2104,27 @@ func (m *BatchEntry_Nonexist) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		}
 		i--
 		dAtA[i] = 0x12
+	}
+	return len(dAtA) - i, nil
+}
+func (m *BatchEntry_Exclusion) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *BatchEntry_Exclusion) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.Exclusion != nil {
+		{
+			size, err := m.Exclusion.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
 	}
 	return len(dAtA) - i, nil
 }
@@ -1927,6 +2253,27 @@ func (m *CompressedBatchEntry_Nonexist) MarshalToSizedBuffer(dAtA []byte) (int, 
 	}
 	return len(dAtA) - i, nil
 }
+func (m *CompressedBatchEntry_Exclusion) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CompressedBatchEntry_Exclusion) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.Exclusion != nil {
+		{
+			size, err := m.Exclusion.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	return len(dAtA) - i, nil
+}
 func (m *CompressedExistenceProof) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1948,21 +2295,21 @@ func (m *CompressedExistenceProof) MarshalToSizedBuffer(dAtA []byte) (int, error
 	var l int
 	_ = l
 	if len(m.Path) > 0 {
-		dAtA17 := make([]byte, len(m.Path)*10)
-		var j16 int
+		dAtA21 := make([]byte, len(m.Path)*10)
+		var j20 int
 		for _, num1 := range m.Path {
 			num := uint64(num1)
 			for num >= 1<<7 {
-				dAtA17[j16] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA21[j20] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j16++
+				j20++
 			}
-			dAtA17[j16] = uint8(num)
-			j16++
+			dAtA21[j20] = uint8(num)
+			j20++
 		}
-		i -= j16
-		copy(dAtA[i:], dAtA17[:j16])
-		i = encodeVarintProofs(dAtA, i, uint64(j16))
+		i -= j20
+		copy(dAtA[i:], dAtA21[:j20])
+		i = encodeVarintProofs(dAtA, i, uint64(j20))
 		i--
 		dAtA[i] = 0x22
 	}
@@ -2049,6 +2396,81 @@ func (m *CompressedNonExistenceProof) MarshalToSizedBuffer(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 
+func (m *CompressedExclusionProof) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CompressedExclusionProof) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CompressedExclusionProof) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Path) > 0 {
+		dAtA26 := make([]byte, len(m.Path)*10)
+		var j25 int
+		for _, num1 := range m.Path {
+			num := uint64(num1)
+			for num >= 1<<7 {
+				dAtA26[j25] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j25++
+			}
+			dAtA26[j25] = uint8(num)
+			j25++
+		}
+		i -= j25
+		copy(dAtA[i:], dAtA26[:j25])
+		i = encodeVarintProofs(dAtA, i, uint64(j25))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.Leaf != nil {
+		{
+			size, err := m.Leaf.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProofs(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.ActualValueHash) > 0 {
+		i -= len(m.ActualValueHash)
+		copy(dAtA[i:], m.ActualValueHash)
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.ActualValueHash)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.ActualPath) > 0 {
+		i -= len(m.ActualPath)
+		copy(dAtA[i:], m.ActualPath)
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.ActualPath)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Key) > 0 {
+		i -= len(m.Key)
+		copy(dAtA[i:], m.Key)
+		i = encodeVarintProofs(dAtA, i, uint64(len(m.Key)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintProofs(dAtA []byte, offset int, v uint64) int {
 	offset -= sovProofs(v)
 	base := offset
@@ -2108,6 +2530,37 @@ func (m *NonExistenceProof) Size() (n int) {
 	return n
 }
 
+func (m *ExclusionProof) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Key)
+	if l > 0 {
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	l = len(m.ActualPath)
+	if l > 0 {
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	l = len(m.ActualValueHash)
+	if l > 0 {
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	if m.Leaf != nil {
+		l = m.Leaf.Size()
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	if len(m.Path) > 0 {
+		for _, e := range m.Path {
+			l = e.Size()
+			n += 1 + l + sovProofs(uint64(l))
+		}
+	}
+	return n
+}
+
 func (m *CommitmentProof) Size() (n int) {
 	if m == nil {
 		return 0
@@ -2140,6 +2593,18 @@ func (m *CommitmentProof_Nonexist) Size() (n int) {
 	_ = l
 	if m.Nonexist != nil {
 		l = m.Nonexist.Size()
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	return n
+}
+func (m *CommitmentProof_Exclusion) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Exclusion != nil {
+		l = m.Exclusion.Size()
 		n += 1 + l + sovProofs(uint64(l))
 	}
 	return n
@@ -2322,6 +2787,18 @@ func (m *BatchEntry_Nonexist) Size() (n int) {
 	}
 	return n
 }
+func (m *BatchEntry_Exclusion) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Exclusion != nil {
+		l = m.Exclusion.Size()
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	return n
+}
 func (m *CompressedBatchProof) Size() (n int) {
 	if m == nil {
 		return 0
@@ -2379,6 +2856,18 @@ func (m *CompressedBatchEntry_Nonexist) Size() (n int) {
 	}
 	return n
 }
+func (m *CompressedBatchEntry_Exclusion) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Exclusion != nil {
+		l = m.Exclusion.Size()
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	return n
+}
 func (m *CompressedExistenceProof) Size() (n int) {
 	if m == nil {
 		return 0
@@ -2424,6 +2913,38 @@ func (m *CompressedNonExistenceProof) Size() (n int) {
 	if m.Right != nil {
 		l = m.Right.Size()
 		n += 1 + l + sovProofs(uint64(l))
+	}
+	return n
+}
+
+func (m *CompressedExclusionProof) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Key)
+	if l > 0 {
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	l = len(m.ActualPath)
+	if l > 0 {
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	l = len(m.ActualValueHash)
+	if l > 0 {
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	if m.Leaf != nil {
+		l = m.Leaf.Size()
+		n += 1 + l + sovProofs(uint64(l))
+	}
+	if len(m.Path) > 0 {
+		l = 0
+		for _, e := range m.Path {
+			l += sovProofs(uint64(e))
+		}
+		n += 1 + sovProofs(uint64(l)) + l
 	}
 	return n
 }
@@ -2778,6 +3299,228 @@ func (m *NonExistenceProof) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *ExclusionProof) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProofs
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ExclusionProof: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ExclusionProof: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Key = append(m.Key[:0], dAtA[iNdEx:postIndex]...)
+			if m.Key == nil {
+				m.Key = []byte{}
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ActualPath", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ActualPath = append(m.ActualPath[:0], dAtA[iNdEx:postIndex]...)
+			if m.ActualPath == nil {
+				m.ActualPath = []byte{}
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ActualValueHash", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ActualValueHash = append(m.ActualValueHash[:0], dAtA[iNdEx:postIndex]...)
+			if m.ActualValueHash == nil {
+				m.ActualValueHash = []byte{}
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Leaf", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Leaf == nil {
+				m.Leaf = &LeafOp{}
+			}
+			if err := m.Leaf.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Path", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Path = append(m.Path, &InnerOp{})
+			if err := m.Path[len(m.Path)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProofs(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *CommitmentProof) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -2879,6 +3622,41 @@ func (m *CommitmentProof) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Exclusion", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &ExclusionProof{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Proof = &CommitmentProof_Exclusion{v}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Batch", wireType)
 			}
 			var msglen int
@@ -2912,7 +3690,7 @@ func (m *CommitmentProof) Unmarshal(dAtA []byte) error {
 			}
 			m.Proof = &CommitmentProof_Batch{v}
 			iNdEx = postIndex
-		case 4:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Compressed", wireType)
 			}
@@ -3864,6 +4642,41 @@ func (m *BatchEntry) Unmarshal(dAtA []byte) error {
 			}
 			m.Proof = &BatchEntry_Nonexist{v}
 			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Exclusion", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &ExclusionProof{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Proof = &BatchEntry_Exclusion{v}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipProofs(dAtA[iNdEx:])
@@ -4101,6 +4914,41 @@ func (m *CompressedBatchEntry) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			m.Proof = &CompressedBatchEntry_Nonexist{v}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Exclusion", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &CompressedExclusionProof{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Proof = &CompressedBatchEntry_Exclusion{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -4488,6 +5336,270 @@ func (m *CompressedNonExistenceProof) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProofs(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CompressedExclusionProof) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProofs
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CompressedExclusionProof: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CompressedExclusionProof: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Key = append(m.Key[:0], dAtA[iNdEx:postIndex]...)
+			if m.Key == nil {
+				m.Key = []byte{}
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ActualPath", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ActualPath = append(m.ActualPath[:0], dAtA[iNdEx:postIndex]...)
+			if m.ActualPath == nil {
+				m.ActualPath = []byte{}
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ActualValueHash", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ActualValueHash = append(m.ActualValueHash[:0], dAtA[iNdEx:postIndex]...)
+			if m.ActualValueHash == nil {
+				m.ActualValueHash = []byte{}
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Leaf", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProofs
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProofs
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProofs
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Leaf == nil {
+				m.Leaf = &LeafOp{}
+			}
+			if err := m.Leaf.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType == 0 {
+				var v int32
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowProofs
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= int32(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.Path = append(m.Path, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowProofs
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthProofs
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex < 0 {
+					return ErrInvalidLengthProofs
+				}
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				var count int
+				for _, integer := range dAtA[iNdEx:postIndex] {
+					if integer < 128 {
+						count++
+					}
+				}
+				elementCount = count
+				if elementCount != 0 && len(m.Path) == 0 {
+					m.Path = make([]int32, 0, elementCount)
+				}
+				for iNdEx < postIndex {
+					var v int32
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowProofs
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= int32(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.Path = append(m.Path, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field Path", wireType)
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipProofs(dAtA[iNdEx:])

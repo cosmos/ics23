@@ -60,6 +60,14 @@ func compressEntry(entry *BatchEntry, lookup *[]*InnerOp, registry map[string]in
 		}
 	}
 
+	if exclusion := entry.GetExclusion(); exclusion != nil {
+		return &CompressedBatchEntry{
+			Proof: &CompressedBatchEntry_Exclusion{
+				Exclusion: compressExclusion(exclusion, lookup, registry),
+			},
+		}
+	}
+
 	non := entry.GetNonexist()
 	return &CompressedBatchEntry{
 		Proof: &CompressedBatchEntry_Nonexist{
@@ -83,6 +91,23 @@ func compressExist(exist *ExistenceProof, lookup *[]*InnerOp, registry map[strin
 		Path:  make([]int32, len(exist.Path)),
 	}
 	for i, step := range exist.Path {
+		res.Path[i] = compressStep(step, lookup, registry)
+	}
+	return res
+}
+
+func compressExclusion(exclusion *ExclusionProof, lookup *[]*InnerOp, registry map[string]int32) *CompressedExclusionProof {
+	if exclusion == nil {
+		return nil
+	}
+	res := &CompressedExclusionProof{
+		Key:             exclusion.Key,
+		ActualPath:      exclusion.ActualPath,
+		ActualValueHash: exclusion.ActualValueHash,
+		Leaf:            exclusion.Leaf,
+		Path:            make([]int32, len(exclusion.Path)),
+	}
+	for i, step := range exclusion.Path {
 		res.Path[i] = compressStep(step, lookup, registry)
 	}
 	return res
@@ -131,6 +156,14 @@ func decompressEntry(entry *CompressedBatchEntry, lookup []*InnerOp) *BatchEntry
 		}
 	}
 
+	if exclusion := entry.GetExclusion(); exclusion != nil {
+		return &BatchEntry{
+			Proof: &BatchEntry_Exclusion{
+				Exclusion: decompressExclusion(exclusion, lookup),
+			},
+		}
+	}
+
 	non := entry.GetNonexist()
 	return &BatchEntry{
 		Proof: &BatchEntry_Nonexist{
@@ -154,6 +187,23 @@ func decompressExist(exist *CompressedExistenceProof, lookup []*InnerOp) *Existe
 		Path:  make([]*InnerOp, len(exist.Path)),
 	}
 	for i, step := range exist.Path {
+		res.Path[i] = lookup[step]
+	}
+	return res
+}
+
+func decompressExclusion(exclusion *CompressedExclusionProof, lookup []*InnerOp) *ExclusionProof {
+	if exclusion == nil {
+		return nil
+	}
+	res := &ExclusionProof{
+		Key:             exclusion.Key,
+		ActualPath:      exclusion.ActualPath,
+		ActualValueHash: exclusion.ActualValueHash,
+		Leaf:            exclusion.Leaf,
+		Path:            make([]*InnerOp, len(exclusion.Path)),
+	}
+	for i, step := range exclusion.Path {
 		res.Path[i] = lookup[step]
 	}
 	return res

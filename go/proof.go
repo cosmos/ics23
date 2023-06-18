@@ -43,7 +43,7 @@ var TendermintSpec = &ProofSpec{
 	},
 }
 
-// SmtSpec constrains the format for SMT proofs (as implemented by github.com/celestiaorg/smt)
+// SmtSpec constrains the format for SMT proofs (as implemented by github.com/pokt-network/smt)
 var SmtSpec = &ProofSpec{
 	LeafSpec: &LeafOp{
 		Hash:         HashOp_SHA256,
@@ -86,12 +86,17 @@ func (p *CommitmentProof) Calculate() (CommitmentRoot, error) {
 		return v.Exist.Calculate()
 	case *CommitmentProof_Nonexist:
 		return v.Nonexist.Calculate()
+	case *CommitmentProof_Exclusion:
+		return v.Exclusion.Calculate()
 	case *CommitmentProof_Batch:
 		if len(v.Batch.GetEntries()) == 0 || v.Batch.GetEntries()[0] == nil {
 			return nil, errors.New("batch proof has empty entry")
 		}
 		if e := v.Batch.GetEntries()[0].GetExist(); e != nil {
 			return e.Calculate()
+		}
+		if x := v.Batch.GetEntries()[0].GetExclusion(); x != nil {
+			return x.Calculate()
 		}
 		if n := v.Batch.GetEntries()[0].GetNonexist(); n != nil {
 			return n.Calculate()
@@ -161,6 +166,36 @@ func (p *ExistenceProof) calculate(spec *ProofSpec) (CommitmentRoot, error) {
 		}
 	}
 	return res, nil
+}
+
+func (p *ExclusionProof) Calculate() (CommitmentRoot, error) {
+	if p.Leaf.PrehashKey != HashOp_NO_HASH {
+		return nil, errors.New("exclusion proof must have leaf with PrehashKey == NO_HASH")
+	}
+	if p.Leaf.PrehashValue != HashOp_NO_HASH {
+		return nil, errors.New("exclusion proof must have leaf with PrehashValue == NO_HASH")
+	}
+	existProof := &ExistenceProof{
+		Key:   p.ActualPath,
+		Value: p.ActualValueHash,
+		Leaf:  p.Leaf,
+		Path:  p.Path,
+	}
+	return existProof.Calculate()
+}
+
+func (p *ExclusionProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte) error {
+	if !bytes.Equal(keyForComparison(spec, key), keyForComparison(spec, p.Key)) {
+		return errors.New("provided key doesn't match proof key")
+	}
+	calc, err := p.Calculate()
+	if err != nil {
+		return fmt.Errorf("error calculating root, %w", err)
+	}
+	if !bytes.Equal(root, calc) {
+		return errors.New("calculcated root doesn't match provided root")
+	}
+	return nil
 }
 
 // Calculate determines the root hash that matches the given nonexistence rpoog.
