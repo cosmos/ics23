@@ -169,19 +169,34 @@ func (p *ExistenceProof) calculate(spec *ProofSpec) (CommitmentRoot, error) {
 }
 
 func (p *ExclusionProof) Calculate() (CommitmentRoot, error) {
+	if p.GetLeaf() == nil {
+		return nil, errors.New("exclusion Proof needs defined LeafOp")
+	}
 	if p.Leaf.PrehashKey != HashOp_NO_HASH {
 		return nil, errors.New("exclusion proof must have leaf with PrehashKey == NO_HASH")
 	}
 	if p.Leaf.PrehashValue != HashOp_NO_HASH {
 		return nil, errors.New("exclusion proof must have leaf with PrehashValue == NO_HASH")
 	}
-	existProof := &ExistenceProof{
-		Key:   p.ActualPath,
-		Value: p.ActualValueHash,
-		Leaf:  p.Leaf,
-		Path:  p.Path,
+
+	// leaf step takes the key and value as input
+	res, err := p.Leaf.Apply(p.ActualPath, p.ActualValueHash)
+	if err != nil {
+		return nil, fmt.Errorf("leaf, %w", err)
 	}
-	return existProof.Calculate()
+	// check if the actual value was a placeholder and replace with empty hash
+	if bytes.Equal(p.ActualValueHash, make([]byte, 32)) {
+		res = make([]byte, 32)
+	}
+
+	// the rest just take the output of the last step (reducing it)
+	for _, step := range p.Path {
+		res, err = step.Apply(res)
+		if err != nil {
+			return nil, fmt.Errorf("inner, %w", err)
+		}
+	}
+	return res, nil
 }
 
 func (p *ExclusionProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte) error {
