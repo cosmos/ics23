@@ -1,5 +1,5 @@
 DOCKER := $(shell which docker)
-HTTPS_GIT := https://github.com/cosmos/cosmos-sdk.git
+HTTPS_GIT := https://github.com/cosmos/ics23.git
 
 ##### GO commands #####
 
