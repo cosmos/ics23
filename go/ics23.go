@@ -66,6 +66,17 @@ func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *Commitment
 			return false
 		}
 		err = ex.Verify(spec, root, key)
+	case *CommitmentProof_Batch:
+		np := getNonExistProofForKey(spec, proof, key)
+		ex := getExclusionProofForKey(proof, key)
+		if np == nil && ex == nil {
+			return false
+		}
+		if np != nil {
+			err = np.Verify(spec, root, key)
+		} else {
+			err = ex.Verify(spec, root, key)
+		}
 	default:
 		return false
 	}
