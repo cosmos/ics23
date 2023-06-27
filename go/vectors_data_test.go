@@ -103,6 +103,7 @@ func BatchVectorsTestData(t *testing.T) map[string]BatchVectorData {
 		"nonexist_left.json",
 		"nonexist_right.json",
 		"nonexist_middle.json",
+		"exclusion.json",
 	})
 
 	batchTMExist, refsTMExist := loadBatch(t, tendermint, "batch_exist.json")
@@ -111,6 +112,7 @@ func BatchVectorsTestData(t *testing.T) map[string]BatchVectorData {
 	batchIAVLNonexist, refsIAVLNonexist := loadBatch(t, iavl, "batch_nonexist.json")
 	batchSMTexist, refsSMTexist := loadBatch(t, smt, "batch_exist.json")
 	batchSMTnonexist, refsSMTnonexist := loadBatch(t, smt, "batch_nonexist.json")
+	batchSMTexclusion, refsSMTexclusion := loadBatch(t, smt, "batch_exclusion.json")
 
 	return map[string]BatchVectorData{
 		"iavl 0": {Spec: IavlSpec, Proof: batchIAVL, Ref: refsIAVL[0]},
@@ -142,10 +144,11 @@ func BatchVectorsTestData(t *testing.T) map[string]BatchVectorData {
 		"smt 4":             {Spec: SmtSpec, Proof: batchSMT, Ref: refsSMT[4]},
 		"smt 5":             {Spec: SmtSpec, Proof: batchSMT, Ref: refsSMT[5]},
 		// Note this spec only differs for non-existence proofs
-		"smt invalid 1":      {Spec: IavlSpec, Proof: batchSMT, Ref: refsSMT[4], Invalid: true},
-		"smt invalid 2":      {Spec: SmtSpec, Proof: batchSMT, Ref: refsIAVL[0], Invalid: true},
-		"smt batch exist":    {Spec: SmtSpec, Proof: batchSMTexist, Ref: refsSMTexist[10]},
-		"smt batch nonexist": {Spec: SmtSpec, Proof: batchSMTnonexist, Ref: refsSMTnonexist[3]},
+		"smt invalid 1":       {Spec: IavlSpec, Proof: batchSMT, Ref: refsSMT[4], Invalid: true},
+		"smt invalid 2":       {Spec: SmtSpec, Proof: batchSMT, Ref: refsIAVL[0], Invalid: true},
+		"smt batch exist":     {Spec: SmtSpec, Proof: batchSMTexist, Ref: refsSMTexist[10]},
+		"smt batch nonexist":  {Spec: SmtSpec, Proof: batchSMTnonexist, Ref: refsSMTnonexist[3]},
+		"smt batch exclusion": {Spec: SmtSpec, Proof: batchSMTexclusion, Ref: refsSMTexclusion[6]},
 	}
 }
 
@@ -231,6 +234,7 @@ func loadBatch(t *testing.T, dir string, filename string) (*CommitmentProof, []*
 	var proof CommitmentProof
 	err = proof.Unmarshal(mustHex(t, data.Proof))
 	if err != nil {
+		t.Log(dir, filename)
 		t.Fatalf("Unmarshal protobuf: %+v", err)
 	}
 	root := mustHex(t, data.RootHash)
