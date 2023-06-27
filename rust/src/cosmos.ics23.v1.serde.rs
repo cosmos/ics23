@@ -231,14 +231,14 @@ impl serde::Serialize for CommitmentProof {
                 commitment_proof::Proof::Nonexist(v) => {
                     struct_ser.serialize_field("nonexist", v)?;
                 }
-                commitment_proof::Proof::Exclusion(v) => {
-                    struct_ser.serialize_field("exclusion", v)?;
-                }
                 commitment_proof::Proof::Batch(v) => {
                     struct_ser.serialize_field("batch", v)?;
                 }
                 commitment_proof::Proof::Compressed(v) => {
                     struct_ser.serialize_field("compressed", v)?;
+                }
+                commitment_proof::Proof::Exclusion(v) => {
+                    struct_ser.serialize_field("exclusion", v)?;
                 }
             }
         }
@@ -254,18 +254,18 @@ impl<'de> serde::Deserialize<'de> for CommitmentProof {
         const FIELDS: &[&str] = &[
             "exist",
             "nonexist",
-            "exclusion",
             "batch",
             "compressed",
+            "exclusion",
         ];
 
         #[allow(clippy::enum_variant_names)]
         enum GeneratedField {
             Exist,
             Nonexist,
-            Exclusion,
             Batch,
             Compressed,
+            Exclusion,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -289,9 +289,9 @@ impl<'de> serde::Deserialize<'de> for CommitmentProof {
                         match value {
                             "exist" => Ok(GeneratedField::Exist),
                             "nonexist" => Ok(GeneratedField::Nonexist),
-                            "exclusion" => Ok(GeneratedField::Exclusion),
                             "batch" => Ok(GeneratedField::Batch),
                             "compressed" => Ok(GeneratedField::Compressed),
+                            "exclusion" => Ok(GeneratedField::Exclusion),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -328,13 +328,6 @@ impl<'de> serde::Deserialize<'de> for CommitmentProof {
                             proof__ = map.next_value::<::std::option::Option<_>>()?.map(commitment_proof::Proof::Nonexist)
 ;
                         }
-                        GeneratedField::Exclusion => {
-                            if proof__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("exclusion"));
-                            }
-                            proof__ = map.next_value::<::std::option::Option<_>>()?.map(commitment_proof::Proof::Exclusion)
-;
-                        }
                         GeneratedField::Batch => {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("batch"));
@@ -347,6 +340,13 @@ impl<'de> serde::Deserialize<'de> for CommitmentProof {
                                 return Err(serde::de::Error::duplicate_field("compressed"));
                             }
                             proof__ = map.next_value::<::std::option::Option<_>>()?.map(commitment_proof::Proof::Compressed)
+;
+                        }
+                        GeneratedField::Exclusion => {
+                            if proof__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("exclusion"));
+                            }
+                            proof__ = map.next_value::<::std::option::Option<_>>()?.map(commitment_proof::Proof::Exclusion)
 ;
                         }
                     }
@@ -642,7 +642,7 @@ impl<'de> serde::Deserialize<'de> for CompressedExclusionProof {
             "key",
             "actual_path",
             "actualPath",
-            "actual_valueHash",
+            "actual_value_hash",
             "actualValueHash",
             "leaf",
             "path",
@@ -678,7 +678,7 @@ impl<'de> serde::Deserialize<'de> for CompressedExclusionProof {
                         match value {
                             "key" => Ok(GeneratedField::Key),
                             "actualPath" | "actual_path" => Ok(GeneratedField::ActualPath),
-                            "actualValueHash" | "actual_valueHash" => Ok(GeneratedField::ActualValueHash),
+                            "actualValueHash" | "actual_value_hash" => Ok(GeneratedField::ActualValueHash),
                             "leaf" => Ok(GeneratedField::Leaf),
                             "path" => Ok(GeneratedField::Path),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
@@ -1088,7 +1088,7 @@ impl<'de> serde::Deserialize<'de> for ExclusionProof {
             "key",
             "actual_path",
             "actualPath",
-            "actual_valueHash",
+            "actual_value_hash",
             "actualValueHash",
             "leaf",
             "path",
@@ -1124,7 +1124,7 @@ impl<'de> serde::Deserialize<'de> for ExclusionProof {
                         match value {
                             "key" => Ok(GeneratedField::Key),
                             "actualPath" | "actual_path" => Ok(GeneratedField::ActualPath),
-                            "actualValueHash" | "actual_valueHash" => Ok(GeneratedField::ActualValueHash),
+                            "actualValueHash" | "actual_value_hash" => Ok(GeneratedField::ActualValueHash),
                             "leaf" => Ok(GeneratedField::Leaf),
                             "path" => Ok(GeneratedField::Path),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),

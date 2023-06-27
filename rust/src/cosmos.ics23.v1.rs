@@ -86,11 +86,11 @@ pub mod commitment_proof {
         #[prost(message, tag = "2")]
         Nonexist(super::NonExistenceProof),
         #[prost(message, tag = "3")]
-        Exclusion(super::ExclusionProof),
-        #[prost(message, tag = "4")]
         Batch(super::BatchProof),
-        #[prost(message, tag = "5")]
+        #[prost(message, tag = "4")]
         Compressed(super::CompressedBatchProof),
+        #[prost(message, tag = "5")]
+        Exclusion(super::ExclusionProof),
     }
 }
 /// *

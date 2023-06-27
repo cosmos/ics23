@@ -234,7 +234,6 @@ func loadBatch(t *testing.T, dir string, filename string) (*CommitmentProof, []*
 	var proof CommitmentProof
 	err = proof.Unmarshal(mustHex(t, data.Proof))
 	if err != nil {
-		t.Log(dir, filename)
 		t.Fatalf("Unmarshal protobuf: %+v", err)
 	}
 	root := mustHex(t, data.RootHash)

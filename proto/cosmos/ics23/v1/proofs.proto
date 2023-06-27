@@ -90,13 +90,13 @@ the key's path. In this case the key was not in the tree as an unrelated leaf
 was found in its place.
 */
 message ExclusionProof {
-    bytes            key              = 1;
-    bytes            actual_path      = 2;
-    bytes            actual_valueHash = 3;
-    // As the actual_path and actual_valueHash are already hashed both the
-    // prehash_key and prehash_value fields should be set to HashOp_NO_HASH.
-    LeafOp           leaf             = 4;
-    repeated InnerOp path             = 5;
+  bytes key               = 1;
+  bytes actual_path       = 2;
+  bytes actual_value_hash = 3;
+  // As the actual_path and actual_valueHash are already hashed both the
+  // prehash_key and prehash_value fields should be set to HashOp_NO_HASH.
+  LeafOp           leaf = 4;
+  repeated InnerOp path = 5;
 }
 
 /*
@@ -106,9 +106,9 @@ message CommitmentProof {
   oneof proof {
     ExistenceProof       exist      = 1;
     NonExistenceProof    nonexist   = 2;
-    ExclusionProof       exclusion  = 3;
-    BatchProof           batch      = 4;
-    CompressedBatchProof compressed = 5;
+    BatchProof           batch      = 3;
+    CompressedBatchProof compressed = 4;
+    ExclusionProof       exclusion  = 5;
   }
 }
 
@@ -259,10 +259,10 @@ message CompressedNonExistenceProof {
 }
 
 message CompressedExclusionProof {
-    bytes          key              = 1;
-    bytes          actual_path      = 2;
-    bytes          actual_valueHash = 3;
-    LeafOp         leaf             = 4;
-    // these are indexes into the lookup_inners table in CompressedBatchProof
-    repeated int32 path             = 5;
+  bytes  key               = 1;
+  bytes  actual_path       = 2;
+  bytes  actual_value_hash = 3;
+  LeafOp leaf              = 4;
+  // these are indexes into the lookup_inners table in CompressedBatchProof
+  repeated int32 path = 5;
 }
