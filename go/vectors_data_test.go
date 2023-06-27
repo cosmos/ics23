@@ -52,6 +52,7 @@ func VectorsTestData() []TestVectorsStruct {
 		{Dir: smt, Filename: "nonexist_left.json", Spec: SmtSpec},
 		{Dir: smt, Filename: "nonexist_right.json", Spec: SmtSpec},
 		{Dir: smt, Filename: "nonexist_middle.json", Spec: SmtSpec},
+		{Dir: smt, Filename: "exclusion.json", Spec: SmtSpec},
 	}
 	return cases
 }
