@@ -143,6 +143,7 @@ func BatchVectorsTestData(t *testing.T) map[string]BatchVectorData {
 		"smt 3":             {Spec: SmtSpec, Proof: batchSMT, Ref: refsSMT[3]},
 		"smt 4":             {Spec: SmtSpec, Proof: batchSMT, Ref: refsSMT[4]},
 		"smt 5":             {Spec: SmtSpec, Proof: batchSMT, Ref: refsSMT[5]},
+		"smt 6":             {Spec: SmtSpec, Proof: batchSMT, Ref: refsSMT[6]},
 		// Note this spec only differs for non-existence proofs
 		"smt invalid 1":       {Spec: IavlSpec, Proof: batchSMT, Ref: refsSMT[4], Invalid: true},
 		"smt invalid 2":       {Spec: SmtSpec, Proof: batchSMT, Ref: refsIAVL[0], Invalid: true},
