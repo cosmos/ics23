@@ -170,7 +170,7 @@ func (p *ExistenceProof) calculate(spec *ProofSpec) (CommitmentRoot, error) {
 
 func (p *ExclusionProof) Calculate() (CommitmentRoot, error) {
 	if p.GetLeaf() == nil {
-		return nil, errors.New("exclusion Proof needs defined LeafOp")
+		return nil, errors.New("exclusion proof needs defined LeafOp")
 	}
 	if p.Leaf.PrehashKey != HashOp_NO_HASH {
 		return nil, errors.New("exclusion proof must have leaf with PrehashKey == NO_HASH")
@@ -185,6 +185,7 @@ func (p *ExclusionProof) Calculate() (CommitmentRoot, error) {
 		return nil, fmt.Errorf("leaf, %w", err)
 	}
 	// check if the actual value was a placeholder and replace with empty hash
+	// assumes the placeholder value is [32]byte
 	if bytes.Equal(p.ActualValueHash, make([]byte, 32)) {
 		res = make([]byte, 32)
 	}
@@ -200,6 +201,9 @@ func (p *ExclusionProof) Calculate() (CommitmentRoot, error) {
 }
 
 func (p *ExclusionProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte) error {
+	if err := p.CheckAgainstSpec(spec); err != nil {
+		return err
+	}
 	if !bytes.Equal(keyForComparison(spec, key), keyForComparison(spec, p.Key)) {
 		return errors.New("provided key doesn't match proof key")
 	}
@@ -209,6 +213,46 @@ func (p *ExclusionProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte
 	}
 	if !bytes.Equal(root, calc) {
 		return errors.New("calculcated root doesn't match provided root")
+	}
+	return nil
+}
+
+// CheckAgainstSpec will verify the leaf and all path steps are in the format defined in spec
+func (p *ExclusionProof) CheckAgainstSpec(spec *ProofSpec) error {
+	if p.GetLeaf() == nil {
+		return errors.New("exclusion Proof needs defined LeafOp")
+	}
+
+	// Custom leaf spec validation
+	if p.Leaf.Hash != spec.LeafSpec.Hash {
+		return fmt.Errorf("unexpected HashOp: %d", p.Leaf.Hash)
+	}
+	if p.Leaf.PrehashKey != HashOp_NO_HASH {
+		return errors.New("exclusion proof must have leaf with PrehashKey == NO_HASH")
+	}
+	if p.Leaf.PrehashValue != HashOp_NO_HASH {
+		return errors.New("exclusion proof must have leaf with PrehashValue == NO_HASH")
+	}
+	if p.Leaf.Length != spec.LeafSpec.Length {
+		return fmt.Errorf("unexpected LengthOp: %d", p.Leaf.Length)
+	}
+	if !bytes.HasPrefix(p.Leaf.Prefix, spec.LeafSpec.Prefix) {
+		return fmt.Errorf("leaf Prefix doesn't start with %X", spec.LeafSpec.Prefix)
+	}
+	if spec.MinDepth > 0 && len(p.Path) < int(spec.MinDepth) {
+		return fmt.Errorf("innerOps depth too short: %d", len(p.Path))
+	}
+	if spec.MaxDepth > 0 && len(p.Path) > int(spec.MaxDepth) {
+		return fmt.Errorf("innerOps depth too long: %d", len(p.Path))
+	}
+
+	layerNum := 1
+
+	for _, inner := range p.Path {
+		if err := inner.CheckAgainstSpec(spec, layerNum); err != nil {
+			return fmt.Errorf("inner, %w", err)
+		}
+		layerNum += 1
 	}
 	return nil
 }
