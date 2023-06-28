@@ -62,6 +62,12 @@ pub fn compress_batch(proof: &ics23::BatchProof) -> Result<ics23::CommitmentProo
                     proof: Some(ics23::compressed_batch_entry::Proof::Nonexist(nonexist)),
                 }
             }
+            Some(ics23::batch_entry::Proof::Exclusion(ex)) => {
+                let exclusion = compress_exclusion(ex, &mut lookup, &mut registry)?;
+                ics23::CompressedBatchEntry {
+                    proof: Some(ics23::compressed_batch_entry::Proof::Exclusion(exclusion)),
+                }
+            }
             None => ics23::CompressedBatchEntry { proof: None },
         };
         centries.push(centry);
@@ -107,6 +113,38 @@ pub fn compress_exist(
     })
 }
 
+pub fn compress_exclusion(
+    exclusion: &ics23::ExclusionProof,
+    lookup: &mut Vec<ics23::InnerOp>,
+    registry: &mut HashMap<Vec<u8>, i32>,
+) -> Result<ics23::CompressedExclusionProof> {
+    let path = exclusion
+        .path
+        .iter()
+        .map(|x| {
+            let mut buf = Vec::new();
+            x.encode(&mut buf)
+                .map_err(|e: prost::EncodeError| anyhow::anyhow!(e))?;
+
+            if let Some(&idx) = registry.get(buf.as_slice()) {
+                return Ok(idx);
+            };
+            let idx = lookup.len() as i32;
+            lookup.push(x.to_owned());
+            registry.insert(buf, idx);
+            Ok(idx)
+        })
+        .collect::<Result<Vec<i32>>>()?;
+
+    Ok(ics23::CompressedExclusionProof {
+        key: exclusion.key.clone(),
+        actual_path: exclusion.actual_path.clone(),
+        actual_value_hash: exclusion.actual_value_hash.clone(),
+        leaf: exclusion.leaf.clone(),
+        path,
+    })
+}
+
 pub fn decompress_batch(proof: &ics23::CompressedBatchProof) -> Result<ics23::CommitmentProof> {
     let lookup = &proof.lookup_inners;
     let entries = proof
@@ -130,6 +168,12 @@ pub fn decompress_batch(proof: &ics23::CompressedBatchProof) -> Result<ics23::Co
                     };
                     Ok(ics23::BatchEntry {
                         proof: Some(ics23::batch_entry::Proof::Nonexist(nonexist)),
+                    })
+                }
+                Some(ics23::compressed_batch_entry::Proof::Exclusion(ex)) => {
+                    let exclusion = decompress_exclusion(ex, lookup);
+                    Ok(ics23::BatchEntry {
+                        proof: Some(ics23::batch_entry::Proof::Exclusion(exclusion)),
                     })
                 }
                 None => Ok(ics23::BatchEntry { proof: None }),
@@ -158,6 +202,25 @@ fn decompress_exist(
         key: exist.key.clone(),
         value: exist.value.clone(),
         leaf: exist.leaf.clone(),
+        path,
+    }
+}
+
+fn decompress_exclusion(
+    exclusion: &ics23::CompressedExclusionProof,
+    lookup: &[ics23::InnerOp],
+) -> ics23::ExclusionProof {
+    let path = exclusion
+        .path
+        .iter()
+        .map(|&x| lookup.get(x as usize).cloned())
+        .collect::<Option<Vec<_>>>()
+        .unwrap_or_default();
+    ics23::ExclusionProof {
+        key: exclusion.key.clone(),
+        actual_path: exclusion.actual_path.clone(),
+        actual_value_hash: exclusion.actual_value_hash.clone(),
+        leaf: exclusion.leaf.clone(),
         path,
     }
 }

@@ -9,7 +9,7 @@ use crate::helpers::Result;
 use crate::host_functions::HostFunctionsProvider;
 use crate::ics23;
 use crate::ops::do_hash;
-use crate::verify::{verify_existence, verify_non_existence, CommitmentRoot};
+use crate::verify::{verify_exclusion, verify_existence, verify_non_existence, CommitmentRoot};
 
 // Use CommitmentRoot vs &[u8] to stick with ics naming
 #[allow(clippy::ptr_arg)]
@@ -63,6 +63,9 @@ pub fn verify_non_membership<H: HostFunctionsProvider>(
 
     if let Some(non) = get_nonexist_proof::<H>(proof, key, spec) {
         let valid = verify_non_existence::<H>(non, spec, root, key);
+        valid.is_ok()
+    } else if let Some(ex) = get_exclusion_proof(proof, key) {
+        let valid = verify_exclusion::<H>(ex, spec, root, key);
         valid.is_ok()
     } else {
         false
@@ -125,6 +128,26 @@ fn get_exist_proof<'a>(
         Some(ics23::commitment_proof::Proof::Batch(batch)) => {
             for entry in &batch.entries {
                 if let Some(ics23::batch_entry::Proof::Exist(ex)) = &entry.proof {
+                    if ex.key == key {
+                        return Some(ex);
+                    }
+                }
+            }
+            None
+        }
+        _ => None,
+    }
+}
+
+fn get_exclusion_proof<'a>(
+    proof: &'a ics23::CommitmentProof,
+    key: &[u8],
+) -> Option<&'a ics23::ExclusionProof> {
+    match &proof.proof {
+        Some(ics23::commitment_proof::Proof::Exclusion(ex)) => Some(ex),
+        Some(ics23::commitment_proof::Proof::Batch(batch)) => {
+            for entry in &batch.entries {
+                if let Some(ics23::batch_entry::Proof::Exclusion(ex)) = &entry.proof {
                     if ex.key == key {
                         return Some(ex);
                     }
@@ -580,6 +603,13 @@ mod tests {
         verify_test_vector("../testdata/smt/nonexist_middle.json", &spec)
     }
 
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_vector_smt_exclusion() -> Result<()> {
+        let spec = smt_spec();
+        verify_test_vector("../testdata/smt/exclusion.json", &spec)
+    }
+
     #[cfg(feature = "std")]
     fn load_batch(files: &[&str]) -> Result<(ics23::CommitmentProof, Vec<RefData>)> {
         let mut entries = Vec::new();
@@ -597,6 +627,11 @@ mod tests {
                 Some(ics23::commitment_proof::Proof::Exist(ex)) => {
                     entries.push(ics23::BatchEntry {
                         proof: Some(ics23::batch_entry::Proof::Exist(ex)),
+                    })
+                }
+                Some(ics23::commitment_proof::Proof::Exclusion(ex)) => {
+                    entries.push(ics23::BatchEntry {
+                        proof: Some(ics23::batch_entry::Proof::Exclusion(ex)),
                     })
                 }
                 _ => bail!("unknown proof type to batch"),
@@ -743,6 +778,7 @@ mod tests {
             "../testdata/smt/nonexist_left.json",
             "../testdata/smt/nonexist_right.json",
             "../testdata/smt/nonexist_middle.json",
+            "../testdata/smt/exclusion.json",
         ])?;
         verify_batch(&spec, &proof, &data[0])
     }
@@ -758,6 +794,7 @@ mod tests {
             "../testdata/smt/nonexist_left.json",
             "../testdata/smt/nonexist_right.json",
             "../testdata/smt/nonexist_middle.json",
+            "../testdata/smt/exclusion.json",
         ])?;
         let comp = compress(&proof)?;
         verify_batch(&spec, &comp, &data[0])
@@ -774,6 +811,7 @@ mod tests {
             "../testdata/smt/nonexist_left.json",
             "../testdata/smt/nonexist_right.json",
             "../testdata/smt/nonexist_middle.json",
+            "../testdata/smt/exclusion.json",
         ])?;
         verify_batch(&spec, &proof, &data[4])
     }
@@ -789,6 +827,7 @@ mod tests {
             "../testdata/smt/nonexist_left.json",
             "../testdata/smt/nonexist_right.json",
             "../testdata/smt/nonexist_middle.json",
+            "../testdata/smt/exclusion.json",
         ])?;
         let comp = compress(&proof)?;
         verify_batch(&spec, &comp, &data[4])

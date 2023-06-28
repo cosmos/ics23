@@ -30,6 +30,19 @@ pub fn verify_existence<H: HostFunctionsProvider>(
     Ok(())
 }
 
+pub fn verify_exclusion<H: HostFunctionsProvider>(
+    proof: &ics23::ExclusionProof,
+    spec: &ics23::ProofSpec,
+    root: &[u8],
+    key: &[u8],
+) -> Result<()> {
+    check_exclusion_spec(proof, spec)?;
+    ensure!(proof.key == key, "Provided key doesn't match proof");
+    let calc = calculate_exclusion_root::<H>(proof)?;
+    ensure!(calc == root, "Root hash doesn't match");
+    Ok(())
+}
+
 pub fn verify_non_existence<H: HostFunctionsProvider>(
     proof: &ics23::NonExistenceProof,
     spec: &ics23::ProofSpec,
@@ -109,10 +122,93 @@ fn calculate_existence_root_for_spec<H: HostFunctionsProvider>(
     }
 }
 
+pub fn calculate_exclusion_root<H: HostFunctionsProvider>(
+    proof: &ics23::ExclusionProof,
+) -> Result<CommitmentRoot> {
+    ensure!(!proof.key.is_empty(), "Exclusion proof must have a key set");
+    ensure!(
+        !proof.actual_path.is_empty(),
+        "Exclusion proof must have an actual path set"
+    );
+    ensure!(
+        !proof.actual_value_hash.is_empty(),
+        "Exclusion proof must have an actual value hash set"
+    );
+    if let Some(leaf_node) = &proof.leaf {
+        ensure!(
+            leaf_node.prehash_key == 0,
+            "Exclusion proof must have prehash_key == NoHash"
+        );
+        ensure!(
+            leaf_node.prehash_value == 0,
+            "Exclusion proof must have prehash_value == NoHash"
+        );
+        let mut hash = apply_leaf::<H>(leaf_node, &proof.actual_path, &proof.actual_value_hash)?;
+        let placeholder = vec![0; 32];
+        if proof.actual_value_hash == placeholder {
+            hash = placeholder
+        }
+        for step in &proof.path {
+            hash = apply_inner::<H>(step, &hash)?;
+        }
+        Ok(hash)
+    } else {
+        bail!("No leaf operation set");
+    }
+}
+
 fn check_existence_spec(proof: &ics23::ExistenceProof, spec: &ics23::ProofSpec) -> Result<()> {
     if let (Some(leaf), Some(leaf_spec)) = (&proof.leaf, &spec.leaf_spec) {
         ensure_leaf_prefix(&leaf.prefix, spec)?;
         ensure_leaf(leaf, leaf_spec)?;
+        // ensure min/max depths
+        if spec.min_depth != 0 {
+            ensure!(
+                proof.path.len() >= spec.min_depth as usize,
+                "Too few InnerOps: {}",
+                proof.path.len(),
+            );
+            ensure!(
+                proof.path.len() <= spec.max_depth as usize,
+                "Too many InnerOps: {}",
+                proof.path.len(),
+            );
+        }
+        for (idx, step) in proof.path.iter().enumerate() {
+            ensure_inner_prefix(&step.prefix, spec, (idx as i64) + 1, step.hash)?;
+            ensure_inner(step, spec)?;
+        }
+        Ok(())
+    } else {
+        bail!("Leaf and Leaf Spec must be set")
+    }
+}
+
+fn check_exclusion_spec(proof: &ics23::ExclusionProof, spec: &ics23::ProofSpec) -> Result<()> {
+    if let (Some(leaf), Some(leaf_spec)) = (&proof.leaf, &spec.leaf_spec) {
+        ensure_leaf_prefix(&leaf.prefix, spec)?;
+        ensure!(
+            leaf_spec.hash == leaf.hash,
+            "Unexpected hashOp: {:?}",
+            leaf.hash
+        );
+        ensure!(
+            leaf.prehash_key == 0,
+            "Exclusion proof must have prehash_key == NoHash"
+        );
+        ensure!(
+            leaf.prehash_value == 0,
+            "Exclusion proof must have prehash_value == NoHash"
+        );
+        ensure!(
+            leaf_spec.length == leaf.length,
+            "Unexpected lengthOp: {:?}",
+            leaf.length
+        );
+        ensure!(
+            has_prefix(&leaf_spec.prefix, &leaf.prefix),
+            "Incorrect prefix on leaf"
+        );
         // ensure min/max depths
         if spec.min_depth != 0 {
             ensure!(
@@ -358,7 +454,9 @@ mod tests {
 
     use crate::api;
     use crate::host_functions::host_functions_impl::HostFunctionsManager;
-    use crate::ics23::{ExistenceProof, HashOp, InnerOp, InnerSpec, LeafOp, LengthOp, ProofSpec};
+    use crate::ics23::{
+        ExclusionProof, ExistenceProof, HashOp, InnerOp, InnerSpec, LeafOp, LengthOp, ProofSpec,
+    };
 
     use alloc::collections::btree_map::BTreeMap as HashMap;
     use alloc::vec;
@@ -622,6 +720,197 @@ mod tests {
 
         for (name, tc) in cases {
             let check = check_existence_spec(&tc.proof, &tc.spec);
+            if tc.valid {
+                check.expect(name);
+            } else {
+                assert!(check.is_err(), "{} should be an error", name);
+            }
+        }
+    }
+
+    #[derive(Debug, Clone)]
+    struct ExclusionCase {
+        proof: ExclusionProof,
+        spec: ProofSpec,
+        valid: bool,
+    }
+
+    #[test]
+    fn enforce_exclusion_spec() {
+        let leaf = LeafOp {
+            hash: HashOp::Sha256.into(),
+            prehash_key: HashOp::NoHash.into(),
+            prehash_value: HashOp::NoHash.into(),
+            length: LengthOp::NoPrefix.into(),
+            prefix: vec![0_u8],
+        };
+        let invalid_leaf = LeafOp {
+            hash: HashOp::Sha512.into(),
+            prehash_key: HashOp::Sha256.into(),
+            prehash_value: HashOp::Sha256.into(),
+            length: LengthOp::VarProto.into(),
+            prefix: vec![0_u8, 2, 2],
+        };
+
+        let valid_inner = InnerOp {
+            hash: HashOp::Sha256.into(),
+            prefix: vec![1_u8],
+            suffix: vec![],
+        };
+        let invalid_inner_hash = InnerOp {
+            hash: HashOp::Sha512.into(),
+            prefix: hex::decode("deadbeef00cafe00").unwrap(),
+            suffix: vec![],
+        };
+
+        let mut depth_limited_spec = api::smt_spec();
+        depth_limited_spec.min_depth = 2;
+        depth_limited_spec.max_depth = 4;
+
+        let cases: HashMap<&'static str, ExclusionCase> = [
+            (
+                "empty proof fails",
+                ExclusionCase {
+                    proof: ExclusionProof {
+                        key: b"foo".to_vec(),
+                        actual_path: b"oof".to_vec(),
+                        actual_value_hash: b"bar".to_vec(),
+                        leaf: None,
+                        path: vec![],
+                    },
+                    spec: api::smt_spec(),
+                    valid: false,
+                },
+            ),
+            (
+                "accepts one valid leaf",
+                ExclusionCase {
+                    proof: ExclusionProof {
+                        key: b"foo".to_vec(),
+                        actual_path: b"oof".to_vec(),
+                        actual_value_hash: b"bar".to_vec(),
+                        leaf: Some(leaf.clone()),
+                        path: vec![],
+                    },
+                    spec: api::smt_spec(),
+                    valid: true,
+                },
+            ),
+            (
+                "rejects invalid leaf",
+                ExclusionCase {
+                    proof: ExclusionProof {
+                        key: b"foo".to_vec(),
+                        actual_path: b"oof".to_vec(),
+                        actual_value_hash: b"bar".to_vec(),
+                        leaf: Some(invalid_leaf),
+                        path: vec![],
+                    },
+                    spec: api::smt_spec(),
+                    valid: false,
+                },
+            ),
+            (
+                "rejects only inner (no leaf)",
+                ExclusionCase {
+                    proof: ExclusionProof {
+                        key: b"foo".to_vec(),
+                        actual_path: b"oof".to_vec(),
+                        actual_value_hash: b"bar".to_vec(),
+                        leaf: None,
+                        path: vec![valid_inner.clone()],
+                    },
+                    spec: api::smt_spec(),
+                    valid: false,
+                },
+            ),
+            (
+                "accepts leaf and valid inner",
+                ExclusionCase {
+                    proof: ExclusionProof {
+                        key: b"foo".to_vec(),
+                        actual_path: b"oof".to_vec(),
+                        actual_value_hash: b"bar".to_vec(),
+                        leaf: Some(leaf.clone()),
+                        path: vec![valid_inner.clone()],
+                    },
+                    spec: api::smt_spec(),
+                    valid: true,
+                },
+            ),
+            (
+                "rejects invalid inner (hash)",
+                ExclusionCase {
+                    proof: ExclusionProof {
+                        key: b"foo".to_vec(),
+                        actual_path: b"oof".to_vec(),
+                        actual_value_hash: b"bar".to_vec(),
+                        leaf: Some(leaf.clone()),
+                        path: vec![invalid_inner_hash],
+                    },
+                    spec: api::smt_spec(),
+                    valid: false,
+                },
+            ),
+            (
+                "accepts depth limited with proper number of inner nodes",
+                ExclusionCase {
+                    proof: ExclusionProof {
+                        key: b"foo".to_vec(),
+                        actual_path: b"oof".to_vec(),
+                        actual_value_hash: b"bar".to_vec(),
+                        leaf: Some(leaf.clone()),
+                        path: vec![
+                            valid_inner.clone(),
+                            valid_inner.clone().with_height(4),
+                            valid_inner.clone().with_height(6),
+                        ],
+                    },
+                    spec: depth_limited_spec.clone(),
+                    valid: true,
+                },
+            ),
+            (
+                "reject depth limited with too few inner nodes",
+                ExclusionCase {
+                    proof: ExclusionProof {
+                        key: b"foo".to_vec(),
+                        actual_path: b"oof".to_vec(),
+                        actual_value_hash: b"bar".to_vec(),
+                        leaf: Some(leaf.clone()),
+                        path: vec![valid_inner.clone()],
+                    },
+                    spec: depth_limited_spec.clone(),
+                    valid: false,
+                },
+            ),
+            (
+                "reject depth limited with too many inner nodes",
+                ExclusionCase {
+                    proof: ExclusionProof {
+                        key: b"foo".to_vec(),
+                        actual_path: b"oof".to_vec(),
+                        actual_value_hash: b"bar".to_vec(),
+                        leaf: Some(leaf),
+                        path: vec![
+                            valid_inner.clone(),
+                            valid_inner.clone(),
+                            valid_inner.clone(),
+                            valid_inner.clone(),
+                            valid_inner,
+                        ],
+                    },
+                    spec: depth_limited_spec,
+                    valid: false,
+                },
+            ),
+        ]
+        .iter()
+        .cloned()
+        .collect();
+
+        for (name, tc) in cases {
+            let check = check_exclusion_spec(&tc.proof, &tc.spec);
             if tc.valid {
                 check.expect(name);
             } else {
