@@ -122,8 +122,8 @@ func BatchVectorsTestData(t *testing.T) map[string]BatchVectorData {
 		"iavl 4": {Spec: IavlSpec, Proof: batchIAVL, Ref: refsIAVL[4]},
 		"iavl 5": {Spec: IavlSpec, Proof: batchIAVL, Ref: refsIAVL[5]},
 		// Note this spec only differs for non-existence proofs
-		"iavl invalid 1":      {Spec: TendermintSpec, Proof: batchIAVL, Ref: refsIAVL[4], Invalid: true},
-		"iavl invalid 2":      {Spec: IavlSpec, Proof: batchIAVL, Ref: refsTM[0], Invalid: true},
+		"iavl invalid spec":   {Spec: TendermintSpec, Proof: batchIAVL, Ref: refsIAVL[4], Invalid: true},
+		"iavl invalid ref":    {Spec: IavlSpec, Proof: batchIAVL, Ref: refsTM[0], Invalid: true},
 		"iavl batch exist":    {Spec: IavlSpec, Proof: batchIAVLExist, Ref: refsIAVLExist[17]},
 		"iavl batch nonexist": {Spec: IavlSpec, Proof: batchIAVLNonexist, Ref: refsIAVLNonexist[7]},
 		"tm 0":                {Spec: TendermintSpec, Proof: refsTML, Ref: refsTM[0]},
@@ -133,8 +133,8 @@ func BatchVectorsTestData(t *testing.T) map[string]BatchVectorData {
 		"tm 4":                {Spec: TendermintSpec, Proof: refsTML, Ref: refsTM[4]},
 		"tm 5":                {Spec: TendermintSpec, Proof: refsTML, Ref: refsTM[5]},
 		// Note this spec only differs for non-existence proofs
-		"tm invalid 1":      {Spec: IavlSpec, Proof: refsTML, Ref: refsTM[4], Invalid: true},
-		"tm invalid 2":      {Spec: TendermintSpec, Proof: refsTML, Ref: refsIAVL[0], Invalid: true},
+		"tm invalid spec":   {Spec: IavlSpec, Proof: refsTML, Ref: refsTM[4], Invalid: true},
+		"tm invalid ref":    {Spec: TendermintSpec, Proof: refsTML, Ref: refsIAVL[0], Invalid: true},
 		"tm batch exist":    {Spec: TendermintSpec, Proof: batchTMExist, Ref: refsTMExist[10]},
 		"tm batch nonexist": {Spec: TendermintSpec, Proof: batchTMNonexist, Ref: refsTMNonexist[3]},
 		"smt 0":             {Spec: SmtSpec, Proof: batchSMT, Ref: refsSMT[0]},
@@ -145,8 +145,8 @@ func BatchVectorsTestData(t *testing.T) map[string]BatchVectorData {
 		"smt 5":             {Spec: SmtSpec, Proof: batchSMT, Ref: refsSMT[5]},
 		"smt 6":             {Spec: SmtSpec, Proof: batchSMT, Ref: refsSMT[6]},
 		// Note this spec only differs for non-existence proofs
-		"smt invalid 1":       {Spec: IavlSpec, Proof: batchSMT, Ref: refsSMT[4], Invalid: true},
-		"smt invalid 2":       {Spec: SmtSpec, Proof: batchSMT, Ref: refsIAVL[0], Invalid: true},
+		"smt invalid spec":    {Spec: IavlSpec, Proof: batchSMT, Ref: refsSMT[4], Invalid: true},
+		"smt invalid ref":     {Spec: SmtSpec, Proof: batchSMT, Ref: refsIAVL[0], Invalid: true},
 		"smt batch exist":     {Spec: SmtSpec, Proof: batchSMTexist, Ref: refsSMTexist[10]},
 		"smt batch nonexist":  {Spec: SmtSpec, Proof: batchSMTnonexist, Ref: refsSMTnonexist[3]},
 		"smt batch exclusion": {Spec: SmtSpec, Proof: batchSMTexclusion, Ref: refsSMTexclusion[6]},

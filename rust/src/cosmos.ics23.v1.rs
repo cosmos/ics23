@@ -61,7 +61,7 @@ pub struct ExclusionProof {
     pub actual_path: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes = "vec", tag = "3")]
     pub actual_value_hash: ::prost::alloc::vec::Vec<u8>,
-    /// As the actual_path and actual_valueHash are already hashed both the
+    /// As the actual_path and actual_value_hash are already hashed both the
     /// prehash_key and prehash_value fields should be set to HashOp_NO_HASH.
     #[prost(message, optional, tag = "4")]
     pub leaf: ::core::option::Option<LeafOp>,

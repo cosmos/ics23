@@ -282,7 +282,7 @@ type ExclusionProof struct {
 	Key             []byte `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	ActualPath      []byte `protobuf:"bytes,2,opt,name=actual_path,json=actualPath,proto3" json:"actual_path,omitempty"`
 	ActualValueHash []byte `protobuf:"bytes,3,opt,name=actual_value_hash,json=actualValueHash,proto3" json:"actual_value_hash,omitempty"`
-	// As the actual_path and actual_valueHash are already hashed both the
+	// As the actual_path and actual_value_hash are already hashed both the
 	// prehash_key and prehash_value fields should be set to HashOp_NO_HASH.
 	Leaf *LeafOp    `protobuf:"bytes,4,opt,name=leaf,proto3" json:"leaf,omitempty"`
 	Path []*InnerOp `protobuf:"bytes,5,rep,name=path,proto3" json:"path,omitempty"`

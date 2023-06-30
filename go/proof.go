@@ -172,6 +172,12 @@ func (p *ExclusionProof) Calculate() (CommitmentRoot, error) {
 	if p.GetLeaf() == nil {
 		return nil, errors.New("exclusion proof needs defined LeafOp")
 	}
+
+	// As the actual_path and actual_value_hash are already hashed both the
+	// prehash_key and prehash_value fields should be set to HashOp_NO_HASH
+	// this is because they have been populated from the unrelated leaf found
+	// in place of the key we were looking for, hashing them again would
+	// result in an incorrect leaf node hash and invalidate the proof.
 	if p.Leaf.PrehashKey != HashOp_NO_HASH {
 		return nil, errors.New("exclusion proof must have leaf with PrehashKey == NO_HASH")
 	}
@@ -186,8 +192,8 @@ func (p *ExclusionProof) Calculate() (CommitmentRoot, error) {
 	}
 	// check if the actual value was a placeholder and replace with empty hash
 	// assumes the placeholder value is [32]byte
-	if bytes.Equal(p.ActualValueHash, make([]byte, 32)) {
-		res = make([]byte, 32)
+	if bytes.Equal(p.ActualValueHash, SmtSpec.InnerSpec.EmptyChild) {
+		res = SmtSpec.InnerSpec.EmptyChild
 	}
 
 	// the rest just take the output of the last step (reducing it)
@@ -200,6 +206,11 @@ func (p *ExclusionProof) Calculate() (CommitmentRoot, error) {
 	return res, nil
 }
 
+// Verify the ExclusionProof by checking the existence of either:
+//  1. An unrelated leaf where the leaf we are looking for should be
+//  2. A placeholder leaf where the leaf we are looking for is
+//
+// Ref: https://github.com/pokt-network/pocket/blob/main/ibc/docs/ics23.md#proof-verification
 func (p *ExclusionProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte) error {
 	if err := p.CheckAgainstSpec(spec); err != nil {
 		return err

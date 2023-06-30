@@ -93,7 +93,7 @@ message ExclusionProof {
   bytes key               = 1;
   bytes actual_path       = 2;
   bytes actual_value_hash = 3;
-  // As the actual_path and actual_valueHash are already hashed both the
+  // As the actual_path and actual_value_hash are already hashed both the
   // prehash_key and prehash_value fields should be set to HashOp_NO_HASH.
   LeafOp           leaf = 4;
   repeated InnerOp path = 5;
