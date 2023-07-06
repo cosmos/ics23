@@ -5,7 +5,7 @@ edition = "2021"
 resolver = "2"
 
 [dependencies]
-ics23 = { path = "../", default-features = false }
+ics23 = { path = "../", default-features = false, features = ["serde"] }
 
 [features]
 panic-handler = []
