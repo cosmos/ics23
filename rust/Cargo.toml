@@ -38,4 +38,4 @@ std = ["prost/std", "bytes/std", "hex/std", "anyhow/std"]
 
 host-functions = ["sha2", "sha3", "ripemd"]
 
-serde = ["dep:pbjson", "serde/std"]
+serde = ["dep:pbjson", "dep:serde"]
