@@ -1,6 +1,8 @@
+use crate::no_std::prelude::*;
+
 impl serde::Serialize for BatchEntry {
     #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> crate::no_std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -25,7 +27,7 @@ impl serde::Serialize for BatchEntry {
 }
 impl<'de> serde::Deserialize<'de> for BatchEntry {
     #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -40,7 +42,7 @@ impl<'de> serde::Deserialize<'de> for BatchEntry {
             Nonexist,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<GeneratedField, D::Error>
             where
                 D: serde::Deserializer<'de>,
             {
@@ -49,12 +51,12 @@ impl<'de> serde::Deserialize<'de> for BatchEntry {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
                     #[allow(unused_variables)]
-                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    fn visit_str<E>(self, value: &str) -> crate::no_std::result::Result<GeneratedField, E>
                     where
                         E: serde::de::Error,
                     {
@@ -72,11 +74,11 @@ impl<'de> serde::Deserialize<'de> for BatchEntry {
         impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
             type Value = BatchEntry;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                 formatter.write_str("struct cosmos.ics23.v1.BatchEntry")
             }
 
-            fn visit_map<V>(self, mut map: V) -> std::result::Result<BatchEntry, V::Error>
+            fn visit_map<V>(self, mut map: V) -> crate::no_std::result::Result<BatchEntry, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -87,14 +89,14 @@ impl<'de> serde::Deserialize<'de> for BatchEntry {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("exist"));
                             }
-                            proof__ = map.next_value::<::std::option::Option<_>>()?.map(batch_entry::Proof::Exist)
+                            proof__ = map.next_value::<crate::no_std::option::Option<_>>()?.map(batch_entry::Proof::Exist)
 ;
                         }
                         GeneratedField::Nonexist => {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("nonexist"));
                             }
-                            proof__ = map.next_value::<::std::option::Option<_>>()?.map(batch_entry::Proof::Nonexist)
+                            proof__ = map.next_value::<crate::no_std::option::Option<_>>()?.map(batch_entry::Proof::Nonexist)
 ;
                         }
                     }
@@ -109,7 +111,7 @@ impl<'de> serde::Deserialize<'de> for BatchEntry {
 }
 impl serde::Serialize for BatchProof {
     #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> crate::no_std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -127,7 +129,7 @@ impl serde::Serialize for BatchProof {
 }
 impl<'de> serde::Deserialize<'de> for BatchProof {
     #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -140,7 +142,7 @@ impl<'de> serde::Deserialize<'de> for BatchProof {
             Entries,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<GeneratedField, D::Error>
             where
                 D: serde::Deserializer<'de>,
             {
@@ -149,12 +151,12 @@ impl<'de> serde::Deserialize<'de> for BatchProof {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
                     #[allow(unused_variables)]
-                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    fn visit_str<E>(self, value: &str) -> crate::no_std::result::Result<GeneratedField, E>
                     where
                         E: serde::de::Error,
                     {
@@ -171,11 +173,11 @@ impl<'de> serde::Deserialize<'de> for BatchProof {
         impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
             type Value = BatchProof;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                 formatter.write_str("struct cosmos.ics23.v1.BatchProof")
             }
 
-            fn visit_map<V>(self, mut map: V) -> std::result::Result<BatchProof, V::Error>
+            fn visit_map<V>(self, mut map: V) -> crate::no_std::result::Result<BatchProof, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -200,7 +202,7 @@ impl<'de> serde::Deserialize<'de> for BatchProof {
 }
 impl serde::Serialize for CommitmentProof {
     #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> crate::no_std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -231,7 +233,7 @@ impl serde::Serialize for CommitmentProof {
 }
 impl<'de> serde::Deserialize<'de> for CommitmentProof {
     #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -250,7 +252,7 @@ impl<'de> serde::Deserialize<'de> for CommitmentProof {
             Compressed,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<GeneratedField, D::Error>
             where
                 D: serde::Deserializer<'de>,
             {
@@ -259,12 +261,12 @@ impl<'de> serde::Deserialize<'de> for CommitmentProof {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
                     #[allow(unused_variables)]
-                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    fn visit_str<E>(self, value: &str) -> crate::no_std::result::Result<GeneratedField, E>
                     where
                         E: serde::de::Error,
                     {
@@ -284,11 +286,11 @@ impl<'de> serde::Deserialize<'de> for CommitmentProof {
         impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
             type Value = CommitmentProof;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                 formatter.write_str("struct cosmos.ics23.v1.CommitmentProof")
             }
 
-            fn visit_map<V>(self, mut map: V) -> std::result::Result<CommitmentProof, V::Error>
+            fn visit_map<V>(self, mut map: V) -> crate::no_std::result::Result<CommitmentProof, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -299,28 +301,28 @@ impl<'de> serde::Deserialize<'de> for CommitmentProof {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("exist"));
                             }
-                            proof__ = map.next_value::<::std::option::Option<_>>()?.map(commitment_proof::Proof::Exist)
+                            proof__ = map.next_value::<crate::no_std::option::Option<_>>()?.map(commitment_proof::Proof::Exist)
 ;
                         }
                         GeneratedField::Nonexist => {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("nonexist"));
                             }
-                            proof__ = map.next_value::<::std::option::Option<_>>()?.map(commitment_proof::Proof::Nonexist)
+                            proof__ = map.next_value::<crate::no_std::option::Option<_>>()?.map(commitment_proof::Proof::Nonexist)
 ;
                         }
                         GeneratedField::Batch => {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("batch"));
                             }
-                            proof__ = map.next_value::<::std::option::Option<_>>()?.map(commitment_proof::Proof::Batch)
+                            proof__ = map.next_value::<crate::no_std::option::Option<_>>()?.map(commitment_proof::Proof::Batch)
 ;
                         }
                         GeneratedField::Compressed => {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("compressed"));
                             }
-                            proof__ = map.next_value::<::std::option::Option<_>>()?.map(commitment_proof::Proof::Compressed)
+                            proof__ = map.next_value::<crate::no_std::option::Option<_>>()?.map(commitment_proof::Proof::Compressed)
 ;
                         }
                     }
@@ -335,7 +337,7 @@ impl<'de> serde::Deserialize<'de> for CommitmentProof {
 }
 impl serde::Serialize for CompressedBatchEntry {
     #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> crate::no_std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -360,7 +362,7 @@ impl serde::Serialize for CompressedBatchEntry {
 }
 impl<'de> serde::Deserialize<'de> for CompressedBatchEntry {
     #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -375,7 +377,7 @@ impl<'de> serde::Deserialize<'de> for CompressedBatchEntry {
             Nonexist,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<GeneratedField, D::Error>
             where
                 D: serde::Deserializer<'de>,
             {
@@ -384,12 +386,12 @@ impl<'de> serde::Deserialize<'de> for CompressedBatchEntry {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
                     #[allow(unused_variables)]
-                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    fn visit_str<E>(self, value: &str) -> crate::no_std::result::Result<GeneratedField, E>
                     where
                         E: serde::de::Error,
                     {
@@ -407,11 +409,11 @@ impl<'de> serde::Deserialize<'de> for CompressedBatchEntry {
         impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
             type Value = CompressedBatchEntry;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                 formatter.write_str("struct cosmos.ics23.v1.CompressedBatchEntry")
             }
 
-            fn visit_map<V>(self, mut map: V) -> std::result::Result<CompressedBatchEntry, V::Error>
+            fn visit_map<V>(self, mut map: V) -> crate::no_std::result::Result<CompressedBatchEntry, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -422,14 +424,14 @@ impl<'de> serde::Deserialize<'de> for CompressedBatchEntry {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("exist"));
                             }
-                            proof__ = map.next_value::<::std::option::Option<_>>()?.map(compressed_batch_entry::Proof::Exist)
+                            proof__ = map.next_value::<crate::no_std::option::Option<_>>()?.map(compressed_batch_entry::Proof::Exist)
 ;
                         }
                         GeneratedField::Nonexist => {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("nonexist"));
                             }
-                            proof__ = map.next_value::<::std::option::Option<_>>()?.map(compressed_batch_entry::Proof::Nonexist)
+                            proof__ = map.next_value::<crate::no_std::option::Option<_>>()?.map(compressed_batch_entry::Proof::Nonexist)
 ;
                         }
                     }
@@ -444,7 +446,7 @@ impl<'de> serde::Deserialize<'de> for CompressedBatchEntry {
 }
 impl serde::Serialize for CompressedBatchProof {
     #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> crate::no_std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -468,7 +470,7 @@ impl serde::Serialize for CompressedBatchProof {
 }
 impl<'de> serde::Deserialize<'de> for CompressedBatchProof {
     #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -484,7 +486,7 @@ impl<'de> serde::Deserialize<'de> for CompressedBatchProof {
             LookupInners,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<GeneratedField, D::Error>
             where
                 D: serde::Deserializer<'de>,
             {
@@ -493,12 +495,12 @@ impl<'de> serde::Deserialize<'de> for CompressedBatchProof {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
                     #[allow(unused_variables)]
-                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    fn visit_str<E>(self, value: &str) -> crate::no_std::result::Result<GeneratedField, E>
                     where
                         E: serde::de::Error,
                     {
@@ -516,11 +518,11 @@ impl<'de> serde::Deserialize<'de> for CompressedBatchProof {
         impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
             type Value = CompressedBatchProof;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                 formatter.write_str("struct cosmos.ics23.v1.CompressedBatchProof")
             }
 
-            fn visit_map<V>(self, mut map: V) -> std::result::Result<CompressedBatchProof, V::Error>
+            fn visit_map<V>(self, mut map: V) -> crate::no_std::result::Result<CompressedBatchProof, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -553,7 +555,7 @@ impl<'de> serde::Deserialize<'de> for CompressedBatchProof {
 }
 impl serde::Serialize for CompressedExistenceProof {
     #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> crate::no_std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -589,7 +591,7 @@ impl serde::Serialize for CompressedExistenceProof {
 }
 impl<'de> serde::Deserialize<'de> for CompressedExistenceProof {
     #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -608,7 +610,7 @@ impl<'de> serde::Deserialize<'de> for CompressedExistenceProof {
             Path,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<GeneratedField, D::Error>
             where
                 D: serde::Deserializer<'de>,
             {
@@ -617,12 +619,12 @@ impl<'de> serde::Deserialize<'de> for CompressedExistenceProof {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
                     #[allow(unused_variables)]
-                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    fn visit_str<E>(self, value: &str) -> crate::no_std::result::Result<GeneratedField, E>
                     where
                         E: serde::de::Error,
                     {
@@ -642,11 +644,11 @@ impl<'de> serde::Deserialize<'de> for CompressedExistenceProof {
         impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
             type Value = CompressedExistenceProof;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                 formatter.write_str("struct cosmos.ics23.v1.CompressedExistenceProof")
             }
 
-            fn visit_map<V>(self, mut map: V) -> std::result::Result<CompressedExistenceProof, V::Error>
+            fn visit_map<V>(self, mut map: V) -> crate::no_std::result::Result<CompressedExistenceProof, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -702,7 +704,7 @@ impl<'de> serde::Deserialize<'de> for CompressedExistenceProof {
 }
 impl serde::Serialize for CompressedNonExistenceProof {
     #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> crate::no_std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -732,7 +734,7 @@ impl serde::Serialize for CompressedNonExistenceProof {
 }
 impl<'de> serde::Deserialize<'de> for CompressedNonExistenceProof {
     #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -749,7 +751,7 @@ impl<'de> serde::Deserialize<'de> for CompressedNonExistenceProof {
             Right,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<GeneratedField, D::Error>
             where
                 D: serde::Deserializer<'de>,
             {
@@ -758,12 +760,12 @@ impl<'de> serde::Deserialize<'de> for CompressedNonExistenceProof {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
                     #[allow(unused_variables)]
-                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    fn visit_str<E>(self, value: &str) -> crate::no_std::result::Result<GeneratedField, E>
                     where
                         E: serde::de::Error,
                     {
@@ -782,11 +784,11 @@ impl<'de> serde::Deserialize<'de> for CompressedNonExistenceProof {
         impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
             type Value = CompressedNonExistenceProof;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                 formatter.write_str("struct cosmos.ics23.v1.CompressedNonExistenceProof")
             }
 
-            fn visit_map<V>(self, mut map: V) -> std::result::Result<CompressedNonExistenceProof, V::Error>
+            fn visit_map<V>(self, mut map: V) -> crate::no_std::result::Result<CompressedNonExistenceProof, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -829,7 +831,7 @@ impl<'de> serde::Deserialize<'de> for CompressedNonExistenceProof {
 }
 impl serde::Serialize for ExistenceProof {
     #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> crate::no_std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -865,7 +867,7 @@ impl serde::Serialize for ExistenceProof {
 }
 impl<'de> serde::Deserialize<'de> for ExistenceProof {
     #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -884,7 +886,7 @@ impl<'de> serde::Deserialize<'de> for ExistenceProof {
             Path,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<GeneratedField, D::Error>
             where
                 D: serde::Deserializer<'de>,
             {
@@ -893,12 +895,12 @@ impl<'de> serde::Deserialize<'de> for ExistenceProof {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
                     #[allow(unused_variables)]
-                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    fn visit_str<E>(self, value: &str) -> crate::no_std::result::Result<GeneratedField, E>
                     where
                         E: serde::de::Error,
                     {
@@ -918,11 +920,11 @@ impl<'de> serde::Deserialize<'de> for ExistenceProof {
         impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
             type Value = ExistenceProof;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                 formatter.write_str("struct cosmos.ics23.v1.ExistenceProof")
             }
 
-            fn visit_map<V>(self, mut map: V) -> std::result::Result<ExistenceProof, V::Error>
+            fn visit_map<V>(self, mut map: V) -> crate::no_std::result::Result<ExistenceProof, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -975,7 +977,7 @@ impl<'de> serde::Deserialize<'de> for ExistenceProof {
 }
 impl serde::Serialize for HashOp {
     #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> crate::no_std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -993,7 +995,7 @@ impl serde::Serialize for HashOp {
 }
 impl<'de> serde::Deserialize<'de> for HashOp {
     #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -1012,15 +1014,15 @@ impl<'de> serde::Deserialize<'de> for HashOp {
         impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
             type Value = HashOp;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                 write!(formatter, "expected one of: {:?}", &FIELDS)
             }
 
-            fn visit_i64<E>(self, v: i64) -> std::result::Result<Self::Value, E>
+            fn visit_i64<E>(self, v: i64) -> crate::no_std::result::Result<Self::Value, E>
             where
                 E: serde::de::Error,
             {
-                use std::convert::TryFrom;
+                use crate::no_std::convert::TryFrom;
                 i32::try_from(v)
                     .ok()
                     .and_then(HashOp::from_i32)
@@ -1029,11 +1031,11 @@ impl<'de> serde::Deserialize<'de> for HashOp {
                     })
             }
 
-            fn visit_u64<E>(self, v: u64) -> std::result::Result<Self::Value, E>
+            fn visit_u64<E>(self, v: u64) -> crate::no_std::result::Result<Self::Value, E>
             where
                 E: serde::de::Error,
             {
-                use std::convert::TryFrom;
+                use crate::no_std::convert::TryFrom;
                 i32::try_from(v)
                     .ok()
                     .and_then(HashOp::from_i32)
@@ -1042,7 +1044,7 @@ impl<'de> serde::Deserialize<'de> for HashOp {
                     })
             }
 
-            fn visit_str<E>(self, value: &str) -> std::result::Result<Self::Value, E>
+            fn visit_str<E>(self, value: &str) -> crate::no_std::result::Result<Self::Value, E>
             where
                 E: serde::de::Error,
             {
@@ -1063,7 +1065,7 @@ impl<'de> serde::Deserialize<'de> for HashOp {
 }
 impl serde::Serialize for InnerOp {
     #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> crate::no_std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -1095,7 +1097,7 @@ impl serde::Serialize for InnerOp {
 }
 impl<'de> serde::Deserialize<'de> for InnerOp {
     #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -1112,7 +1114,7 @@ impl<'de> serde::Deserialize<'de> for InnerOp {
             Suffix,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<GeneratedField, D::Error>
             where
                 D: serde::Deserializer<'de>,
             {
@@ -1121,12 +1123,12 @@ impl<'de> serde::Deserialize<'de> for InnerOp {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
                     #[allow(unused_variables)]
-                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    fn visit_str<E>(self, value: &str) -> crate::no_std::result::Result<GeneratedField, E>
                     where
                         E: serde::de::Error,
                     {
@@ -1145,11 +1147,11 @@ impl<'de> serde::Deserialize<'de> for InnerOp {
         impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
             type Value = InnerOp;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                 formatter.write_str("struct cosmos.ics23.v1.InnerOp")
             }
 
-            fn visit_map<V>(self, mut map: V) -> std::result::Result<InnerOp, V::Error>
+            fn visit_map<V>(self, mut map: V) -> crate::no_std::result::Result<InnerOp, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -1194,7 +1196,7 @@ impl<'de> serde::Deserialize<'de> for InnerOp {
 }
 impl serde::Serialize for InnerSpec {
     #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> crate::no_std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -1244,7 +1246,7 @@ impl serde::Serialize for InnerSpec {
 }
 impl<'de> serde::Deserialize<'de> for InnerSpec {
     #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -1272,7 +1274,7 @@ impl<'de> serde::Deserialize<'de> for InnerSpec {
             Hash,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<GeneratedField, D::Error>
             where
                 D: serde::Deserializer<'de>,
             {
@@ -1281,12 +1283,12 @@ impl<'de> serde::Deserialize<'de> for InnerSpec {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
                     #[allow(unused_variables)]
-                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    fn visit_str<E>(self, value: &str) -> crate::no_std::result::Result<GeneratedField, E>
                     where
                         E: serde::de::Error,
                     {
@@ -1308,11 +1310,11 @@ impl<'de> serde::Deserialize<'de> for InnerSpec {
         impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
             type Value = InnerSpec;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                 formatter.write_str("struct cosmos.ics23.v1.InnerSpec")
             }
 
-            fn visit_map<V>(self, mut map: V) -> std::result::Result<InnerSpec, V::Error>
+            fn visit_map<V>(self, mut map: V) -> crate::no_std::result::Result<InnerSpec, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -1388,7 +1390,7 @@ impl<'de> serde::Deserialize<'de> for InnerSpec {
 }
 impl serde::Serialize for LeafOp {
     #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> crate::no_std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -1438,7 +1440,7 @@ impl serde::Serialize for LeafOp {
 }
 impl<'de> serde::Deserialize<'de> for LeafOp {
     #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -1461,7 +1463,7 @@ impl<'de> serde::Deserialize<'de> for LeafOp {
             Prefix,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<GeneratedField, D::Error>
             where
                 D: serde::Deserializer<'de>,
             {
@@ -1470,12 +1472,12 @@ impl<'de> serde::Deserialize<'de> for LeafOp {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
                     #[allow(unused_variables)]
-                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    fn visit_str<E>(self, value: &str) -> crate::no_std::result::Result<GeneratedField, E>
                     where
                         E: serde::de::Error,
                     {
@@ -1496,11 +1498,11 @@ impl<'de> serde::Deserialize<'de> for LeafOp {
         impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
             type Value = LeafOp;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                 formatter.write_str("struct cosmos.ics23.v1.LeafOp")
             }
 
-            fn visit_map<V>(self, mut map: V) -> std::result::Result<LeafOp, V::Error>
+            fn visit_map<V>(self, mut map: V) -> crate::no_std::result::Result<LeafOp, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -1559,7 +1561,7 @@ impl<'de> serde::Deserialize<'de> for LeafOp {
 }
 impl serde::Serialize for LengthOp {
     #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> crate::no_std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -1579,7 +1581,7 @@ impl serde::Serialize for LengthOp {
 }
 impl<'de> serde::Deserialize<'de> for LengthOp {
     #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -1600,15 +1602,15 @@ impl<'de> serde::Deserialize<'de> for LengthOp {
         impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
             type Value = LengthOp;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                 write!(formatter, "expected one of: {:?}", &FIELDS)
             }
 
-            fn visit_i64<E>(self, v: i64) -> std::result::Result<Self::Value, E>
+            fn visit_i64<E>(self, v: i64) -> crate::no_std::result::Result<Self::Value, E>
             where
                 E: serde::de::Error,
             {
-                use std::convert::TryFrom;
+                use crate::no_std::convert::TryFrom;
                 i32::try_from(v)
                     .ok()
                     .and_then(LengthOp::from_i32)
@@ -1617,11 +1619,11 @@ impl<'de> serde::Deserialize<'de> for LengthOp {
                     })
             }
 
-            fn visit_u64<E>(self, v: u64) -> std::result::Result<Self::Value, E>
+            fn visit_u64<E>(self, v: u64) -> crate::no_std::result::Result<Self::Value, E>
             where
                 E: serde::de::Error,
             {
-                use std::convert::TryFrom;
+                use crate::no_std::convert::TryFrom;
                 i32::try_from(v)
                     .ok()
                     .and_then(LengthOp::from_i32)
@@ -1630,7 +1632,7 @@ impl<'de> serde::Deserialize<'de> for LengthOp {
                     })
             }
 
-            fn visit_str<E>(self, value: &str) -> std::result::Result<Self::Value, E>
+            fn visit_str<E>(self, value: &str) -> crate::no_std::result::Result<Self::Value, E>
             where
                 E: serde::de::Error,
             {
@@ -1653,7 +1655,7 @@ impl<'de> serde::Deserialize<'de> for LengthOp {
 }
 impl serde::Serialize for NonExistenceProof {
     #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> crate::no_std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -1683,7 +1685,7 @@ impl serde::Serialize for NonExistenceProof {
 }
 impl<'de> serde::Deserialize<'de> for NonExistenceProof {
     #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -1700,7 +1702,7 @@ impl<'de> serde::Deserialize<'de> for NonExistenceProof {
             Right,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<GeneratedField, D::Error>
             where
                 D: serde::Deserializer<'de>,
             {
@@ -1709,12 +1711,12 @@ impl<'de> serde::Deserialize<'de> for NonExistenceProof {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
                     #[allow(unused_variables)]
-                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    fn visit_str<E>(self, value: &str) -> crate::no_std::result::Result<GeneratedField, E>
                     where
                         E: serde::de::Error,
                     {
@@ -1733,11 +1735,11 @@ impl<'de> serde::Deserialize<'de> for NonExistenceProof {
         impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
             type Value = NonExistenceProof;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                 formatter.write_str("struct cosmos.ics23.v1.NonExistenceProof")
             }
 
-            fn visit_map<V>(self, mut map: V) -> std::result::Result<NonExistenceProof, V::Error>
+            fn visit_map<V>(self, mut map: V) -> crate::no_std::result::Result<NonExistenceProof, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -1780,7 +1782,7 @@ impl<'de> serde::Deserialize<'de> for NonExistenceProof {
 }
 impl serde::Serialize for ProofSpec {
     #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> crate::no_std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -1822,7 +1824,7 @@ impl serde::Serialize for ProofSpec {
 }
 impl<'de> serde::Deserialize<'de> for ProofSpec {
     #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -1848,7 +1850,7 @@ impl<'de> serde::Deserialize<'de> for ProofSpec {
             PrehashKeyBeforeComparison,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            fn deserialize<D>(deserializer: D) -> crate::no_std::result::Result<GeneratedField, D::Error>
             where
                 D: serde::Deserializer<'de>,
             {
@@ -1857,12 +1859,12 @@ impl<'de> serde::Deserialize<'de> for ProofSpec {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
                     #[allow(unused_variables)]
-                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    fn visit_str<E>(self, value: &str) -> crate::no_std::result::Result<GeneratedField, E>
                     where
                         E: serde::de::Error,
                     {
@@ -1883,11 +1885,11 @@ impl<'de> serde::Deserialize<'de> for ProofSpec {
         impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
             type Value = ProofSpec;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut crate::no_std::fmt::Formatter<'_>) -> crate::no_std::fmt::Result {
                 formatter.write_str("struct cosmos.ics23.v1.ProofSpec")
             }
 
-            fn visit_map<V>(self, mut map: V) -> std::result::Result<ProofSpec, V::Error>
+            fn visit_map<V>(self, mut map: V) -> crate::no_std::result::Result<ProofSpec, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {

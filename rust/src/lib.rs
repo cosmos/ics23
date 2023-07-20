@@ -8,6 +8,7 @@ mod api;
 mod compress;
 mod helpers;
 mod host_functions;
+mod no_std;
 mod ops;
 mod verify;
 
