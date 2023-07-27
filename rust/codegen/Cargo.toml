@@ -10,4 +10,4 @@ edition = "2018"
 bytes = "1.0.1"
 prost = "0.11"
 prost-build = "0.11"
-pbjson-build = "0.5.1"
+informalsystems-pbjson-build = { git = "https://github.com/informalsystems/pbjson", rev = "e54f504" }
