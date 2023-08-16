@@ -1,5 +1,16 @@
 # Changelog
 
+# 0.10.2
+
+## Rust
+
+This release re-enables `no_std` support for ProtoJSON `Serialize` and `Deserialize` instances,
+by swapping out `pbjson` for the `no_std`-compatible fork `informalsystems-pbjson`.
+
+## Full changes
+
+- feat(rust): enable no_std support for pbjson ([#158](https://github.com/cosmos/ics23/pull/146))
+
 # 0.10.1
 
 ## Rust
