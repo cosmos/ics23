@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/cosmos/gogoproto v1.4.3
-	golang.org/x/crypto v0.2.0
+	golang.org/x/crypto v0.12.0
 )
 
 // subject to the dragonberry vulnerability
