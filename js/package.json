@@ -51,6 +51,6 @@
   },
   "dependencies": {
     "@noble/hashes": "^1.0.0",
-    "protobufjs": "^6.8.8"
+    "protobufjs": "^7.2.5"
   }
 }
