@@ -582,26 +582,29 @@ mod tests {
 
     #[cfg(feature = "std")]
     fn load_batch(files: &[&str]) -> Result<(ics23::CommitmentProof, Vec<RefData>)> {
-        let mut entries = Vec::new();
-        let mut data = Vec::new();
-
-        for &file in files {
-            let (proof, datum) = load_file(file)?;
-            data.push(datum);
-            match proof.proof {
-                Some(ics23::commitment_proof::Proof::Nonexist(non)) => {
-                    entries.push(ics23::BatchEntry {
-                        proof: Some(ics23::batch_entry::Proof::Nonexist(non)),
-                    })
+        let (data, entries) = files
+            .iter()
+            .map(|file| {
+                let (proof, datum) = load_file(file)?;
+                match proof.proof {
+                    Some(ics23::commitment_proof::Proof::Nonexist(non)) => Ok((
+                        datum,
+                        ics23::BatchEntry {
+                            proof: Some(ics23::batch_entry::Proof::Nonexist(non)),
+                        },
+                    )),
+                    Some(ics23::commitment_proof::Proof::Exist(ex)) => Ok((
+                        datum,
+                        ics23::BatchEntry {
+                            proof: Some(ics23::batch_entry::Proof::Exist(ex)),
+                        },
+                    )),
+                    _ => bail!("unknown proof type to batch"),
                 }
-                Some(ics23::commitment_proof::Proof::Exist(ex)) => {
-                    entries.push(ics23::BatchEntry {
-                        proof: Some(ics23::batch_entry::Proof::Exist(ex)),
-                    })
-                }
-                _ => bail!("unknown proof type to batch"),
-            }
-        }
+            })
+            .collect::<Result<Vec<_>>>()?
+            .into_iter()
+            .unzip();
 
         let batch = ics23::CommitmentProof {
             proof: Some(ics23::commitment_proof::Proof::Batch(ics23::BatchProof {
