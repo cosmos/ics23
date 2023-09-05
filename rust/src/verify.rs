@@ -1,6 +1,7 @@
 // we want to name functions verify_* to match ics23
 #![allow(clippy::module_name_repetitions)]
 
+use alloc::borrow::Cow;
 use alloc::vec::Vec;
 
 use anyhow::{bail, ensure};
@@ -39,7 +40,11 @@ pub fn verify_non_existence<H: HostFunctionsProvider>(
     let key_for_comparison = |key: &[u8]| -> Vec<u8> {
         match spec.prehash_key_before_comparison {
             true => do_hash::<H>(
-                spec.leaf_spec.clone().unwrap_or_default().prehash_key(),
+                spec.leaf_spec
+                    .as_ref()
+                    .map(Cow::Borrowed)
+                    .unwrap_or_default()
+                    .prehash_key(),
                 key,
             ),
             false => key.to_vec(),
@@ -236,8 +241,8 @@ fn ensure_left_neighbor(
     left: &[ics23::InnerOp],
     right: &[ics23::InnerOp],
 ) -> Result<()> {
-    let mut mut_left = Vec::from(left);
-    let mut mut_right = Vec::from(right);
+    let mut mut_left = left.to_vec();
+    let mut mut_right = right.to_vec();
 
     let mut top_left = mut_left.pop().unwrap();
     let mut top_right = mut_right.pop().unwrap();
@@ -252,7 +257,8 @@ fn ensure_left_neighbor(
     }
 
     ensure_right_most(spec, &mut_left)?;
-    ensure_left_most(spec, &mut_right)
+    ensure_left_most(spec, &mut_right)?;
+    Ok(())
 }
 
 fn is_left_step(
@@ -616,8 +622,7 @@ mod tests {
                 },
             ),
         ]
-        .iter()
-        .cloned()
+        .into_iter()
         .collect();
 
         for (name, tc) in cases {
@@ -758,7 +763,7 @@ mod tests {
 
         for (i, case) in cases.iter().enumerate() {
             ensure_inner(&case.op, case.spec)?;
-            let inner = &case.spec.inner_spec.as_ref().unwrap();
+            let inner = case.spec.inner_spec.as_ref().unwrap();
             assert_eq!(
                 case.is_left,
                 left_branches_are_empty(inner, &case.op)?,
