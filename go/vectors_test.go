@@ -33,6 +33,51 @@ func TestVectors(t *testing.T) {
 				if !valid {
 					t.Fatal("Invalid proof")
 				}
+				if tc.Spec == SmtSpec {
+					existProof := proof.GetExist()
+					path, _ := doHash(HashOp_SHA256, existProof.Key)
+					val, _ := doHash(HashOp_SHA256, existProof.Value)
+					exclusionProof := &CommitmentProof{
+						Proof: &CommitmentProof_Exclusion{
+							Exclusion: &ExclusionProof{
+								Key:             existProof.Key,
+								ActualPath:      path,
+								ActualValueHash: val,
+								Leaf: &LeafOp{
+									Hash:         HashOp_SHA256,
+									PrehashKey:   HashOp_NO_HASH,
+									PrehashValue: HashOp_NO_HASH,
+									Length:       LengthOp_NO_PREFIX,
+									Prefix:       []byte{0},
+								},
+								Path: existProof.Path,
+							},
+						},
+					}
+					spec := &ProofSpec{
+						LeafSpec: &LeafOp{
+							Hash:         HashOp_SHA256,
+							PrehashKey:   HashOp_NO_HASH,
+							PrehashValue: HashOp_NO_HASH,
+							Length:       LengthOp_NO_PREFIX,
+							Prefix:       []byte{0},
+						},
+						InnerSpec: &InnerSpec{
+							ChildOrder:      []int32{0, 1},
+							ChildSize:       32,
+							MinPrefixLength: 1,
+							MaxPrefixLength: 1,
+							EmptyChild:      make([]byte, 32),
+							Hash:            HashOp_SHA256,
+						},
+						MaxDepth:                   256,
+						PrehashKeyBeforeComparison: true,
+					}
+					invalid := VerifyNonMembership(spec, ref.RootHash, exclusionProof, ref.Key)
+					if invalid {
+						t.Fatal("verify nonmembership works for valid key/val")
+					}
+				}
 			}
 		})
 	}
