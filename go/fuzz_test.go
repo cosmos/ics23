@@ -61,8 +61,6 @@ func init() {
 	batchVectorDataSeeds = bsL
 }
 
-var specVectorTestData = VectorsTestData()
-
 func FuzzVerifyNonMembership(f *testing.F) {
 	if testing.Short() {
 		f.Skip("in -short mode")
