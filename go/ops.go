@@ -12,7 +12,6 @@ import (
 	_ "crypto/sha256"
 	// adds sha512 capability to crypto.SHA512
 	_ "crypto/sha512"
-
 	// adds ripemd160 capability to crypto.RIPEMD160
 	_ "golang.org/x/crypto/ripemd160" //nolint:staticcheck
 )
@@ -164,15 +163,24 @@ func doHash(hashOp HashOp, preimage []byte) ([]byte, error) {
 	case HashOp_BITCOIN:
 		// ripemd160(sha256(x))
 		sha := crypto.SHA256.New()
-		sha.Write(preimage)
+		_, err := sha.Write(preimage)
+		if err != nil {
+			return nil, err
+		}
 		tmp := sha.Sum(nil)
-		hash := crypto.RIPEMD160.New()
-		hash.Write(tmp)
-		return hash.Sum(nil), nil
+		bitcoinHash := crypto.RIPEMD160.New()
+		_, err = bitcoinHash.Write(tmp)
+		if err != nil {
+			return nil, err
+		}
+		return bitcoinHash.Sum(nil), nil
 	case HashOp_SHA512_256:
-		hash := crypto.SHA512_256.New()
-		hash.Write(preimage)
-		return hash.Sum(nil), nil
+		shaHash := crypto.SHA512_256.New()
+		_, err := shaHash.Write(preimage)
+		if err != nil {
+			return nil, err
+		}
+		return shaHash.Sum(nil), nil
 	}
 	return nil, fmt.Errorf("unsupported hashop: %d", hashOp)
 }
@@ -183,7 +191,10 @@ type hasher interface {
 
 func hashBz(h hasher, preimage []byte) ([]byte, error) {
 	hh := h.New()
-	hh.Write(preimage)
+	_, err := hh.Write(preimage)
+	if err != nil {
+		return nil, err
+	}
 	return hh.Sum(nil), nil
 }
 
@@ -193,8 +204,8 @@ func prepareLeafData(hashOp HashOp, lengthOp LengthOp, data []byte) ([]byte, err
 	if err != nil {
 		return nil, err
 	}
-	ldata, err := doLengthOp(lengthOp, hdata)
-	return ldata, err
+
+	return doLengthOp(lengthOp, hdata)
 }
 
 func validateSpec(spec *ProofSpec) bool {
