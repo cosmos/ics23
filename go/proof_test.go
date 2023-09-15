@@ -12,11 +12,14 @@ func TestExistenceProof(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			res, err := tc.Proof.Calculate()
 			// short-circuit with error case
-			if tc.IsErr && err == nil {
-				t.Fatal("Expected error, but got none")
-			}
-			if tc.IsErr == false && err != nil {
-				t.Fatal(err)
+			if tc.IsErr {
+				if err == nil {
+					t.Fatal("Expected error, but got none")
+				}
+			} else {
+				if err != nil {
+					t.Fatal(err)
+				}
 			}
 			if !bytes.Equal(res, tc.Expected) {
 				t.Errorf("Bad result: %s vs %s", toHex(res), toHex(tc.Expected))

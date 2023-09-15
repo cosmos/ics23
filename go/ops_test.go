@@ -14,13 +14,13 @@ func TestLeafOp(t *testing.T) {
 			res, err := tc.Op.Apply(tc.Key, tc.Value)
 			// short-circuit with error case
 			if tc.IsErr && err == nil {
-				t.Fatal("Expected error, but got none")
+				t.Fatal("expected error, but got none")
 			}
-			if tc.IsErr == false && err != nil {
+			if !tc.IsErr && err != nil {
 				t.Fatal(err)
 			}
 			if !bytes.Equal(res, tc.Expected) {
-				t.Errorf("Bad result: %s vs %s", toHex(res), toHex(tc.Expected))
+				t.Errorf("bad result: %s vs %s", toHex(res), toHex(tc.Expected))
 			}
 		})
 	}
@@ -35,7 +35,7 @@ func TestInnerOp(t *testing.T) {
 			if tc.IsErr && err == nil {
 				t.Fatal("Expected error, but got none")
 			}
-			if tc.IsErr == false && err != nil {
+			if !tc.IsErr && err != nil {
 				t.Fatal(err)
 			}
 			if !bytes.Equal(res, tc.Expected) {

@@ -17,6 +17,7 @@ type LeafOpTestStruct struct {
 }
 
 func LeafOpTestData(t *testing.T) map[string]LeafOpTestStruct {
+	t.Helper()
 	fname := filepath.Join("..", "testdata", "TestLeafOpData.json")
 	ffile, err := os.Open(fname)
 	if err != nil {
@@ -39,6 +40,7 @@ type InnerOpTestStruct struct {
 }
 
 func InnerOpTestData(t *testing.T) map[string]InnerOpTestStruct {
+	t.Helper()
 	fname := filepath.Join("..", "testdata", "TestInnerOpData.json")
 	ffile, err := os.Open(fname)
 	if err != nil {
@@ -60,6 +62,7 @@ type DoHashTestStruct struct {
 }
 
 func DoHashTestData(t *testing.T) map[string]DoHashTestStruct {
+	t.Helper()
 	fname := filepath.Join("..", "testdata", "TestDoHashData.json")
 	ffile, err := os.Open(fname)
 	if err != nil {
