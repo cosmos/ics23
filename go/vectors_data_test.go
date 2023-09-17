@@ -3,7 +3,7 @@ package ics23
 import (
 	"encoding/hex"
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -74,6 +74,7 @@ type BatchVectorData struct {
 }
 
 func BatchVectorsTestData(t *testing.T) map[string]BatchVectorData {
+	t.Helper()
 	iavl := filepath.Join("..", "testdata", "iavl")
 	tendermint := filepath.Join("..", "testdata", "tendermint")
 	smt := filepath.Join("..", "testdata", "smt")
@@ -149,6 +150,7 @@ func BatchVectorsTestData(t *testing.T) map[string]BatchVectorData {
 }
 
 func DecompressBatchVectorsTestData(t *testing.T) map[string]*CommitmentProof {
+	t.Helper()
 	iavl := filepath.Join("..", "testdata", "iavl")
 	tendermint := filepath.Join("..", "testdata", "tendermint")
 	smt := filepath.Join("..", "testdata", "smt")
@@ -164,9 +166,10 @@ func DecompressBatchVectorsTestData(t *testing.T) map[string]*CommitmentProof {
 }
 
 func LoadFile(t *testing.T, dir string, filename string) (*CommitmentProof, *RefData) {
+	t.Helper()
 	// load the file into a json struct
 	name := filepath.Join(dir, filename)
-	bz, err := ioutil.ReadFile(name)
+	bz, err := os.ReadFile(name)
 	if err != nil {
 		t.Fatalf("Read file: %+v", err)
 	}
@@ -191,6 +194,7 @@ func LoadFile(t *testing.T, dir string, filename string) (*CommitmentProof, *Ref
 }
 
 func mustHex(t *testing.T, data string) []byte {
+	t.Helper()
 	if data == "" {
 		return nil
 	}
@@ -202,6 +206,7 @@ func mustHex(t *testing.T, data string) []byte {
 }
 
 func buildBatch(t *testing.T, dir string, filenames []string) (*CommitmentProof, []*RefData) {
+	t.Helper()
 	refs := make([]*RefData, len(filenames))
 	proofs := make([]*CommitmentProof, len(filenames))
 	for i, fn := range filenames {
@@ -215,9 +220,10 @@ func buildBatch(t *testing.T, dir string, filenames []string) (*CommitmentProof,
 }
 
 func loadBatch(t *testing.T, dir string, filename string) (*CommitmentProof, []*RefData) {
+	t.Helper()
 	// load the file into a json struct
 	name := filepath.Join(dir, filename)
-	bz, err := ioutil.ReadFile(name)
+	bz, err := os.ReadFile(name)
 	if err != nil {
 		t.Fatalf("Read file: %+v", err)
 	}
