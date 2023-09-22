@@ -33,7 +33,7 @@
     "protoc": "yarn pack-proto && yarn define-proto && yarn format"
   },
   "devDependencies": {
-    "@types/jasmine": "^3.5.0",
+    "@types/jasmine": "^4.3.6",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
     "eslint": "^8.8.0",

@@ -339,9 +339,9 @@
   resolved "https://registry.npmjs.org/@protobufjs/utf8/-/utf8-1.1.0.tgz"
   integrity "sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw== sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw=="
 
-"@types/jasmine@^3.5.0":
-  version "3.5.9"
-  resolved "https://registry.npmjs.org/@types/jasmine/-/jasmine-3.5.9.tgz"
+"@types/jasmine@^4.3.6":
+  version "4.3.6"
+  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-4.3.6.tgz#d9855fa9f808138488784610f888046bb9a59aff"
 
 "@types/json-schema@^7.0.9":
   version "7.0.9"
