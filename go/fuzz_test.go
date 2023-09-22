@@ -61,8 +61,6 @@ func init() {
 	batchVectorDataSeeds = bsL
 }
 
-var specVectorTestData = VectorsTestData()
-
 func FuzzVerifyNonMembership(f *testing.F) {
 	if testing.Short() {
 		f.Skip("in -short mode")
@@ -79,11 +77,11 @@ func FuzzVerifyNonMembership(f *testing.F) {
 
 	// 2. Now run the fuzzer.
 	f.Fuzz(func(t *testing.T, inputJSON []byte) {
-		bv := new(BatchVectorData)
-		if err := json.Unmarshal(inputJSON, bv); err != nil {
+		var bv BatchVectorData
+		if err := json.Unmarshal(inputJSON, &bv); err != nil {
 			return
 		}
-		if bv.Ref == nil || bv.Ref.RootHash == nil {
+		if bv.Ref == nil || bv.Proof == nil || bv.Ref.RootHash == nil {
 			return
 		}
 		// Otherwise now run VerifyNonMembership.
@@ -118,7 +116,7 @@ func FuzzCombineProofs(f *testing.F) {
 	// 2. Now let's run the fuzzer.
 	f.Fuzz(func(t *testing.T, proofsJSON []byte) {
 		var proofs []*CommitmentProof
-		if err := json.Unmarshal(proofsJSON, proofs); err != nil {
+		if err := json.Unmarshal(proofsJSON, &proofs); err != nil {
 			return
 		}
 		_, _ = CombineProofs(proofs)

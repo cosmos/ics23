@@ -1,10 +1,10 @@
 module github.com/cosmos/ics23/go
 
-go 1.19
+go 1.21
 
 require (
 	github.com/cosmos/gogoproto v1.4.11
-	golang.org/x/crypto v0.12.0
+	golang.org/x/crypto v0.13.0
 )
 
 require (
