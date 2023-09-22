@@ -200,7 +200,7 @@ func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
 		if err := inner.CheckAgainstSpec(spec, layerNum); err != nil {
 			return fmt.Errorf("inner, %w", err)
 		}
-		layerNum += 1
+		layerNum++
 	}
 	return nil
 }
@@ -367,7 +367,7 @@ func getPadding(spec *InnerSpec, branch int32) (minPrefix, maxPrefix, suffix int
 
 	// count how many children are in the suffix
 	suffix = (len(spec.ChildOrder) - 1 - idx) * int(spec.ChildSize)
-	return
+	return minPrefix, maxPrefix, suffix
 }
 
 // leftBranchesAreEmpty returns true if the padding bytes correspond to all empty siblings
