@@ -703,6 +703,9 @@ export namespace ics23 {
 
     /** ProofSpec minDepth */
     minDepth?: number | null;
+
+    /** ProofSpec prehashKeyBeforeComparison */
+    prehashKeyBeforeComparison?: boolean | null;
   }
 
   /**
@@ -735,6 +738,9 @@ export namespace ics23 {
 
     /** ProofSpec minDepth. */
     public minDepth: number;
+
+    /** ProofSpec prehashKeyBeforeComparison. */
+    public prehashKeyBeforeComparison: boolean;
 
     /**
      * Creates a new ProofSpec instance using the specified properties.

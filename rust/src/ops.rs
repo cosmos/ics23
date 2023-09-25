@@ -37,7 +37,7 @@ fn prepare_leaf_data<H: HostFunctionsProvider>(
     do_length(length, &h)
 }
 
-fn do_hash<H: HostFunctionsProvider>(hash: HashOp, data: &[u8]) -> Hash {
+pub(crate) fn do_hash<H: HostFunctionsProvider>(hash: HashOp, data: &[u8]) -> Hash {
     match hash {
         HashOp::NoHash => Hash::from(data),
         HashOp::Sha256 => Hash::from(H::sha2_256(data)),

@@ -1,8 +1,8 @@
 import { decompress } from "./compress";
 import { ics23 } from "./generated/codecimpl";
 import { CommitmentRoot, verifyExistence, verifyNonExistence } from "./proofs";
+import { keyForComparison } from "./proofs";
 import { bytesBefore, bytesEqual } from "./specs";
-
 /*
 This implements the client side functions as specified in
 https://github.com/cosmos/ics/tree/master/spec/ics-023-vector-commitments
@@ -59,7 +59,7 @@ export function verifyNonMembership(
   key: Uint8Array
 ): boolean {
   const norm = decompress(proof);
-  const nonexist = getNonExistForKey(norm, key);
+  const nonexist = getNonExistForKey(spec, norm, key);
   if (!nonexist) {
     return false;
   }
@@ -122,14 +122,23 @@ function getExistForKey(
 }
 
 function getNonExistForKey(
+  spec: ics23.IProofSpec,
   proof: ics23.ICommitmentProof,
   key: Uint8Array
 ): ics23.INonExistenceProof | undefined | null {
   const match = (p: ics23.INonExistenceProof | null | undefined): boolean => {
     return (
       !!p &&
-      (!p.left || bytesBefore(p.left.key!, key)) &&
-      (!p.right || bytesBefore(key, p.right.key!))
+      (!p.left ||
+        bytesBefore(
+          keyForComparison(spec, p.left.key!),
+          keyForComparison(spec, key)
+        )) &&
+      (!p.right ||
+        bytesBefore(
+          keyForComparison(spec, key),
+          keyForComparison(spec, p.right.key!)
+        ))
     );
   };
   if (match(proof.nonexist)) {
