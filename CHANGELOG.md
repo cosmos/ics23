@@ -49,6 +49,21 @@ the Go and Rust implementations.
 - ci: Add tags to codecov reports ([#121](https://github.com/cosmos/ics23/pull/121)) (4 months ago)
 - ci: Refactor GitHub workflows and add code coverage job ([#120](https://github.com/cosmos/ics23/pull/120))
 
+# 0.9.1
+
+## Go
+
+This release is a backport into the `release/v0.9.x` line of the feature that added the `prehash_compare_key` boolean parameter to the top-level `ProofSpec`.
+When set to `true`, this flag causes keys to be consistently compared lexicographically according to their hashes
+within nonexistence proof verification, using the same hash function as specified by the already-extant `prehash_key` field.
+
+This is a backwards-compatible change, as it requires opt-in via setting the `prehash_compare_key` flag to `true` in the `ProofSpec`.
+All existing ProofSpecs will continue to behave identically.
+
+## Full changes
+
+- feat(go): Add `prehash_compare_key` to allow proving nonexistence in sparse trees ([#136](https://github.com/cosmos/ics23/pull/136))
+
 # 0.9.0
 
 ## Go
