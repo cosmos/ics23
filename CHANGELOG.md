@@ -32,7 +32,7 @@ When set to `true`, this flag causes keys to be consistently compared lexicograp
 within nonexistence proof verification, using the same hash function as specified by the already-extant `prehash_key` field.
 
 This is a backwards-compatible change, as it requires opt-in via setting the `prehash_compare_key` flag to `true` in the `ProofSpec`.
-All existing ProofSpecs will continue to behave identically.
+All existing `ProofSpec`s will continue to behave identically.
 
 Please note that the version of the TypeScript library has been bump from 0.6.8 to 0.10.0 to align it with 
 the Go and Rust implementations.
