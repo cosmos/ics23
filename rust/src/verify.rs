@@ -6,6 +6,7 @@ use anyhow::{bail, ensure};
 use crate::helpers::Result;
 use crate::host_functions::HostFunctionsProvider;
 use crate::ics23;
+use crate::ops::do_hash;
 use crate::ops::{apply_inner, apply_leaf};
 use alloc::vec::Vec;
 
@@ -33,13 +34,29 @@ pub fn verify_non_existence<H: HostFunctionsProvider>(
     root: &[u8],
     key: &[u8],
 ) -> Result<()> {
+    let key_for_comparison = |key: &[u8]| -> Vec<u8> {
+        match spec.prehash_key_before_comparison {
+            true => do_hash::<H>(
+                spec.leaf_spec.clone().unwrap_or_default().prehash_key(),
+                key,
+            ),
+            false => key.to_vec(),
+        }
+    };
+
     if let Some(left) = &proof.left {
         verify_existence::<H>(left, spec, root, &left.key, &left.value)?;
-        ensure!(key > left.key.as_slice(), "left key isn't before key");
+        ensure!(
+            key_for_comparison(key) > key_for_comparison(&left.key),
+            "left key isn't before key"
+        );
     }
     if let Some(right) = &proof.right {
         verify_existence::<H>(right, spec, root, &right.key, &right.value)?;
-        ensure!(key < right.key.as_slice(), "right key isn't after key");
+        ensure!(
+            key_for_comparison(key) < key_for_comparison(&right.key),
+            "right key isn't after key"
+        );
     }
 
     if let Some(inner) = &spec.inner_spec {
@@ -606,6 +623,7 @@ mod tests {
             inner_spec: Some(inner),
             min_depth: 0,
             max_depth: 0,
+            prehash_key_before_comparison: false,
         }
     }
 

@@ -13,7 +13,9 @@ fn main() {
     let out_dir: &str = &format!("{}{}", root, "/rust/src");
     let input: &str = &format!("{}{}", root, "/proofs.proto");
 
-    let mut cfg = prost_build::Config::new();
-    cfg.out_dir(&out_dir);
-    cfg.compile_protos(&[input], &[root]).unwrap();
+    prost_build::Config::new()
+        .out_dir(&out_dir)
+        .format(true)
+        .compile_protos(&[input], &[root])
+        .unwrap();
 }
