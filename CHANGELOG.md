@@ -1,5 +1,13 @@
 # Changelog
 
+# Unreleased
+
+## Rust
+
+## Full changes
+
+- chore(rust): update `prost` to v0.12 ([#202](https://github.com/cosmos/ics23/pull/202))
+
 # 0.10.2
 
 ## Rust
