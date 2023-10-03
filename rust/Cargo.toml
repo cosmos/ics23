@@ -6,8 +6,8 @@ exclude = ["codegen", "no-std-check"]
 license = "Apache-2.0"
 name = "ics23"
 repository = "https://github.com/cosmos/ics23/tree/master/rust"
-rust-version = "1.56.1"
-version = "0.10.2"
+rust-version = "1.60"
+version = "0.10.3"
 
 [workspace]
 members = ["codegen", "no-std-check"]
