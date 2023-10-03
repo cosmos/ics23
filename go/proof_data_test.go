@@ -14,6 +14,7 @@ type ExistenceProofTestStruct struct {
 }
 
 func ExistenceProofTestData(t *testing.T) map[string]ExistenceProofTestStruct {
+	t.Helper()
 	fname := filepath.Join("..", "testdata", "TestExistenceProofData.json")
 	ffile, err := os.Open(fname)
 	if err != nil {
@@ -35,6 +36,7 @@ type CheckLeafTestStruct struct {
 }
 
 func CheckLeafTestData(t *testing.T) map[string]CheckLeafTestStruct {
+	t.Helper()
 	fname := filepath.Join("..", "testdata", "TestCheckLeafData.json")
 	ffile, err := os.Open(fname)
 	if err != nil {
@@ -56,6 +58,7 @@ type CheckAgainstSpecTestStruct struct {
 }
 
 func CheckAgainstSpecTestData(t *testing.T) map[string]CheckAgainstSpecTestStruct {
+	t.Helper()
 	fname := filepath.Join("..", "testdata", "TestCheckAgainstSpecData.json")
 	ffile, err := os.Open(fname)
 	if err != nil {
@@ -94,6 +97,7 @@ type EmptyBranchTestStruct struct {
 }
 
 func EmptyBranchTestData(t *testing.T) []EmptyBranchTestStruct {
+	t.Helper()
 	emptyChild := SpecWithEmptyChild.InnerSpec.EmptyChild
 
 	return []EmptyBranchTestStruct{

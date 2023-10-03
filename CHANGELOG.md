@@ -1,5 +1,36 @@
 # Changelog
 
+# 0.10.3
+
+## Rust
+
+## Full changes
+
+- chore(rust): update `prost` to v0.12 ([#202](https://github.com/cosmos/ics23/pull/202))
+
+# 0.10.2
+
+## Rust
+
+This release re-enables `no_std` support for ProtoJSON `Serialize` and `Deserialize` instances,
+by swapping out `pbjson` for the `no_std`-compatible fork `informalsystems-pbjson`.
+
+## Full changes
+
+- feat(rust): enable no_std support for pbjson ([#158](https://github.com/cosmos/ics23/pull/146))
+
+# 0.10.1
+
+## Rust
+
+The only change in this release of the `ics23` crate is the addition of a `serde` feature
+which adds ProtoJSON-compatible `Serialize` and `Deserialize` instances on all Protobuf definitions via
+the [`pbjson-build`](https://docs.rs/pbjson-build/latest/pbjson_build/) crate.
+
+## Full changes
+
+- feat(rust): Add ProtoJSON-compatible `Serialize` and `Deserialize` instances on all Protobuf definitions via `pbjson` ([#146](https://github.com/cosmos/ics23/pull/146))
+
 # 0.10.0
 
 ## Go / Rust / TypeScript
@@ -9,7 +40,11 @@ When set to `true`, this flag causes keys to be consistently compared lexicograp
 within nonexistence proof verification, using the same hash function as specified by the already-extant `prehash_key` field.
 
 This is a backwards-compatible change, as it requires opt-in via setting the `prehash_compare_key` flag to `true` in the `ProofSpec`.
+<<<<<<< HEAD
 All existing ProofSpecs will continue to behave identically.
+=======
+All existing `ProofSpec`s will continue to behave identically.
+>>>>>>> release/rust/v0.10.3
 
 Please note that the version of the TypeScript library has been bump from 0.6.8 to 0.10.0 to align it with 
 the Go and Rust implementations.
@@ -26,6 +61,24 @@ the Go and Rust implementations.
 - ci: Add tags to codecov reports ([#121](https://github.com/cosmos/ics23/pull/121)) (4 months ago)
 - ci: Refactor GitHub workflows and add code coverage job ([#120](https://github.com/cosmos/ics23/pull/120))
 
+<<<<<<< HEAD
+=======
+# 0.9.1
+
+## Go
+
+This release is a backport into the `release/v0.9.x` line of the feature that added the `prehash_compare_key` boolean parameter to the top-level `ProofSpec`.
+When set to `true`, this flag causes keys to be consistently compared lexicographically according to their hashes
+within nonexistence proof verification, using the same hash function as specified by the already-extant `prehash_key` field.
+
+This is a backwards-compatible change, as it requires opt-in via setting the `prehash_compare_key` flag to `true` in the `ProofSpec`.
+All existing `ProofSpec`s will continue to behave identically.
+
+## Full changes
+
+- feat(go): Add `prehash_compare_key` to allow proving nonexistence in sparse trees ([#136](https://github.com/cosmos/ics23/pull/136))
+
+>>>>>>> release/rust/v0.10.3
 # 0.9.0
 
 ## Go

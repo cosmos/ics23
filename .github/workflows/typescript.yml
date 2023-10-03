@@ -20,7 +20,7 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run test suite
         working-directory: ./js
         run: yarn && yarn test
@@ -29,7 +29,7 @@ jobs:
     name: Code Coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Generate code coverage
         working-directory: ./js
         run: yarn && yarn coverage
