@@ -9,11 +9,6 @@
     "PreImage": "food",
     "ExpectedHash": "c235548cfe84fc87678ff04c9134e060cdcd7512d09ed726192151a995541ed8db9fda5204e72e7ac268214c322c17787c70530513c59faede52b7dd9ce64331"
   },
-  "keccak": {
-    "HashOp": 3,
-    "PreImage": "food",
-    "ExpectedHash": "a471c7c90860799b1facb54795f0a93d821fb727241025770865602471b765a8"
-  },
   "ripemd160": {
     "HashOp": 4,
     "Preimage": "food",
