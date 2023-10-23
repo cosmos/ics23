@@ -15,6 +15,8 @@ members = ["codegen", "no-std-check"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 anyhow = {version = "1.0.40", default-features = false}
+blake2 = {version = "0.10.6", optional = true, default-features = false}
+blake3 = {version = "1.5.0", optional = true, default-features = false}
 bytes = {version = "1.0.1", default-features = false}
 hex = {version = "0.4.3", default-features = false, features = ["alloc"]}
 prost = {version = "0.12", default-features = false, features = ["prost-derive"]}
@@ -36,6 +38,6 @@ default = ["std", "host-functions"]
 
 std = ["prost/std", "bytes/std", "hex/std", "anyhow/std", "informalsystems-pbjson/std", "serde/std"]
 
-host-functions = ["sha2", "sha3", "ripemd"]
+host-functions = ["sha2", "sha3", "ripemd", "blake2", "blake3"]
 
 serde = ["dep:serde", "informalsystems-pbjson"]
