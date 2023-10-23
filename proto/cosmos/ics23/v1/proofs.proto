@@ -13,6 +13,9 @@ enum HashOp {
   RIPEMD160  = 4;
   BITCOIN    = 5; // ripemd160(sha256(x))
   SHA512_256 = 6;
+  BLAKE2B    = 7;
+  BLAKE2S    = 8;
+  BLAKE3     = 9;
 }
 
 /**
