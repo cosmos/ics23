@@ -34,6 +34,36 @@ describe("doHash", () => {
     const hash = doHash(ics23.HashOp.BITCOIN, toAscii("food"));
     expect(hash).toEqual(fromHex("0bcb587dfb4fc10b36d57f2bba1878f139b75d24"));
   });
+
+  it("blake2b hashes food", () => {
+    // use this online tool: https://toolkitbay.com/tkb/tool/BLAKE2b_512
+    const hash = doHash(ics23.HashOp.BLAKE2B, toAscii("food"));
+    expect(hash).toEqual(
+      fromHex(
+        "b1f115361afc179415d93d4f58dc2fc7d8fa434192d7cb9b65fca592f6aa904103d1f12b28655c2355478e10908ab002c418dc52a4367d8e645309cd25e3a504"
+      )
+    );
+  });
+
+  it("blake2s hashes food", () => {
+    // use this online tool: https://toolkitbay.com/tkb/tool/BLAKE2s_256
+    const hash = doHash(ics23.HashOp.BLAKE2S, toAscii("food"));
+    expect(hash).toEqual(
+      fromHex(
+        "5a1ec796f11f3dfc7e8ca5de13828edf2e910eb7dd41caaac356a4acbefb1758"
+      )
+    );
+  });
+
+  it("blake3 hashes food", () => {
+    // use this online tool: https://connor4312.github.io/blake3/index.html
+    const hash = doHash(ics23.HashOp.BLAKE3, toAscii("food"));
+    expect(hash).toEqual(
+      fromHex(
+        "f775a8ccf8cb78cd1c63ade4e9802de4ead836b36cea35242accf31d2c6a3697"
+      )
+    );
+  });
 });
 
 describe("applyLeaf", () => {

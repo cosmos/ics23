@@ -1,9 +1,9 @@
-import { ripemd160 } from "@noble/hashes/ripemd160";
-import { sha256 } from "@noble/hashes/sha256";
-import { sha512, sha512_256 } from "@noble/hashes/sha512";
 import { blake2b } from "@noble/hashes/blake2b";
 import { blake2s } from "@noble/hashes/blake2s";
 import { blake3 } from "@noble/hashes/blake3";
+import { ripemd160 } from "@noble/hashes/ripemd160";
+import { sha256 } from "@noble/hashes/sha256";
+import { sha512, sha512_256 } from "@noble/hashes/sha512";
 
 import { ics23 } from "./generated/codecimpl";
 

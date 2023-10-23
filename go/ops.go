@@ -193,7 +193,7 @@ func doHash(hashOp HashOp, preimage []byte) ([]byte, error) {
 		}
 		return hash.Sum(nil), nil
 	case HashOp_BLAKE2S:
-		hash := crypto.BLAKE2b_256.New()
+		hash := crypto.BLAKE2s_256.New()
 		_, err := hash.Write(preimage)
 		if err != nil {
 			return nil, err
