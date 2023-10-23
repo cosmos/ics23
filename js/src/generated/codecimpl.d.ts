@@ -10,6 +10,9 @@ export namespace ics23 {
     RIPEMD160 = 4,
     BITCOIN = 5,
     SHA512_256 = 6,
+    BLAKE2B = 7,
+    BLAKE2S = 8,
+    BLAKE3 = 9,
   }
 
   /**
