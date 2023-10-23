@@ -14,6 +14,10 @@ import (
 	_ "crypto/sha512"
 	// adds ripemd160 capability to crypto.RIPEMD160
 	_ "golang.org/x/crypto/ripemd160" //nolint:staticcheck
+	// adds blake2b capability to crypto.BLAKE2b_512
+	_ "golang.org/x/crypto/blake2b"
+	// adds blake2s capability to crypto.BLAKE2s_256
+	_ "golang.org/x/crypto/blake2s"
 )
 
 // validate the IAVL Ops
@@ -181,6 +185,22 @@ func doHash(hashOp HashOp, preimage []byte) ([]byte, error) {
 			return nil, err
 		}
 		return shaHash.Sum(nil), nil
+	case HashOp_BLAKE2B:
+		hash := crypto.BLAKE2b_512.New()
+		_, err := hash.Write(preimage)
+		if err != nil {
+			return nil, err
+		}
+		return hash.Sum(nil), nil
+	case HashOp_BLAKE2S:
+		hash := crypto.BLAKE2b_256.New()
+		_, err := hash.Write(preimage)
+		if err != nil {
+			return nil, err
+		}
+		return hash.Sum(nil), nil
+		// TODO: there doesn't seem to be an "official" implementation of BLAKE3 in Go,
+		// so we are unable to support it for now
 	}
 	return nil, fmt.Errorf("unsupported hashop: %d", hashOp)
 }
