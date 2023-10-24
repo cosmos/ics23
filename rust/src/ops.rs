@@ -62,8 +62,23 @@ pub(crate) fn do_length(length: LengthOp, data: &[u8]) -> Result<Hash> {
             len.extend(data);
             return Ok(len);
         }
+        LengthOp::Fixed32Big => {
+            let mut len = (data.len() as u32).to_be_bytes().to_vec();
+            len.extend(data);
+            return Ok(len);
+        }
         LengthOp::Fixed32Little => {
             let mut len = (data.len() as u32).to_le_bytes().to_vec();
+            len.extend(data);
+            return Ok(len);
+        }
+        LengthOp::Fixed64Big => {
+            let mut len = (data.len() as u64).to_be_bytes().to_vec();
+            len.extend(data);
+            return Ok(len);
+        }
+        LengthOp::Fixed64Little => {
+            let mut len = (data.len() as u64).to_le_bytes().to_vec();
             len.extend(data);
             return Ok(len);
         }
