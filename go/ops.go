@@ -259,16 +259,28 @@ func doLengthOp(lengthOp LengthOp, data []byte) ([]byte, error) {
 			return nil, fmt.Errorf("data was %d bytes, not 64", len(data))
 		}
 		return data, nil
+	case LengthOp_FIXED32_BIG:
+		res := make([]byte, 4, 4+len(data))
+		binary.BigEndian.PutUint32(res[:4], uint32(len(data)))
+		res = append(res, data...)
+		return res, nil
 	case LengthOp_FIXED32_LITTLE:
 		res := make([]byte, 4, 4+len(data))
 		binary.LittleEndian.PutUint32(res[:4], uint32(len(data)))
 		res = append(res, data...)
 		return res, nil
+	case LengthOp_FIXED64_BIG:
+		res := make([]byte, 8, 8+len(data))
+		binary.BigEndian.PutUint64(res[:8], uint64(len(data)))
+		res = append(res, data...)
+		return res, nil
+	case LengthOp_FIXED64_LITTLE:
+		res := make([]byte, 8, 8+len(data))
+		binary.LittleEndian.PutUint64(res[:8], uint64(len(data)))
+		res = append(res, data...)
+		return res, nil
 		// TODO
 		// case LengthOp_VAR_RLP:
-		// case LengthOp_FIXED32_BIG:
-		// case LengthOp_FIXED64_BIG:
-		// case LengthOp_FIXED64_LITTLE:
 	}
 	return nil, fmt.Errorf("unsupported lengthop: %d", lengthOp)
 }
