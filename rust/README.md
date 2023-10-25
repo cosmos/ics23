@@ -28,5 +28,5 @@ Unless you modify the protobuf file, you can ignore this step.
 
 ## MSRV
 
-The minimum supported Rust version (MSRV) is 1.56.1.
+The minimum supported Rust version (MSRV) is 1.60.
 
