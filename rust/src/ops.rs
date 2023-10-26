@@ -172,7 +172,6 @@ mod tests {
         );
 
         let prefixed = do_length(LengthOp::Fixed32Big, b"food").unwrap();
-        println!("{:?}", prefixed);
         assert!(
             prefixed == decode("00000004666f6f64"),
             "proto prefix returned {}",
