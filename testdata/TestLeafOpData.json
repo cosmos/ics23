@@ -36,6 +36,16 @@
     "IsErr": false,
     "Expected": "to9dKY6RWuF1PdMz2h+c9gVBGl8uElFr5nWPNl5tsmU="
   },
+  "hash with length prefix (fixed 32-bit big-endian encoding)": {
+    "Op": {
+      "hash": 1,
+      "length": 3
+    },
+    "Key": "Zm9vZA==",
+    "Value": "c29tZSBsb25nZXIgdGV4dA==",
+    "IsErr": false,
+    "Expected": "3aKSo5jYgP68i5P2GN+958ViipD1gKhhSkTH7WbujqA="
+  },
   "hash with length prefix (fixed 32-bit little-endian encoding)": {
     "Op": {
       "hash": 1,
@@ -45,6 +55,26 @@
     "Value": "c29tZSBsb25nZXIgdGV4dA==",
     "IsErr": false,
     "Expected": "yFNlJDe+AlAcZ0dEvyorRdkqCp8pxLEEQBD7Pi1DqUk="
+  },
+  "hash with length prefix (fixed 64-bit big-endian encoding)": {
+    "Op": {
+      "hash": 1,
+      "length": 5
+    },
+    "Key": "Zm9vZA==",
+    "Value": "c29tZSBsb25nZXIgdGV4dA==",
+    "IsErr": false,
+    "Expected": "MdmqaTGpBztx8P0weVWka+tw4YpYyS63U11hPfWTvAo="
+  },
+  "hash with length prefix (fixed 64-bit little-endian encoding)": {
+    "Op": {
+      "hash": 1,
+      "length": 6
+    },
+    "Key": "Zm9vZA==",
+    "Value": "c29tZSBsb25nZXIgdGV4dA==",
+    "IsErr": false,
+    "Expected": "Ta2v+wNch1+5Oz5ASqGvSotk2Gp4a8BPFEs6r/qYT/4="
   },
   "hash with prehash and length prefix": {
     "Op": {

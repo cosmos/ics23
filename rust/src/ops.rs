@@ -171,9 +171,31 @@ mod tests {
             hex::encode(&prefixed),
         );
 
+        let prefixed = do_length(LengthOp::Fixed32Big, b"food").unwrap();
+        println!("{:?}", prefixed);
+        assert!(
+            prefixed == decode("00000004666f6f64"),
+            "proto prefix returned {}",
+            hex::encode(&prefixed),
+        );
+
         let prefixed = do_length(LengthOp::Fixed32Little, b"food").unwrap();
         assert!(
             prefixed == decode("04000000666f6f64"),
+            "proto prefix returned {}",
+            hex::encode(&prefixed),
+        );
+
+        let prefixed = do_length(LengthOp::Fixed64Big, b"food").unwrap();
+        assert!(
+            prefixed == decode("0000000000000004666f6f64"),
+            "proto prefix returned {}",
+            hex::encode(&prefixed),
+        );
+
+        let prefixed = do_length(LengthOp::Fixed64Little, b"food").unwrap();
+        assert!(
+            prefixed == decode("0400000000000000666f6f64"),
             "proto prefix returned {}",
             hex::encode(&prefixed),
         );

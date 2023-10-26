@@ -29,7 +29,7 @@ describe("doHash", () => {
     expect(hash).toEqual(fromHex("b1ab9988c7c7c5ec4b2b291adfeeee10e77cdd46"));
   });
 
-  it("'bitcoin' hashes food", () => {
+  it("bitcoin hashes food", () => {
     // echo -n c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b | xxd -r -p | openssl dgst -rmd160 -hex
     const hash = doHash(ics23.HashOp.BITCOIN, toAscii("food"));
     expect(hash).toEqual(fromHex("0bcb587dfb4fc10b36d57f2bba1878f139b75d24"));
