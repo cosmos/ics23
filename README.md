@@ -59,6 +59,13 @@ live alongside the various merkle tree representations (eg. not in this reposito
 * [TypeScript](./js)
 * [Rust](./rust)
 
+### Compatibility Table
+
+| ICS 023 Spec  | Go                | Rust                |
+|---------------|-------------------|---------------------|
+| 2019-08-25    | 0.9.x             | 0.9.x               |
+| 2019-08-25    | 0.10.x            | 0.10.x, 0.11.x      |
+
 ### Planned Support
 
 * Solidity - [thanks to Mossid](https://github.com/cosmos/proofs/pull/12)
