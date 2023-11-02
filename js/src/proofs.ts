@@ -67,7 +67,7 @@ export type CommitmentRoot = Uint8Array;
 
 export function keyForComparison(
   spec: ics23.IProofSpec,
-  key: Uint8Array
+  key: Uint8Array,
 ): Uint8Array {
   if (!spec.prehashKeyBeforeComparison) {
     return key;
@@ -83,7 +83,7 @@ export function verifyExistence(
   spec: ics23.IProofSpec,
   root: CommitmentRoot,
   key: Uint8Array,
-  value: Uint8Array
+  value: Uint8Array,
 ): void {
   ensureSpec(proof, spec);
   const calc = calculateExistenceRoot(proof);
@@ -99,7 +99,7 @@ export function verifyNonExistence(
   proof: ics23.INonExistenceProof,
   spec: ics23.IProofSpec,
   root: CommitmentRoot,
-  key: Uint8Array
+  key: Uint8Array,
 ): void {
   let leftKey: Uint8Array | undefined;
   let rightKey: Uint8Array | undefined;
@@ -114,7 +114,7 @@ export function verifyNonExistence(
       spec,
       root,
       proof.right.key!,
-      proof.right.value!
+      proof.right.value!,
     );
     rightKey = proof.right.key!;
   }
@@ -126,13 +126,13 @@ export function verifyNonExistence(
   if (leftKey) {
     ensureBytesBefore(
       keyForComparison(spec, leftKey),
-      keyForComparison(spec, key)
+      keyForComparison(spec, key),
     );
   }
   if (rightKey) {
     ensureBytesBefore(
       keyForComparison(spec, key),
-      keyForComparison(spec, rightKey)
+      keyForComparison(spec, rightKey),
     );
   }
 
@@ -153,7 +153,7 @@ export function verifyNonExistence(
 // You must validate the result is what you have in a header.
 // Returns error if the calculations cannot be performed.
 export function calculateExistenceRoot(
-  proof: ics23.IExistenceProof
+  proof: ics23.IExistenceProof,
 ): CommitmentRoot {
   if (!proof.key || !proof.value) {
     throw new Error("Existence proof needs key and value set");
@@ -173,7 +173,7 @@ export function calculateExistenceRoot(
 // ensureSpec throws an Error if proof doesn't fulfill spec
 export function ensureSpec(
   proof: ics23.IExistenceProof,
-  spec: ics23.IProofSpec
+  spec: ics23.IProofSpec,
 ): void {
   if (!proof.leaf) {
     throw new Error("Existence proof must start with a leaf operation");
@@ -200,7 +200,7 @@ export function ensureSpec(
 
 function ensureLeftMost(
   spec: ics23.IInnerSpec,
-  path: readonly ics23.IInnerOp[]
+  path: readonly ics23.IInnerOp[],
 ): void {
   const { minPrefix, maxPrefix, suffix } = getPadding(spec, 0);
 
@@ -214,7 +214,7 @@ function ensureLeftMost(
 
 function ensureRightMost(
   spec: ics23.IInnerSpec,
-  path: readonly ics23.IInnerOp[]
+  path: readonly ics23.IInnerOp[],
 ): void {
   const len = spec.childOrder!.length - 1;
   const { minPrefix, maxPrefix, suffix } = getPadding(spec, len);
@@ -230,7 +230,7 @@ function ensureRightMost(
 export function ensureLeftNeighbor(
   spec: ics23.IInnerSpec,
   left: readonly ics23.IInnerOp[],
-  right: readonly ics23.IInnerOp[]
+  right: readonly ics23.IInnerOp[],
 ): void {
   const mutleft: ics23.IInnerOp[] = [...left];
   const mutright: ics23.IInnerOp[] = [...right];
@@ -261,7 +261,7 @@ export function ensureLeftNeighbor(
 function isLeftStep(
   spec: ics23.IInnerSpec,
   left: ics23.IInnerOp,
-  right: ics23.IInnerOp
+  right: ics23.IInnerOp,
 ): boolean {
   const leftidx = orderFromPadding(spec, left);
   const rightidx = orderFromPadding(spec, right);
@@ -270,7 +270,7 @@ function isLeftStep(
 
 function orderFromPadding(
   spec: ics23.IInnerSpec,
-  inner: ics23.IInnerOp
+  inner: ics23.IInnerOp,
 ): number {
   for (let branch = 0; branch < spec.childOrder!.length; branch++) {
     const { minPrefix, maxPrefix, suffix } = getPadding(spec, branch);
@@ -285,7 +285,7 @@ function hasPadding(
   op: ics23.IInnerOp,
   minPrefix: number,
   maxPrefix: number,
-  suffix: number
+  suffix: number,
 ): boolean {
   if ((op.prefix || []).length < minPrefix) {
     return false;
