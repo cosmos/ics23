@@ -19,7 +19,7 @@ export function ensureLeaf(leaf: ics23.ILeafOp, spec: ics23.ILeafOp): void {
 export function ensureInner(
   inner: ics23.IInnerOp,
   prefix: Uint8Array | null | undefined,
-  spec: ics23.IInnerSpec
+  spec: ics23.IInnerSpec,
 ): void {
   if (inner.hash !== spec.hash) {
     throw new Error(`Unexpected hashOp: ${inner.hash}`);
@@ -41,7 +41,7 @@ export function ensureInner(
 
 function ensurePrefix(
   check?: Uint8Array | null,
-  prefix?: Uint8Array | null
+  prefix?: Uint8Array | null,
 ): void {
   // no prefix supplied, means everything passes
   if (!prefix || prefix.length === 0) {
@@ -79,7 +79,7 @@ export function bytesEqual(a: Uint8Array, b: Uint8Array): boolean {
 
 function hasPrefix(
   check?: Uint8Array | null,
-  prefix?: Uint8Array | null
+  prefix?: Uint8Array | null,
 ): boolean {
   // no prefix supplied, means everything passes
   if (!prefix || prefix.length === 0) {

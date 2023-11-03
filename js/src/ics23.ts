@@ -34,7 +34,7 @@ export function verifyMembership(
   spec: ics23.IProofSpec,
   root: CommitmentRoot,
   key: Uint8Array,
-  value: Uint8Array
+  value: Uint8Array,
 ): boolean {
   const norm = decompress(proof);
   const exist = getExistForKey(norm, key);
@@ -56,7 +56,7 @@ export function verifyNonMembership(
   proof: ics23.ICommitmentProof,
   spec: ics23.IProofSpec,
   root: CommitmentRoot,
-  key: Uint8Array
+  key: Uint8Array,
 ): boolean {
   const norm = decompress(proof);
   const nonexist = getNonExistForKey(spec, norm, key);
@@ -78,7 +78,7 @@ export function batchVerifyMembership(
   proof: ics23.ICommitmentProof,
   spec: ics23.IProofSpec,
   root: CommitmentRoot,
-  items: Map<Uint8Array, Uint8Array>
+  items: Map<Uint8Array, Uint8Array>,
 ): boolean {
   const norm = decompress(proof);
   for (const [key, value] of items.entries()) {
@@ -96,7 +96,7 @@ export function batchVerifyNonMembership(
   proof: ics23.ICommitmentProof,
   spec: ics23.IProofSpec,
   root: CommitmentRoot,
-  keys: readonly Uint8Array[]
+  keys: readonly Uint8Array[],
 ): boolean {
   const norm = decompress(proof);
   for (const key of keys) {
@@ -109,7 +109,7 @@ export function batchVerifyNonMembership(
 
 function getExistForKey(
   proof: ics23.ICommitmentProof,
-  key: Uint8Array
+  key: Uint8Array,
 ): ics23.IExistenceProof | undefined | null {
   const match = (p: ics23.IExistenceProof | null | undefined): boolean =>
     !!p && bytesEqual(key, p.key!);
@@ -124,7 +124,7 @@ function getExistForKey(
 function getNonExistForKey(
   spec: ics23.IProofSpec,
   proof: ics23.ICommitmentProof,
-  key: Uint8Array
+  key: Uint8Array,
 ): ics23.INonExistenceProof | undefined | null {
   const match = (p: ics23.INonExistenceProof | null | undefined): boolean => {
     return (
@@ -132,12 +132,12 @@ function getNonExistForKey(
       (!p.left ||
         bytesBefore(
           keyForComparison(spec, p.left.key!),
-          keyForComparison(spec, key)
+          keyForComparison(spec, key),
         )) &&
       (!p.right ||
         bytesBefore(
           keyForComparison(spec, key),
-          keyForComparison(spec, p.right.key!)
+          keyForComparison(spec, p.right.key!),
         ))
     );
   };
