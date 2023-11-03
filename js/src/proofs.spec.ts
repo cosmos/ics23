@@ -20,7 +20,7 @@ describe("calculateExistenceRoot", () => {
       },
     };
     const expected = fromHex(
-      "b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"
+      "b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265",
     );
     expect(calculateExistenceRoot(proof)).toEqual(expected);
   });
@@ -55,7 +55,7 @@ describe("calculateExistenceRoot", () => {
       ],
     };
     const expected = fromHex(
-      "836ea236a6902a665c2a004c920364f24cad52ded20b1e4f22c3179bfe25b2a9"
+      "836ea236a6902a665c2a004c920364f24cad52ded20b1e4f22c3179bfe25b2a9",
     );
     expect(calculateExistenceRoot(proof)).toEqual(expected);
   });

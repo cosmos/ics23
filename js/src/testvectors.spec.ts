@@ -82,37 +82,37 @@ describe("calculateExistenceRoot", () => {
   it("should parse tendermint left", () => {
     validateTestVector(
       "../testdata/tendermint/exist_left.json",
-      tendermintSpec
+      tendermintSpec,
     );
   });
   it("should parse tendermint right", () => {
     validateTestVector(
       "../testdata/tendermint/exist_right.json",
-      tendermintSpec
+      tendermintSpec,
     );
   });
   it("should parse tendermint middle", () => {
     validateTestVector(
       "../testdata/tendermint/exist_middle.json",
-      tendermintSpec
+      tendermintSpec,
     );
   });
   it("should parse tendermint left - nonexist", () => {
     validateTestVector(
       "../testdata/tendermint/nonexist_left.json",
-      tendermintSpec
+      tendermintSpec,
     );
   });
   it("should parse tendermint right - nonexist", () => {
     validateTestVector(
       "../testdata/tendermint/nonexist_right.json",
-      tendermintSpec
+      tendermintSpec,
     );
   });
   it("should parse tendermint middle - nonexist", () => {
     validateTestVector(
       "../testdata/tendermint/nonexist_middle.json",
-      tendermintSpec
+      tendermintSpec,
     );
   });
 
@@ -144,7 +144,7 @@ describe("calculateExistenceRoot", () => {
   function validateBatch(
     proof: ics23.ICommitmentProof,
     spec: ics23.IProofSpec,
-    data: RefData
+    data: RefData,
   ): void {
     const { root, key, value } = data;
     if (value) {
