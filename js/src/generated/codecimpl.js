@@ -25,7 +25,7 @@ $root.ics23 = (function() {
      * @property {number} NO_HASH=0 NO_HASH value
      * @property {number} SHA256=1 SHA256 value
      * @property {number} SHA512=2 SHA512 value
-     * @property {number} KECCAK=3 KECCAK value
+     * @property {number} KECCAK256=3 KECCAK256 value
      * @property {number} RIPEMD160=4 RIPEMD160 value
      * @property {number} BITCOIN=5 BITCOIN value
      * @property {number} SHA512_256=6 SHA512_256 value
@@ -35,7 +35,7 @@ $root.ics23 = (function() {
         values[valuesById[0] = "NO_HASH"] = 0;
         values[valuesById[1] = "SHA256"] = 1;
         values[valuesById[2] = "SHA512"] = 2;
-        values[valuesById[3] = "KECCAK"] = 3;
+        values[valuesById[3] = "KECCAK256"] = 3;
         values[valuesById[4] = "RIPEMD160"] = 4;
         values[valuesById[5] = "BITCOIN"] = 5;
         values[valuesById[6] = "SHA512_256"] = 6;
@@ -1238,7 +1238,7 @@ $root.ics23 = (function() {
             case 2:
                 message.hash = 2;
                 break;
-            case "KECCAK":
+            case "KECCAK256":
             case 3:
                 message.hash = 3;
                 break;
@@ -1268,7 +1268,7 @@ $root.ics23 = (function() {
             case 2:
                 message.prehashKey = 2;
                 break;
-            case "KECCAK":
+            case "KECCAK256":
             case 3:
                 message.prehashKey = 3;
                 break;
@@ -1298,7 +1298,7 @@ $root.ics23 = (function() {
             case 2:
                 message.prehashValue = 2;
                 break;
-            case "KECCAK":
+            case "KECCAK256":
             case 3:
                 message.prehashValue = 3;
                 break;
@@ -1633,7 +1633,7 @@ $root.ics23 = (function() {
             case 2:
                 message.hash = 2;
                 break;
-            case "KECCAK":
+            case "KECCAK256":
             case 3:
                 message.hash = 3;
                 break;
@@ -2301,7 +2301,7 @@ $root.ics23 = (function() {
             case 2:
                 message.hash = 2;
                 break;
-            case "KECCAK":
+            case "KECCAK256":
             case 3:
                 message.hash = 3;
                 break;
