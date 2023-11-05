@@ -197,7 +197,7 @@ describe("calculateExistenceRoot", () => {
     ]);
     const small = compress(proof);
 
-    // ensure this is acutally a different format
+    // ensure this is actually a different format
     const origBin = ics23.CommitmentProof.encode(proof).finish();
     const origBin2 = ics23.CommitmentProof.encode(proof).finish();
     const smallBin = ics23.CommitmentProof.encode(small).finish();
@@ -218,7 +218,7 @@ describe("calculateExistenceRoot", () => {
     ]);
     const small = compress(proof);
 
-    // ensure this is acutally a different format
+    // ensure this is actually a different format
     const origBin = ics23.CommitmentProof.encode(proof).finish();
     const origBin2 = ics23.CommitmentProof.encode(proof).finish();
     const smallBin = ics23.CommitmentProof.encode(small).finish();
