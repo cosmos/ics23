@@ -94,9 +94,9 @@ export function doHash(hashOp: ics23.HashOp, preimage: Uint8Array): Uint8Array {
       return ripemd160(sha256(preimage));
     case ics23.HashOp.SHA512_256:
       return sha512_256(preimage);
-    case ics23.HashOp.BLAKE2B:
+    case ics23.HashOp.BLAKE2B_512:
       return blake2b(preimage);
-    case ics23.HashOp.BLAKE2S:
+    case ics23.HashOp.BLAKE2S_256:
       return blake2s(preimage);
     case ics23.HashOp.BLAKE3:
       return blake3(preimage);

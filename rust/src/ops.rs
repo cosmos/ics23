@@ -46,8 +46,8 @@ pub(crate) fn do_hash<H: HostFunctionsProvider>(hash: HashOp, data: &[u8]) -> Ha
         HashOp::Ripemd160 => Hash::from(H::ripemd160(data)),
         HashOp::Bitcoin => Hash::from(H::ripemd160(&H::sha2_256(data)[..])),
         HashOp::Sha512256 => Hash::from(H::sha2_512_truncated(data)),
-        HashOp::Blake2b => Hash::from(H::blake2b_512(data)),
-        HashOp::Blake2s => Hash::from(H::blake2s_256(data)),
+        HashOp::Blake2b512 => Hash::from(H::blake2b_512(data)),
+        HashOp::Blake2s256 => Hash::from(H::blake2s_256(data)),
         HashOp::Blake3 => Hash::from(H::blake3(data)),
     }
 }
@@ -140,13 +140,13 @@ mod tests {
             "sha512/256 hash fails"
         );
 
-        let hash = do_hash::<HostFunctionsManager>(HashOp::Blake2b, b"food");
+        let hash = do_hash::<HostFunctionsManager>(HashOp::Blake2b512, b"food");
         assert!(
             hash == decode("b1f115361afc179415d93d4f58dc2fc7d8fa434192d7cb9b65fca592f6aa904103d1f12b28655c2355478e10908ab002c418dc52a4367d8e645309cd25e3a504"),
             "blake2b hash fails"
         );
 
-        let hash = do_hash::<HostFunctionsManager>(HashOp::Blake2s, b"food");
+        let hash = do_hash::<HostFunctionsManager>(HashOp::Blake2s256, b"food");
         assert!(
             hash == decode("5a1ec796f11f3dfc7e8ca5de13828edf2e910eb7dd41caaac356a4acbefb1758"),
             "blake2s hash fails"

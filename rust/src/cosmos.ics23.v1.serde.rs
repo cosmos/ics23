@@ -987,8 +987,8 @@ impl serde::Serialize for HashOp {
             Self::Ripemd160 => "RIPEMD160",
             Self::Bitcoin => "BITCOIN",
             Self::Sha512256 => "SHA512_256",
-            Self::Blake2b => "BLAKE2B",
-            Self::Blake2s => "BLAKE2S",
+            Self::Blake2b512 => "BLAKE2B_512",
+            Self::Blake2s256 => "BLAKE2S_256",
             Self::Blake3 => "BLAKE3",
         };
         serializer.serialize_str(variant)
@@ -1008,8 +1008,8 @@ impl<'de> serde::Deserialize<'de> for HashOp {
             "RIPEMD160",
             "BITCOIN",
             "SHA512_256",
-            "BLAKE2B",
-            "BLAKE2S",
+            "BLAKE2B_512",
+            "BLAKE2S_256",
             "BLAKE3",
         ];
 
@@ -1060,8 +1060,8 @@ impl<'de> serde::Deserialize<'de> for HashOp {
                     "RIPEMD160" => Ok(HashOp::Ripemd160),
                     "BITCOIN" => Ok(HashOp::Bitcoin),
                     "SHA512_256" => Ok(HashOp::Sha512256),
-                    "BLAKE2B" => Ok(HashOp::Blake2b),
-                    "BLAKE2S" => Ok(HashOp::Blake2s),
+                    "BLAKE2B_512" => Ok(HashOp::Blake2b512),
+                    "BLAKE2S_256" => Ok(HashOp::Blake2s256),
                     "BLAKE3" => Ok(HashOp::Blake3),
                     _ => Err(serde::de::Error::unknown_variant(value, FIELDS)),
                 }

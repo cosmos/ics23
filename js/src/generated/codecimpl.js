@@ -29,8 +29,8 @@ $root.ics23 = (function() {
      * @property {number} RIPEMD160=4 RIPEMD160 value
      * @property {number} BITCOIN=5 BITCOIN value
      * @property {number} SHA512_256=6 SHA512_256 value
-     * @property {number} BLAKE2B=7 BLAKE2B value
-     * @property {number} BLAKE2S=8 BLAKE2S value
+     * @property {number} BLAKE2B_512=7 BLAKE2B value
+     * @property {number} BLAKE2S_256=8 BLAKE2S value
      * @property {number} BLAKE3=9 BLAKE3 value
      */
     ics23.HashOp = (function() {
@@ -42,8 +42,8 @@ $root.ics23 = (function() {
         values[valuesById[4] = "RIPEMD160"] = 4;
         values[valuesById[5] = "BITCOIN"] = 5;
         values[valuesById[6] = "SHA512_256"] = 6;
-        values[valuesById[7] = "BLAKE2B"] = 7;
-        values[valuesById[8] = "BLAKE2S"] = 8;
+        values[valuesById[7] = "BLAKE2B_512"] = 7;
+        values[valuesById[8] = "BLAKE2S_256"] = 8;
         values[valuesById[9] = "BLAKE3"] = 9;
         return values;
     })();

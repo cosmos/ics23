@@ -185,14 +185,14 @@ func doHash(hashOp HashOp, preimage []byte) ([]byte, error) {
 			return nil, err
 		}
 		return shaHash.Sum(nil), nil
-	case HashOp_BLAKE2B:
+	case HashOp_BLAKE2B_512:
 		blakeHash := crypto.BLAKE2b_512.New()
 		_, err := blakeHash.Write(preimage)
 		if err != nil {
 			return nil, err
 		}
 		return blakeHash.Sum(nil), nil
-	case HashOp_BLAKE2S:
+	case HashOp_BLAKE2S_256:
 		blakeHash := crypto.BLAKE2s_256.New()
 		_, err := blakeHash.Write(preimage)
 		if err != nil {
