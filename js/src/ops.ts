@@ -10,7 +10,7 @@ import { ics23 } from "./generated/codecimpl";
 export function applyLeaf(
   leaf: ics23.ILeafOp,
   key: Uint8Array,
-  value: Uint8Array
+  value: Uint8Array,
 ): Uint8Array {
   if (key.length === 0) {
     throw new Error("Missing key");
@@ -21,12 +21,12 @@ export function applyLeaf(
   const pkey = prepareLeafData(
     ensureHash(leaf.prehashKey),
     ensureLength(leaf.length),
-    key
+    key,
   );
   const pvalue = prepareLeafData(
     ensureHash(leaf.prehashValue),
     ensureLength(leaf.length),
-    value
+    value,
   );
   const data = new Uint8Array([
     ...ensureBytes(leaf.prefix),
@@ -38,7 +38,7 @@ export function applyLeaf(
 
 export function applyInner(
   inner: ics23.IInnerOp,
-  child: Uint8Array
+  child: Uint8Array,
 ): Uint8Array {
   if (child.length === 0) {
     throw new Error("Inner op needs child value");
@@ -65,7 +65,7 @@ const ensureBytes = (b: Uint8Array | null | undefined): Uint8Array =>
 function prepareLeafData(
   hashOp: ics23.HashOp,
   lengthOp: ics23.LengthOp,
-  data: Uint8Array
+  data: Uint8Array,
 ): Uint8Array {
   const h = doHashOrNoop(hashOp, data);
   return doLengthOp(lengthOp, h);

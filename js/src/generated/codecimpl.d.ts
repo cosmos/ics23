@@ -94,7 +94,7 @@ export namespace ics23 {
      * @returns ExistenceProof instance
      */
     public static create(
-      properties?: ics23.IExistenceProof
+      properties?: ics23.IExistenceProof,
     ): ics23.ExistenceProof;
 
     /**
@@ -105,7 +105,7 @@ export namespace ics23 {
      */
     public static encode(
       message: ics23.IExistenceProof,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -116,7 +116,7 @@ export namespace ics23 {
      */
     public static encodeDelimited(
       message: ics23.IExistenceProof,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -129,7 +129,7 @@ export namespace ics23 {
      */
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
-      length?: number
+      length?: number,
     ): ics23.ExistenceProof;
 
     /**
@@ -140,7 +140,7 @@ export namespace ics23 {
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
     public static decodeDelimited(
-      reader: $protobuf.Reader | Uint8Array
+      reader: $protobuf.Reader | Uint8Array,
     ): ics23.ExistenceProof;
 
     /**
@@ -167,7 +167,7 @@ export namespace ics23 {
      */
     public static toObject(
       message: ics23.ExistenceProof,
-      options?: $protobuf.IConversionOptions
+      options?: $protobuf.IConversionOptions,
     ): { [k: string]: any };
 
     /**
@@ -212,7 +212,7 @@ export namespace ics23 {
      * @returns NonExistenceProof instance
      */
     public static create(
-      properties?: ics23.INonExistenceProof
+      properties?: ics23.INonExistenceProof,
     ): ics23.NonExistenceProof;
 
     /**
@@ -223,7 +223,7 @@ export namespace ics23 {
      */
     public static encode(
       message: ics23.INonExistenceProof,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -234,7 +234,7 @@ export namespace ics23 {
      */
     public static encodeDelimited(
       message: ics23.INonExistenceProof,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -247,7 +247,7 @@ export namespace ics23 {
      */
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
-      length?: number
+      length?: number,
     ): ics23.NonExistenceProof;
 
     /**
@@ -258,7 +258,7 @@ export namespace ics23 {
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
     public static decodeDelimited(
-      reader: $protobuf.Reader | Uint8Array
+      reader: $protobuf.Reader | Uint8Array,
     ): ics23.NonExistenceProof;
 
     /**
@@ -285,7 +285,7 @@ export namespace ics23 {
      */
     public static toObject(
       message: ics23.NonExistenceProof,
-      options?: $protobuf.IConversionOptions
+      options?: $protobuf.IConversionOptions,
     ): { [k: string]: any };
 
     /**
@@ -339,7 +339,7 @@ export namespace ics23 {
      * @returns CommitmentProof instance
      */
     public static create(
-      properties?: ics23.ICommitmentProof
+      properties?: ics23.ICommitmentProof,
     ): ics23.CommitmentProof;
 
     /**
@@ -350,7 +350,7 @@ export namespace ics23 {
      */
     public static encode(
       message: ics23.ICommitmentProof,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -361,7 +361,7 @@ export namespace ics23 {
      */
     public static encodeDelimited(
       message: ics23.ICommitmentProof,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -374,7 +374,7 @@ export namespace ics23 {
      */
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
-      length?: number
+      length?: number,
     ): ics23.CommitmentProof;
 
     /**
@@ -385,7 +385,7 @@ export namespace ics23 {
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
     public static decodeDelimited(
-      reader: $protobuf.Reader | Uint8Array
+      reader: $protobuf.Reader | Uint8Array,
     ): ics23.CommitmentProof;
 
     /**
@@ -412,7 +412,7 @@ export namespace ics23 {
      */
     public static toObject(
       message: ics23.CommitmentProof,
-      options?: $protobuf.IConversionOptions
+      options?: $protobuf.IConversionOptions,
     ): { [k: string]: any };
 
     /**
@@ -493,7 +493,7 @@ export namespace ics23 {
      */
     public static encode(
       message: ics23.ILeafOp,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -504,7 +504,7 @@ export namespace ics23 {
      */
     public static encodeDelimited(
       message: ics23.ILeafOp,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -517,7 +517,7 @@ export namespace ics23 {
      */
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
-      length?: number
+      length?: number,
     ): ics23.LeafOp;
 
     /**
@@ -528,7 +528,7 @@ export namespace ics23 {
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
     public static decodeDelimited(
-      reader: $protobuf.Reader | Uint8Array
+      reader: $protobuf.Reader | Uint8Array,
     ): ics23.LeafOp;
 
     /**
@@ -553,7 +553,7 @@ export namespace ics23 {
      */
     public static toObject(
       message: ics23.LeafOp,
-      options?: $protobuf.IConversionOptions
+      options?: $protobuf.IConversionOptions,
     ): { [k: string]: any };
 
     /**
@@ -623,7 +623,7 @@ export namespace ics23 {
      */
     public static encode(
       message: ics23.IInnerOp,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -634,7 +634,7 @@ export namespace ics23 {
      */
     public static encodeDelimited(
       message: ics23.IInnerOp,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -647,7 +647,7 @@ export namespace ics23 {
      */
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
-      length?: number
+      length?: number,
     ): ics23.InnerOp;
 
     /**
@@ -658,7 +658,7 @@ export namespace ics23 {
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
     public static decodeDelimited(
-      reader: $protobuf.Reader | Uint8Array
+      reader: $protobuf.Reader | Uint8Array,
     ): ics23.InnerOp;
 
     /**
@@ -683,7 +683,7 @@ export namespace ics23 {
      */
     public static toObject(
       message: ics23.InnerOp,
-      options?: $protobuf.IConversionOptions
+      options?: $protobuf.IConversionOptions,
     ): { [k: string]: any };
 
     /**
@@ -760,7 +760,7 @@ export namespace ics23 {
      */
     public static encode(
       message: ics23.IProofSpec,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -771,7 +771,7 @@ export namespace ics23 {
      */
     public static encodeDelimited(
       message: ics23.IProofSpec,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -784,7 +784,7 @@ export namespace ics23 {
      */
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
-      length?: number
+      length?: number,
     ): ics23.ProofSpec;
 
     /**
@@ -795,7 +795,7 @@ export namespace ics23 {
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
     public static decodeDelimited(
-      reader: $protobuf.Reader | Uint8Array
+      reader: $protobuf.Reader | Uint8Array,
     ): ics23.ProofSpec;
 
     /**
@@ -820,7 +820,7 @@ export namespace ics23 {
      */
     public static toObject(
       message: ics23.ProofSpec,
-      options?: $protobuf.IConversionOptions
+      options?: $protobuf.IConversionOptions,
     ): { [k: string]: any };
 
     /**
@@ -892,7 +892,7 @@ export namespace ics23 {
      */
     public static encode(
       message: ics23.IInnerSpec,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -903,7 +903,7 @@ export namespace ics23 {
      */
     public static encodeDelimited(
       message: ics23.IInnerSpec,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -916,7 +916,7 @@ export namespace ics23 {
      */
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
-      length?: number
+      length?: number,
     ): ics23.InnerSpec;
 
     /**
@@ -927,7 +927,7 @@ export namespace ics23 {
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
     public static decodeDelimited(
-      reader: $protobuf.Reader | Uint8Array
+      reader: $protobuf.Reader | Uint8Array,
     ): ics23.InnerSpec;
 
     /**
@@ -952,7 +952,7 @@ export namespace ics23 {
      */
     public static toObject(
       message: ics23.InnerSpec,
-      options?: $protobuf.IConversionOptions
+      options?: $protobuf.IConversionOptions,
     ): { [k: string]: any };
 
     /**
@@ -994,7 +994,7 @@ export namespace ics23 {
      */
     public static encode(
       message: ics23.IBatchProof,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -1005,7 +1005,7 @@ export namespace ics23 {
      */
     public static encodeDelimited(
       message: ics23.IBatchProof,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -1018,7 +1018,7 @@ export namespace ics23 {
      */
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
-      length?: number
+      length?: number,
     ): ics23.BatchProof;
 
     /**
@@ -1029,7 +1029,7 @@ export namespace ics23 {
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
     public static decodeDelimited(
-      reader: $protobuf.Reader | Uint8Array
+      reader: $protobuf.Reader | Uint8Array,
     ): ics23.BatchProof;
 
     /**
@@ -1054,7 +1054,7 @@ export namespace ics23 {
      */
     public static toObject(
       message: ics23.BatchProof,
-      options?: $protobuf.IConversionOptions
+      options?: $protobuf.IConversionOptions,
     ): { [k: string]: any };
 
     /**
@@ -1105,7 +1105,7 @@ export namespace ics23 {
      */
     public static encode(
       message: ics23.IBatchEntry,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -1116,7 +1116,7 @@ export namespace ics23 {
      */
     public static encodeDelimited(
       message: ics23.IBatchEntry,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -1129,7 +1129,7 @@ export namespace ics23 {
      */
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
-      length?: number
+      length?: number,
     ): ics23.BatchEntry;
 
     /**
@@ -1140,7 +1140,7 @@ export namespace ics23 {
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
     public static decodeDelimited(
-      reader: $protobuf.Reader | Uint8Array
+      reader: $protobuf.Reader | Uint8Array,
     ): ics23.BatchEntry;
 
     /**
@@ -1165,7 +1165,7 @@ export namespace ics23 {
      */
     public static toObject(
       message: ics23.BatchEntry,
-      options?: $protobuf.IConversionOptions
+      options?: $protobuf.IConversionOptions,
     ): { [k: string]: any };
 
     /**
@@ -1204,7 +1204,7 @@ export namespace ics23 {
      * @returns CompressedBatchProof instance
      */
     public static create(
-      properties?: ics23.ICompressedBatchProof
+      properties?: ics23.ICompressedBatchProof,
     ): ics23.CompressedBatchProof;
 
     /**
@@ -1215,7 +1215,7 @@ export namespace ics23 {
      */
     public static encode(
       message: ics23.ICompressedBatchProof,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -1226,7 +1226,7 @@ export namespace ics23 {
      */
     public static encodeDelimited(
       message: ics23.ICompressedBatchProof,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -1239,7 +1239,7 @@ export namespace ics23 {
      */
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
-      length?: number
+      length?: number,
     ): ics23.CompressedBatchProof;
 
     /**
@@ -1250,7 +1250,7 @@ export namespace ics23 {
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
     public static decodeDelimited(
-      reader: $protobuf.Reader | Uint8Array
+      reader: $protobuf.Reader | Uint8Array,
     ): ics23.CompressedBatchProof;
 
     /**
@@ -1277,7 +1277,7 @@ export namespace ics23 {
      */
     public static toObject(
       message: ics23.CompressedBatchProof,
-      options?: $protobuf.IConversionOptions
+      options?: $protobuf.IConversionOptions,
     ): { [k: string]: any };
 
     /**
@@ -1319,7 +1319,7 @@ export namespace ics23 {
      * @returns CompressedBatchEntry instance
      */
     public static create(
-      properties?: ics23.ICompressedBatchEntry
+      properties?: ics23.ICompressedBatchEntry,
     ): ics23.CompressedBatchEntry;
 
     /**
@@ -1330,7 +1330,7 @@ export namespace ics23 {
      */
     public static encode(
       message: ics23.ICompressedBatchEntry,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -1341,7 +1341,7 @@ export namespace ics23 {
      */
     public static encodeDelimited(
       message: ics23.ICompressedBatchEntry,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -1354,7 +1354,7 @@ export namespace ics23 {
      */
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
-      length?: number
+      length?: number,
     ): ics23.CompressedBatchEntry;
 
     /**
@@ -1365,7 +1365,7 @@ export namespace ics23 {
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
     public static decodeDelimited(
-      reader: $protobuf.Reader | Uint8Array
+      reader: $protobuf.Reader | Uint8Array,
     ): ics23.CompressedBatchEntry;
 
     /**
@@ -1392,7 +1392,7 @@ export namespace ics23 {
      */
     public static toObject(
       message: ics23.CompressedBatchEntry,
-      options?: $protobuf.IConversionOptions
+      options?: $protobuf.IConversionOptions,
     ): { [k: string]: any };
 
     /**
@@ -1443,7 +1443,7 @@ export namespace ics23 {
      * @returns CompressedExistenceProof instance
      */
     public static create(
-      properties?: ics23.ICompressedExistenceProof
+      properties?: ics23.ICompressedExistenceProof,
     ): ics23.CompressedExistenceProof;
 
     /**
@@ -1454,7 +1454,7 @@ export namespace ics23 {
      */
     public static encode(
       message: ics23.ICompressedExistenceProof,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -1465,7 +1465,7 @@ export namespace ics23 {
      */
     public static encodeDelimited(
       message: ics23.ICompressedExistenceProof,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -1478,7 +1478,7 @@ export namespace ics23 {
      */
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
-      length?: number
+      length?: number,
     ): ics23.CompressedExistenceProof;
 
     /**
@@ -1489,7 +1489,7 @@ export namespace ics23 {
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
     public static decodeDelimited(
-      reader: $protobuf.Reader | Uint8Array
+      reader: $protobuf.Reader | Uint8Array,
     ): ics23.CompressedExistenceProof;
 
     /**
@@ -1516,7 +1516,7 @@ export namespace ics23 {
      */
     public static toObject(
       message: ics23.CompressedExistenceProof,
-      options?: $protobuf.IConversionOptions
+      options?: $protobuf.IConversionOptions,
     ): { [k: string]: any };
 
     /**
@@ -1561,7 +1561,7 @@ export namespace ics23 {
      * @returns CompressedNonExistenceProof instance
      */
     public static create(
-      properties?: ics23.ICompressedNonExistenceProof
+      properties?: ics23.ICompressedNonExistenceProof,
     ): ics23.CompressedNonExistenceProof;
 
     /**
@@ -1572,7 +1572,7 @@ export namespace ics23 {
      */
     public static encode(
       message: ics23.ICompressedNonExistenceProof,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -1583,7 +1583,7 @@ export namespace ics23 {
      */
     public static encodeDelimited(
       message: ics23.ICompressedNonExistenceProof,
-      writer?: $protobuf.Writer
+      writer?: $protobuf.Writer,
     ): $protobuf.Writer;
 
     /**
@@ -1596,7 +1596,7 @@ export namespace ics23 {
      */
     public static decode(
       reader: $protobuf.Reader | Uint8Array,
-      length?: number
+      length?: number,
     ): ics23.CompressedNonExistenceProof;
 
     /**
@@ -1607,7 +1607,7 @@ export namespace ics23 {
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
     public static decodeDelimited(
-      reader: $protobuf.Reader | Uint8Array
+      reader: $protobuf.Reader | Uint8Array,
     ): ics23.CompressedNonExistenceProof;
 
     /**
@@ -1634,7 +1634,7 @@ export namespace ics23 {
      */
     public static toObject(
       message: ics23.CompressedNonExistenceProof,
-      options?: $protobuf.IConversionOptions
+      options?: $protobuf.IConversionOptions,
     ): { [k: string]: any };
 
     /**
