@@ -6,7 +6,7 @@
 | ------------------ | ------------------------------------------------- | ---------------------------------------------- |
 | [Go](./go)         | [![Go Test][go-test-badge]][go-test-link]         | [![Go Cov][go-cov-badge]][go-cov-link]         |
 | [Rust](./rust)     | [![Rust Test][rust-test-badge]][rust-test-link]   | [![Rust Cov][rust-cov-badge]][rust-cov-link]   |
-| [TypeScript](./ts) | [![TypeScript Test][ts-test-badge]][ts-test-link] | [![TypeScript Cov][ts-cov-badge]][ts-cov-link] |
+| [TypeScript](./js) | [![TypeScript Test][ts-test-badge]][ts-test-link] | [![TypeScript Cov][ts-cov-badge]][ts-cov-link] |
 
 [cosmos-link]: https://cosmos.network
 [go-test-link]: https://github.com/cosmos/ics23/actions/workflows/go.yml

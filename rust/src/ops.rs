@@ -46,6 +46,9 @@ pub(crate) fn do_hash<H: HostFunctionsProvider>(hash: HashOp, data: &[u8]) -> Ha
         HashOp::Ripemd160 => Hash::from(H::ripemd160(data)),
         HashOp::Bitcoin => Hash::from(H::ripemd160(&H::sha2_256(data)[..])),
         HashOp::Sha512256 => Hash::from(H::sha2_512_truncated(data)),
+        HashOp::Blake2b512 => Hash::from(H::blake2b_512(data)),
+        HashOp::Blake2s256 => Hash::from(H::blake2s_256(data)),
+        HashOp::Blake3 => Hash::from(H::blake3(data)),
     }
 }
 
@@ -59,8 +62,23 @@ pub(crate) fn do_length(length: LengthOp, data: &[u8]) -> Result<Hash> {
             len.extend(data);
             return Ok(len);
         }
+        LengthOp::Fixed32Big => {
+            let mut len = (data.len() as u32).to_be_bytes().to_vec();
+            len.extend(data);
+            return Ok(len);
+        }
         LengthOp::Fixed32Little => {
             let mut len = (data.len() as u32).to_le_bytes().to_vec();
+            len.extend(data);
+            return Ok(len);
+        }
+        LengthOp::Fixed64Big => {
+            let mut len = (data.len() as u64).to_be_bytes().to_vec();
+            len.extend(data);
+            return Ok(len);
+        }
+        LengthOp::Fixed64Little => {
+            let mut len = (data.len() as u64).to_le_bytes().to_vec();
             len.extend(data);
             return Ok(len);
         }
@@ -121,6 +139,24 @@ mod tests {
             hash == decode("5b3a452a6acbf1fc1e553a40c501585d5bd3cca176d562e0a0e19a3c43804e88"),
             "sha512/256 hash fails"
         );
+
+        let hash = do_hash::<HostFunctionsManager>(HashOp::Blake2b512, b"food");
+        assert!(
+            hash == decode("b1f115361afc179415d93d4f58dc2fc7d8fa434192d7cb9b65fca592f6aa904103d1f12b28655c2355478e10908ab002c418dc52a4367d8e645309cd25e3a504"),
+            "blake2b hash fails"
+        );
+
+        let hash = do_hash::<HostFunctionsManager>(HashOp::Blake2s256, b"food");
+        assert!(
+            hash == decode("5a1ec796f11f3dfc7e8ca5de13828edf2e910eb7dd41caaac356a4acbefb1758"),
+            "blake2s hash fails"
+        );
+
+        let hash = do_hash::<HostFunctionsManager>(HashOp::Blake3, b"food");
+        assert!(
+            hash == decode("f775a8ccf8cb78cd1c63ade4e9802de4ead836b36cea35242accf31d2c6a3697"),
+            "blake3 hash fails"
+        );
     }
 
     #[test]
@@ -135,9 +171,30 @@ mod tests {
             hex::encode(&prefixed),
         );
 
+        let prefixed = do_length(LengthOp::Fixed32Big, b"food").unwrap();
+        assert!(
+            prefixed == decode("00000004666f6f64"),
+            "proto prefix returned {}",
+            hex::encode(&prefixed),
+        );
+
         let prefixed = do_length(LengthOp::Fixed32Little, b"food").unwrap();
         assert!(
             prefixed == decode("04000000666f6f64"),
+            "proto prefix returned {}",
+            hex::encode(&prefixed),
+        );
+
+        let prefixed = do_length(LengthOp::Fixed64Big, b"food").unwrap();
+        assert!(
+            prefixed == decode("0000000000000004666f6f64"),
+            "proto prefix returned {}",
+            hex::encode(&prefixed),
+        );
+
+        let prefixed = do_length(LengthOp::Fixed64Little, b"food").unwrap();
+        assert!(
+            prefixed == decode("0400000000000000666f6f64"),
             "proto prefix returned {}",
             hex::encode(&prefixed),
         );
