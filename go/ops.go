@@ -12,6 +12,10 @@ import (
 	_ "crypto/sha256"
 	// adds sha512 capability to crypto.SHA512
 	_ "crypto/sha512"
+	// adds blake2b capability to crypto.BLAKE2b_512
+	_ "golang.org/x/crypto/blake2b"
+	// adds blake2s capability to crypto.BLAKE2s_256
+	_ "golang.org/x/crypto/blake2s"
 	// adds ripemd160 capability to crypto.RIPEMD160
 	_ "golang.org/x/crypto/ripemd160" //nolint:staticcheck
 )
@@ -181,6 +185,22 @@ func doHash(hashOp HashOp, preimage []byte) ([]byte, error) {
 			return nil, err
 		}
 		return shaHash.Sum(nil), nil
+	case HashOp_BLAKE2B_512:
+		blakeHash := crypto.BLAKE2b_512.New()
+		_, err := blakeHash.Write(preimage)
+		if err != nil {
+			return nil, err
+		}
+		return blakeHash.Sum(nil), nil
+	case HashOp_BLAKE2S_256:
+		blakeHash := crypto.BLAKE2s_256.New()
+		_, err := blakeHash.Write(preimage)
+		if err != nil {
+			return nil, err
+		}
+		return blakeHash.Sum(nil), nil
+		// TODO: there doesn't seem to be an "official" implementation of BLAKE3 in Go,
+		// so we are unable to support it for now
 	}
 	return nil, fmt.Errorf("unsupported hashop: %d", hashOp)
 }
@@ -239,16 +259,28 @@ func doLengthOp(lengthOp LengthOp, data []byte) ([]byte, error) {
 			return nil, fmt.Errorf("data was %d bytes, not 64", len(data))
 		}
 		return data, nil
+	case LengthOp_FIXED32_BIG:
+		res := make([]byte, 4, 4+len(data))
+		binary.BigEndian.PutUint32(res[:4], uint32(len(data)))
+		res = append(res, data...)
+		return res, nil
 	case LengthOp_FIXED32_LITTLE:
 		res := make([]byte, 4, 4+len(data))
 		binary.LittleEndian.PutUint32(res[:4], uint32(len(data)))
 		res = append(res, data...)
 		return res, nil
+	case LengthOp_FIXED64_BIG:
+		res := make([]byte, 8, 8+len(data))
+		binary.BigEndian.PutUint64(res[:8], uint64(len(data)))
+		res = append(res, data...)
+		return res, nil
+	case LengthOp_FIXED64_LITTLE:
+		res := make([]byte, 8, 8+len(data))
+		binary.LittleEndian.PutUint64(res[:8], uint64(len(data)))
+		res = append(res, data...)
+		return res, nil
 		// TODO
 		// case LengthOp_VAR_RLP:
-		// case LengthOp_FIXED32_BIG:
-		// case LengthOp_FIXED64_BIG:
-		// case LengthOp_FIXED64_LITTLE:
 	}
 	return nil, fmt.Errorf("unsupported lengthop: %d", lengthOp)
 }

@@ -16,11 +16,21 @@ pub trait HostFunctionsProvider {
 
     /// The Ripemd160 hash function.
     fn ripemd160(message: &[u8]) -> [u8; 20];
+
+    /// BLAKE2b-512 hash function.
+    fn blake2b_512(message: &[u8]) -> [u8; 64];
+
+    /// BLAKE2s-256 hash function.
+    fn blake2s_256(message: &[u8]) -> [u8; 32];
+
+    /// BLAKE3 hash function.
+    fn blake3(message: &[u8]) -> [u8; 32];
 }
 
 #[cfg(any(feature = "host-functions", test))]
 pub mod host_functions_impl {
     use crate::host_functions::HostFunctionsProvider;
+    use blake2::{Blake2b512, Blake2s256};
     use ripemd::Ripemd160;
     use sha2::{Digest, Sha256, Sha512, Sha512_256};
     use sha3::Keccak256;
@@ -60,6 +70,24 @@ pub mod host_functions_impl {
             let mut buf = [0u8; 20];
             buf.copy_from_slice(&digest);
             buf
+        }
+
+        fn blake2b_512(message: &[u8]) -> [u8; 64] {
+            let digest = Blake2b512::digest(message);
+            let mut buf = [0u8; 64];
+            buf.copy_from_slice(&digest);
+            buf
+        }
+
+        fn blake2s_256(message: &[u8]) -> [u8; 32] {
+            let digest = Blake2s256::digest(message);
+            let mut buf = [0u8; 32];
+            buf.copy_from_slice(&digest);
+            buf
+        }
+
+        fn blake3(message: &[u8]) -> [u8; 32] {
+            blake3::hash(message).into()
         }
     }
 }

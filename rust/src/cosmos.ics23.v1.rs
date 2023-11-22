@@ -275,6 +275,9 @@ pub enum HashOp {
     /// ripemd160(sha256(x))
     Bitcoin = 5,
     Sha512256 = 6,
+    Blake2b512 = 7,
+    Blake2s256 = 8,
+    Blake3 = 9,
 }
 impl HashOp {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -290,6 +293,9 @@ impl HashOp {
             HashOp::Ripemd160 => "RIPEMD160",
             HashOp::Bitcoin => "BITCOIN",
             HashOp::Sha512256 => "SHA512_256",
+            HashOp::Blake2b512 => "BLAKE2B_512",
+            HashOp::Blake2s256 => "BLAKE2S_256",
+            HashOp::Blake3 => "BLAKE3",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -302,6 +308,9 @@ impl HashOp {
             "RIPEMD160" => Some(Self::Ripemd160),
             "BITCOIN" => Some(Self::Bitcoin),
             "SHA512_256" => Some(Self::Sha512256),
+            "BLAKE2B_512" => Some(Self::Blake2b512),
+            "BLAKE2S_256" => Some(Self::Blake2s256),
+            "BLAKE3" => Some(Self::Blake3),
             _ => None,
         }
     }

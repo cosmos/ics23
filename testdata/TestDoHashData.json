@@ -1,22 +1,37 @@
 {
-  "bitcoin": {
-    "HashOp": 5,
+  "sha256": {
+    "HashOp": 1,
     "Preimage": "food",
-    "ExpectedHash": "0bcb587dfb4fc10b36d57f2bba1878f139b75d24"
+    "ExpectedHash": "c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b"
+  },
+  "sha512": {
+    "HashOp": 2,
+    "PreImage": "food",
+    "ExpectedHash": "c235548cfe84fc87678ff04c9134e060cdcd7512d09ed726192151a995541ed8db9fda5204e72e7ac268214c322c17787c70530513c59faede52b7dd9ce64331"
   },
   "ripemd160": {
     "HashOp": 4,
     "Preimage": "food",
     "ExpectedHash": "b1ab9988c7c7c5ec4b2b291adfeeee10e77cdd46"
   },
-  "sha256": {
-    "HashOp": 1,
+  "bitcoin": {
+    "HashOp": 5,
     "Preimage": "food",
-    "ExpectedHash": "c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b"
+    "ExpectedHash": "0bcb587dfb4fc10b36d57f2bba1878f139b75d24"
   },
   "sha512_256": {
     "HashOp": 6,
     "Preimage": "food",
     "ExpectedHash": "5b3a452a6acbf1fc1e553a40c501585d5bd3cca176d562e0a0e19a3c43804e88"
+  },
+  "blake2b": {
+    "HashOp": 7,
+    "Preimage": "food",
+    "ExpectedHash": "b1f115361afc179415d93d4f58dc2fc7d8fa434192d7cb9b65fca592f6aa904103d1f12b28655c2355478e10908ab002c418dc52a4367d8e645309cd25e3a504"
+  },
+  "blake2s": {
+    "HashOp": 8,
+    "Preimage": "food",
+    "ExpectedHash": "5a1ec796f11f3dfc7e8ca5de13828edf2e910eb7dd41caaac356a4acbefb1758"
   }
 }

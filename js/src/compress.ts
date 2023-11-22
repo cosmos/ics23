@@ -1,7 +1,7 @@
 import { ics23 } from "./generated/codecimpl";
 
 export function compress(
-  proof: ics23.ICommitmentProof
+  proof: ics23.ICommitmentProof,
 ): ics23.ICommitmentProof {
   if (!proof.batch) {
     return proof;
@@ -10,7 +10,7 @@ export function compress(
 }
 
 export function decompress(
-  proof: ics23.ICommitmentProof
+  proof: ics23.ICommitmentProof,
 ): ics23.ICommitmentProof {
   if (!proof.compressed) {
     return proof;
@@ -51,7 +51,7 @@ function compressBatch(proof: ics23.IBatchProof): ics23.ICompressedBatchProof {
 function compressExist(
   exist: ics23.IExistenceProof | null | undefined,
   lookup: ics23.IInnerOp[],
-  registry: Map<Uint8Array, number>
+  registry: Map<Uint8Array, number>,
 ): ics23.ICompressedExistenceProof | undefined {
   if (!exist) {
     return undefined;
@@ -77,7 +77,7 @@ function compressExist(
 }
 
 function decompressBatch(
-  proof: ics23.ICompressedBatchProof
+  proof: ics23.ICompressedBatchProof,
 ): ics23.IBatchProof {
   const lookup = proof.lookupInners!;
   const entries = proof.entries!.map((comp) => {
@@ -103,7 +103,7 @@ function decompressBatch(
 
 function decompressExist(
   exist: ics23.ICompressedExistenceProof | null | undefined,
-  lookup: readonly ics23.IInnerOp[]
+  lookup: readonly ics23.IInnerOp[],
 ): ics23.IExistenceProof | undefined {
   if (!exist) {
     return undefined;
