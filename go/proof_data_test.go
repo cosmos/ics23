@@ -13,18 +13,18 @@ type ExistenceProofTestStruct struct {
 	Expected []byte
 }
 
-func ExistenceProofTestData(t *testing.T) map[string]ExistenceProofTestStruct {
-	t.Helper()
+func ExistenceProofTestData(tb testing.TB) map[string]ExistenceProofTestStruct {
+	tb.Helper()
 	fname := filepath.Join("..", "testdata", "TestExistenceProofData.json")
 	ffile, err := os.Open(fname)
 	if err != nil {
-		t.Fatal(err)
+		tb.Fatal(err)
 	}
 	var cases map[string]ExistenceProofTestStruct
 	jsonDecoder := json.NewDecoder(ffile)
 	err = jsonDecoder.Decode(&cases)
 	if err != nil {
-		t.Fatal(err)
+		tb.Fatal(err)
 	}
 	return cases
 }
@@ -35,18 +35,18 @@ type CheckLeafTestStruct struct {
 	IsErr bool
 }
 
-func CheckLeafTestData(t *testing.T) map[string]CheckLeafTestStruct {
-	t.Helper()
+func CheckLeafTestData(tb testing.TB) map[string]CheckLeafTestStruct {
+	tb.Helper()
 	fname := filepath.Join("..", "testdata", "TestCheckLeafData.json")
 	ffile, err := os.Open(fname)
 	if err != nil {
-		t.Fatal(err)
+		tb.Fatal(err)
 	}
 	var cases map[string]CheckLeafTestStruct
 	jsonDecoder := json.NewDecoder(ffile)
 	err = jsonDecoder.Decode(&cases)
 	if err != nil {
-		t.Fatal(err)
+		tb.Fatal(err)
 	}
 	return cases
 }
@@ -57,18 +57,18 @@ type CheckAgainstSpecTestStruct struct {
 	IsErr bool
 }
 
-func CheckAgainstSpecTestData(t *testing.T) map[string]CheckAgainstSpecTestStruct {
-	t.Helper()
+func CheckAgainstSpecTestData(tb testing.TB) map[string]CheckAgainstSpecTestStruct {
+	tb.Helper()
 	fname := filepath.Join("..", "testdata", "TestCheckAgainstSpecData.json")
 	ffile, err := os.Open(fname)
 	if err != nil {
-		t.Fatal(err)
+		tb.Fatal(err)
 	}
 	var cases map[string]CheckAgainstSpecTestStruct
 	jsonDecoder := json.NewDecoder(ffile)
 	err = jsonDecoder.Decode(&cases)
 	if err != nil {
-		t.Fatal(err)
+		tb.Fatal(err)
 	}
 	return cases
 }

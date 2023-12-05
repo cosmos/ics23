@@ -180,11 +180,11 @@ func (p *NonExistenceProof) Calculate() (CommitmentRoot, error) {
 
 // CheckAgainstSpec will verify the leaf and all path steps are in the format defined in spec
 func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
-	if p.GetLeaf() == nil {
+	leaf := p.GetLeaf()
+	if leaf == nil {
 		return errors.New("existence Proof needs defined LeafOp")
 	}
-	err := p.Leaf.CheckAgainstSpec(spec)
-	if err != nil {
+	if err := leaf.CheckAgainstSpec(spec); err != nil {
 		return fmt.Errorf("leaf, %w", err)
 	}
 	if spec.MinDepth > 0 && len(p.Path) < int(spec.MinDepth) {
@@ -452,13 +452,41 @@ func orderFromPadding(spec *InnerSpec, inner *InnerOp) (int32, error) {
 
 // over-declares equality, which we cosnider fine for now.
 func (p *ProofSpec) SpecEquals(spec *ProofSpec) bool {
-	return p.LeafSpec.Hash == spec.LeafSpec.Hash &&
-		p.LeafSpec.PrehashKey == spec.LeafSpec.PrehashKey &&
-		p.LeafSpec.PrehashValue == spec.LeafSpec.PrehashValue &&
-		p.LeafSpec.Length == spec.LeafSpec.Length &&
-		p.InnerSpec.Hash == spec.InnerSpec.Hash &&
-		p.InnerSpec.MinPrefixLength == spec.InnerSpec.MinPrefixLength &&
-		p.InnerSpec.MaxPrefixLength == spec.InnerSpec.MaxPrefixLength &&
-		p.InnerSpec.ChildSize == spec.InnerSpec.ChildSize &&
-		len(p.InnerSpec.ChildOrder) == len(spec.InnerSpec.ChildOrder)
+	// 1. Compare LeafSpecs values.
+	switch {
+	case (p.LeafSpec == nil) != (spec.LeafSpec == nil): // One of them is nil.
+		return false
+
+	case p.LeafSpec != nil && spec.LeafSpec != nil:
+		ok := p.LeafSpec.Hash == spec.LeafSpec.Hash &&
+			p.LeafSpec.PrehashKey == spec.LeafSpec.PrehashKey &&
+			p.LeafSpec.PrehashValue == spec.LeafSpec.PrehashValue &&
+			p.LeafSpec.Length == spec.LeafSpec.Length
+		if !ok {
+			return false
+		}
+
+	default: // Both are nil, hence LeafSpec values are equal.
+	}
+
+	// 2. Compare InnerSpec values.
+	switch {
+	case (p.InnerSpec == nil) != (spec.InnerSpec == nil): // One of them is not nil.
+		return false
+
+	case p.InnerSpec != nil && spec.InnerSpec != nil: // Both are non-nil
+		ok := p.InnerSpec.Hash == spec.InnerSpec.Hash &&
+			p.InnerSpec.MinPrefixLength == spec.InnerSpec.MinPrefixLength &&
+			p.InnerSpec.MaxPrefixLength == spec.InnerSpec.MaxPrefixLength &&
+			p.InnerSpec.ChildSize == spec.InnerSpec.ChildSize &&
+			len(p.InnerSpec.ChildOrder) == len(spec.InnerSpec.ChildOrder)
+		if !ok {
+			return false
+		}
+
+	default: // Both are nil, hence InnerSpec values are equal.
+	}
+
+	// By this point all the above conditions pass so they are equal.
+	return true
 }

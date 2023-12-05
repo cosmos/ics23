@@ -1,6 +1,7 @@
 package ics23
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -37,6 +38,38 @@ func FuzzExistenceProofCalculate(f *testing.F) {
 
 		// Now let's try this seemingly well formed ExistenceProof.
 		_, _ = ep.Calculate()
+	})
+}
+
+func FuzzExistenceProofCheckAgainstSpec(f *testing.F) {
+	if testing.Short() {
+		f.Skip("in -short mode")
+	}
+
+	seedDataMap := CheckAgainstSpecTestData(f)
+	for _, seed := range seedDataMap {
+		if seed.IsErr {
+			// Erroneous data, skip it.
+			continue
+		}
+		if blob, err := json.Marshal(seed); err == nil {
+			f.Add(blob)
+		}
+	}
+
+	// 2. Now run the fuzzer.
+	f.Fuzz(func(t *testing.T, fJSON []byte) {
+		pvs := new(CheckAgainstSpecTestStruct)
+		if err := json.Unmarshal(fJSON, pvs); err != nil {
+			return
+		}
+		if pvs.Proof == nil {
+			// No need checking from a nil ExistenceProof.
+			return
+		}
+
+		ep, spec := pvs.Proof, pvs.Spec
+		_ = ep.CheckAgainstSpec(spec)
 	})
 }
 
@@ -86,6 +119,57 @@ func FuzzVerifyNonMembership(f *testing.F) {
 		}
 		// Otherwise now run VerifyNonMembership.
 		_ = VerifyNonMembership(bv.Spec, bv.Ref.RootHash, bv.Proof, bv.Ref.Key)
+	})
+}
+
+// verifyJSON is necessary so we already have sources of Proof, Ref and Spec
+// that'll be mutated by the fuzzer to get much closer to values for greater coverage.
+type verifyJSON struct {
+	Proof *CommitmentProof
+	Ref   *RefData
+	Spec  *ProofSpec
+}
+
+func FuzzVerifyMembership(f *testing.F) {
+	seeds := VectorsTestData()
+
+	// VerifyMembership requires:
+	//  Spec, ExistenceProof, CommitmentRootref.
+	for _, seed := range seeds {
+		proof, ref := LoadFile(f, seed.Dir, seed.Filename)
+		root, err := proof.Calculate()
+		if err != nil {
+			continue
+		}
+		if !bytes.Equal(ref.RootHash, root) {
+			continue
+		}
+
+		if ref.Value == nil {
+			continue
+		}
+
+		// Now serialize this value as a seed.
+		// The use of already calculated values is necessary
+		// for the fuzzers to have a basis of much better coverage
+		// generating values.
+		blob, err := json.Marshal(&verifyJSON{Proof: proof, Ref: ref, Spec: seed.Spec})
+		if err == nil {
+			f.Add(blob)
+		}
+	}
+
+	// 2. Now let's run the fuzzer.
+	f.Fuzz(func(t *testing.T, input []byte) {
+		var con verifyJSON
+		if err := json.Unmarshal(input, &con); err != nil {
+			return
+		}
+		spec, ref, proof := con.Spec, con.Ref, con.Proof
+		if ref == nil {
+			return
+		}
+		_ = VerifyMembership(spec, ref.RootHash, proof, ref.Key, ref.Value)
 	})
 }
 

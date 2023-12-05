@@ -165,42 +165,42 @@ func DecompressBatchVectorsTestData(t *testing.T) map[string]*CommitmentProof {
 	}
 }
 
-func LoadFile(t *testing.T, dir string, filename string) (*CommitmentProof, *RefData) {
-	t.Helper()
+func LoadFile(tb testing.TB, dir string, filename string) (*CommitmentProof, *RefData) {
+	tb.Helper()
 	// load the file into a json struct
 	name := filepath.Join(dir, filename)
 	bz, err := os.ReadFile(name)
 	if err != nil {
-		t.Fatalf("Read file: %+v", err)
+		tb.Fatalf("Read file: %+v", err)
 	}
 	var data TestVector
 	err = json.Unmarshal(bz, &data)
 	if err != nil {
-		t.Fatalf("Unmarshal json: %+v", err)
+		tb.Fatalf("Unmarshal json: %+v", err)
 	}
 	// parse the protobuf object
 	var proof CommitmentProof
-	err = proof.Unmarshal(mustHex(t, data.Proof))
+	err = proof.Unmarshal(mustHex(tb, data.Proof))
 	if err != nil {
-		t.Fatalf("Unmarshal protobuf: %+v", err)
+		tb.Fatalf("Unmarshal protobuf: %+v", err)
 	}
 	var ref RefData
-	ref.RootHash = CommitmentRoot(mustHex(t, data.RootHash))
-	ref.Key = mustHex(t, data.Key)
+	ref.RootHash = CommitmentRoot(mustHex(tb, data.RootHash))
+	ref.Key = mustHex(tb, data.Key)
 	if data.Value != "" {
-		ref.Value = mustHex(t, data.Value)
+		ref.Value = mustHex(tb, data.Value)
 	}
 	return &proof, &ref
 }
 
-func mustHex(t *testing.T, data string) []byte {
-	t.Helper()
+func mustHex(tb testing.TB, data string) []byte {
+	tb.Helper()
 	if data == "" {
 		return nil
 	}
 	res, err := hex.DecodeString(data)
 	if err != nil {
-		t.Fatalf("decoding hex: %v", err)
+		tb.Fatalf("decoding hex: %v", err)
 	}
 	return res
 }
