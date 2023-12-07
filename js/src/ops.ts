@@ -1,3 +1,6 @@
+import { blake2b } from "@noble/hashes/blake2b";
+import { blake2s } from "@noble/hashes/blake2s";
+import { blake3 } from "@noble/hashes/blake3";
 import { ripemd160 } from "@noble/hashes/ripemd160";
 import { sha256 } from "@noble/hashes/sha256";
 import { sha512, sha512_256 } from "@noble/hashes/sha512";
@@ -91,6 +94,12 @@ export function doHash(hashOp: ics23.HashOp, preimage: Uint8Array): Uint8Array {
       return ripemd160(sha256(preimage));
     case ics23.HashOp.SHA512_256:
       return sha512_256(preimage);
+    case ics23.HashOp.BLAKE2B_512:
+      return blake2b(preimage);
+    case ics23.HashOp.BLAKE2S_256:
+      return blake2s(preimage);
+    case ics23.HashOp.BLAKE3:
+      return blake3(preimage);
   }
   throw new Error(`Unsupported hashop: ${hashOp}`);
 }
