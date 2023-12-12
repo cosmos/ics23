@@ -157,6 +157,12 @@ mod tests {
             hash == decode("f775a8ccf8cb78cd1c63ade4e9802de4ead836b36cea35242accf31d2c6a3697"),
             "blake3 hash fails"
         );
+
+        let hash = do_hash::<HostFunctionsManager>(HashOp::Keccak256, b"food");
+        assert!(
+            hash == decode("a471c7c90860799b1facb54795f0a93d821fb727241025770865602471b765a8"),
+            "Keccak256 hash fails"
+        );
     }
 
     #[test]
