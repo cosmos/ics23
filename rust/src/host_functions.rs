@@ -11,10 +11,10 @@ pub trait HostFunctionsProvider {
     /// The SHA-512 hash algorithm with its output truncated to 256 bits.
     fn sha2_512_truncated(message: &[u8]) -> [u8; 32];
 
-    /// SHA-3-512 hash function.
-    fn sha3_512(message: &[u8]) -> [u8; 64];
+    /// The Keccak-256 hash function.
+    fn keccak_256(message: &[u8]) -> [u8; 32];
 
-    /// Ripemd160 hash function.
+    /// The Ripemd160 hash function.
     fn ripemd160(message: &[u8]) -> [u8; 20];
 
     /// BLAKE2b-512 hash function.
@@ -33,7 +33,7 @@ pub mod host_functions_impl {
     use blake2::{Blake2b512, Blake2s256};
     use ripemd::Ripemd160;
     use sha2::{Digest, Sha256, Sha512, Sha512_256};
-    use sha3::Sha3_512;
+    use sha3::Keccak256;
 
     pub struct HostFunctionsManager;
     impl HostFunctionsProvider for HostFunctionsManager {
@@ -58,9 +58,9 @@ pub mod host_functions_impl {
             buf
         }
 
-        fn sha3_512(message: &[u8]) -> [u8; 64] {
-            let digest = Sha3_512::digest(message);
-            let mut buf = [0u8; 64];
+        fn keccak_256(message: &[u8]) -> [u8; 32] {
+            let digest = Keccak256::digest(message);
+            let mut buf = [0u8; 32];
             buf.copy_from_slice(&digest);
             buf
         }
