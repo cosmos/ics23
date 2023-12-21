@@ -94,7 +94,13 @@ func (op *InnerOp) Apply(child []byte) ([]byte, error) {
 
 // CheckAgainstSpec will verify the LeafOp is in the format defined in spec
 func (op *LeafOp) CheckAgainstSpec(spec *ProofSpec) error {
+	if spec == nil {
+		return errors.New("op and spec must be non-nil")
+	}
 	lspec := spec.LeafSpec
+	if lspec == nil {
+		return errors.New("spec.LeafSpec must be non-nil")
+	}
 
 	if validateSpec(spec) {
 		err := validateIavlOps(op, 0)
@@ -123,6 +129,16 @@ func (op *LeafOp) CheckAgainstSpec(spec *ProofSpec) error {
 
 // CheckAgainstSpec will verify the InnerOp is in the format defined in spec
 func (op *InnerOp) CheckAgainstSpec(spec *ProofSpec, b int) error {
+	if spec == nil {
+		return errors.New("op and spec must be both non-nil")
+	}
+	if spec.InnerSpec == nil {
+		return errors.New("spec.InnerSpec must be non-nil")
+	}
+	if spec.LeafSpec == nil {
+		return errors.New("spec.LeafSpec must be non-nil")
+	}
+
 	if op.Hash != spec.InnerSpec.Hash {
 		return fmt.Errorf("unexpected HashOp: %d", op.Hash)
 	}
@@ -144,6 +160,10 @@ func (op *InnerOp) CheckAgainstSpec(spec *ProofSpec, b int) error {
 	maxLeftChildBytes := (len(spec.InnerSpec.ChildOrder) - 1) * int(spec.InnerSpec.ChildSize)
 	if len(op.Prefix) > int(spec.InnerSpec.MaxPrefixLength)+maxLeftChildBytes {
 		return fmt.Errorf("innerOp prefix too long (%d)", len(op.Prefix))
+	}
+
+	if spec.InnerSpec.ChildSize <= 0 {
+		return errors.New("spec.InnerSpec.ChildSize must be >= 1")
 	}
 
 	// ensures soundness, with suffix having to be of correct length
