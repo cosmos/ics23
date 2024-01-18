@@ -52,5 +52,8 @@
   "dependencies": {
     "@noble/hashes": "^1.0.0",
     "protobufjs": "^7.2.5"
+  },
+  "resolutions": {
+    "jackspeak": "2.1.1"
   }
 }
