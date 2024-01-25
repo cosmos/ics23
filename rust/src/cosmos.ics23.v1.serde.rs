@@ -76,25 +76,25 @@ impl<'de> serde::Deserialize<'de> for BatchEntry {
                 formatter.write_str("struct cosmos.ics23.v1.BatchEntry")
             }
 
-            fn visit_map<V>(self, mut map: V) -> core::result::Result<BatchEntry, V::Error>
+            fn visit_map<V>(self, mut map_: V) -> core::result::Result<BatchEntry, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
                 let mut proof__ = None;
-                while let Some(k) = map.next_key()? {
+                while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Exist => {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("exist"));
                             }
-                            proof__ = map.next_value::<::core::option::Option<_>>()?.map(batch_entry::Proof::Exist)
+                            proof__ = map_.next_value::<::core::option::Option<_>>()?.map(batch_entry::Proof::Exist)
 ;
                         }
                         GeneratedField::Nonexist => {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("nonexist"));
                             }
-                            proof__ = map.next_value::<::core::option::Option<_>>()?.map(batch_entry::Proof::Nonexist)
+                            proof__ = map_.next_value::<::core::option::Option<_>>()?.map(batch_entry::Proof::Nonexist)
 ;
                         }
                     }
@@ -175,18 +175,18 @@ impl<'de> serde::Deserialize<'de> for BatchProof {
                 formatter.write_str("struct cosmos.ics23.v1.BatchProof")
             }
 
-            fn visit_map<V>(self, mut map: V) -> core::result::Result<BatchProof, V::Error>
+            fn visit_map<V>(self, mut map_: V) -> core::result::Result<BatchProof, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
                 let mut entries__ = None;
-                while let Some(k) = map.next_key()? {
+                while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Entries => {
                             if entries__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("entries"));
                             }
-                            entries__ = Some(map.next_value()?);
+                            entries__ = Some(map_.next_value()?);
                         }
                     }
                 }
@@ -288,39 +288,39 @@ impl<'de> serde::Deserialize<'de> for CommitmentProof {
                 formatter.write_str("struct cosmos.ics23.v1.CommitmentProof")
             }
 
-            fn visit_map<V>(self, mut map: V) -> core::result::Result<CommitmentProof, V::Error>
+            fn visit_map<V>(self, mut map_: V) -> core::result::Result<CommitmentProof, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
                 let mut proof__ = None;
-                while let Some(k) = map.next_key()? {
+                while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Exist => {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("exist"));
                             }
-                            proof__ = map.next_value::<::core::option::Option<_>>()?.map(commitment_proof::Proof::Exist)
+                            proof__ = map_.next_value::<::core::option::Option<_>>()?.map(commitment_proof::Proof::Exist)
 ;
                         }
                         GeneratedField::Nonexist => {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("nonexist"));
                             }
-                            proof__ = map.next_value::<::core::option::Option<_>>()?.map(commitment_proof::Proof::Nonexist)
+                            proof__ = map_.next_value::<::core::option::Option<_>>()?.map(commitment_proof::Proof::Nonexist)
 ;
                         }
                         GeneratedField::Batch => {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("batch"));
                             }
-                            proof__ = map.next_value::<::core::option::Option<_>>()?.map(commitment_proof::Proof::Batch)
+                            proof__ = map_.next_value::<::core::option::Option<_>>()?.map(commitment_proof::Proof::Batch)
 ;
                         }
                         GeneratedField::Compressed => {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("compressed"));
                             }
-                            proof__ = map.next_value::<::core::option::Option<_>>()?.map(commitment_proof::Proof::Compressed)
+                            proof__ = map_.next_value::<::core::option::Option<_>>()?.map(commitment_proof::Proof::Compressed)
 ;
                         }
                     }
@@ -411,25 +411,25 @@ impl<'de> serde::Deserialize<'de> for CompressedBatchEntry {
                 formatter.write_str("struct cosmos.ics23.v1.CompressedBatchEntry")
             }
 
-            fn visit_map<V>(self, mut map: V) -> core::result::Result<CompressedBatchEntry, V::Error>
+            fn visit_map<V>(self, mut map_: V) -> core::result::Result<CompressedBatchEntry, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
                 let mut proof__ = None;
-                while let Some(k) = map.next_key()? {
+                while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Exist => {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("exist"));
                             }
-                            proof__ = map.next_value::<::core::option::Option<_>>()?.map(compressed_batch_entry::Proof::Exist)
+                            proof__ = map_.next_value::<::core::option::Option<_>>()?.map(compressed_batch_entry::Proof::Exist)
 ;
                         }
                         GeneratedField::Nonexist => {
                             if proof__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("nonexist"));
                             }
-                            proof__ = map.next_value::<::core::option::Option<_>>()?.map(compressed_batch_entry::Proof::Nonexist)
+                            proof__ = map_.next_value::<::core::option::Option<_>>()?.map(compressed_batch_entry::Proof::Nonexist)
 ;
                         }
                     }
@@ -520,25 +520,25 @@ impl<'de> serde::Deserialize<'de> for CompressedBatchProof {
                 formatter.write_str("struct cosmos.ics23.v1.CompressedBatchProof")
             }
 
-            fn visit_map<V>(self, mut map: V) -> core::result::Result<CompressedBatchProof, V::Error>
+            fn visit_map<V>(self, mut map_: V) -> core::result::Result<CompressedBatchProof, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
                 let mut entries__ = None;
                 let mut lookup_inners__ = None;
-                while let Some(k) = map.next_key()? {
+                while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Entries => {
                             if entries__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("entries"));
                             }
-                            entries__ = Some(map.next_value()?);
+                            entries__ = Some(map_.next_value()?);
                         }
                         GeneratedField::LookupInners => {
                             if lookup_inners__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("lookupInners"));
                             }
-                            lookup_inners__ = Some(map.next_value()?);
+                            lookup_inners__ = Some(map_.next_value()?);
                         }
                     }
                 }
@@ -573,9 +573,11 @@ impl serde::Serialize for CompressedExistenceProof {
         }
         let mut struct_ser = serializer.serialize_struct("cosmos.ics23.v1.CompressedExistenceProof", len)?;
         if !self.key.is_empty() {
+            #[allow(clippy::needless_borrow)]
             struct_ser.serialize_field("key", pbjson::private::base64::encode(&self.key).as_str())?;
         }
         if !self.value.is_empty() {
+            #[allow(clippy::needless_borrow)]
             struct_ser.serialize_field("value", pbjson::private::base64::encode(&self.value).as_str())?;
         }
         if let Some(v) = self.leaf.as_ref() {
@@ -646,7 +648,7 @@ impl<'de> serde::Deserialize<'de> for CompressedExistenceProof {
                 formatter.write_str("struct cosmos.ics23.v1.CompressedExistenceProof")
             }
 
-            fn visit_map<V>(self, mut map: V) -> core::result::Result<CompressedExistenceProof, V::Error>
+            fn visit_map<V>(self, mut map_: V) -> core::result::Result<CompressedExistenceProof, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -654,14 +656,14 @@ impl<'de> serde::Deserialize<'de> for CompressedExistenceProof {
                 let mut value__ = None;
                 let mut leaf__ = None;
                 let mut path__ = None;
-                while let Some(k) = map.next_key()? {
+                while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Key => {
                             if key__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("key"));
                             }
                             key__ = 
-                                Some(map.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                                Some(map_.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
                             ;
                         }
                         GeneratedField::Value => {
@@ -669,21 +671,21 @@ impl<'de> serde::Deserialize<'de> for CompressedExistenceProof {
                                 return Err(serde::de::Error::duplicate_field("value"));
                             }
                             value__ = 
-                                Some(map.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                                Some(map_.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
                             ;
                         }
                         GeneratedField::Leaf => {
                             if leaf__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("leaf"));
                             }
-                            leaf__ = map.next_value()?;
+                            leaf__ = map_.next_value()?;
                         }
                         GeneratedField::Path => {
                             if path__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("path"));
                             }
                             path__ = 
-                                Some(map.next_value::<::alloc::vec::Vec<::pbjson::private::NumberDeserialize<_>>>()?
+                                Some(map_.next_value::<::alloc::vec::Vec<::pbjson::private::NumberDeserialize<_>>>()?
                                     .into_iter().map(|x| x.0).collect())
                             ;
                         }
@@ -719,6 +721,7 @@ impl serde::Serialize for CompressedNonExistenceProof {
         }
         let mut struct_ser = serializer.serialize_struct("cosmos.ics23.v1.CompressedNonExistenceProof", len)?;
         if !self.key.is_empty() {
+            #[allow(clippy::needless_borrow)]
             struct_ser.serialize_field("key", pbjson::private::base64::encode(&self.key).as_str())?;
         }
         if let Some(v) = self.left.as_ref() {
@@ -786,34 +789,34 @@ impl<'de> serde::Deserialize<'de> for CompressedNonExistenceProof {
                 formatter.write_str("struct cosmos.ics23.v1.CompressedNonExistenceProof")
             }
 
-            fn visit_map<V>(self, mut map: V) -> core::result::Result<CompressedNonExistenceProof, V::Error>
+            fn visit_map<V>(self, mut map_: V) -> core::result::Result<CompressedNonExistenceProof, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
                 let mut key__ = None;
                 let mut left__ = None;
                 let mut right__ = None;
-                while let Some(k) = map.next_key()? {
+                while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Key => {
                             if key__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("key"));
                             }
                             key__ = 
-                                Some(map.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                                Some(map_.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
                             ;
                         }
                         GeneratedField::Left => {
                             if left__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("left"));
                             }
-                            left__ = map.next_value()?;
+                            left__ = map_.next_value()?;
                         }
                         GeneratedField::Right => {
                             if right__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("right"));
                             }
-                            right__ = map.next_value()?;
+                            right__ = map_.next_value()?;
                         }
                     }
                 }
@@ -849,9 +852,11 @@ impl serde::Serialize for ExistenceProof {
         }
         let mut struct_ser = serializer.serialize_struct("cosmos.ics23.v1.ExistenceProof", len)?;
         if !self.key.is_empty() {
+            #[allow(clippy::needless_borrow)]
             struct_ser.serialize_field("key", pbjson::private::base64::encode(&self.key).as_str())?;
         }
         if !self.value.is_empty() {
+            #[allow(clippy::needless_borrow)]
             struct_ser.serialize_field("value", pbjson::private::base64::encode(&self.value).as_str())?;
         }
         if let Some(v) = self.leaf.as_ref() {
@@ -922,7 +927,7 @@ impl<'de> serde::Deserialize<'de> for ExistenceProof {
                 formatter.write_str("struct cosmos.ics23.v1.ExistenceProof")
             }
 
-            fn visit_map<V>(self, mut map: V) -> core::result::Result<ExistenceProof, V::Error>
+            fn visit_map<V>(self, mut map_: V) -> core::result::Result<ExistenceProof, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -930,14 +935,14 @@ impl<'de> serde::Deserialize<'de> for ExistenceProof {
                 let mut value__ = None;
                 let mut leaf__ = None;
                 let mut path__ = None;
-                while let Some(k) = map.next_key()? {
+                while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Key => {
                             if key__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("key"));
                             }
                             key__ = 
-                                Some(map.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                                Some(map_.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
                             ;
                         }
                         GeneratedField::Value => {
@@ -945,20 +950,20 @@ impl<'de> serde::Deserialize<'de> for ExistenceProof {
                                 return Err(serde::de::Error::duplicate_field("value"));
                             }
                             value__ = 
-                                Some(map.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                                Some(map_.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
                             ;
                         }
                         GeneratedField::Leaf => {
                             if leaf__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("leaf"));
                             }
-                            leaf__ = map.next_value()?;
+                            leaf__ = map_.next_value()?;
                         }
                         GeneratedField::Path => {
                             if path__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("path"));
                             }
-                            path__ = Some(map.next_value()?);
+                            path__ = Some(map_.next_value()?);
                         }
                     }
                 }
@@ -1026,10 +1031,9 @@ impl<'de> serde::Deserialize<'de> for HashOp {
             where
                 E: serde::de::Error,
             {
-                use core::convert::TryFrom;
                 i32::try_from(v)
                     .ok()
-                    .and_then(HashOp::from_i32)
+                    .and_then(|x| x.try_into().ok())
                     .ok_or_else(|| {
                         serde::de::Error::invalid_value(serde::de::Unexpected::Signed(v), &self)
                     })
@@ -1039,10 +1043,9 @@ impl<'de> serde::Deserialize<'de> for HashOp {
             where
                 E: serde::de::Error,
             {
-                use core::convert::TryFrom;
                 i32::try_from(v)
                     .ok()
-                    .and_then(HashOp::from_i32)
+                    .and_then(|x| x.try_into().ok())
                     .ok_or_else(|| {
                         serde::de::Error::invalid_value(serde::de::Unexpected::Unsigned(v), &self)
                     })
@@ -1089,14 +1092,16 @@ impl serde::Serialize for InnerOp {
         }
         let mut struct_ser = serializer.serialize_struct("cosmos.ics23.v1.InnerOp", len)?;
         if self.hash != 0 {
-            let v = HashOp::from_i32(self.hash)
-                .ok_or_else(|| serde::ser::Error::custom(::alloc::format!("Invalid variant {}", self.hash)))?;
+            let v = HashOp::try_from(self.hash)
+                .map_err(|_| serde::ser::Error::custom(::alloc::format!("Invalid variant {}", self.hash)))?;
             struct_ser.serialize_field("hash", &v)?;
         }
         if !self.prefix.is_empty() {
+            #[allow(clippy::needless_borrow)]
             struct_ser.serialize_field("prefix", pbjson::private::base64::encode(&self.prefix).as_str())?;
         }
         if !self.suffix.is_empty() {
+            #[allow(clippy::needless_borrow)]
             struct_ser.serialize_field("suffix", pbjson::private::base64::encode(&self.suffix).as_str())?;
         }
         struct_ser.end()
@@ -1158,27 +1163,27 @@ impl<'de> serde::Deserialize<'de> for InnerOp {
                 formatter.write_str("struct cosmos.ics23.v1.InnerOp")
             }
 
-            fn visit_map<V>(self, mut map: V) -> core::result::Result<InnerOp, V::Error>
+            fn visit_map<V>(self, mut map_: V) -> core::result::Result<InnerOp, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
                 let mut hash__ = None;
                 let mut prefix__ = None;
                 let mut suffix__ = None;
-                while let Some(k) = map.next_key()? {
+                while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Hash => {
                             if hash__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("hash"));
                             }
-                            hash__ = Some(map.next_value::<HashOp>()? as i32);
+                            hash__ = Some(map_.next_value::<HashOp>()? as i32);
                         }
                         GeneratedField::Prefix => {
                             if prefix__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("prefix"));
                             }
                             prefix__ = 
-                                Some(map.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                                Some(map_.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
                             ;
                         }
                         GeneratedField::Suffix => {
@@ -1186,7 +1191,7 @@ impl<'de> serde::Deserialize<'de> for InnerOp {
                                 return Err(serde::de::Error::duplicate_field("suffix"));
                             }
                             suffix__ = 
-                                Some(map.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                                Some(map_.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
                             ;
                         }
                     }
@@ -1241,11 +1246,12 @@ impl serde::Serialize for InnerSpec {
             struct_ser.serialize_field("maxPrefixLength", &self.max_prefix_length)?;
         }
         if !self.empty_child.is_empty() {
+            #[allow(clippy::needless_borrow)]
             struct_ser.serialize_field("emptyChild", pbjson::private::base64::encode(&self.empty_child).as_str())?;
         }
         if self.hash != 0 {
-            let v = HashOp::from_i32(self.hash)
-                .ok_or_else(|| serde::ser::Error::custom(::alloc::format!("Invalid variant {}", self.hash)))?;
+            let v = HashOp::try_from(self.hash)
+                .map_err(|_| serde::ser::Error::custom(::alloc::format!("Invalid variant {}", self.hash)))?;
             struct_ser.serialize_field("hash", &v)?;
         }
         struct_ser.end()
@@ -1321,7 +1327,7 @@ impl<'de> serde::Deserialize<'de> for InnerSpec {
                 formatter.write_str("struct cosmos.ics23.v1.InnerSpec")
             }
 
-            fn visit_map<V>(self, mut map: V) -> core::result::Result<InnerSpec, V::Error>
+            fn visit_map<V>(self, mut map_: V) -> core::result::Result<InnerSpec, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -1331,14 +1337,14 @@ impl<'de> serde::Deserialize<'de> for InnerSpec {
                 let mut max_prefix_length__ = None;
                 let mut empty_child__ = None;
                 let mut hash__ = None;
-                while let Some(k) = map.next_key()? {
+                while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::ChildOrder => {
                             if child_order__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("childOrder"));
                             }
                             child_order__ = 
-                                Some(map.next_value::<::alloc::vec::Vec<::pbjson::private::NumberDeserialize<_>>>()?
+                                Some(map_.next_value::<::alloc::vec::Vec<::pbjson::private::NumberDeserialize<_>>>()?
                                     .into_iter().map(|x| x.0).collect())
                             ;
                         }
@@ -1347,7 +1353,7 @@ impl<'de> serde::Deserialize<'de> for InnerSpec {
                                 return Err(serde::de::Error::duplicate_field("childSize"));
                             }
                             child_size__ = 
-                                Some(map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
+                                Some(map_.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
                             ;
                         }
                         GeneratedField::MinPrefixLength => {
@@ -1355,7 +1361,7 @@ impl<'de> serde::Deserialize<'de> for InnerSpec {
                                 return Err(serde::de::Error::duplicate_field("minPrefixLength"));
                             }
                             min_prefix_length__ = 
-                                Some(map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
+                                Some(map_.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
                             ;
                         }
                         GeneratedField::MaxPrefixLength => {
@@ -1363,7 +1369,7 @@ impl<'de> serde::Deserialize<'de> for InnerSpec {
                                 return Err(serde::de::Error::duplicate_field("maxPrefixLength"));
                             }
                             max_prefix_length__ = 
-                                Some(map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
+                                Some(map_.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
                             ;
                         }
                         GeneratedField::EmptyChild => {
@@ -1371,14 +1377,14 @@ impl<'de> serde::Deserialize<'de> for InnerSpec {
                                 return Err(serde::de::Error::duplicate_field("emptyChild"));
                             }
                             empty_child__ = 
-                                Some(map.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                                Some(map_.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
                             ;
                         }
                         GeneratedField::Hash => {
                             if hash__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("hash"));
                             }
-                            hash__ = Some(map.next_value::<HashOp>()? as i32);
+                            hash__ = Some(map_.next_value::<HashOp>()? as i32);
                         }
                     }
                 }
@@ -1420,26 +1426,27 @@ impl serde::Serialize for LeafOp {
         }
         let mut struct_ser = serializer.serialize_struct("cosmos.ics23.v1.LeafOp", len)?;
         if self.hash != 0 {
-            let v = HashOp::from_i32(self.hash)
-                .ok_or_else(|| serde::ser::Error::custom(::alloc::format!("Invalid variant {}", self.hash)))?;
+            let v = HashOp::try_from(self.hash)
+                .map_err(|_| serde::ser::Error::custom(::alloc::format!("Invalid variant {}", self.hash)))?;
             struct_ser.serialize_field("hash", &v)?;
         }
         if self.prehash_key != 0 {
-            let v = HashOp::from_i32(self.prehash_key)
-                .ok_or_else(|| serde::ser::Error::custom(::alloc::format!("Invalid variant {}", self.prehash_key)))?;
+            let v = HashOp::try_from(self.prehash_key)
+                .map_err(|_| serde::ser::Error::custom(::alloc::format!("Invalid variant {}", self.prehash_key)))?;
             struct_ser.serialize_field("prehashKey", &v)?;
         }
         if self.prehash_value != 0 {
-            let v = HashOp::from_i32(self.prehash_value)
-                .ok_or_else(|| serde::ser::Error::custom(::alloc::format!("Invalid variant {}", self.prehash_value)))?;
+            let v = HashOp::try_from(self.prehash_value)
+                .map_err(|_| serde::ser::Error::custom(::alloc::format!("Invalid variant {}", self.prehash_value)))?;
             struct_ser.serialize_field("prehashValue", &v)?;
         }
         if self.length != 0 {
-            let v = LengthOp::from_i32(self.length)
-                .ok_or_else(|| serde::ser::Error::custom(::alloc::format!("Invalid variant {}", self.length)))?;
+            let v = LengthOp::try_from(self.length)
+                .map_err(|_| serde::ser::Error::custom(::alloc::format!("Invalid variant {}", self.length)))?;
             struct_ser.serialize_field("length", &v)?;
         }
         if !self.prefix.is_empty() {
+            #[allow(clippy::needless_borrow)]
             struct_ser.serialize_field("prefix", pbjson::private::base64::encode(&self.prefix).as_str())?;
         }
         struct_ser.end()
@@ -1509,7 +1516,7 @@ impl<'de> serde::Deserialize<'de> for LeafOp {
                 formatter.write_str("struct cosmos.ics23.v1.LeafOp")
             }
 
-            fn visit_map<V>(self, mut map: V) -> core::result::Result<LeafOp, V::Error>
+            fn visit_map<V>(self, mut map_: V) -> core::result::Result<LeafOp, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -1518,38 +1525,38 @@ impl<'de> serde::Deserialize<'de> for LeafOp {
                 let mut prehash_value__ = None;
                 let mut length__ = None;
                 let mut prefix__ = None;
-                while let Some(k) = map.next_key()? {
+                while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Hash => {
                             if hash__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("hash"));
                             }
-                            hash__ = Some(map.next_value::<HashOp>()? as i32);
+                            hash__ = Some(map_.next_value::<HashOp>()? as i32);
                         }
                         GeneratedField::PrehashKey => {
                             if prehash_key__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("prehashKey"));
                             }
-                            prehash_key__ = Some(map.next_value::<HashOp>()? as i32);
+                            prehash_key__ = Some(map_.next_value::<HashOp>()? as i32);
                         }
                         GeneratedField::PrehashValue => {
                             if prehash_value__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("prehashValue"));
                             }
-                            prehash_value__ = Some(map.next_value::<HashOp>()? as i32);
+                            prehash_value__ = Some(map_.next_value::<HashOp>()? as i32);
                         }
                         GeneratedField::Length => {
                             if length__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("length"));
                             }
-                            length__ = Some(map.next_value::<LengthOp>()? as i32);
+                            length__ = Some(map_.next_value::<LengthOp>()? as i32);
                         }
                         GeneratedField::Prefix => {
                             if prefix__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("prefix"));
                             }
                             prefix__ = 
-                                Some(map.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                                Some(map_.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
                             ;
                         }
                     }
@@ -1617,10 +1624,9 @@ impl<'de> serde::Deserialize<'de> for LengthOp {
             where
                 E: serde::de::Error,
             {
-                use core::convert::TryFrom;
                 i32::try_from(v)
                     .ok()
-                    .and_then(LengthOp::from_i32)
+                    .and_then(|x| x.try_into().ok())
                     .ok_or_else(|| {
                         serde::de::Error::invalid_value(serde::de::Unexpected::Signed(v), &self)
                     })
@@ -1630,10 +1636,9 @@ impl<'de> serde::Deserialize<'de> for LengthOp {
             where
                 E: serde::de::Error,
             {
-                use core::convert::TryFrom;
                 i32::try_from(v)
                     .ok()
-                    .and_then(LengthOp::from_i32)
+                    .and_then(|x| x.try_into().ok())
                     .ok_or_else(|| {
                         serde::de::Error::invalid_value(serde::de::Unexpected::Unsigned(v), &self)
                     })
@@ -1679,6 +1684,7 @@ impl serde::Serialize for NonExistenceProof {
         }
         let mut struct_ser = serializer.serialize_struct("cosmos.ics23.v1.NonExistenceProof", len)?;
         if !self.key.is_empty() {
+            #[allow(clippy::needless_borrow)]
             struct_ser.serialize_field("key", pbjson::private::base64::encode(&self.key).as_str())?;
         }
         if let Some(v) = self.left.as_ref() {
@@ -1746,34 +1752,34 @@ impl<'de> serde::Deserialize<'de> for NonExistenceProof {
                 formatter.write_str("struct cosmos.ics23.v1.NonExistenceProof")
             }
 
-            fn visit_map<V>(self, mut map: V) -> core::result::Result<NonExistenceProof, V::Error>
+            fn visit_map<V>(self, mut map_: V) -> core::result::Result<NonExistenceProof, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
                 let mut key__ = None;
                 let mut left__ = None;
                 let mut right__ = None;
-                while let Some(k) = map.next_key()? {
+                while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Key => {
                             if key__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("key"));
                             }
                             key__ = 
-                                Some(map.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                                Some(map_.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
                             ;
                         }
                         GeneratedField::Left => {
                             if left__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("left"));
                             }
-                            left__ = map.next_value()?;
+                            left__ = map_.next_value()?;
                         }
                         GeneratedField::Right => {
                             if right__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("right"));
                             }
-                            right__ = map.next_value()?;
+                            right__ = map_.next_value()?;
                         }
                     }
                 }
@@ -1896,7 +1902,7 @@ impl<'de> serde::Deserialize<'de> for ProofSpec {
                 formatter.write_str("struct cosmos.ics23.v1.ProofSpec")
             }
 
-            fn visit_map<V>(self, mut map: V) -> core::result::Result<ProofSpec, V::Error>
+            fn visit_map<V>(self, mut map_: V) -> core::result::Result<ProofSpec, V::Error>
                 where
                     V: serde::de::MapAccess<'de>,
             {
@@ -1905,26 +1911,26 @@ impl<'de> serde::Deserialize<'de> for ProofSpec {
                 let mut max_depth__ = None;
                 let mut min_depth__ = None;
                 let mut prehash_key_before_comparison__ = None;
-                while let Some(k) = map.next_key()? {
+                while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::LeafSpec => {
                             if leaf_spec__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("leafSpec"));
                             }
-                            leaf_spec__ = map.next_value()?;
+                            leaf_spec__ = map_.next_value()?;
                         }
                         GeneratedField::InnerSpec => {
                             if inner_spec__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("innerSpec"));
                             }
-                            inner_spec__ = map.next_value()?;
+                            inner_spec__ = map_.next_value()?;
                         }
                         GeneratedField::MaxDepth => {
                             if max_depth__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("maxDepth"));
                             }
                             max_depth__ = 
-                                Some(map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
+                                Some(map_.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
                             ;
                         }
                         GeneratedField::MinDepth => {
@@ -1932,14 +1938,14 @@ impl<'de> serde::Deserialize<'de> for ProofSpec {
                                 return Err(serde::de::Error::duplicate_field("minDepth"));
                             }
                             min_depth__ = 
-                                Some(map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
+                                Some(map_.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
                             ;
                         }
                         GeneratedField::PrehashKeyBeforeComparison => {
                             if prehash_key_before_comparison__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("prehashKeyBeforeComparison"));
                             }
-                            prehash_key_before_comparison__ = Some(map.next_value()?);
+                            prehash_key_before_comparison__ = Some(map_.next_value()?);
                         }
                     }
                 }
