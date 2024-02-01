@@ -1,0 +1,214 @@
+[
+  {
+    "Op": {
+      "hash": 1,
+      "prefix": "ATMyX2VtcHR5X2NoaWxkX3BsYWNlaG9sZGVyX2J5dGVz"
+    },
+    "Spec": {
+      "leaf_spec": {
+        "hash": 1,
+        "prehash_value": 1,
+        "prefix": "AA=="
+      },
+      "inner_spec": {
+        "child_order": [
+          0,
+          1
+        ],
+        "child_size": 32,
+        "min_prefix_length": 1,
+        "max_prefix_length": 1,
+        "empty_child": "MzJfZW1wdHlfY2hpbGRfcGxhY2Vob2xkZXJfYnl0ZXM=",
+        "hash": 1
+      }
+    },
+    "IsLeft": true,
+    "IsRight": false
+  },
+  {
+    "Op": {
+      "hash": 1,
+      "prefix": "AQ==",
+      "suffix": "MzJfZW1wdHlfY2hpbGRfcGxhY2Vob2xkZXJfYnl0ZXM="
+    },
+    "Spec": {
+      "leaf_spec": {
+        "hash": 1,
+        "prehash_value": 1,
+        "prefix": "AA=="
+      },
+      "inner_spec": {
+        "child_order": [
+          0,
+          1
+        ],
+        "child_size": 32,
+        "min_prefix_length": 1,
+        "max_prefix_length": 1,
+        "empty_child": "MzJfZW1wdHlfY2hpbGRfcGxhY2Vob2xkZXJfYnl0ZXM=",
+        "hash": 1
+      }
+    },
+    "IsLeft": false,
+    "IsRight": true
+  },
+  {
+    "Op": {
+      "hash": 1,
+      "prefix": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    },
+    "Spec": {
+      "leaf_spec": {
+        "hash": 1,
+        "prehash_value": 1,
+        "prefix": "AA=="
+      },
+      "inner_spec": {
+        "child_order": [
+          0,
+          1
+        ],
+        "child_size": 32,
+        "min_prefix_length": 1,
+        "max_prefix_length": 1,
+        "empty_child": "MzJfZW1wdHlfY2hpbGRfcGxhY2Vob2xkZXJfYnl0ZXM=",
+        "hash": 1
+      }
+    },
+    "IsLeft": false,
+    "IsRight": false
+  },
+  {
+    "Op": {
+      "hash": 1,
+      "prefix": "AQ==",
+      "suffix": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+    },
+    "Spec": {
+      "leaf_spec": {
+        "hash": 1,
+        "prehash_value": 1,
+        "prefix": "AA=="
+      },
+      "inner_spec": {
+        "child_order": [
+          0,
+          1
+        ],
+        "child_size": 32,
+        "min_prefix_length": 1,
+        "max_prefix_length": 1,
+        "empty_child": "MzJfZW1wdHlfY2hpbGRfcGxhY2Vob2xkZXJfYnl0ZXM=",
+        "hash": 1
+      }
+    },
+    "IsLeft": false,
+    "IsRight": false
+  },
+  {
+    "Op": {
+      "hash": 1,
+      "prefix": "ATMyX2VtcHR5X2NoaWxkX3BsYWNlaG9sZGVyX2J4eHh4"
+    },
+    "Spec": {
+      "leaf_spec": {
+        "hash": 1,
+        "prehash_value": 1,
+        "prefix": "AA=="
+      },
+      "inner_spec": {
+        "child_order": [
+          0,
+          1
+        ],
+        "child_size": 32,
+        "min_prefix_length": 1,
+        "max_prefix_length": 1,
+        "empty_child": "MzJfZW1wdHlfY2hpbGRfcGxhY2Vob2xkZXJfYnl0ZXM=",
+        "hash": 1
+      }
+    },
+    "IsLeft": false,
+    "IsRight": false
+  },
+  {
+    "Op": {
+      "hash": 1,
+      "prefix": "AQ==",
+      "suffix": "MzJfZW1wdHlfY2hpbGRfcGxhY2Vob2xkZXJfYnh4eHg="
+    },
+    "Spec": {
+      "leaf_spec": {
+        "hash": 1,
+        "prehash_value": 1,
+        "prefix": "AA=="
+      },
+      "inner_spec": {
+        "child_order": [
+          0,
+          1
+        ],
+        "child_size": 32,
+        "min_prefix_length": 1,
+        "max_prefix_length": 1,
+        "empty_child": "MzJfZW1wdHlfY2hpbGRfcGxhY2Vob2xkZXJfYnl0ZXM=",
+        "hash": 1
+      }
+    },
+    "IsLeft": false,
+    "IsRight": false
+  },
+  {
+    "Op": {
+      "hash": 1,
+      "prefix": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    },
+    "Spec": {
+      "leaf_spec": {
+        "hash": 1,
+        "prehash_value": 1,
+        "length": 1,
+        "prefix": "AA=="
+      },
+      "inner_spec": {
+        "child_order": [
+          0,
+          1
+        ],
+        "child_size": 32,
+        "min_prefix_length": 1,
+        "max_prefix_length": 1,
+        "hash": 1
+      }
+    },
+    "IsLeft": false,
+    "IsRight": false
+  },
+  {
+    "Op": {
+      "hash": 1,
+      "prefix": "AQ==",
+      "suffix": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+    },
+    "Spec": {
+      "leaf_spec": {
+        "hash": 1,
+        "prehash_value": 1,
+        "length": 1,
+        "prefix": "AA=="
+      },
+      "inner_spec": {
+        "child_order": [
+          0,
+          1
+        ],
+        "child_size": 32,
+        "min_prefix_length": 1,
+        "max_prefix_length": 1,
+        "hash": 1
+      }
+    },
+    "IsLeft": false,
+    "IsRight": false
+  }
+]
