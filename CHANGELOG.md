@@ -1,4 +1,11 @@
 # Changelog
+# 0.11.1
+
+## Rust
+
+## Full changes
+
+- chore(rust): Update `informalsystems-pbjson` to v0.7.0 ([#274](https://github.com/cosmos/ics23/pull/274))
 
 # 0.11.0
 
