@@ -55,7 +55,7 @@ jobs:
         working-directory: ./go
         run: go test -race -coverprofile=coverage.txt -covermode=atomic
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: go/coverage.txt
           flags: go
