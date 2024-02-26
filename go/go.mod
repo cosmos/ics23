@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/cosmos/gogoproto v1.4.11
-	golang.org/x/crypto v0.19.0
+	golang.org/x/crypto v0.20.0
 )
 
 require (
