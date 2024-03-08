@@ -26,7 +26,7 @@ jobs:
         run: yarn && yarn test
 
   analysis:
-    name: Go analysis
+    name: Typescript analysis
     needs: [test]
     runs-on: ubuntu-latest
     steps:
