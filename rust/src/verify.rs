@@ -230,7 +230,7 @@ fn ensure_right_most(spec: &ics23::InnerSpec, path: &[ics23::InnerOp]) -> Result
     // ensure every step has a prefix and suffix defined to be rightmost, unless it is a placeholder node
     for step in path {
         if !has_padding(step, &pad) && !right_branches_are_empty(spec, step)? {
-            bail!("step not leftmost")
+            bail!("step not rightmost")
         }
     }
     Ok(())
@@ -344,7 +344,7 @@ fn right_branches_are_empty(spec: &ics23::InnerSpec, op: &ics23::InnerOp) -> Res
     if right_branches == 0 {
         return Ok(false);
     }
-    if op.suffix.len() != spec.child_size as usize {
+    if op.suffix.len() != right_branches * spec.child_size as usize {
         return Ok(false);
     }
     for i in 0..right_branches {
