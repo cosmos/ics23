@@ -124,7 +124,7 @@ func (p *ExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []byte
 		return fmt.Errorf("error calculating root, %w", err)
 	}
 	if !bytes.Equal(root, calc) {
-		return fmt.Errorf("calculcated root doesn't match provided root")
+		return fmt.Errorf("calculated root doesn't match provided root")
 	}
 
 	return nil
@@ -163,7 +163,7 @@ func (p *ExistenceProof) calculate(spec *ProofSpec) (CommitmentRoot, error) {
 	return res, nil
 }
 
-// Calculate determines the root hash that matches the given nonexistence rpoog.
+// Calculate determines the root hash that matches the given nonexistence proof.
 // You must validate the result is what you have in a header.
 // Returns error if the calculations cannot be performed.
 func (p *NonExistenceProof) Calculate() (CommitmentRoot, error) {
@@ -283,7 +283,7 @@ func IsLeftMost(spec *InnerSpec, path []*InnerOp) bool {
 	return true
 }
 
-// IsRightMost returns true if this is the left-most path in the tree, excluding placeholder (empty child) nodes
+// IsRightMost returns true if this is the right-most path in the tree, excluding placeholder (empty child) nodes
 func IsRightMost(spec *InnerSpec, path []*InnerOp) bool {
 	last := len(spec.ChildOrder) - 1
 	minPrefix, maxPrefix, suffix := getPadding(spec, int32(last))
@@ -450,7 +450,7 @@ func orderFromPadding(spec *InnerSpec, inner *InnerOp) (int32, error) {
 	return 0, errors.New("cannot find any valid spacing for this node")
 }
 
-// over-declares equality, which we cosnider fine for now.
+// over-declares equality, which we consider fine for now.
 func (p *ProofSpec) SpecEquals(spec *ProofSpec) bool {
 	// 1. Compare LeafSpecs values.
 	switch {
