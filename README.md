@@ -11,16 +11,16 @@
 [cosmos-link]: https://cosmos.network
 [go-test-link]: https://github.com/cosmos/ics23/actions/workflows/go.yml
 [go-test-badge]: https://github.com/cosmos/ics23/actions/workflows/go.yml/badge.svg?branch=master
-[go-cov-link]: https://codecov.io/gh/cosmos/ics23/tree/master/go
-[go-cov-badge]: https://codecov.io/github/cosmos/ics23/branch/master/graph/badge.svg?token=xlGriS907o&flag=go
+[go-cov-link]: https://sonarcloud.io/project/configuration?id=ics23-go
+[go-cov-badge]: https://sonarcloud.io/api/project_badges/measure?project=ics23-go&metric=coverage
 [rust-test-link]: https://github.com/cosmos/ics23/actions/workflows/rust.yml
 [rust-test-badge]: https://github.com/cosmos/ics23/actions/workflows/rust.yml/badge.svg?branch=master
 [rust-cov-link]: https://codecov.io/gh/cosmos/ics23/tree/master/rust
 [rust-cov-badge]: https://codecov.io/github/cosmos/ics23/branch/master/graph/badge.svg?token=xlGriS907o&flag=rust
 [ts-test-link]: https://github.com/cosmos/ics23/actions/workflows/typescript.yml
 [ts-test-badge]: https://github.com/cosmos/ics23/actions/workflows/typescript.yml/badge.svg?branch=master
-[ts-cov-link]: https://codecov.io/gh/cosmos/ics23/tree/master/js
-[ts-cov-badge]: https://codecov.io/github/cosmos/ics23/branch/master/graph/badge.svg?token=xlGriS907o&flag=typescript
+[ts-cov-link]: https://sonarcloud.io/project/configuration?id=ics23-js
+[ts-cov-badge]: https://sonarcloud.io/api/project_badges/measure?project=ics23-js&metric=coverage
 [license-link]: https://github.com/cosmos/ics23/blob/master/LICENSE
 [license-badge]: https://img.shields.io/badge/license-Apache2.0-blue.svg
 
@@ -34,15 +34,15 @@ The end goal is to provide a standard representation not only for light-client
 proofs of blockchains, but more specifically for proofs that accompany IBC
 (inter-blockchain communication) packets as defined in the cosmos specification.
 
-## Feature Set
+## Feature set
 
 The features and naming follow the [ICS23: Vector Commitments](https://github.com/cosmos/ibc/tree/master/spec/core/ics-023-vector-commitments) Specification
 
 * Proof of Existence (key-value pair linked to root hash)
-* Hold Existence Proof to db-specific spec (avoid reinterpretation of bytes to different key-value pair)
+* Hold Exiderpretation of bytes to different key-value pair)
 * Proof of Non-Existence (key proven not to be inside tree with given root hash)
 
-### Planned Features
+### Future features
 
 * Batch Proof or Range Proof (prove many keys at once, more efficiently than separate proofs)
 
@@ -51,50 +51,39 @@ The features and naming follow the [ICS23: Vector Commitments](https://github.co
 The top level package will provide language-agnostic documentation and protobuf specifications.
 Every language should have a sub-folder, containing both protobuf generated code,
 as well as client-side code for validating such proofs. The server-side code should
-live alongside the various merkle tree representations (eg. not in this repository)
+live alongside the various merkle tree representations (eg. not in this repository).
 
-### Client Languages Supported
+### Supported client languages
 
 * [Go](./go)
 * [TypeScript](./js)
 * [Rust](./rust)
 
-### Compatibility Table
+Anyone interested in adding support for Solidity could pick up where [#58](https://github.com/cosmos/ics23/pull/58) left off.
+
+### Compatibility table
 
 | ICS 023 Spec  | Go                | Rust                |
 |---------------|-------------------|---------------------|
 | 2019-08-25    | 0.9.x             | 0.9.x               |
 | 2019-08-25    | 0.10.x            | 0.10.x, 0.11.x      |
 
-### Planned Support
+## Supported merkle stores
 
-* Solidity - [thanks to Mossid](https://github.com/cosmos/proofs/pull/12)
-
-## Supported Merkle Stores
-
-* [tendermint/iavl](https://github.com/confio/proofs-iavl) - this is the reference implementation for proofs from [tendermint/iavl](https://github.com/tendermint/iavl)
-* [tendermint - SimpleMerkleProof](https://github.com/confio/proofs-tendermint) - support for key-value proofs created by [crypto/merkle.SimpleProofsFromMap](https://github.com/tendermint/tendermint/blob/master/crypto/merkle/simple_proof.go#L45)
-
-### Planned
-
-* [nomic-io/merk](https://github.com/nomic-io/merk)
+* [cosmos/iavl](https://github.com/cosmos/iavl)
+* [cometbft/crypto/merkle](https://github.com/cometbft/cometbft/tree/main/crypto/merkle)
+* [penumbra-zone/jmt](https://github.com/penumbra-zone/jmt)
 
 ### Unsupported
 
-* [go-ethereum Patricia Trie](https://github.com/confio/proofs-ethereum)
+* [turbofish-org/merk](https://github.com/turbofish-org/merk)
+* [go-ethereum Merkle Patricia Trie](https://github.com/ethereum/go-ethereum/blob/master/trie/trie.go)
 
-I spent quite some time to wrestle out a well-defined serialization and a validation logic that didn't
-involve importing too much code from go-ethereum (copying parts and stripping it down to the minimum).
-At the end, I realized the key is only present from parsing the entire path and is quite a painstaking
-process, even with go code that imports rlp and has the custom patricia key encodings. After a long time
-reflecting, I cannot see any way to implement this that doesn't either: (A) allow the provider to forge
-a different key that cannot be detected by the verifier or (B) include a huge amount of custom code
-in the client side.
+Ethan Frey [spent quite some time](https://github.com/confio/proofs-ethereum) to wrestle out a well-defined serialization and a validation logic that didn't involve importing too much code from go-ethereum (copying parts and stripping it down to the minimum). At the end, he realized the key is only present from parsing the entire path and is quite a painstaking process, even with go code that imports rlp and has the custom patricia key encodings. After a long time reflecting, he cannot see any way to implement this that doesn't either: (A) allow the provider to forge a different key that cannot be detected by the verifier or (B) include a huge amount of custom code in the client side.
 
-If anyone has a solution to this, please open an issue in the
-[proofs-ethereum repo](https://github.com/confio/proofs-ethereum).
+If anyone has a solution to this, please open an issue in this repository.
 
-## Known Limitations
+## Known limitations
 
 This format is designed to support any merklized data store that encodes key-value pairs into
 a node, and computes a root hash by repeatedly concatenating hashes and re-hashing them.
