@@ -39,7 +39,7 @@ proofs of blockchains, but more specifically for proofs that accompany IBC
 The features and naming follow the [ICS23: Vector Commitments](https://github.com/cosmos/ibc/tree/master/spec/core/ics-023-vector-commitments) Specification
 
 * Proof of Existence (key-value pair linked to root hash)
-* Hold Exiderpretation of bytes to different key-value pair)
+* Hold Existence Proof to db-specific spec (avoid reinterpretation of bytes to different key-value pair)
 * Proof of Non-Existence (key proven not to be inside tree with given root hash)
 
 ### Future features
