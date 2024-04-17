@@ -72,6 +72,7 @@ func (HashOp) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_5e599a3f914c9389, []int{0}
 }
 
+// *
 // LengthOp defines how to process the key and value of the LeafOp
 // to include length information. After encoding the length with the given
 // algorithm, the length will be prepended to the key and value bytes.
@@ -131,6 +132,7 @@ func (LengthOp) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_5e599a3f914c9389, []int{1}
 }
 
+// *
 // ExistenceProof takes a key and a value and a set of steps to perform on it.
 // The result of peforming all these steps will provide a "root hash", which can
 // be compared to the value in a header.
@@ -394,6 +396,7 @@ func (*CommitmentProof) XXX_OneofWrappers() []interface{} {
 	}
 }
 
+// *
 // LeafOp represents the raw key-value data we wish to prove, and
 // must be flexible to represent the internal transformation from
 // the original key-value pairs into the basis hash, for many existing
@@ -486,6 +489,7 @@ func (m *LeafOp) GetPrefix() []byte {
 	return nil
 }
 
+// *
 // InnerOp represents a merkle-proof step that is not a leaf.
 // It represents concatenating two children and hashing them to provide the next result.
 //
@@ -561,6 +565,7 @@ func (m *InnerOp) GetSuffix() []byte {
 	return nil
 }
 
+// *
 // ProofSpec defines what the expected parameters are for a given proof type.
 // This can be stored in the client and used to validate any incoming proofs.
 //
