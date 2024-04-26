@@ -192,7 +192,7 @@ If we run the program with the debugger and step through it, the entry point for
 
 ![alt text](./membership/01-verify-membership.png)
 
-Inside `VerifyMembership` the `proof`, which is of type `CommitmentProof`(https://github.com/cosmos/ics23/blob/go/v0.10.0/proto/cosmos/ics23/v1/proofs.proto#L84-L94) is converted to an `ExistenceProof` and then the function `Verify` is called:
+Inside `VerifyMembership` the `proof`, which is of type [`CommitmentProof`](https://github.com/cosmos/ics23/blob/go/v0.10.0/proto/cosmos/ics23/v1/proofs.proto#L84-L94) is converted to an `ExistenceProof` and then the function `Verify` is called:
 
 ![alt text](./membership/02-verify.png)
 
