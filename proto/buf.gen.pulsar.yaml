@@ -1,0 +1,10 @@
+version: v1
+managed:
+  enabled: true
+  go_package_prefix:
+    default: github.com/cosmos/ics23/go/api
+    except:
+      - buf.build/cosmos/ics23
+plugins:
+  - name: go-pulsar
+    out: ../go/api
