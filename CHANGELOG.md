@@ -1,5 +1,11 @@
 # Changelog
 
+# 0.12.0
+
+## Rust
+
+- chore(rust): Update `prost` to v0.13 ([#335](https://github.com/cosmos/ics23/pull/335), [#336](https://github.com/cosmos/ics23/pull/336))
+
 # 0.11.2
 
 ## Rust
