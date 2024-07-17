@@ -1,4 +1,11 @@
 # Changelog
+
+# Unreleased
+
+## Rust
+
+- fix(rust): Enforce that `spec.InnerSpec.ChildSize` is >= 1  ([#339](https://github.com/cosmos/ics23/pull/339))
+
 # 0.11.1
 
 ## Rust
