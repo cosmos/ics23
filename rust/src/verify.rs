@@ -202,6 +202,10 @@ fn ensure_inner(inner: &ics23::InnerOp, spec: &ics23::ProofSpec) -> Result<()> {
                 inner.prefix.len(),
             );
             ensure!(
+                inner_spec.child_size > 0,
+                "spec.InnerSpec.ChildSize must be >= 1"
+            );
+            ensure!(
                 inner.suffix.len() % (inner_spec.child_size as usize) == 0,
                 "InnerOp suffix malformed"
             );
