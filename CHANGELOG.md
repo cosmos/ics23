@@ -1,24 +1,26 @@
 # Changelog
 
-# Unreleased
+# 0.11.3
 
 ## Rust
 
 - fix(rust): Enforce that `spec.InnerSpec.ChildSize` is >= 1  ([#339](https://github.com/cosmos/ics23/pull/339))
 
-# 0.11.1
+# 0.11.2
 
 ## Rust
 
-## Full changes
+This release was yanked, please use v0.11.3 instead.
+
+# 0.11.1
+
+## Rust
 
 - chore(rust): Update `informalsystems-pbjson` to v0.7.0 ([#274](https://github.com/cosmos/ics23/pull/274))
 
 # 0.11.0
 
 ## Rust
-
-## Full changes
 
 - chore(rust): update `prost` to v0.12 ([#202](https://github.com/cosmos/ics23/pull/202))
 
