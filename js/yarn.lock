@@ -1833,18 +1833,18 @@ jasmine-console-reporter@^3.1.0:
     ora "^3.0.0"
     perfy "^1.1.5"
 
-jasmine-core@~5.1.0:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-5.1.1.tgz#38b6ccfbe60aa2a863cf441751d9639b5a571edc"
-  integrity sha512-UrzO3fL7nnxlQXlvTynNAenL+21oUQRlzqQFsA2U11ryb4+NLOCOePZ70PTojEaUKhiFugh7dG0Q+I58xlPdWg==
+jasmine-core@~5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-5.2.0.tgz#7d0aa4c26cb3dbaed201d0505489baf1e48faeca"
+  integrity sha512-tSAtdrvWybZkQmmaIoDgnvHG8ORUNw5kEVlO5CvrXj02Jjr9TZrmjFq7FUiOUzJiOP2wLGYT6PgrQgQF4R1xiw==
 
 jasmine@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-5.1.0.tgz#a3218fd425ff35aec12f3dc6cf70d8cebbf0042a"
-  integrity sha512-prmJlC1dbLhti4nE4XAPDWmfJesYO15sjGXVp7Cs7Ym5I9Xtwa/hUHxxJXjnpfLO72+ySttA0Ztf8g/RiVnUKw==
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-5.2.0.tgz#caa318ac1ccf966b2768e092137337621cdd3ca9"
+  integrity sha512-il+noV96N1BGU9/FMmc8QtAMxC8lPnXUiAvgb0o9MDZATRdxglTQe9wo6UdL049ropQL6MopDYwDlludKR6wJQ==
   dependencies:
     glob "^10.2.2"
-    jasmine-core "~5.1.0"
+    jasmine-core "~5.2.0"
 
 js-tokens@^4.0.0:
   version "4.0.0"
