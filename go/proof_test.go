@@ -44,7 +44,6 @@ func TestCheckLeaf(t *testing.T) {
 }
 
 func TestCheckAgainstSpec(t *testing.T) {
-	t.Skip()
 	cases := CheckAgainstSpecTestData(t)
 
 	for name, tc := range cases {
