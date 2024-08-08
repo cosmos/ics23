@@ -48,7 +48,7 @@ func FuzzExistenceProofCheckAgainstSpec(f *testing.F) {
 
 	seedDataMap := CheckAgainstSpecTestData(f)
 	for _, seed := range seedDataMap {
-		if seed.IsErr {
+		if seed.Err != "" {
 			// Erroneous data, skip it.
 			continue
 		}
