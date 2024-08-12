@@ -3,7 +3,7 @@ module github.com/cosmos/ics23/go
 go 1.21
 
 require (
-	github.com/cosmos/gogoproto v1.5.0
+	github.com/cosmos/gogoproto v1.6.0
 	golang.org/x/crypto v0.25.0
 )
 
