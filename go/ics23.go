@@ -1,7 +1,8 @@
 /*
 *
 This implements the client side functions as specified in
-https://github.com/cosmos/ics/tree/master/spec/ics-023-vector-commitments
+https://github.com/cosmos/ibc/tree/main/spec/core/ics-023-vector-commitments
+
 In particular:
 
 	// Assumes ExistenceProof
