@@ -9,14 +9,6 @@ updates:
     commit-message:
       prefix: "chore"
 
-  # Maintain dependencies for npm
-  - package-ecosystem: "npm"
-    directory: "/js"
-    schedule:
-      interval: "weekly"
-    commit-message:
-      prefix: "chore"
-
   # Maintain dependencies for Composer
   - package-ecosystem: "gomod"
     directory: "/go"
