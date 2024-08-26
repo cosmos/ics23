@@ -6,7 +6,6 @@
 | ------------------ | ------------------------------------------------- | ---------------------------------------------- |
 | [Go](./go)         | [![Go Test][go-test-badge]][go-test-link]         | [![Go Cov][go-cov-badge]][go-cov-link]         |
 | [Rust](./rust)     | [![Rust Test][rust-test-badge]][rust-test-link]   | [![Rust Cov][rust-cov-badge]][rust-cov-link]   |
-| [TypeScript](./js) | [![TypeScript Test][ts-test-badge]][ts-test-link] | [![TypeScript Cov][ts-cov-badge]][ts-cov-link] |
 
 [cosmos-link]: https://cosmos.network
 [go-test-link]: https://github.com/cosmos/ics23/actions/workflows/go.yml
@@ -17,10 +16,6 @@
 [rust-test-badge]: https://github.com/cosmos/ics23/actions/workflows/rust.yml/badge.svg?branch=master
 [rust-cov-link]: https://codecov.io/gh/cosmos/ics23/tree/master/rust
 [rust-cov-badge]: https://codecov.io/github/cosmos/ics23/branch/master/graph/badge.svg?token=xlGriS907o&flag=rust
-[ts-test-link]: https://github.com/cosmos/ics23/actions/workflows/typescript.yml
-[ts-test-badge]: https://github.com/cosmos/ics23/actions/workflows/typescript.yml/badge.svg?branch=master
-[ts-cov-link]: https://sonarcloud.io/project/configuration?id=ics23-js
-[ts-cov-badge]: https://sonarcloud.io/api/project_badges/measure?project=ics23-js&metric=coverage
 [license-link]: https://github.com/cosmos/ics23/blob/master/LICENSE
 [license-badge]: https://img.shields.io/badge/license-Apache2.0-blue.svg
 
@@ -56,8 +51,9 @@ live alongside the various merkle tree representations (eg. not in this reposito
 ### Supported client languages
 
 * [Go](./go)
-* [TypeScript](./js)
 * [Rust](./rust)
+
+The repository used to have a TypeScript implementation, but due to lack of maintenance and usage, it was removed in [#353](https://github.com/cosmos/ics23/pull/353).
 
 Anyone interested in adding support for Solidity could pick up where [#58](https://github.com/cosmos/ics23/pull/58) left off.
 
