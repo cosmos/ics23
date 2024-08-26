@@ -783,7 +783,7 @@
         "max_prefix_length": 12,
         "hash": 1
       },
-      "max_depth": 4,
+      "max_depth": 0,
       "min_depth": 2
     },
     "Err": "innerOps depth too long: 129"
