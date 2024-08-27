@@ -577,6 +577,7 @@ type ProofSpec struct {
 	LeafSpec  *LeafOp    `protobuf:"bytes,1,opt,name=leaf_spec,json=leafSpec,proto3" json:"leaf_spec,omitempty"`
 	InnerSpec *InnerSpec `protobuf:"bytes,2,opt,name=inner_spec,json=innerSpec,proto3" json:"inner_spec,omitempty"`
 	// max_depth (if > 0) is the maximum number of InnerOps allowed (mainly for fixed-depth tries)
+	// the max_depth is interpreted as 128 if set to 0
 	MaxDepth int32 `protobuf:"varint,3,opt,name=max_depth,json=maxDepth,proto3" json:"max_depth,omitempty"`
 	// min_depth (if > 0) is the minimum number of InnerOps allowed (mainly for fixed-depth tries)
 	MinDepth int32 `protobuf:"varint,4,opt,name=min_depth,json=minDepth,proto3" json:"min_depth,omitempty"`
