@@ -44,16 +44,15 @@ func TestCheckLeaf(t *testing.T) {
 }
 
 func TestCheckAgainstSpec(t *testing.T) {
-	t.Skip()
 	cases := CheckAgainstSpecTestData(t)
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			err := tc.Proof.CheckAgainstSpec(tc.Spec)
-			if tc.IsErr && err == nil {
-				t.Fatal("Expected error, but got nil")
-			} else if !tc.IsErr && err != nil {
+			if tc.Err == "" && err != nil {
 				t.Fatalf("Unexpected error: %v", err)
+			} else if tc.Err != "" && tc.Err != err.Error() {
+				t.Fatalf("Expected error: %s, got %s", tc.Err, err.Error())
 			}
 		})
 	}

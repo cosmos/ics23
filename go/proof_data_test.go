@@ -54,7 +54,7 @@ func CheckLeafTestData(tb testing.TB) map[string]CheckLeafTestStruct {
 type CheckAgainstSpecTestStruct struct {
 	Proof *ExistenceProof
 	Spec  *ProofSpec
-	IsErr bool
+	Err   string
 }
 
 func CheckAgainstSpecTestData(tb testing.TB) map[string]CheckAgainstSpecTestStruct {
@@ -70,6 +70,7 @@ func CheckAgainstSpecTestData(tb testing.TB) map[string]CheckAgainstSpecTestStru
 	if err != nil {
 		tb.Fatal(err)
 	}
+
 	return cases
 }
 
