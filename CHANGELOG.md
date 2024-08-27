@@ -1,5 +1,9 @@
 # Changelog
 
+# Unreleased
+
+- fix(go): interpret max_depth in inner specs as 128 if left to 0 [#352](https://github.com/cosmos/ics23/pull/352).
+
 # 0.12.0
 
 ## Rust
