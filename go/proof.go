@@ -455,7 +455,7 @@ func leftBranchesAreEmpty(spec *InnerSpec, op *InnerOp) (bool, error) {
 func rightBranchesAreEmpty(spec *InnerSpec, op *InnerOp) (bool, error) {
 	idx, err := orderFromPadding(spec, op)
 	if err != nil {
-		return false, nil
+		return false, err
 	}
 	// count branches to right of this one
 	rightBranches := len(spec.ChildOrder) - 1 - int(idx)
