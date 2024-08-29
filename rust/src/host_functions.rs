@@ -8,8 +8,8 @@ pub trait HostFunctionsProvider {
     /// The SHA-512 hash algorithm
     fn sha2_512(message: &[u8]) -> [u8; 64];
 
-    /// The SHA-512 hash algorithm with its output truncated to 256 bits.
-    fn sha2_512_truncated(message: &[u8]) -> [u8; 32];
+    /// The SHA2-512/256 hash algorithm.
+    fn sha2_512_256(message: &[u8]) -> [u8; 32];
 
     /// The Keccak-256 hash function.
     fn keccak_256(message: &[u8]) -> [u8; 32];
@@ -51,7 +51,7 @@ pub mod host_functions_impl {
             buf
         }
 
-        fn sha2_512_truncated(message: &[u8]) -> [u8; 32] {
+        fn sha2_512_256(message: &[u8]) -> [u8; 32] {
             let digest = Sha512_256::digest(message);
             let mut buf = [0u8; 32];
             buf.copy_from_slice(&digest);
