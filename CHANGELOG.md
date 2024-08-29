@@ -1,5 +1,9 @@
 # Changelog
 
+# Unreleased
+
+- deps(go): bump golang to v1.22 ([#363](https://github.com/cosmos/ics23/pull/363).
+
 # 0.12.0
 
 ## Rust
