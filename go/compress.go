@@ -153,7 +153,9 @@ func decompressExist(exist *CompressedExistenceProof, lookup []*InnerOp) *Existe
 		Path:  make([]*InnerOp, len(exist.Path)),
 	}
 	for i, step := range exist.Path {
-		res.Path[i] = lookup[step]
+		if int(step) < len(lookup) {
+			res.Path[i] = lookup[step]
+		}
 	}
 	return res
 }
