@@ -3,6 +3,7 @@
 # Unreleased
 
 - fix(go): interpret max_depth in proof specs as 128 if left to 0 [#352](https://github.com/cosmos/ics23/pull/352).
+- deps(go): bump golang to v1.22 ([#363](https://github.com/cosmos/ics23/pull/363).
 
 # 0.12.0
 
