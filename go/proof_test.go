@@ -66,10 +66,18 @@ func TestEmptyBranch(t *testing.T) {
 			if err := tc.Op.CheckAgainstSpec(tc.Spec, 1); err != nil {
 				t.Errorf("Invalid InnerOp: %v", err)
 			}
-			if leftBranchesAreEmpty(tc.Spec.InnerSpec, tc.Op) != tc.IsLeft {
+			leftBranchesAreEmpty, err := leftBranchesAreEmpty(tc.Spec.InnerSpec, tc.Op)
+			if err != nil {
+				t.Errorf("Error: %v", err)
+			}
+			if leftBranchesAreEmpty != tc.IsLeft {
 				t.Errorf("Expected leftBranchesAreEmpty to be %t but it wasn't", tc.IsLeft)
 			}
-			if rightBranchesAreEmpty(tc.Spec.InnerSpec, tc.Op) != tc.IsRight {
+			rightBranchesAreEmpty, err := rightBranchesAreEmpty(tc.Spec.InnerSpec, tc.Op)
+			if err != nil {
+				t.Errorf("Error: %v", err)
+			}
+			if rightBranchesAreEmpty != tc.IsRight {
 				t.Errorf("Expected rightBranchesAreEmpty to be %t but it wasn't", tc.IsRight)
 			}
 		})
