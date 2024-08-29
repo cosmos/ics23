@@ -2,7 +2,6 @@
 
 # Unreleased
 
-- fix(go): interpret max_depth in proof specs as 128 if left to 0 [#352](https://github.com/cosmos/ics23/pull/352).
 - deps(go): bump golang to v1.22 ([#363](https://github.com/cosmos/ics23/pull/363).
 
 # 0.12.0
@@ -34,6 +33,14 @@ This release was yanked, please use v0.11.3 instead.
 ## Rust
 
 - chore(rust): update `prost` to v0.12 ([#202](https://github.com/cosmos/ics23/pull/202))
+
+## Go
+
+- fix(go): interpret max_depth in proof specs as 128 if left to 0 ([#352](https://github.com/cosmos/ics23/pull/352)).
+- deps: bump cosmos/gogoproto to v1.7.0.
+- deps: bump x/crypto v0.26.0.
+- feat: add support for Blake2b/2s/3 hash functions ([#212](https://github.com/cosmos/ics23/pull/212)).
+- fix(go): bullet-proof against nil dereferences, add more fuzzers ([\#244](https://github.com/cosmos/ics23/pull/244)).
 
 # 0.10.2
 
