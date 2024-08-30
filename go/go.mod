@@ -1,6 +1,6 @@
 module github.com/cosmos/ics23/go
 
-go 1.21
+go 1.22
 
 require (
 	github.com/cosmos/gogoproto v1.7.0
