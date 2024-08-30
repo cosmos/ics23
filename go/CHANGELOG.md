@@ -2,6 +2,10 @@
 
 # Unreleased
 
+- deps: bump golang to v1.22 ([#363](https://github.com/cosmos/ics23/pull/363)).
+
+# v0.11.0
+
 - fix(go): interpret max_depth in proof specs as 128 if left to 0 ([#352](https://github.com/cosmos/ics23/pull/352)).
 - deps: bump cosmos/gogoproto to v1.7.0.
 - deps: bump x/crypto v0.26.0.
