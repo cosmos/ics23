@@ -173,7 +173,7 @@ pub struct ProofSpec {
 pub struct InnerSpec {
     /// Child order is the ordering of the children node, must count from 0
     /// iavl tree is \[0, 1\] (left then right)
-    /// merk is \[0, 2, 1\] (left, right, here)
+    /// merk is \[0, 1, 2\] (left, here, right)
     #[prost(int32, repeated, tag = "1")]
     pub child_order: ::prost::alloc::vec::Vec<i32>,
     #[prost(int32, tag = "2")]
