@@ -492,7 +492,7 @@ func getPosition(order []int32, branch int32) (int, error) {
 		}
 	}
 
-	return 0, fmt.Errorf("branch %d not found in order %v", branch, order)
+	return -1, fmt.Errorf("branch %d not found in order %v", branch, order)
 }
 
 // This will look at the proof and determine which order it is...
