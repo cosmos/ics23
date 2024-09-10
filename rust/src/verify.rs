@@ -203,7 +203,11 @@ fn ensure_inner(inner: &ics23::InnerOp, spec: &ics23::ProofSpec) -> Result<()> {
             );
             ensure!(
                 inner_spec.child_size > 0,
-                "spec.InnerSpec.ChildSize must be >= 1"
+                "spec.inner_spec.child_size must be >= 1"
+            );
+            ensure!(
+                inner_spec.max_prefix_length < inner_spec.min_prefix_length + inner_spec.child_size,
+                "spec.inner_spec.max_prefix_length must be < spec.inner_spec.min_prefix_length + spec.inner_spec.child_size"
             );
             ensure!(
                 inner.suffix.len() % (inner_spec.child_size as usize) == 0,
