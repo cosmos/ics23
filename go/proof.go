@@ -484,7 +484,7 @@ func rightBranchesAreEmpty(spec *InnerSpec, op *InnerOp) (bool, error) {
 // the index of this branch
 func getPosition(order []int32, branch int32) (int, error) {
 	if branch < 0 || int(branch) >= len(order) {
-		return 0, fmt.Errorf("invalid branch: %d", branch)
+		return -1, fmt.Errorf("invalid branch: %d", branch)
 	}
 	for i, item := range order {
 		if branch == item {
