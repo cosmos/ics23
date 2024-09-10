@@ -166,6 +166,10 @@ func (op *InnerOp) CheckAgainstSpec(spec *ProofSpec, b int) error {
 		return errors.New("spec.InnerSpec.ChildSize must be >= 1")
 	}
 
+	if spec.InnerSpec.MaxPrefixLength >= spec.InnerSpec.MinPrefixLength+spec.InnerSpec.ChildSize {
+		return errors.New("spec.InnerSpec.MaxPrefixLength must be < spec.InnerSpec.MinPrefixLength + spec.InnerSpec.ChildSize")
+	}
+
 	// ensures soundness, with suffix having to be of correct length
 	if len(op.Suffix)%int(spec.InnerSpec.ChildSize) != 0 {
 		return fmt.Errorf("InnerOp suffix malformed")
