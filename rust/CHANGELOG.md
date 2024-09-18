@@ -1,5 +1,9 @@
 # Changelog
 
+# Unreleased
+
+- fix(rust): Interpret `max_depth` in proof specs as 128 if left to 0 [#371](https://github.com/cosmos/ics23/pull/371).
+
 # v0.12.0
 
 - chore(rust): Update `prost` to v0.13 ([#335](https://github.com/cosmos/ics23/pull/335), [#336](https://github.com/cosmos/ics23/pull/336))
