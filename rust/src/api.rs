@@ -580,6 +580,69 @@ mod tests {
         verify_test_vector("../testdata/smt/nonexist_middle.json", &spec)
     }
 
+    #[derive(Deserialize)]
+    #[serde(rename_all = "PascalCase")]
+    struct ExistenceProofTest {
+        proof: crate::ExistenceProof,
+        is_err: bool,
+        expected: Option<Vec<u8>>,
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_existence_proof() -> Result<()> {
+        use crate::calculate_existence_root;
+
+        let data = std::fs::read_to_string("../testdata/TestExistenceProofData.json")?;
+        let tests: BTreeMap<String, ExistenceProofTest> = serde_json::from_str(&data)?;
+
+        for (name, test) in tests {
+            println!("Test: {name}");
+            let result = calculate_existence_root::<HostFunctionsManager>(&test.proof);
+            if test.is_err {
+                assert!(result.is_err());
+            } else {
+                assert!(result.is_ok());
+                assert_eq!(
+                    result.unwrap().as_slice(),
+                    test.expected.unwrap().as_slice()
+                );
+            }
+        }
+
+        Ok(())
+    }
+
+    #[derive(Deserialize)]
+    #[serde(rename_all = "PascalCase")]
+    struct CheckAgainstSpecTest {
+        proof: crate::ExistenceProof,
+        spec: crate::ProofSpec,
+        err: String,
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_check_against_spec() -> Result<()> {
+        use crate::verify::check_existence_spec;
+
+        let data = std::fs::read_to_string("../testdata/TestCheckAgainstSpecData.json")?;
+        let tests: BTreeMap<String, CheckAgainstSpecTest> = serde_json::from_str(&data)?;
+
+        for (name, test) in tests {
+            println!("Test: {name}");
+            let result = check_existence_spec(&test.proof, &test.spec);
+            if test.err.is_empty() {
+                assert!(result.is_ok());
+            } else {
+                assert!(result.is_err());
+                // assert_eq!(result.unwrap_err().to_string(), test.err);
+            }
+        }
+
+        Ok(())
+    }
+
     #[cfg(feature = "std")]
     fn load_batch(files: &[&str]) -> Result<(ics23::CommitmentProof, Vec<RefData>)> {
         let (data, entries) = files

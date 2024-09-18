@@ -114,31 +114,47 @@ fn calculate_existence_root_for_spec<H: HostFunctionsProvider>(
     }
 }
 
-fn check_existence_spec(proof: &ics23::ExistenceProof, spec: &ics23::ProofSpec) -> Result<()> {
-    if let (Some(leaf), Some(leaf_spec)) = (&proof.leaf, &spec.leaf_spec) {
-        ensure_leaf_prefix(&leaf.prefix, spec)?;
-        ensure_leaf(leaf, leaf_spec)?;
-        // ensure min/max depths
-        if spec.min_depth != 0 {
-            ensure!(
-                proof.path.len() >= spec.min_depth as usize,
-                "Too few InnerOps: {}",
-                proof.path.len(),
-            );
-            ensure!(
-                proof.path.len() <= spec.max_depth as usize,
-                "Too many InnerOps: {}",
-                proof.path.len(),
-            );
-        }
-        for (idx, step) in proof.path.iter().enumerate() {
-            ensure_inner_prefix(&step.prefix, spec, (idx as i64) + 1, step.hash)?;
-            ensure_inner(step, spec)?;
-        }
-        Ok(())
+pub(crate) fn check_existence_spec(
+    proof: &ics23::ExistenceProof,
+    spec: &ics23::ProofSpec,
+) -> Result<()> {
+    let Some(leaf) = &proof.leaf else {
+        bail!("existence Proof needs defined LeafOp");
+    };
+
+    let Some(leaf_spec) = &spec.leaf_spec else {
+        bail!("existence Proof needs defined LeafSpec");
+    };
+
+    ensure_leaf_prefix(&leaf.prefix, spec)?;
+    ensure_leaf(leaf, leaf_spec)?;
+
+    let max_depth = if spec.max_depth == 0 {
+        ics23::ProofSpec::DEFAULT_MAX_DEPTH
     } else {
-        bail!("Leaf and Leaf Spec must be set")
+        spec.max_depth
+    };
+
+    // ensure min/max depths
+    if spec.min_depth != 0 {
+        ensure!(
+            proof.path.len() >= spec.min_depth as usize,
+            "innerOps depth too short: {}",
+            proof.path.len(),
+        );
+        ensure!(
+            proof.path.len() <= max_depth as usize,
+            "innerOps depth too long: {}",
+            proof.path.len(),
+        );
     }
+
+    for (idx, step) in proof.path.iter().enumerate() {
+        ensure_inner_prefix(&step.prefix, spec, (idx as i64) + 1, step.hash)?;
+        ensure_inner(step, spec)?;
+    }
+
+    Ok(())
 }
 
 fn ensure_leaf(leaf: &ics23::LeafOp, leaf_spec: &ics23::LeafOp) -> Result<()> {

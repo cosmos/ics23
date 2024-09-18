@@ -14,6 +14,10 @@ mod verify;
 mod ics23 {
     include!("cosmos.ics23.v1.rs");
 
+    impl ProofSpec {
+        pub const DEFAULT_MAX_DEPTH: i32 = 128;
+    }
+
     #[cfg(feature = "serde")]
     include!("cosmos.ics23.v1.serde.rs");
 }
