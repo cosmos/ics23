@@ -64,8 +64,24 @@ func TestDoHash(t *testing.T) {
 	}
 }
 
-func TestForgeNonexistenceProofWithIncorrectMaxPrefixLength(t *testing.T) {
-	spec := TendermintSpec
+func TestForgeNonExistenceProofWithIncorrectMaxPrefixLength(t *testing.T) {
+	spec := &ProofSpec{ // TendermintSpec
+		LeafSpec: &LeafOp{
+			Prefix:       []byte{0},
+			PrehashKey:   HashOp_NO_HASH,
+			Hash:         HashOp_SHA256,
+			PrehashValue: HashOp_SHA256,
+			Length:       LengthOp_VAR_PROTO,
+		},
+		InnerSpec: &InnerSpec{
+			ChildOrder:      []int32{0, 1},
+			MinPrefixLength: 1,
+			MaxPrefixLength: 1,
+			ChildSize:       32, // (no length byte)
+			Hash:            HashOp_SHA256,
+		},
+	}
+
 	spec.InnerSpec.MaxPrefixLength = 33
 	leafOp := spec.LeafSpec
 	aLeaf, _ := leafOp.Apply([]byte("a"), []byte("a"))
