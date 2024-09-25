@@ -3,6 +3,8 @@ package ics23
 import (
 	"bytes"
 	"encoding/hex"
+	"errors"
+	"fmt"
 	"testing"
 )
 
@@ -59,5 +61,116 @@ func TestDoHash(t *testing.T) {
 				t.Fatalf("Expected %s got %s", tc.ExpectedHash, hexRes)
 			}
 		})
+	}
+}
+
+func TestForgeNonexistenceProofWithIncorrectMaxPrefixLength(t *testing.T) {
+	spec := TendermintSpec
+	spec.InnerSpec.MaxPrefixLength = 33
+	leafOp := spec.LeafSpec
+	aLeaf, _ := leafOp.Apply([]byte("a"), []byte("a"))
+	bLeaf, _ := leafOp.Apply([]byte("b"), []byte("b"))
+	b2Leaf, _ := leafOp.Apply([]byte("b2"), []byte("b2"))
+
+	cLeaf, _ := leafOp.Apply([]byte("c"), []byte("c"))
+	aExist := ExistenceProof{
+		Key:   []byte("a"),
+		Value: []byte("a"),
+		Leaf:  leafOp,
+		Path: []*InnerOp{
+			&InnerOp{
+				Hash:   spec.InnerSpec.Hash,
+				Prefix: []byte{1},
+				Suffix: append(bLeaf, b2Leaf...),
+			},
+			&InnerOp{
+				Hash:   spec.InnerSpec.Hash,
+				Prefix: []byte{1},
+				Suffix: cLeaf,
+			},
+		},
+	}
+	bExist := ExistenceProof{
+		Key:   []byte("b"),
+		Value: []byte("b"),
+		Leaf:  leafOp,
+		Path: []*InnerOp{
+			&InnerOp{
+				Hash:   spec.InnerSpec.Hash,
+				Prefix: append([]byte{1}, aLeaf...),
+				Suffix: b2Leaf,
+			},
+			&InnerOp{
+				Hash:   spec.InnerSpec.Hash,
+				Prefix: []byte{1},
+				Suffix: cLeaf,
+			},
+		},
+	}
+	b2Exist := ExistenceProof{
+		Key:   []byte("b2"),
+		Value: []byte("b2"),
+		Leaf:  leafOp,
+		Path: []*InnerOp{
+			&InnerOp{
+				Hash:   spec.InnerSpec.Hash,
+				Prefix: append(append([]byte{1}, aLeaf...), bLeaf...),
+				Suffix: []byte{},
+			},
+			&InnerOp{
+				Hash:   spec.InnerSpec.Hash,
+				Prefix: []byte{1},
+				Suffix: cLeaf,
+			},
+		},
+	}
+	yHash, _ := aExist.Path[0].Apply(aLeaf)
+	cExist := ExistenceProof{
+		Key:   []byte("c"),
+		Value: []byte("c"),
+		Leaf:  leafOp,
+		Path: []*InnerOp{
+			&InnerOp{
+				Hash:   spec.InnerSpec.Hash,
+				Prefix: append([]byte{1}, yHash...),
+				Suffix: []byte{},
+			},
+		},
+	}
+	aNotExist := NonExistenceProof{
+		Key:   []byte("a"),
+		Left:  nil,
+		Right: &bExist,
+	}
+	root, err := aExist.Calculate()
+	if err != nil {
+		t.Fatal("failed to calculate existence proof of leaf a")
+	}
+
+	expError := fmt.Errorf("inner, %w", errors.New("spec.InnerSpec.MaxPrefixLength must be < spec.InnerSpec.MinPrefixLength + spec.InnerSpec.ChildSize"))
+	err = aExist.Verify(spec, root, []byte("a"), []byte("a"))
+	if err.Error() != expError.Error() {
+		t.Fatal("attempting to prove existence of leaf a returned incorrect error")
+	}
+
+	err = bExist.Verify(spec, root, []byte("b"), []byte("b"))
+	if err.Error() != expError.Error() {
+		t.Fatal("attempting to prove existence of leaf b returned incorrect error")
+	}
+
+	err = b2Exist.Verify(spec, root, []byte("b2"), []byte("b2"))
+	if err.Error() != expError.Error() {
+		t.Fatal("attempting to prove existence of third leaf returned incorrect error")
+	}
+
+	err = cExist.Verify(spec, root, []byte("c"), []byte("c"))
+	if err.Error() != expError.Error() {
+		t.Fatal("attempting to prove existence of leaf c returned incorrect error")
+	}
+
+	err = aNotExist.Verify(spec, root, []byte("a"))
+	expError = fmt.Errorf("right proof, %w", expError)
+	if err.Error() != expError.Error() {
+		t.Fatal("attempting to prove non-existence of leaf a returned incorrect error")
 	}
 }
