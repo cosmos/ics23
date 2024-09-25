@@ -487,7 +487,7 @@ mod tests {
         let mut depth_limited_spec = api::iavl_spec();
         depth_limited_spec.min_depth = 2;
         depth_limited_spec.max_depth = 4;
-        
+
         let mut max_prefix_length_too_large_spec = api::iavl_spec();
         let inner_spec = max_prefix_length_too_large_spec
             .inner_spec
