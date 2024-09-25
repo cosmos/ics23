@@ -637,7 +637,7 @@ mod tests {
                 },
             ),
             (
-                "rejects inner spec with max prefix length >= min prefix lenght + child size",
+                "rejects inner spec with max prefix length >= min prefix length + child size",
                 ExistenceCase {
                     proof: ExistenceProof {
                         key: b"foo".to_vec(),
