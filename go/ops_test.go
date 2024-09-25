@@ -94,12 +94,12 @@ func TestForgeNonExistenceProofWithIncorrectMaxPrefixLength(t *testing.T) {
 		Value: []byte("a"),
 		Leaf:  leafOp,
 		Path: []*InnerOp{
-			&InnerOp{
+			{
 				Hash:   spec.InnerSpec.Hash,
 				Prefix: []byte{1},
 				Suffix: append(bLeaf, b2Leaf...),
 			},
-			&InnerOp{
+			{
 				Hash:   spec.InnerSpec.Hash,
 				Prefix: []byte{1},
 				Suffix: cLeaf,
@@ -111,12 +111,12 @@ func TestForgeNonExistenceProofWithIncorrectMaxPrefixLength(t *testing.T) {
 		Value: []byte("b"),
 		Leaf:  leafOp,
 		Path: []*InnerOp{
-			&InnerOp{
+			{
 				Hash:   spec.InnerSpec.Hash,
 				Prefix: append([]byte{1}, aLeaf...),
 				Suffix: b2Leaf,
 			},
-			&InnerOp{
+			{
 				Hash:   spec.InnerSpec.Hash,
 				Prefix: []byte{1},
 				Suffix: cLeaf,
@@ -128,12 +128,12 @@ func TestForgeNonExistenceProofWithIncorrectMaxPrefixLength(t *testing.T) {
 		Value: []byte("b2"),
 		Leaf:  leafOp,
 		Path: []*InnerOp{
-			&InnerOp{
+			{
 				Hash:   spec.InnerSpec.Hash,
 				Prefix: append(append([]byte{1}, aLeaf...), bLeaf...),
 				Suffix: []byte{},
 			},
-			&InnerOp{
+			{
 				Hash:   spec.InnerSpec.Hash,
 				Prefix: []byte{1},
 				Suffix: cLeaf,
@@ -146,7 +146,7 @@ func TestForgeNonExistenceProofWithIncorrectMaxPrefixLength(t *testing.T) {
 		Value: []byte("c"),
 		Leaf:  leafOp,
 		Path: []*InnerOp{
-			&InnerOp{
+			{
 				Hash:   spec.InnerSpec.Hash,
 				Prefix: append([]byte{1}, yHash...),
 				Suffix: []byte{},
