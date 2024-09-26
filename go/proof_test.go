@@ -123,10 +123,10 @@ func TestGetPosition(t *testing.T) {
 		},
 		{
 			name:     "failure: branch not found in child order",
-			order:    []int32{0, 1, 1},
-			branch:   2,
+			order:    []int32{0, 2},
+			branch:   1,
 			expPos:   -1,
-			expError: fmt.Errorf("branch %d not found in order %v", 2, []int32{0, 1, 1}),
+			expError: fmt.Errorf("branch %d not found in order %v", 1, []int32{0, 2}),
 		},
 	}
 
