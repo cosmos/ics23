@@ -180,6 +180,7 @@ pub struct InnerSpec {
     pub child_size: i32,
     #[prost(int32, tag = "3")]
     pub min_prefix_length: i32,
+    /// the max prefix length must be less than the minimum prefix length + child size
     #[prost(int32, tag = "4")]
     pub max_prefix_length: i32,
     /// empty child is the prehash image that is used when one child is nil (eg. 20 bytes of 0)

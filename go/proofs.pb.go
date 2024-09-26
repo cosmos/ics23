@@ -670,7 +670,8 @@ type InnerSpec struct {
 	ChildOrder      []int32 `protobuf:"varint,1,rep,packed,name=child_order,json=childOrder,proto3" json:"child_order,omitempty"`
 	ChildSize       int32   `protobuf:"varint,2,opt,name=child_size,json=childSize,proto3" json:"child_size,omitempty"`
 	MinPrefixLength int32   `protobuf:"varint,3,opt,name=min_prefix_length,json=minPrefixLength,proto3" json:"min_prefix_length,omitempty"`
-	MaxPrefixLength int32   `protobuf:"varint,4,opt,name=max_prefix_length,json=maxPrefixLength,proto3" json:"max_prefix_length,omitempty"`
+	// the max prefix length must be less than the minimum prefix length + child size
+	MaxPrefixLength int32 `protobuf:"varint,4,opt,name=max_prefix_length,json=maxPrefixLength,proto3" json:"max_prefix_length,omitempty"`
 	// empty child is the prehash image that is used when one child is nil (eg. 20 bytes of 0)
 	EmptyChild []byte `protobuf:"bytes,5,opt,name=empty_child,json=emptyChild,proto3" json:"empty_child,omitempty"`
 	// hash is the algorithm that must be used for each InnerOp
