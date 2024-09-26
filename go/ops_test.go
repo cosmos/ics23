@@ -151,6 +151,13 @@ func TestInnerOpCheckAgainstSpec(t *testing.T) {
 			errors.New("spec.InnerSpec.ChildSize must be >= 1"),
 		},
 		{
+			"failure: MaxPrefixLength >= MinPrefixLength + ChildSize",
+			func() {
+				spec.InnerSpec.MaxPrefixLength = spec.InnerSpec.MinPrefixLength + spec.InnerSpec.ChildSize
+			},
+			errors.New("spec.InnerSpec.MaxPrefixLength must be < spec.InnerSpec.MinPrefixLength + spec.InnerSpec.ChildSize"),
+		},
+		{
 			"failure: inner op suffix malformed",
 			func() {
 				innerOp.Suffix = []byte{0x01}
