@@ -300,13 +300,15 @@ func IsLeftMost(spec *InnerSpec, path []*InnerOp) (bool, error) {
 
 	// ensure every step has a prefix and suffix defined to be leftmost, unless it is a placeholder node
 	for _, step := range path {
-		leftBranchesAreEmpty, err := leftBranchesAreEmpty(spec, step)
-		if err != nil {
-			return false, err
-		}
+		if !hasPadding(step, minPrefix, maxPrefix, suffix) {
+			leftBranchesAreEmpty, err := leftBranchesAreEmpty(spec, step)
+			if err != nil {
+				return false, err
+			}
 
-		if !hasPadding(step, minPrefix, maxPrefix, suffix) && !leftBranchesAreEmpty {
-			return false, nil
+			if !leftBranchesAreEmpty {
+				return false, nil
+			}
 		}
 	}
 	return true, nil
@@ -322,13 +324,15 @@ func IsRightMost(spec *InnerSpec, path []*InnerOp) (bool, error) {
 
 	// ensure every step has a prefix and suffix defined to be rightmost, unless it is a placeholder node
 	for _, step := range path {
-		rightBranchesAreEmpty, err := rightBranchesAreEmpty(spec, step)
-		if err != nil {
-			return false, err
-		}
+		if !hasPadding(step, minPrefix, maxPrefix, suffix) {
+			rightBranchesAreEmpty, err := rightBranchesAreEmpty(spec, step)
+			if err != nil {
+				return false, err
+			}
 
-		if !hasPadding(step, minPrefix, maxPrefix, suffix) && !rightBranchesAreEmpty {
-			return false, nil
+			if !rightBranchesAreEmpty {
+				return false, nil
+			}
 		}
 	}
 	return true, nil
