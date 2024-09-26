@@ -2,6 +2,7 @@ package ics23
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 )
 
@@ -81,5 +82,71 @@ func TestEmptyBranch(t *testing.T) {
 				t.Errorf("Expected rightBranchesAreEmpty to be %t but it wasn't", tc.IsRight)
 			}
 		})
+	}
+}
+
+func TestGetPosition(t *testing.T) {
+	cases := []struct {
+		name     string
+		order    []int32
+		branch   int32
+		expPos   int
+		expError error
+	}{
+		{
+			name:     "success: first branch",
+			order:    IavlSpec.InnerSpec.ChildOrder,
+			branch:   0,
+			expPos:   0,
+			expError: nil,
+		},
+		{
+			name:     "success: second branch",
+			order:    IavlSpec.InnerSpec.ChildOrder,
+			branch:   1,
+			expPos:   1,
+			expError: nil,
+		},
+		{
+			name:     "failure: negative branch value",
+			order:    IavlSpec.InnerSpec.ChildOrder,
+			branch:   -1,
+			expPos:   -1,
+			expError: fmt.Errorf("invalid branch: %d", int32(-1)),
+		},
+		{
+			name:     "failure: branch is greater than length of child order",
+			order:    IavlSpec.InnerSpec.ChildOrder,
+			branch:   3,
+			expPos:   -1,
+			expError: fmt.Errorf("invalid branch: %d", int32(3)),
+		},
+		{
+			name:     "failure: branch not found in child order",
+			order:    []int32{0, 1, 1},
+			branch:   2,
+			expPos:   -1,
+			expError: fmt.Errorf("branch %d not found in order %v", 2, []int32{0, 1, 1}),
+		},
+	}
+
+	for _, tc := range cases {
+		tc := tc
+
+		t.Run(tc.name, func(t *testing.T) {
+			pos, err := getPosition(tc.order, tc.branch)
+			if tc.expError == nil && err != nil {
+				t.Fatal(err)
+			}
+
+			if tc.expError != nil && (err.Error() != tc.expError.Error() || pos != -1) {
+				t.Fatalf("expected: %v, got: %v", tc.expError, err)
+			}
+
+			if tc.expPos != pos {
+				t.Fatalf("expected position: %d, got: %d", tc.expPos, pos)
+			}
+		})
+
 	}
 }
