@@ -153,8 +153,6 @@ func TestInnerOpCheckAgainstSpec(t *testing.T) {
 		{
 			"failure: inner op suffix malformed",
 			func() {
-				// change spec to be non-iavl spec to skip strict iavl validation
-				spec.LeafSpec.PrehashKey = HashOp_BITCOIN
 				innerOp.Suffix = []byte{0x01}
 			},
 			fmt.Errorf("InnerOp suffix malformed"),
