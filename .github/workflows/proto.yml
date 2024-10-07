@@ -22,6 +22,7 @@ jobs:
 
   break-check:
     runs-on: ubuntu-latest
+    name: Protobuf break check
     steps:
       - uses: actions/checkout@v4
       - uses: bufbuild/buf-setup-action@v1.43.0
