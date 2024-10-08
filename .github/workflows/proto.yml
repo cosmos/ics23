@@ -15,16 +15,17 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - uses: bufbuild/buf-setup-action@v1.38.0
+      - uses: bufbuild/buf-setup-action@v1.44.0
       - uses: bufbuild/buf-lint-action@v1
         with:
           input: "proto"
 
   break-check:
     runs-on: ubuntu-latest
+    name: Protobuf break check
     steps:
       - uses: actions/checkout@v4
-      - uses: bufbuild/buf-setup-action@v1.38.0
+      - uses: bufbuild/buf-setup-action@v1.44.0
       - uses: bufbuild/buf-breaking-action@v1
         with:
           input: "proto"
