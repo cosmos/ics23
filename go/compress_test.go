@@ -114,7 +114,6 @@ func TestDecompressExist(t *testing.T) {
 			if tc.expError != nil && err.Error() != tc.expError.Error() {
 				t.Fatalf("expected: %v, got: %v", tc.expError, err)
 			}
-
 		})
 	}
 }
