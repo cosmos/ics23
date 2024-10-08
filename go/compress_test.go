@@ -43,7 +43,7 @@ func TestDecompressExist(t *testing.T) {
 		expError error
 	}{
 		{
-			"success single lookup",
+			"success: single lookup",
 			func() {
 				compressedExistProof.Path = []int32{0}
 			},
@@ -56,7 +56,7 @@ func TestDecompressExist(t *testing.T) {
 			nil,
 		},
 		{
-			"success multiple lookups",
+			"success: multiple lookups",
 			func() {
 				compressedExistProof.Path = []int32{0, 1, 0, 2}
 			},
@@ -66,6 +66,14 @@ func TestDecompressExist(t *testing.T) {
 				Leaf:  leafOp,
 				Path:  []*InnerOp{innerOps[0], innerOps[1], innerOps[0], innerOps[2]},
 			},
+			nil,
+		},
+		{
+			"success: empty exist proof",
+			func() {
+				compressedExistProof = nil
+			},
+			nil,
 			nil,
 		},
 		{
