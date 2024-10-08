@@ -97,7 +97,10 @@ func (p *CommitmentProof) Calculate() (CommitmentRoot, error) {
 			return n.Calculate()
 		}
 	case *CommitmentProof_Compressed:
-		proof := Decompress(p)
+		proof, err := Decompress(p)
+		if err != nil {
+			return nil, err
+		}
 		return proof.Calculate()
 	default:
 		return nil, errors.New("unrecognized proof type")

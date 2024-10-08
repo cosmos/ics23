@@ -35,12 +35,15 @@ type CommitmentRoot []byte
 // calculating the root for the ExistenceProof matches the provided CommitmentRoot
 func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, key []byte, value []byte) bool {
 	// decompress it before running code (no-op if not compressed)
-	proof = Decompress(proof)
+	proof, err := Decompress(proof)
+	if err != nil {
+		return false
+	}
 	ep := getExistProofForKey(proof, key)
 	if ep == nil {
 		return false
 	}
-	err := ep.Verify(spec, root, key, value)
+	err = ep.Verify(spec, root, key, value)
 	return err == nil
 }
 
@@ -51,12 +54,15 @@ func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentPro
 // provided key is between the keys of the two proofs
 func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, key []byte) bool {
 	// decompress it before running code (no-op if not compressed)
-	proof = Decompress(proof)
+	proof, err := Decompress(proof)
+	if err != nil {
+		return false
+	}
 	np := getNonExistProofForKey(spec, proof, key)
 	if np == nil {
 		return false
 	}
-	err := np.Verify(spec, root, key)
+	err = np.Verify(spec, root, key)
 	return err == nil
 }
 
@@ -64,7 +70,10 @@ func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *Commitment
 // unless there is one item, when a ExistenceProof may work)
 func BatchVerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, items map[string][]byte) bool {
 	// decompress it before running code (no-op if not compressed) - once for batch
-	proof = Decompress(proof)
+	proof, err := Decompress(proof)
+	if err != nil {
+		return false
+	}
 	for k, v := range items {
 		valid := VerifyMembership(spec, root, proof, []byte(k), v)
 		if !valid {
@@ -78,7 +87,10 @@ func BatchVerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *Commitme
 // (which should be a BatchProof, unless there is one item, when a NonExistenceProof may work)
 func BatchVerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, keys [][]byte) bool {
 	// decompress it before running code (no-op if not compressed) - once for batch
-	proof = Decompress(proof)
+	proof, err := Decompress(proof)
+	if err != nil {
+		return false
+	}
 	for _, k := range keys {
 		valid := VerifyNonMembership(spec, root, proof, k)
 		if !valid {
@@ -113,7 +125,10 @@ func CombineProofs(proofs []*CommitmentProof) (*CommitmentProof, error) {
 		} else if batch := proof.GetBatch(); batch != nil {
 			entries = append(entries, batch.Entries...)
 		} else if comp := proof.GetCompressed(); comp != nil {
-			decomp := Decompress(proof)
+			decomp, err := Decompress(proof)
+			if err != nil {
+				return nil, err
+			}
 			entries = append(entries, decomp.GetBatch().Entries...)
 		} else {
 			return nil, fmt.Errorf("proof neither exist or nonexist: %#v", proof.GetProof())

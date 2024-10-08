@@ -1,5 +1,7 @@
 package ics23
 
+import "fmt"
+
 // IsCompressed returns true if the proof was compressed
 func IsCompressed(proof *CommitmentProof) bool {
 	return proof.GetCompressed() != nil
@@ -23,16 +25,20 @@ func Compress(proof *CommitmentProof) *CommitmentProof {
 // Decompress will return a BatchProof if the input is CompressedBatchProof
 // Otherwise it will return the input.
 // This is safe to call multiple times (idempotent)
-func Decompress(proof *CommitmentProof) *CommitmentProof {
+func Decompress(proof *CommitmentProof) (*CommitmentProof, error) {
 	comp := proof.GetCompressed()
 	if comp != nil {
+		batch, err := decompress(comp)
+		if err != nil {
+			return nil, err
+		}
 		return &CommitmentProof{
 			Proof: &CommitmentProof_Batch{
-				Batch: decompress(comp),
+				Batch: batch,
 			},
-		}
+		}, nil
 	}
-	return proof
+	return proof, nil
 }
 
 func compress(batch *BatchProof) *CompressedBatchProof {
@@ -106,45 +112,62 @@ func compressStep(step *InnerOp, lookup *[]*InnerOp, registry map[string]int32) 
 	return num
 }
 
-func decompress(comp *CompressedBatchProof) *BatchProof {
+func decompress(comp *CompressedBatchProof) (*BatchProof, error) {
 	lookup := comp.LookupInners
 
 	var entries []*BatchEntry
 
 	for _, centry := range comp.Entries {
-		entry := decompressEntry(centry, lookup)
+		entry, err := decompressEntry(centry, lookup)
+		if err != nil {
+			return nil, err
+		}
 		entries = append(entries, entry)
 	}
 
 	return &BatchProof{
 		Entries: entries,
-	}
+	}, nil
 }
 
-func decompressEntry(entry *CompressedBatchEntry, lookup []*InnerOp) *BatchEntry {
+func decompressEntry(entry *CompressedBatchEntry, lookup []*InnerOp) (*BatchEntry, error) {
 	if exist := entry.GetExist(); exist != nil {
+		decompressedExist, err := decompressExist(exist, lookup)
+		if err != nil {
+			return nil, err
+		}
 		return &BatchEntry{
 			Proof: &BatchEntry_Exist{
-				Exist: decompressExist(exist, lookup),
+				Exist: decompressedExist,
 			},
-		}
+		}, nil
 	}
 
 	non := entry.GetNonexist()
+	decompressedLeft, err := decompressExist(non.Left, lookup)
+	if err != nil {
+		return nil, err
+	}
+
+	decompressedRight, err := decompressExist(non.Right, lookup)
+	if err != nil {
+		return nil, err
+	}
+
 	return &BatchEntry{
 		Proof: &BatchEntry_Nonexist{
 			Nonexist: &NonExistenceProof{
 				Key:   non.Key,
-				Left:  decompressExist(non.Left, lookup),
-				Right: decompressExist(non.Right, lookup),
+				Left:  decompressedLeft,
+				Right: decompressedRight,
 			},
 		},
-	}
+	}, nil
 }
 
-func decompressExist(exist *CompressedExistenceProof, lookup []*InnerOp) *ExistenceProof {
+func decompressExist(exist *CompressedExistenceProof, lookup []*InnerOp) (*ExistenceProof, error) {
 	if exist == nil {
-		return nil
+		return nil, nil
 	}
 	res := &ExistenceProof{
 		Key:   exist.Key,
@@ -153,9 +176,10 @@ func decompressExist(exist *CompressedExistenceProof, lookup []*InnerOp) *Existe
 		Path:  make([]*InnerOp, len(exist.Path)),
 	}
 	for i, step := range exist.Path {
-		if int(step) < len(lookup) {
-			res.Path[i] = lookup[step]
+		if int(step) >= len(lookup) {
+			return nil, fmt.Errorf("compressed existence proof at index %d has lookup index out of bounds", i)
 		}
+		res.Path[i] = lookup[step]
 	}
-	return res
+	return res, nil
 }

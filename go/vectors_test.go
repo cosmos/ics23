@@ -83,7 +83,10 @@ func TestDecompressBatchVectors(t *testing.T) {
 				t.Fatalf("Marshal batch %v", err)
 			}
 
-			decomp := Decompress(tc)
+			decomp, err := Decompress(tc)
+			if err != nil {
+				t.Fatalf("Failed to decompress test case")
+			}
 			if decomp == tc {
 				t.Fatalf("Decompression is a no-op")
 			}
