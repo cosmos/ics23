@@ -15,16 +15,16 @@ func TestDecompressExist(t *testing.T) {
 		Prefix:       []byte{},
 	}
 	innerOps := []*InnerOp{
-		&InnerOp{
+		{
 			Hash:   HashOp_SHA256,
 			Prefix: generateInnerOpPrefix(),
 		},
-		&InnerOp{
+		{
 			Hash:   HashOp_SHA256,
 			Prefix: generateInnerOpPrefix(),
 			Suffix: []byte{1},
 		},
-		&InnerOp{
+		{
 			Hash:   HashOp_SHA256,
 			Prefix: generateInnerOpPrefix(),
 			Suffix: []byte{2},
@@ -98,7 +98,7 @@ func TestDecompressExist(t *testing.T) {
 				Leaf:  leafOp,
 			}
 
-			lookup = innerOps[:]
+			lookup = innerOps
 
 			tc.malleate()
 
