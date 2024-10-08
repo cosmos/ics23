@@ -4,7 +4,7 @@
 
 - deps: bump golang to v1.22 ([#363](https://github.com/cosmos/ics23/pull/363)).
 - fix: guarantee that `spec.InnerSpec.MaxPrefixLength` < `spec.InnerSpec.MinPrefixLength` + `spec.InnerSpec.ChildSize` ([#369](https://github.com/cosmos/ics23/pull/369))
-- imp: change out of bound inner op lookups in compressed batch proofs to error returns. The `Decompress` function now returns an error, along with `decompress`, `decompressEntry`, and `decompressExist`. 
+- imp: change panics on out of bound inner op lookups in compressed batch proofs to error returns. The `Decompress` function now returns an error, along with `decompress`, `decompressEntry`, and `decompressExist`. 
 
 # v0.11.0
 
