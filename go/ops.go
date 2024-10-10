@@ -32,7 +32,7 @@ func validateIavlOps(op opType, layerNum int) error {
 		return err
 	}
 	if int(height) < 0 || int(height) < layerNum {
-		return fmt.Errorf("IAVL height (%d) must be non-negative and less than the layer number (%d)", height, layerNum)
+		return fmt.Errorf("IAVL height (%d) must be non-negative and greater than or equal to the layer number (%d)", height, layerNum)
 	}
 
 	size, err := binary.ReadVarint(r)

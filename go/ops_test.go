@@ -114,7 +114,7 @@ func TestInnerOpCheckAgainstSpec(t *testing.T) {
 			func() {
 				innerOp.Prefix = []byte{0x01}
 			},
-			fmt.Errorf("IAVL height (-1) must be non-negative and less than the layer number (1)"),
+			fmt.Errorf("IAVL height (-1) must be non-negative and greater than or equal to the layer number (1)"),
 		},
 		{
 			"failure: inner prefix starts with leaf prefix",
