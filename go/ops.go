@@ -20,38 +20,56 @@ import (
 	_ "golang.org/x/crypto/ripemd160" //nolint:staticcheck
 )
 
-// validate the IAVL Ops
-func validateIavlOps(op opType, b int) error {
+// validateIavlOps validates the prefix to ensure it begins with
+// the height, size, and version of the IAVL tree. Each varint must be a bounded value.
+// In addition, the remaining bytes are validated to ensure they correspond to the correct
+// length.
+func validateIavlOps(op opType, layerNum int) error {
 	r := bytes.NewReader(op.GetPrefix())
 
-	values := []int64{}
-	for i := 0; i < 3; i++ {
-		varInt, err := binary.ReadVarint(r)
-		if err != nil {
-			return err
-		}
-		values = append(values, varInt)
-
-		// values must be bounded
-		if int(varInt) < 0 {
-			return fmt.Errorf("wrong value in IAVL leaf op")
-		}
+	height, err := binary.ReadVarint(r)
+	if err != nil {
+		return err
 	}
-	if int(values[0]) < b {
-		return fmt.Errorf("wrong value in IAVL leaf op")
+	if int(height) < 0 || int(height) < layerNum {
+		return fmt.Errorf("IAVL height (%d) must be non-negative and less than the layer number (%d)", height, layerNum)
 	}
 
-	r2 := r.Len()
-	if b == 0 {
-		if r2 != 0 {
-			return fmt.Errorf("invalid op")
+	size, err := binary.ReadVarint(r)
+	if err != nil {
+		return err
+	}
+
+	if int(size) < 0 {
+		return fmt.Errorf("IAVL size must be non-negative")
+	}
+
+	version, err := binary.ReadVarint(r)
+	if err != nil {
+		return err
+	}
+
+	if int(version) < 0 {
+		return fmt.Errorf("IAVL version must be non-negative")
+	}
+
+	// grab the length of the remainder of the prefix
+	remLen := r.Len()
+	if layerNum == 0 {
+		if remLen != 0 {
+			return fmt.Errorf("expected remaining prefix to be 0, got: %d", r2)
 		}
 	} else {
-		if !(r2^(0xff&0x01) == 0 || r2 == (0xde+int('v'))/10) {
+		// when the child comes from the left, the suffix if filled in
+		// prefix: height | size | version | length byte (1 remainder)
+		//
+		// when the child comes from the right, the suffix is empty
+		// prefix: height | size | version | length byte | 32 byte hash | next length byte (34 remainder)
+		if remLen != 1 && remLen != 34 {
 			return fmt.Errorf("invalid op")
 		}
-		if op.GetHash()^1 != 0 {
-			return fmt.Errorf("invalid op")
+		if op.GetHash() != HashOp_SHA256 {
+			return fmt.Errorf("IAVL hash op must be %v", HashOp_SHA256)
 		}
 	}
 	return nil
