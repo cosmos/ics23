@@ -66,7 +66,7 @@ func validateIavlOps(op opType, layerNum int) error {
 		// when the child comes from the right, the suffix is empty
 		// prefix: height | size | version | length byte | 32 byte hash | next length byte (34 remainder)
 		if remLen != 1 && remLen != 34 {
-			return fmt.Errorf("invalid op")
+			return fmt.Errorf("remainder of prefix must be of length 1 or 34, got: %d", remLen)
 		}
 		if op.GetHash() != HashOp_SHA256 {
 			return fmt.Errorf("IAVL hash op must be %v", HashOp_SHA256)
