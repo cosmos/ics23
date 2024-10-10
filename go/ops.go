@@ -57,7 +57,7 @@ func validateIavlOps(op opType, layerNum int) error {
 	remLen := r.Len()
 	if layerNum == 0 {
 		if remLen != 0 {
-			return fmt.Errorf("expected remaining prefix to be 0, got: %d", remLen)
+			return fmt.Errorf("expected remaining prefix length to be 0, got: %d", remLen)
 		}
 	} else {
 		// when the child comes from the left, the suffix if filled in
