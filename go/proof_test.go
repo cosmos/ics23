@@ -52,7 +52,7 @@ func TestCheckAgainstSpec(t *testing.T) {
 			if tc.Err == "" && err != nil {
 				t.Fatalf("Unexpected error: %v", err)
 			} else if tc.Err != "" && tc.Err != err.Error() {
-				t.Fatalf("Expected error: %s, got %s", tc.Err, err.Error())
+				t.Fatalf("Expected error: %s, got: %s", tc.Err, err.Error())
 			}
 		})
 	}
