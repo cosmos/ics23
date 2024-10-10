@@ -166,6 +166,8 @@ func decompressEntry(entry *CompressedBatchEntry, lookup []*InnerOp) (*BatchEntr
 }
 
 func decompressExist(exist *CompressedExistenceProof, lookup []*InnerOp) (*ExistenceProof, error) {
+	// when proving non-existence, if we are proving the leftmost key or rightmost key,
+	// the left existence proof or right existence proof will be nil, so we safely return.
 	if exist == nil {
 		return nil, nil
 	}
