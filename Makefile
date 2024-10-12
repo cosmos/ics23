@@ -7,12 +7,12 @@ include go/Makefile
 
 
 ##### Protobuf #####
-protoVer=0.11.2
+protoVer=0.14.0
 protoImageName=ghcr.io/cosmos/proto-builder:$(protoVer)
 protoImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(protoImageName)
 
 ##### Rust #####
-rustVer=1.65-slim
+rustVer=1.71
 rustImageName=rust:$(rustVer)
 rustImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(rustImageName)
 
