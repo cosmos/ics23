@@ -9,6 +9,124 @@ import (
 	"testing"
 )
 
+func TestValidateIavlOps(t *testing.T) {
+	var (
+		op       opType
+		layerNum int
+	)
+	cases := []struct {
+		name     string
+		malleate func()
+		expError error
+	}{
+		{
+			"success",
+			func() {},
+			nil,
+		},
+		{
+			"failure: reading varint",
+			func() {
+				op.(*InnerOp).Prefix = []byte{}
+			},
+			errors.New("failed to read IAVL height varint: EOF"),
+		},
+		{
+			"failure: invalid height value",
+			func() {
+				op.(*InnerOp).Prefix = []byte{1}
+			},
+			errors.New("IAVL height (-1) must be non-negative and greater than or equal to the layer number (1)"),
+		},
+		{
+			"failure: invalid size varint",
+			func() {
+				var varintBuf [binary.MaxVarintLen64]byte
+				prefix := convertVarIntToBytes(int64(5), varintBuf)
+				op.(*InnerOp).Prefix = prefix
+			},
+			errors.New("failed to read IAVL size varint: EOF"),
+		},
+		{
+			"failure: invalid size value",
+			func() {
+				var varintBuf [binary.MaxVarintLen64]byte
+				prefix := convertVarIntToBytes(int64(5), varintBuf)
+				prefix = append(prefix, convertVarIntToBytes(int64(-1), varintBuf)...) // size
+				op.(*InnerOp).Prefix = prefix
+			},
+			errors.New("IAVL size must be non-negative"),
+		},
+		{
+			"failure: invalid version varint",
+			func() {
+				var varintBuf [binary.MaxVarintLen64]byte
+				prefix := convertVarIntToBytes(int64(5), varintBuf)
+				prefix = append(prefix, convertVarIntToBytes(int64(10), varintBuf)...)
+				op.(*InnerOp).Prefix = prefix
+			},
+			errors.New("failed to read IAVL version varint: EOF"),
+		},
+		{
+			"failure: invalid version value",
+			func() {
+				var varintBuf [binary.MaxVarintLen64]byte
+				prefix := convertVarIntToBytes(int64(5), varintBuf)
+				prefix = append(prefix, convertVarIntToBytes(int64(10), varintBuf)...)
+				prefix = append(prefix, convertVarIntToBytes(int64(-1), varintBuf)...) // version
+				op.(*InnerOp).Prefix = prefix
+			},
+			errors.New("IAVL version must be non-negative"),
+		},
+		{
+			"failure: invalid remaining length with layer number is 0",
+			func() {
+				layerNum = 0
+			},
+			fmt.Errorf("expected remaining prefix length to be 0, got: 1"),
+		},
+		{
+			"failure: invalid reminaing length with non-zero layer number",
+			func() {
+				layerNum = 1
+				op.(*InnerOp).Prefix = append(op.(*InnerOp).Prefix, []byte{1}...)
+			},
+			fmt.Errorf("remainder of prefix must be of length 1 or 34, got: 2"),
+		},
+		{
+			"failure: invalid hash",
+			func() {
+				op.(*InnerOp).Hash = HashOp_NO_HASH
+			},
+			fmt.Errorf("IAVL hash op must be %v", HashOp_SHA256),
+		},
+	}
+	for _, tc := range cases {
+		tc := tc
+
+		t.Run(tc.name, func(t *testing.T) {
+			op = &InnerOp{
+				Hash:   HashOp_SHA256,
+				Prefix: generateInnerOpPrefix(),
+				Suffix: []byte(""),
+			}
+			layerNum = 1
+
+			tc.malleate()
+
+			err := validateIavlOps(op, layerNum)
+			if tc.expError == nil && err != nil {
+				t.Fatal(err)
+			}
+
+			if tc.expError != nil && err.Error() != tc.expError.Error() {
+				t.Fatalf("expected: %v, got: %v", tc.expError, err)
+			}
+		})
+
+	}
+}
+
 func TestLeafOp(t *testing.T) {
 	cases := LeafOpTestData(t)
 

@@ -29,7 +29,7 @@ func validateIavlOps(op opType, layerNum int) error {
 
 	height, err := binary.ReadVarint(r)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to read IAVL height varint: %w", err)
 	}
 	if int(height) < 0 || int(height) < layerNum {
 		return fmt.Errorf("IAVL height (%d) must be non-negative and greater than or equal to the layer number (%d)", height, layerNum)
@@ -37,7 +37,7 @@ func validateIavlOps(op opType, layerNum int) error {
 
 	size, err := binary.ReadVarint(r)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to read IAVL size varint: %w", err)
 	}
 
 	if int(size) < 0 {
@@ -46,7 +46,7 @@ func validateIavlOps(op opType, layerNum int) error {
 
 	version, err := binary.ReadVarint(r)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to read IAVL version varint: %w", err)
 	}
 
 	if int(version) < 0 {
