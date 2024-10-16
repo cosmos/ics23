@@ -166,6 +166,10 @@ func (op *InnerOp) CheckAgainstSpec(spec *ProofSpec, b int) error {
 		return errors.New("spec.InnerSpec.ChildSize must be >= 1")
 	}
 
+	if spec.InnerSpec.MaxPrefixLength >= spec.InnerSpec.MinPrefixLength+spec.InnerSpec.ChildSize {
+		return errors.New("spec.InnerSpec.MaxPrefixLength must be < spec.InnerSpec.MinPrefixLength + spec.InnerSpec.ChildSize")
+	}
+
 	// ensures soundness, with suffix having to be of correct length
 	if len(op.Suffix)%int(spec.InnerSpec.ChildSize) != 0 {
 		return fmt.Errorf("InnerOp suffix malformed")
@@ -186,41 +190,17 @@ func doHash(hashOp HashOp, preimage []byte) ([]byte, error) {
 		return hashBz(crypto.RIPEMD160, preimage)
 	case HashOp_BITCOIN:
 		// ripemd160(sha256(x))
-		sha := crypto.SHA256.New()
-		_, err := sha.Write(preimage)
+		tmp, err := hashBz(crypto.SHA256, preimage)
 		if err != nil {
 			return nil, err
 		}
-		tmp := sha.Sum(nil)
-		bitcoinHash := crypto.RIPEMD160.New()
-		_, err = bitcoinHash.Write(tmp)
-		if err != nil {
-			return nil, err
-		}
-		return bitcoinHash.Sum(nil), nil
+		return hashBz(crypto.RIPEMD160, tmp)
 	case HashOp_SHA512_256:
-		shaHash := crypto.SHA512_256.New()
-		_, err := shaHash.Write(preimage)
-		if err != nil {
-			return nil, err
-		}
-		return shaHash.Sum(nil), nil
+		return hashBz(crypto.SHA512_256, preimage)
 	case HashOp_BLAKE2B_512:
-		blakeHash := crypto.BLAKE2b_512.New()
-		_, err := blakeHash.Write(preimage)
-		if err != nil {
-			return nil, err
-		}
-		return blakeHash.Sum(nil), nil
+		return hashBz(crypto.BLAKE2b_512, preimage)
 	case HashOp_BLAKE2S_256:
-		blakeHash := crypto.BLAKE2s_256.New()
-		_, err := blakeHash.Write(preimage)
-		if err != nil {
-			return nil, err
-		}
-		return blakeHash.Sum(nil), nil
-		// TODO: there doesn't seem to be an "official" implementation of BLAKE3 in Go,
-		// so we are unable to support it for now
+		return hashBz(crypto.BLAKE2s_256, preimage)
 	}
 	return nil, fmt.Errorf("unsupported hashop: %d", hashOp)
 }

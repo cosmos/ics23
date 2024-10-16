@@ -7,16 +7,16 @@
         "hash": 1,
         "prehash_value": 1,
         "length": 1,
-        "prefix": "AA=="
+        "prefix": "AAKKAQ=="
       },
       "path": [
         {
           "hash": 1,
-          "prefix": "qrvM3Q=="
+          "prefix": "AgQIIGe3bHuC1g6+5/Qd0RoCU0waFu+nDCFzEDViMN/VrQwgIA=="
         },
         {
           "hash": 1,
-          "prefix": "qrvM3Q=="
+          "prefix": "BAYIIA=="
         }
       ]
     },
@@ -38,7 +38,7 @@
         "hash": 1
       }
     },
-    "IsErr": false
+    "Err": ""
   },
   "accepts one proper leaf": {
     "Proof": {
@@ -48,7 +48,7 @@
         "hash": 1,
         "prehash_value": 1,
         "length": 1,
-        "prefix": "AA=="
+        "prefix": "AAKKAQ=="
       }
     },
     "Spec": {
@@ -69,7 +69,7 @@
         "hash": 1
       }
     },
-    "IsErr": false
+    "Err": ""
   },
   "allows depth limited in proper range": {
     "Proof": {
@@ -79,20 +79,20 @@
         "hash": 1,
         "prehash_value": 1,
         "length": 1,
-        "prefix": "AA=="
+        "prefix": "AAKKAQ=="
       },
       "path": [
         {
           "hash": 1,
-          "prefix": "qrvM3Q=="
+          "prefix": "AgQIIGe3bHuC1g6+5/Qd0RoCU0waFu+nDCFzEDViMN/VrQwgIA=="
         },
         {
           "hash": 1,
-          "prefix": "qrvM3Q=="
+          "prefix": "BAYIIA=="
         },
         {
           "hash": 1,
-          "prefix": "qrvM3Q=="
+          "prefix": "BgwKIA=="
         }
       ]
     },
@@ -116,7 +116,7 @@
       "max_depth": 4,
       "min_depth": 2
     },
-    "IsErr": false
+    "Err": ""
   },
   "empty proof fails": {
     "Proof": {
@@ -141,7 +141,7 @@
         "hash": 1
       }
     },
-    "IsErr": true
+    "Err": "existence Proof needs defined LeafOp"
   },
   "reject depth limited with too few inner nodes": {
     "Proof": {
@@ -151,7 +151,7 @@
         "hash": 1,
         "prehash_value": 1,
         "length": 1,
-        "prefix": "AA=="
+        "prefix": "AAKKAQ=="
       },
       "path": [
         {
@@ -180,7 +180,7 @@
       "max_depth": 4,
       "min_depth": 2
     },
-    "IsErr": true
+    "Err": "innerOps depth too short: 1"
   },
   "reject depth limited with too many inner nodes": {
     "Proof": {
@@ -190,7 +190,7 @@
         "hash": 1,
         "prehash_value": 1,
         "length": 1,
-        "prefix": "AA=="
+        "prefix": "AAKKAQ=="
       },
       "path": [
         {
@@ -235,7 +235,558 @@
       "max_depth": 4,
       "min_depth": 2
     },
-    "IsErr": true
+    "Err": "innerOps depth too long: 5"
+  },
+  "reject too many inner nodes (129) using default limited depth (128)": {
+    "Proof": {
+      "key": "Zm9vZA==",
+      "value": "YmFy",
+      "leaf": {
+        "hash": 1,
+        "prehash_value": 1,
+        "length": 1,
+        "prefix": "AAKKAQ=="
+      },
+      "path": [
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        }, 
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        },
+        {
+          "hash": 1,
+          "prefix": "qrvM3Q=="
+        }
+      ]
+    },
+    "Spec": {
+      "leaf_spec": {
+        "hash": 1,
+        "prehash_value": 1,
+        "length": 1,
+        "prefix": "AA=="
+      },
+      "inner_spec": {
+        "child_order": [
+          0,
+          1
+        ],
+        "child_size": 33,
+        "min_prefix_length": 4,
+        "max_prefix_length": 12,
+        "hash": 1
+      },
+      "max_depth": 0,
+      "min_depth": 2
+    },
+    "Err": "innerOps depth too long: 129"
   },
   "rejects invalid inner proof (hash mismatch)": {
     "Proof": {
@@ -245,7 +796,7 @@
         "hash": 1,
         "prehash_value": 1,
         "length": 1,
-        "prefix": "AA=="
+        "prefix": "AAKKAQ=="
       },
       "path": [
         {
@@ -280,7 +831,7 @@
         "hash": 1
       }
     },
-    "IsErr": true
+    "Err": "inner, unexpected HashOp: 2"
   },
   "rejects invalid leaf": {
     "Proof": {
@@ -289,7 +840,7 @@
       "leaf": {
         "hash": 1,
         "length": 1,
-        "prefix": "AA=="
+        "prefix": "AAKKAQ=="
       }
     },
     "Spec": {
@@ -310,7 +861,7 @@
         "hash": 1
       }
     },
-    "IsErr": true
+    "Err": "leaf, unexpected PrehashValue: 0"
   },
   "rejects leaf with invalid inner proofs": {
     "Proof": {
@@ -320,23 +871,23 @@
         "hash": 1,
         "prehash_value": 1,
         "length": 1,
-        "prefix": "AA=="
+        "prefix": "AAKKAQ=="
       },
       "path": [
         {
           "hash": 1,
-          "prefix": "qrvM3Q=="
+          "prefix": "AgQIIGe3bHuC1g6+5/Qd0RoCU0waFu+nDCFzEDViMN/VrQwgIA=="
         },
+        {
+          "hash": 1,
+          "prefix": "BAYIIA=="
+        }, 
         {
           "hash": 1,
           "prefix": "AKq7zN0=",
           "suffix": "uw=="
-        },
-        {
-          "hash": 1,
-          "prefix": "qrvM3Q=="
         }
-      ]
+    ]
     },
     "Spec": {
       "leaf_spec": {
@@ -356,15 +907,21 @@
         "hash": 1
       }
     },
-    "IsErr": true
+    "Err": "inner, unexpected EOF"
   },
-  "rejects only inner proof": {
+  "rejects only inner proof (hash mismatch)": {
     "Proof": {
       "key": "Zm9vZA==",
       "value": "YmFy",
+      "leaf": {
+        "hash": 1,
+        "prehash_value": 1,
+        "length": 1,
+        "prefix": "AAKKAQ=="
+      },
       "path": [
         {
-          "hash": 1,
+          "hash": 0,
           "prefix": "qrvM3Q=="
         }
       ]
@@ -387,6 +944,6 @@
         "hash": 1
       }
     },
-    "IsErr": true
+    "Err": "inner, unexpected HashOp: 0"
   }
 }

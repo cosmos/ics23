@@ -202,6 +202,14 @@ fn ensure_inner(inner: &ics23::InnerOp, spec: &ics23::ProofSpec) -> Result<()> {
                 inner.prefix.len(),
             );
             ensure!(
+                inner_spec.child_size > 0,
+                "spec.inner_spec.child_size must be >= 1"
+            );
+            ensure!(
+                inner_spec.max_prefix_length < inner_spec.min_prefix_length + inner_spec.child_size,
+                "spec.inner_spec.max_prefix_length must be < spec.inner_spec.min_prefix_length + spec.inner_spec.child_size"
+            );
+            ensure!(
                 inner.suffix.len() % (inner_spec.child_size as usize) == 0,
                 "InnerOp suffix malformed"
             );
@@ -480,6 +488,13 @@ mod tests {
         depth_limited_spec.min_depth = 2;
         depth_limited_spec.max_depth = 4;
 
+        let mut max_prefix_length_too_large_spec = api::iavl_spec();
+        let inner_spec = max_prefix_length_too_large_spec
+            .inner_spec
+            .as_mut()
+            .unwrap();
+        inner_spec.max_prefix_length = 100;
+
         let cases: HashMap<&'static str, ExistenceCase> = [
             (
                 "empty proof fails",
@@ -608,16 +623,29 @@ mod tests {
                     proof: ExistenceProof {
                         key: b"foo".to_vec(),
                         value: b"bar".to_vec(),
-                        leaf: Some(leaf),
+                        leaf: Some(leaf.clone()),
                         path: vec![
                             valid_inner.clone(),
                             valid_inner.clone(),
                             valid_inner.clone(),
                             valid_inner.clone(),
-                            valid_inner,
+                            valid_inner.clone(),
                         ],
                     },
                     spec: depth_limited_spec,
+                    valid: false,
+                },
+            ),
+            (
+                "rejects inner spec with max prefix length >= min prefix length + child size",
+                ExistenceCase {
+                    proof: ExistenceProof {
+                        key: b"foo".to_vec(),
+                        value: b"bar".to_vec(),
+                        leaf: Some(leaf),
+                        path: vec![valid_inner],
+                    },
+                    spec: max_prefix_length_too_large_spec,
                     valid: false,
                 },
             ),

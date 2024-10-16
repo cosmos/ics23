@@ -163,6 +163,7 @@ message ProofSpec {
   LeafOp    leaf_spec  = 1;
   InnerSpec inner_spec = 2;
   // max_depth (if > 0) is the maximum number of InnerOps allowed (mainly for fixed-depth tries)
+  // the max_depth is interpreted as 128 if set to 0
   int32 max_depth = 3;
   // min_depth (if > 0) is the minimum number of InnerOps allowed (mainly for fixed-depth tries)
   int32 min_depth = 4;
@@ -189,7 +190,8 @@ message InnerSpec {
   repeated int32 child_order       = 1;
   int32          child_size        = 2;
   int32          min_prefix_length = 3;
-  int32          max_prefix_length = 4;
+  // the max prefix length must be less than the minimum prefix length + child size
+  int32 max_prefix_length = 4;
   // empty child is the prehash image that is used when one child is nil (eg. 20 bytes of 0)
   bytes empty_child = 5;
   // hash is the algorithm that must be used for each InnerOp

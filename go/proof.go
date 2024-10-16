@@ -190,7 +190,13 @@ func (p *ExistenceProof) CheckAgainstSpec(spec *ProofSpec) error {
 	if spec.MinDepth > 0 && len(p.Path) < int(spec.MinDepth) {
 		return fmt.Errorf("innerOps depth too short: %d", len(p.Path))
 	}
-	if spec.MaxDepth > 0 && len(p.Path) > int(spec.MaxDepth) {
+
+	maxDepth := spec.MaxDepth
+	if maxDepth == 0 {
+		maxDepth = 128
+	}
+
+	if len(p.Path) > int(maxDepth) {
 		return fmt.Errorf("innerOps depth too long: %d", len(p.Path))
 	}
 
