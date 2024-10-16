@@ -1,6 +1,6 @@
 # ICS 23
 
-As already stated in the README.md, ics23 attempts to be a generic library to represent and verify merkle proofs for (ideally) many different merkle tree storage implementations. The library is heavily used in [ibc-go](https://github.com/cosmos/ibc-go) for proof verification. The following documentation uses the Golang implementation as a reference.
+As already stated in the README.md, ICS 23 attempts to be a generic library to represent and verify merkle proofs for (ideally) many different merkle tree storage implementations. The library is heavily used in [ibc-go](https://github.com/cosmos/ibc-go) for proof verification. The following documentation uses the Golang implementation as a reference.
 
 The two most important top level types in the library are `ProofSpec` and `CommitmmentProof`. We will explain them in the coming sections.
 
