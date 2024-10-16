@@ -6,7 +6,7 @@ The two most important top level types in the library are `ProofSpec` and `Commi
 
 ## Proof specs
 
-The [`ProofSpec`](https://github.com/cosmos/ics23/blob/go/v0.10.0/proto/cosmos/ics23/v1/proofs.proto#L145-L170) message defines what the expected parameters are for a given proof type. Different types of merkle trees will have different proof specs. For example, for [IAVL](https://github.com/cosmos/iavl) trees, [this](https://github.com/cosmos/ics23/blob/go/v0.10.0/go/proof.go#L9-L26) is the corresponding proof spec. The proof spec defines any contraints (e.g. minimum and maximum allowed depth of trees), what data should added (e.g. prefix or suffix data), what operations are executed on [leaf](https://github.com/cosmos/ics23/blob/go/v0.10.0/proto/cosmos/ics23/v1/proofs.proto#L96-L120) and [inner](https://github.com/cosmos/ics23/blob/go/v0.10.0/proto/cosmos/ics23/v1/proofs.proto#L172-L194) nodes of the tree when calculating the root hash, etc. 
+The [`ProofSpec`](https://github.com/cosmos/ics23/blob/go/v0.10.0/proto/cosmos/ics23/v1/proofs.proto#L145-L170) message defines what the expected parameters are for a given proof type. Different types of merkle trees will have different proof specs. For example, for [IAVL](https://github.com/cosmos/iavl) trees, [this](https://github.com/cosmos/ics23/blob/go/v0.10.0/go/proof.go#L9-L26) is the corresponding proof spec. The proof spec defines any contraints (e.g. minimum and maximum allowed depth of trees), what data should be added (e.g. prefix or suffix data), what operations are executed on [leaf](https://github.com/cosmos/ics23/blob/go/v0.10.0/proto/cosmos/ics23/v1/proofs.proto#L96-L120) and [inner](https://github.com/cosmos/ics23/blob/go/v0.10.0/proto/cosmos/ics23/v1/proofs.proto#L172-L194) nodes of the tree when calculating the root hash, etc. 
 
 ```proto
 message ProofSpec {
@@ -22,9 +22,9 @@ where:
 
 - `max_depth` is the maximum number of inner nodes in the tree.
 - `min-depth` is the minimum number of inner nodes in the tree.
-- `prehash_key_before_comparison` is a flag that indicates whether to use the `prehash_key` hash operation specified in the `leaf_spec`. This is used to compare lexical ordering of keys for non-existence proofs.
+- `prehash_key_before_comparison` is a flag that indicates whether to prehash the key using the `prehash_key` hash operation specified in the `leaf_spec`. This is used to compare lexical ordering of keys for non-existence proofs.
 
-The `leaf_spec` is a [`LeafOp`](https://github.com/cosmos/ics23/blob/go/v0.10.0/proto/cosmos/ics23/v1/proofs.proto#L96-L120). The `LeafOp` type specifies the internal transformation from the original key/value pair of the leaf node into a hash. It specifies any prefix that should prepended and the hash operations to may transform the key and value, among other things:
+The `leaf_spec` is a [`LeafOp`](https://github.com/cosmos/ics23/blob/go/v0.10.0/proto/cosmos/ics23/v1/proofs.proto#L96-L120). The `LeafOp` type specifies the internal transformation from the original key/value pair of the leaf node into a hash. It specifies any prefix that should prepended and the hash operations to transform the key and value, among other things:
 
 ```proto
 message LeafOp {
@@ -61,9 +61,9 @@ message InnerSpec {
 where:
 
 - `child_order` is the ordering of the children node and counts from 0. For example, for an IAVL tree is [0, 1] (left, then right); for a merk tree is [0, 2, 1] (left, right, here).
-- `child_size`
-- `min_prefix_length`
-- `max_prefix_length`
+- `child_size` is the size of the child node when calculating the root hash. For example, the child size for an [IAVL tree](https://github.com/cosmos/ics23/blob/4fd3a5af9a290e80bca166fd40f0ef316e167245/go/proof.go#L22) is 33, as the child is: `length op (1 byte) | child_hash (32 bytes)`
+- `min_prefix_length` is the minimum allowed prefix length. For example, for an IAVL tree the `min_prefix_length` is [4](https://github.com/cosmos/ics23/blob/4fd3a5af9a290e80bca166fd40f0ef316e167245/go/proof.go#L20). This derives from the logic that when the child comes from the left, the prefix is: `IAVL height | IAVL size | IAVL version | length byte`
+- `max_prefix_length` is the maximum allowed prefix length. It must be strictly less than the `min_prefix_length` + `child_size`.
 - `empty_child` is the prehash image that is used when one child is `nil`.
 - `hash` is the hashing algorithm that must be used in each element of an `InnerOp` list in an `ExistenceProof`.
 
@@ -113,8 +113,8 @@ message InnerOp {
 where:
 
 - `hash` is the hash operation that is applied to the result of `(prefix || child || suffix)`, where the `||` operator is concatenation of binary data and where `child` the result of hashing all the tree below this step.
-- `prefix` is is a fixed set of bytes that may optionally be prepended to differentiate from lead nodes.
-- `suffix` is a fixed set of bytes that may optionally be appended  to differentiate from leaf nodes.
+- `prefix` is is a fixed set of bytes that may optionally be prepended to differentiate leaf nodes from inner nodes.
+- `suffix` is a fixed set of bytes that may optionally be appended to differentiate leaf nodes from inner nodes.
 
 We will explain more details of the different supported proof types in the following sections, where we see an example of how each proof type is used.
 
@@ -222,4 +222,4 @@ The result from the last inner operation can be compared against the input root 
 
 ## Non-membership verification
 
-TODO
+TODO: https://github.com/cosmos/ics23/issues/385 
