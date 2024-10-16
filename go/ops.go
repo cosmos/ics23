@@ -23,7 +23,7 @@ import (
 // validateIavlOps validates the prefix to ensure it begins with
 // the height, size, and version of the IAVL tree. Each varint must be a bounded value.
 // In addition, the remaining bytes are validated to ensure they correspond to the correct
-// length. The layerNum is the tree depth.
+// length. The layerNum is the inverse of the tree depth, i.e. depth=0 means leaf, depth>=1 means inner node
 func validateIavlOps(op opType, layerNum int) error {
 	r := bytes.NewReader(op.GetPrefix())
 
