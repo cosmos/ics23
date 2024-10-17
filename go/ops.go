@@ -120,7 +120,7 @@ func (op *LeafOp) CheckAgainstSpec(spec *ProofSpec) error {
 		return errors.New("spec.LeafSpec must be non-nil")
 	}
 
-	if validateSpec(spec) {
+	if spec.SpecEquals(IavlSpec) {
 		err := validateIavlOps(op, 0)
 		if err != nil {
 			return err
@@ -161,7 +161,7 @@ func (op *InnerOp) CheckAgainstSpec(spec *ProofSpec, b int) error {
 		return fmt.Errorf("unexpected HashOp: %d", op.Hash)
 	}
 
-	if validateSpec(spec) {
+	if spec.SpecEquals(IavlSpec) {
 		err := validateIavlOps(op, b)
 		if err != nil {
 			return err
@@ -244,10 +244,6 @@ func prepareLeafData(hashOp HashOp, lengthOp LengthOp, data []byte) ([]byte, err
 	}
 
 	return doLengthOp(lengthOp, hdata)
-}
-
-func validateSpec(spec *ProofSpec) bool {
-	return spec.SpecEquals(IavlSpec)
 }
 
 type opType interface {
