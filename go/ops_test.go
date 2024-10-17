@@ -179,7 +179,7 @@ func TestValidateTendermintOps(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			op = &InnerOp{
 				Hash:   HashOp_SHA256,
-				Prefix: append([]byte{1}),
+				Prefix: []byte{1},
 				Suffix: []byte{1},
 			}
 
