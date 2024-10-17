@@ -1,5 +1,9 @@
 # Changelog
 
+# Unreleased
+
+- fix: guarantee that `spec.InnerSpec.MaxPrefixLength` < `spec.InnerSpec.MinPrefixLength` + `spec.InnerSpec.ChildSize` ([#369](https://github.com/cosmos/ics23/pull/369))
+
 # v0.12.0
 
 - chore(rust): Update `prost` to v0.13 ([#335](https://github.com/cosmos/ics23/pull/335), [#336](https://github.com/cosmos/ics23/pull/336))
