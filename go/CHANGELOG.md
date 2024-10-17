@@ -4,6 +4,7 @@
 
 - deps: bump golang to v1.22 ([#363](https://github.com/cosmos/ics23/pull/363)).
 - fix: guarantee that `spec.InnerSpec.MaxPrefixLength` < `spec.InnerSpec.MinPrefixLength` + `spec.InnerSpec.ChildSize` ([#369](https://github.com/cosmos/ics23/pull/369))
+- fix: return error instead of panic in `getPosition` which results in error returns from `IsLeftMost`, `IsRightMost`, `IsLeftNeighbor`, `leftBranchesAreEmpty`, `rightBranchesAreEmpty`, and `getPadding`
 
 # v0.11.0
 
