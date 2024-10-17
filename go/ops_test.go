@@ -127,6 +127,77 @@ func TestValidateIavlOps(t *testing.T) {
 	}
 }
 
+func TestValidateTendermintOps(t *testing.T) {
+	var op *InnerOp
+	cases := []struct {
+		name     string
+		malleate func()
+		expError error
+	}{
+		{
+			"success: valid prefix when suffix populated",
+			func() {},
+			nil,
+		},
+		{
+			"success: valid prefix when suffix empty",
+			func() {
+				op.Prefix = []byte{1, 2}
+				op.Suffix = nil
+			},
+			nil,
+		},
+		{
+			"failure: empty prefix and suffix",
+			func() {
+				op.Prefix = nil
+				op.Suffix = nil
+			},
+			errors.New("inner op prefix must not be empty"),
+		},
+		{
+			"failure: invalid prefix when suffix populated",
+			func() {
+				op.Prefix = []byte{0}
+				op.Suffix = []byte{1}
+			},
+			fmt.Errorf("expected inner op prefix: %v, got: %v", []byte{1}, []byte{0}),
+		},
+		{
+			"failure: invalid prefix when suffix empty",
+			func() {
+				op.Prefix = []byte{2, 1}
+				op.Suffix = nil
+			},
+			fmt.Errorf("expected inner op prefix to begin with: %v, got: %v", []byte{1}, []byte{2}),
+		},
+	}
+
+	for _, tc := range cases {
+		tc := tc
+
+		t.Run(tc.name, func(t *testing.T) {
+			op = &InnerOp{
+				Hash:   HashOp_SHA256,
+				Prefix: append([]byte{1}),
+				Suffix: []byte{1},
+			}
+
+			tc.malleate()
+
+			err := validateTendermintOps(op)
+			if tc.expError == nil && err != nil {
+				t.Fatal(err)
+			}
+
+			if tc.expError != nil && err.Error() != tc.expError.Error() {
+				t.Fatalf("expected: %v, got: %v", tc.expError, err)
+			}
+		})
+
+	}
+}
+
 func TestLeafOp(t *testing.T) {
 	cases := LeafOpTestData(t)
 

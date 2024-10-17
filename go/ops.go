@@ -56,10 +56,19 @@ func validateIavlOps(op opType, layerNum int) error {
 	// grab the length of the remainder of the prefix
 	remLen := r.Len()
 	if layerNum == 0 {
+		// leaf node
 		if remLen != 0 {
 			return fmt.Errorf("expected remaining prefix length to be 0, got: %d", remLen)
 		}
+		if height != 0 {
+			return fmt.Errorf("expected leaf node height to be 0, got: %d", remLen)
+		}
+		if size != 1 {
+			return fmt.Errorf("expected leaf node size to be 1, got: %d", remLen)
+		}
 	} else {
+		// inner node
+		//
 		// when the child comes from the left, the suffix if filled in
 		// prefix: height | size | version | length byte (1 remainder)
 		//
@@ -72,6 +81,26 @@ func validateIavlOps(op opType, layerNum int) error {
 			return fmt.Errorf("IAVL hash op must be %v", HashOp_SHA256)
 		}
 	}
+	return nil
+}
+
+// validateTendermintOps validates the prefix to ensure it begins with []byte{1}.
+func validateTendermintOps(op *InnerOp) error {
+	if len(op.Prefix) == 0 {
+		return fmt.Errorf("inner op prefix must not be empty")
+	}
+
+	innerPrefix := []byte{1}
+	if op.Suffix != nil {
+		if !bytes.Equal(op.Prefix, innerPrefix) {
+			return fmt.Errorf("expected inner op prefix: %v, got: %v", innerPrefix, op.Prefix)
+		}
+	}
+
+	if !bytes.HasPrefix(op.Prefix, innerPrefix) {
+		return fmt.Errorf("expected inner op prefix to begin with: %v, got: %v", innerPrefix, op.Prefix[:1])
+	}
+
 	return nil
 }
 
@@ -163,6 +192,13 @@ func (op *InnerOp) CheckAgainstSpec(spec *ProofSpec, b int) error {
 
 	if validateSpec(spec) {
 		err := validateIavlOps(op, b)
+		if err != nil {
+			return err
+		}
+	}
+
+	if spec.SpecEquals(TendermintSpec) {
+		err := validateTendermintOps(op)
 		if err != nil {
 			return err
 		}
