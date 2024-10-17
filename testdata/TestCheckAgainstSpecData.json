@@ -907,7 +907,7 @@
         "hash": 1
       }
     },
-    "Err": "inner, unexpected EOF"
+    "Err": "inner, IAVL height (0) must be non-negative and greater than or equal to the layer number (3)"
   },
   "rejects only inner proof (hash mismatch)": {
     "Proof": {
