@@ -12,9 +12,10 @@ func TestVectors(t *testing.T) {
 		tc := tc
 		name := fmt.Sprintf("%s/%s", tc.Dir, tc.Filename)
 		t.Run(name, func(t *testing.T) {
-			proof, ref := LoadFile(t, tc.Dir, tc.Filename)
+			commitmentProof, ref := LoadFile(t, tc.Dir, tc.Filename)
+
 			// Test Calculate method
-			calculatedRoot, err := proof.Calculate()
+			calculatedRoot, err := commitmentProof.Calculate()
 			if err != nil {
 				t.Fatal("proof.Calculate() returned error")
 			}
@@ -23,15 +24,17 @@ func TestVectors(t *testing.T) {
 			}
 			// Test Verify method
 			if ref.Value == nil {
+				proof := commitmentProof.GetNonexist()
 				// non-existence
-				valid := VerifyNonMembership(tc.Spec, ref.RootHash, proof, ref.Key)
-				if !valid {
-					t.Fatal("Invalid proof")
+				err := VerifyNonMembership(tc.Spec, ref.RootHash, proof, ref.Key)
+				if err != nil {
+					t.Fatalf("Invalid proof: %v", err)
 				}
 			} else {
-				valid := VerifyMembership(tc.Spec, ref.RootHash, proof, ref.Key, ref.Value)
-				if !valid {
-					t.Fatal("Invalid proof")
+				proof := commitmentProof.GetExist()
+				err := VerifyMembership(tc.Spec, ref.RootHash, proof, ref.Key, ref.Value)
+				if err != nil {
+					t.Fatalf("Invalid proof: %v", err)
 				}
 			}
 		})

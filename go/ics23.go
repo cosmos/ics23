@@ -25,23 +25,24 @@ package ics23
 
 import (
 	"bytes"
+	"fmt"
 )
 
 // CommitmentRoot is a byte slice that represents the merkle root of a tree that can be used to validate proofs
 type CommitmentRoot []byte
 
-// VerifyMembership returns true iff
-// proof is (contains) an ExistenceProof for the given key and value AND
-// calculating the root for the ExistenceProof matches the provided CommitmentRoot
-func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, key []byte, value []byte) bool {
-	// decompress it before running code (no-op if not compressed)
-	proof = Decompress(proof)
-	ep := getExistProofForKey(proof, key)
-	if ep == nil {
-		return false
+// VerifyMembership returns successfully iff
+// proof is an ExistenceProof for the given key and value AND
+// calculating the root for the ExistenceProof matches the provided CommitmentRoot.
+func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *ExistenceProof, key []byte, value []byte) error {
+	if proof == nil {
+		return fmt.Errorf("proof cannot be empty")
 	}
-	err := ep.Verify(spec, root, key, value)
-	return err == nil
+	if !bytes.Equal(proof.Key, key) {
+		return fmt.Errorf("proof key (%s) must equal given key (%s)", proof.Key, key)
+	}
+
+	return proof.Verify(spec, root, key, value)
 }
 
 // VerifyNonMembership returns true iff
@@ -49,53 +50,15 @@ func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentPro
 // both left and right sub-proofs are valid existence proofs (see above) or nil
 // left and right proofs are neighbors (or left/right most if one is nil)
 // provided key is between the keys of the two proofs
-func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, key []byte) bool {
-	// decompress it before running code (no-op if not compressed)
-	proof = Decompress(proof)
-	np := getNonExistProofForKey(spec, proof, key)
-	if np == nil {
-		return false
-	}
-	err := np.Verify(spec, root, key)
-	return err == nil
-}
-
-func getExistProofForKey(proof *CommitmentProof, key []byte) *ExistenceProof {
+func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *NonExistenceProof, key []byte) error {
 	if proof == nil {
-		return nil
+		return fmt.Errorf("proof cannot be empty")
+	}
+	if !isLeft(spec, proof.Left, key) || !isRight(spec, proof.Right, key) {
+		return fmt.Errorf("provided existence proofs must be for left and right keys of non-existing key")
 	}
 
-	switch p := proof.Proof.(type) {
-	case *CommitmentProof_Exist:
-		ep := p.Exist
-		if bytes.Equal(ep.Key, key) {
-			return ep
-		}
-	case *CommitmentProof_Batch:
-		for _, sub := range p.Batch.Entries {
-			if ep := sub.GetExist(); ep != nil && bytes.Equal(ep.Key, key) {
-				return ep
-			}
-		}
-	}
-	return nil
-}
-
-func getNonExistProofForKey(spec *ProofSpec, proof *CommitmentProof, key []byte) *NonExistenceProof {
-	switch p := proof.Proof.(type) {
-	case *CommitmentProof_Nonexist:
-		np := p.Nonexist
-		if isLeft(spec, np.Left, key) && isRight(spec, np.Right, key) {
-			return np
-		}
-	case *CommitmentProof_Batch:
-		for _, sub := range p.Batch.Entries {
-			if np := sub.GetNonexist(); np != nil && isLeft(spec, np.Left, key) && isRight(spec, np.Right, key) {
-				return np
-			}
-		}
-	}
-	return nil
+	return proof.Verify(spec, root, key)
 }
 
 func isLeft(spec *ProofSpec, left *ExistenceProof, key []byte) bool {

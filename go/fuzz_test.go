@@ -118,7 +118,7 @@ func FuzzVerifyNonMembership(f *testing.F) {
 			return
 		}
 		// Otherwise now run VerifyNonMembership.
-		_ = VerifyNonMembership(bv.Spec, bv.Ref.RootHash, bv.Proof, bv.Ref.Key)
+		_ = VerifyNonMembership(bv.Spec, bv.Ref.RootHash, bv.Proof.GetNonexist(), bv.Ref.Key)
 	})
 }
 
@@ -165,7 +165,7 @@ func FuzzVerifyMembership(f *testing.F) {
 		if err := json.Unmarshal(input, &con); err != nil {
 			return
 		}
-		spec, ref, proof := con.Spec, con.Ref, con.Proof
+		spec, ref, proof := con.Spec, con.Ref, con.Proof.GetExist()
 		if ref == nil {
 			return
 		}
