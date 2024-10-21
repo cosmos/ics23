@@ -25,7 +25,6 @@ package ics23
 
 import (
 	"bytes"
-	"fmt"
 )
 
 // CommitmentRoot is a byte slice that represents the merkle root of a tree that can be used to validate proofs
@@ -34,15 +33,17 @@ type CommitmentRoot []byte
 // VerifyMembership returns successfully iff
 // proof is an ExistenceProof for the given key and value AND
 // calculating the root for the ExistenceProof matches the provided CommitmentRoot.
-func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *ExistenceProof, key []byte, value []byte) error {
+func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, key []byte, value []byte) bool {
 	if proof == nil {
-		return fmt.Errorf("proof cannot be empty")
-	}
-	if !bytes.Equal(proof.Key, key) {
-		return fmt.Errorf("proof key (%s) must equal given key (%s)", proof.Key, key)
+		return false
 	}
 
-	return proof.Verify(spec, root, key, value)
+	ep := proof.GetExist()
+	if ep == nil {
+		return false
+	}
+
+	return ep.Verify(spec, root, key, value) == nil
 }
 
 // VerifyNonMembership returns true iff
@@ -50,15 +51,21 @@ func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *ExistenceProo
 // both left and right sub-proofs are valid existence proofs (see above) or nil
 // left and right proofs are neighbors (or left/right most if one is nil)
 // provided key is between the keys of the two proofs
-func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *NonExistenceProof, key []byte) error {
+func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, key []byte) bool {
 	if proof == nil {
-		return fmt.Errorf("proof cannot be empty")
-	}
-	if !isLeft(spec, proof.Left, key) || !isRight(spec, proof.Right, key) {
-		return fmt.Errorf("provided existence proofs must be for left and right keys of non-existing key")
+		return false
 	}
 
-	return proof.Verify(spec, root, key)
+	np := proof.GetNonexist()
+	if np == nil {
+		return false
+	}
+
+	if !isLeft(spec, np.Left, key) || !isRight(spec, np.Right, key) {
+		return false
+	}
+
+	return np.Verify(spec, root, key) == nil
 }
 
 func isLeft(spec *ProofSpec, left *ExistenceProof, key []byte) bool {
