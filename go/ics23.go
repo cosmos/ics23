@@ -61,34 +61,6 @@ func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *Commitment
 	return err == nil
 }
 
-// BatchVerifyMembership will ensure all items are also proven by the CommitmentProof (which should be a BatchProof,
-// unless there is one item, when a ExistenceProof may work)
-func BatchVerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, items map[string][]byte) bool {
-	// decompress it before running code (no-op if not compressed) - once for batch
-	proof = Decompress(proof)
-	for k, v := range items {
-		valid := VerifyMembership(spec, root, proof, []byte(k), v)
-		if !valid {
-			return false
-		}
-	}
-	return true
-}
-
-// BatchVerifyNonMembership will ensure all items are also proven to not be in the Commitment by the CommitmentProof
-// (which should be a BatchProof, unless there is one item, when a NonExistenceProof may work)
-func BatchVerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, keys [][]byte) bool {
-	// decompress it before running code (no-op if not compressed) - once for batch
-	proof = Decompress(proof)
-	for _, k := range keys {
-		valid := VerifyNonMembership(spec, root, proof, k)
-		if !valid {
-			return false
-		}
-	}
-	return true
-}
-
 // CombineProofs takes a number of commitment proofs (simple or batch) and
 // converts them into a batch and compresses them.
 //
