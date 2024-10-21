@@ -79,9 +79,9 @@ func DecompressBatchVectorsTestData(t *testing.T) map[string]*CommitmentProof {
 	tendermint := filepath.Join("..", "testdata", "tendermint")
 	smt := filepath.Join("..", "testdata", "smt")
 	// note that these batches are already compressed
-	batchIAVL, _ := loadBatch(t, iavl, "batch_exist.json")
-	batchTM, _ := loadBatch(t, tendermint, "batch_nonexist.json")
-	batchSMT, _ := loadBatch(t, smt, "batch_nonexist.json")
+	batchIAVL := loadBatch(t, iavl, "batch_exist.json")
+	batchTM := loadBatch(t, tendermint, "batch_nonexist.json")
+	batchSMT := loadBatch(t, smt, "batch_nonexist.json")
 	return map[string]*CommitmentProof{
 		"iavl":       batchIAVL,
 		"tendermint": batchTM,
@@ -129,21 +129,7 @@ func mustHex(tb testing.TB, data string) []byte {
 	return res
 }
 
-func buildBatch(t *testing.T, dir string, filenames []string) (*CommitmentProof, []*RefData) {
-	t.Helper()
-	refs := make([]*RefData, len(filenames))
-	proofs := make([]*CommitmentProof, len(filenames))
-	for i, fn := range filenames {
-		proofs[i], refs[i] = LoadFile(t, dir, fn)
-	}
-	batch, err := CombineProofs(proofs)
-	if err != nil {
-		t.Fatalf("Generating batch: %v", err)
-	}
-	return batch, refs
-}
-
-func loadBatch(t *testing.T, dir string, filename string) (*CommitmentProof, []*RefData) {
+func loadBatch(t *testing.T, dir string, filename string) *CommitmentProof {
 	t.Helper()
 	// load the file into a json struct
 	name := filepath.Join(dir, filename)
@@ -162,14 +148,5 @@ func loadBatch(t *testing.T, dir string, filename string) (*CommitmentProof, []*
 	if err != nil {
 		t.Fatalf("Unmarshal protobuf: %+v", err)
 	}
-	root := mustHex(t, data.RootHash)
-	refs := make([]*RefData, len(data.Items))
-	for i, item := range data.Items {
-		refs[i] = &RefData{
-			RootHash: root,
-			Key:      mustHex(t, item.Key),
-			Value:    mustHex(t, item.Value),
-		}
-	}
-	return &proof, refs
+	return &proof
 }
