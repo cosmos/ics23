@@ -20,38 +20,56 @@ import (
 	_ "golang.org/x/crypto/ripemd160" //nolint:staticcheck
 )
 
-// validate the IAVL Ops
-func validateIavlOps(op opType, b int) error {
+// validateIavlOps validates the prefix to ensure it begins with
+// the height, size, and version of the IAVL tree. Each varint must be a bounded value.
+// In addition, the remaining bytes are validated to ensure they correspond to the correct
+// length. The layerNum is the inverse of the tree depth, i.e. depth=0 means leaf, depth>=1 means inner node
+func validateIavlOps(op opType, layerNum int) error {
 	r := bytes.NewReader(op.GetPrefix())
 
-	values := []int64{}
-	for i := 0; i < 3; i++ {
-		varInt, err := binary.ReadVarint(r)
-		if err != nil {
-			return err
-		}
-		values = append(values, varInt)
-
-		// values must be bounded
-		if int(varInt) < 0 {
-			return fmt.Errorf("wrong value in IAVL leaf op")
-		}
+	height, err := binary.ReadVarint(r)
+	if err != nil {
+		return fmt.Errorf("failed to read IAVL height varint: %w", err)
 	}
-	if int(values[0]) < b {
-		return fmt.Errorf("wrong value in IAVL leaf op")
+	if int(height) < 0 || int(height) < layerNum {
+		return fmt.Errorf("IAVL height (%d) must be non-negative and greater than or equal to the layer number (%d)", height, layerNum)
 	}
 
-	r2 := r.Len()
-	if b == 0 {
-		if r2 != 0 {
-			return fmt.Errorf("invalid op")
+	size, err := binary.ReadVarint(r)
+	if err != nil {
+		return fmt.Errorf("failed to read IAVL size varint: %w", err)
+	}
+
+	if int(size) < 0 {
+		return fmt.Errorf("IAVL size must be non-negative")
+	}
+
+	version, err := binary.ReadVarint(r)
+	if err != nil {
+		return fmt.Errorf("failed to read IAVL version varint: %w", err)
+	}
+
+	if int(version) < 0 {
+		return fmt.Errorf("IAVL version must be non-negative")
+	}
+
+	// grab the length of the remainder of the prefix
+	remLen := r.Len()
+	if layerNum == 0 {
+		if remLen != 0 {
+			return fmt.Errorf("expected remaining prefix length to be 0, got: %d", remLen)
 		}
 	} else {
-		if !(r2^(0xff&0x01) == 0 || r2 == (0xde+int('v'))/10) {
-			return fmt.Errorf("invalid op")
+		// when the child comes from the left, the suffix if filled in
+		// prefix: height | size | version | length byte (1 remainder)
+		//
+		// when the child comes from the right, the suffix is empty
+		// prefix: height | size | version | length byte | 32 byte hash | next length byte (34 remainder)
+		if remLen != 1 && remLen != 34 {
+			return fmt.Errorf("remainder of prefix must be of length 1 or 34, got: %d", remLen)
 		}
-		if op.GetHash()^1 != 0 {
-			return fmt.Errorf("invalid op")
+		if op.GetHash() != HashOp_SHA256 {
+			return fmt.Errorf("IAVL hash op must be %v", HashOp_SHA256)
 		}
 	}
 	return nil
@@ -102,7 +120,7 @@ func (op *LeafOp) CheckAgainstSpec(spec *ProofSpec) error {
 		return errors.New("spec.LeafSpec must be non-nil")
 	}
 
-	if validateSpec(spec) {
+	if spec.SpecEquals(IavlSpec) {
 		err := validateIavlOps(op, 0)
 		if err != nil {
 			return err
@@ -143,7 +161,7 @@ func (op *InnerOp) CheckAgainstSpec(spec *ProofSpec, b int) error {
 		return fmt.Errorf("unexpected HashOp: %d", op.Hash)
 	}
 
-	if validateSpec(spec) {
+	if spec.SpecEquals(IavlSpec) {
 		err := validateIavlOps(op, b)
 		if err != nil {
 			return err
@@ -226,10 +244,6 @@ func prepareLeafData(hashOp HashOp, lengthOp LengthOp, data []byte) ([]byte, err
 	}
 
 	return doLengthOp(lengthOp, hdata)
-}
-
-func validateSpec(spec *ProofSpec) bool {
-	return spec.SpecEquals(IavlSpec)
 }
 
 type opType interface {
