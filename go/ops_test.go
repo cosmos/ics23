@@ -86,7 +86,7 @@ func TestValidateIavlOps(t *testing.T) {
 			fmt.Errorf("expected remaining prefix length to be 0, got: 1"),
 		},
 		{
-			"failure: invalid reminaing length with non-zero layer number",
+			"failure: invalid remaining length with non-zero layer number",
 			func() {
 				layerNum = 1
 				op.(*InnerOp).Prefix = append(op.(*InnerOp).Prefix, []byte{1}...)
