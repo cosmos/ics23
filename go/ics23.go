@@ -30,7 +30,7 @@ import (
 // CommitmentRoot is a byte slice that represents the merkle root of a tree that can be used to validate proofs
 type CommitmentRoot []byte
 
-// VerifyMembership returns successfully iff
+// VerifyMembership returns true iff
 // proof is an ExistenceProof for the given key and value AND
 // calculating the root for the ExistenceProof matches the provided CommitmentRoot.
 func VerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, key []byte, value []byte) bool {
