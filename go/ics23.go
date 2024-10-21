@@ -61,10 +61,6 @@ func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *Commitment
 		return false
 	}
 
-	if !isLeft(spec, np.Left, key) || !isRight(spec, np.Right, key) {
-		return false
-	}
-
 	return np.Verify(spec, root, key) == nil
 }
 
