@@ -70,7 +70,7 @@ Anyone interested in adding support for Solidity could pick up where [#58](https
 * [cometbft/crypto/merkle](https://github.com/cometbft/cometbft/tree/main/crypto/merkle)
 * [penumbra-zone/jmt](https://github.com/penumbra-zone/jmt)
 
-Supported merkle stores must be lexographically ordered to mainatin soundness. 
+Supported merkle stores must be lexicographically ordered to maintain soundness. 
 
 ### Unsupported
 
