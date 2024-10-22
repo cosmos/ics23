@@ -89,7 +89,6 @@ func (p *CommitmentProof) Calculate() (CommitmentRoot, error) {
 	default:
 		return nil, errors.New("unrecognized proof type")
 	}
-	return nil, errors.New("unrecognized proof type")
 }
 
 // Verify does all checks to ensure this proof proves this key, value -> root
