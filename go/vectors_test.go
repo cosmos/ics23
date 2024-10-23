@@ -13,6 +13,7 @@ func TestVectors(t *testing.T) {
 		name := fmt.Sprintf("%s/%s", tc.Dir, tc.Filename)
 		t.Run(name, func(t *testing.T) {
 			proof, ref := LoadFile(t, tc.Dir, tc.Filename)
+
 			// Test Calculate method
 			calculatedRoot, err := proof.Calculate()
 			if err != nil {
@@ -26,12 +27,12 @@ func TestVectors(t *testing.T) {
 				// non-existence
 				valid := VerifyNonMembership(tc.Spec, ref.RootHash, proof, ref.Key)
 				if !valid {
-					t.Fatal("Invalid proof")
+					t.Fatalf("Invalid proof: %v", err)
 				}
 			} else {
 				valid := VerifyMembership(tc.Spec, ref.RootHash, proof, ref.Key, ref.Value)
 				if !valid {
-					t.Fatal("Invalid proof")
+					t.Fatalf("Invalid proof: %v", err)
 				}
 			}
 		})
