@@ -73,22 +73,6 @@ type BatchVectorData struct {
 	Invalid bool // default is valid
 }
 
-func DecompressBatchVectorsTestData(t *testing.T) map[string]*CommitmentProof {
-	t.Helper()
-	iavl := filepath.Join("..", "testdata", "iavl")
-	tendermint := filepath.Join("..", "testdata", "tendermint")
-	smt := filepath.Join("..", "testdata", "smt")
-	// note that these batches are already compressed
-	batchIAVL := loadBatch(t, iavl, "batch_exist.json")
-	batchTM := loadBatch(t, tendermint, "batch_nonexist.json")
-	batchSMT := loadBatch(t, smt, "batch_nonexist.json")
-	return map[string]*CommitmentProof{
-		"iavl":       batchIAVL,
-		"tendermint": batchTM,
-		"smt":        batchSMT,
-	}
-}
-
 func LoadFile(tb testing.TB, dir string, filename string) (*CommitmentProof, *RefData) {
 	tb.Helper()
 	// load the file into a json struct
@@ -127,26 +111,4 @@ func mustHex(tb testing.TB, data string) []byte {
 		tb.Fatalf("decoding hex: %v", err)
 	}
 	return res
-}
-
-func loadBatch(t *testing.T, dir string, filename string) *CommitmentProof {
-	t.Helper()
-	// load the file into a json struct
-	name := filepath.Join(dir, filename)
-	bz, err := os.ReadFile(name)
-	if err != nil {
-		t.Fatalf("Read file: %+v", err)
-	}
-	var data BatchVector
-	err = json.Unmarshal(bz, &data)
-	if err != nil {
-		t.Fatalf("Unmarshal json: %+v", err)
-	}
-	// parse the protobuf object
-	var proof CommitmentProof
-	err = proof.Unmarshal(mustHex(t, data.Proof))
-	if err != nil {
-		t.Fatalf("Unmarshal protobuf: %+v", err)
-	}
-	return &proof
 }

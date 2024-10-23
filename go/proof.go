@@ -86,23 +86,9 @@ func (p *CommitmentProof) Calculate() (CommitmentRoot, error) {
 		return v.Exist.Calculate()
 	case *CommitmentProof_Nonexist:
 		return v.Nonexist.Calculate()
-	case *CommitmentProof_Batch:
-		if len(v.Batch.GetEntries()) == 0 || v.Batch.GetEntries()[0] == nil {
-			return nil, errors.New("batch proof has empty entry")
-		}
-		if e := v.Batch.GetEntries()[0].GetExist(); e != nil {
-			return e.Calculate()
-		}
-		if n := v.Batch.GetEntries()[0].GetNonexist(); n != nil {
-			return n.Calculate()
-		}
-	case *CommitmentProof_Compressed:
-		proof := Decompress(p)
-		return proof.Calculate()
 	default:
 		return nil, errors.New("unrecognized proof type")
 	}
-	return nil, errors.New("unrecognized proof type")
 }
 
 // Verify does all checks to ensure this proof proves this key, value -> root
