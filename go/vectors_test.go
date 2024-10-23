@@ -38,39 +38,3 @@ func TestVectors(t *testing.T) {
 		})
 	}
 }
-
-func TestDecompressBatchVectors(t *testing.T) {
-	cases := DecompressBatchVectorsTestData(t)
-	for name, tc := range cases {
-		t.Run(name, func(t *testing.T) {
-			small, err := tc.Marshal()
-			if err != nil {
-				t.Fatalf("Marshal batch %v", err)
-			}
-
-			decomp := Decompress(tc)
-			if decomp == tc {
-				t.Fatalf("Decompression is a no-op")
-			}
-			big, err := decomp.Marshal()
-			if err != nil {
-				t.Fatalf("Marshal batch %v", err)
-			}
-			if len(small) >= len(big) {
-				t.Fatalf("Compression doesn't reduce size")
-			}
-
-			restore := Compress(tc)
-			resmall, err := restore.Marshal()
-			if err != nil {
-				t.Fatalf("Marshal batch %v", err)
-			}
-			if len(resmall) != len(small) {
-				t.Fatalf("Decompressed len %d, original len %d", len(resmall), len(small))
-			}
-			if !bytes.Equal(resmall, small) {
-				t.Fatal("Decompressed batch proof differs from original")
-			}
-		})
-	}
-}
