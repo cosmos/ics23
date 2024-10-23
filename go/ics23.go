@@ -25,7 +25,6 @@ package ics23
 
 import (
 	"bytes"
-	"fmt"
 )
 
 // CommitmentRoot is a byte slice that represents the merkle root of a tree that can be used to validate proofs
@@ -59,77 +58,6 @@ func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *Commitment
 	}
 	err := np.Verify(spec, root, key)
 	return err == nil
-}
-
-// BatchVerifyMembership will ensure all items are also proven by the CommitmentProof (which should be a BatchProof,
-// unless there is one item, when a ExistenceProof may work)
-func BatchVerifyMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, items map[string][]byte) bool {
-	// decompress it before running code (no-op if not compressed) - once for batch
-	proof = Decompress(proof)
-	for k, v := range items {
-		valid := VerifyMembership(spec, root, proof, []byte(k), v)
-		if !valid {
-			return false
-		}
-	}
-	return true
-}
-
-// BatchVerifyNonMembership will ensure all items are also proven to not be in the Commitment by the CommitmentProof
-// (which should be a BatchProof, unless there is one item, when a NonExistenceProof may work)
-func BatchVerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *CommitmentProof, keys [][]byte) bool {
-	// decompress it before running code (no-op if not compressed) - once for batch
-	proof = Decompress(proof)
-	for _, k := range keys {
-		valid := VerifyNonMembership(spec, root, proof, k)
-		if !valid {
-			return false
-		}
-	}
-	return true
-}
-
-// CombineProofs takes a number of commitment proofs (simple or batch) and
-// converts them into a batch and compresses them.
-//
-// This is designed for proof generation libraries to create efficient batches
-func CombineProofs(proofs []*CommitmentProof) (*CommitmentProof, error) {
-	var entries []*BatchEntry
-
-	for _, proof := range proofs {
-		if ex := proof.GetExist(); ex != nil {
-			entry := &BatchEntry{
-				Proof: &BatchEntry_Exist{
-					Exist: ex,
-				},
-			}
-			entries = append(entries, entry)
-		} else if non := proof.GetNonexist(); non != nil {
-			entry := &BatchEntry{
-				Proof: &BatchEntry_Nonexist{
-					Nonexist: non,
-				},
-			}
-			entries = append(entries, entry)
-		} else if batch := proof.GetBatch(); batch != nil {
-			entries = append(entries, batch.Entries...)
-		} else if comp := proof.GetCompressed(); comp != nil {
-			decomp := Decompress(proof)
-			entries = append(entries, decomp.GetBatch().Entries...)
-		} else {
-			return nil, fmt.Errorf("proof neither exist or nonexist: %#v", proof.GetProof())
-		}
-	}
-
-	batch := &CommitmentProof{
-		Proof: &CommitmentProof_Batch{
-			Batch: &BatchProof{
-				Entries: entries,
-			},
-		},
-	}
-
-	return Compress(batch), nil
 }
 
 func getExistProofForKey(proof *CommitmentProof, key []byte) *ExistenceProof {
