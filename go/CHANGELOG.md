@@ -5,6 +5,9 @@
 - deps: bump golang to v1.22 ([#363](https://github.com/cosmos/ics23/pull/363)).
 - fix: guarantee that `spec.InnerSpec.MaxPrefixLength` < `spec.InnerSpec.MinPrefixLength` + `spec.InnerSpec.ChildSize` ([#369](https://github.com/cosmos/ics23/pull/369))
 - fix: return error instead of panic in `getPosition` which results in error returns from `IsLeftMost`, `IsRightMost`, `IsLeftNeighbor`, `leftBranchesAreEmpty`, `rightBranchesAreEmpty`, and `getPadding`
+- refactor: support for `BatchProof` and `CompressedBatchProof` is being dropped. 
+    * The API's `BatchVerifyMembership`, `BatchVerifyNonMembership`, and `CombineProofs` have been removed. ([#390](https://github.com/cosmos/ics23/pull/390))
+    * The API's `IsCompressed`, `Compress`, and `Decompress` have been removed. ([#392](https://github.com/cosmos/ics23/pull/392))
 
 # v0.11.0
 
