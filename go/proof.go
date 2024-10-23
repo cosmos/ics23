@@ -246,15 +246,30 @@ func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []b
 
 	switch {
 	case leftKey == nil:
-		if !IsLeftMost(spec.InnerSpec, p.Right.Path) {
+		isLeftMost, err := IsLeftMost(spec.InnerSpec, p.Right.Path)
+		if err != nil {
+			return err
+		}
+
+		if !isLeftMost {
 			return errors.New("left proof missing, right proof must be left-most")
 		}
 	case rightKey == nil:
-		if !IsRightMost(spec.InnerSpec, p.Left.Path) {
+		isRightMost, err := IsRightMost(spec.InnerSpec, p.Left.Path)
+		if err != nil {
+			return err
+		}
+
+		if !isRightMost {
 			return errors.New("right proof missing, left proof must be right-most")
 		}
 	default:
-		if !IsLeftNeighbor(spec.InnerSpec, p.Left.Path, p.Right.Path) {
+		isLeftNeighbor, err := IsLeftNeighbor(spec.InnerSpec, p.Left.Path, p.Right.Path)
+		if err != nil {
+			return err
+		}
+
+		if !isLeftNeighbor {
 			return errors.New("right proof missing, left proof must be right-most")
 		}
 	}
@@ -263,30 +278,50 @@ func (p *NonExistenceProof) Verify(spec *ProofSpec, root CommitmentRoot, key []b
 }
 
 // IsLeftMost returns true if this is the left-most path in the tree, excluding placeholder (empty child) nodes
-func IsLeftMost(spec *InnerSpec, path []*InnerOp) bool {
-	minPrefix, maxPrefix, suffix := getPadding(spec, 0)
+func IsLeftMost(spec *InnerSpec, path []*InnerOp) (bool, error) {
+	minPrefix, maxPrefix, suffix, err := getPadding(spec, 0)
+	if err != nil {
+		return false, err
+	}
 
 	// ensure every step has a prefix and suffix defined to be leftmost, unless it is a placeholder node
 	for _, step := range path {
-		if !hasPadding(step, minPrefix, maxPrefix, suffix) && !leftBranchesAreEmpty(spec, step) {
-			return false
+		if !hasPadding(step, minPrefix, maxPrefix, suffix) {
+			leftBranchesAreEmpty, err := leftBranchesAreEmpty(spec, step)
+			if err != nil {
+				return false, err
+			}
+
+			if !leftBranchesAreEmpty {
+				return false, nil
+			}
 		}
 	}
-	return true
+	return true, nil
 }
 
 // IsRightMost returns true if this is the right-most path in the tree, excluding placeholder (empty child) nodes
-func IsRightMost(spec *InnerSpec, path []*InnerOp) bool {
+func IsRightMost(spec *InnerSpec, path []*InnerOp) (bool, error) {
 	last := len(spec.ChildOrder) - 1
-	minPrefix, maxPrefix, suffix := getPadding(spec, int32(last))
+	minPrefix, maxPrefix, suffix, err := getPadding(spec, int32(last))
+	if err != nil {
+		return false, err
+	}
 
 	// ensure every step has a prefix and suffix defined to be rightmost, unless it is a placeholder node
 	for _, step := range path {
-		if !hasPadding(step, minPrefix, maxPrefix, suffix) && !rightBranchesAreEmpty(spec, step) {
-			return false
+		if !hasPadding(step, minPrefix, maxPrefix, suffix) {
+			rightBranchesAreEmpty, err := rightBranchesAreEmpty(spec, step)
+			if err != nil {
+				return false, err
+			}
+
+			if !rightBranchesAreEmpty {
+				return false, nil
+			}
 		}
 	}
-	return true
+	return true, nil
 }
 
 // IsLeftNeighbor returns true if `right` is the next possible path right of `left`
@@ -295,7 +330,7 @@ func IsRightMost(spec *InnerSpec, path []*InnerOp) bool {
 //	Validate that LPath[len-1] is the left neighbor of RPath[len-1]
 //	For step in LPath[0..len-1], validate step is right-most node
 //	For step in RPath[0..len-1], validate step is left-most node
-func IsLeftNeighbor(spec *InnerSpec, left []*InnerOp, right []*InnerOp) bool {
+func IsLeftNeighbor(spec *InnerSpec, left []*InnerOp, right []*InnerOp) (bool, error) {
 	// count common tail (from end, near root)
 	left, topleft := left[:len(left)-1], left[len(left)-1]
 	right, topright := right[:len(right)-1], right[len(right)-1]
@@ -307,18 +342,27 @@ func IsLeftNeighbor(spec *InnerSpec, left []*InnerOp, right []*InnerOp) bool {
 	// now topleft and topright are the first divergent nodes
 	// make sure they are left and right of each other
 	if !isLeftStep(spec, topleft, topright) {
-		return false
+		return false, nil
 	}
 
 	// left and right are remaining children below the split,
 	// ensure left child is the rightmost path, and visa versa
-	if !IsRightMost(spec, left) {
-		return false
+	isRightMost, err := IsRightMost(spec, left)
+	if err != nil {
+		return false, err
 	}
-	if !IsLeftMost(spec, right) {
-		return false
+	if !isRightMost {
+		return false, nil
 	}
-	return true
+
+	isLeftMost, err := IsLeftMost(spec, right)
+	if err != nil {
+		return false, err
+	}
+	if !isLeftMost {
+		return false, nil
+	}
+	return true, nil
 }
 
 // isLeftStep assumes left and right have common parents
@@ -349,8 +393,11 @@ func hasPadding(op *InnerOp, minPrefix, maxPrefix, suffix int) bool {
 }
 
 // getPadding determines prefix and suffix with the given spec and position in the tree
-func getPadding(spec *InnerSpec, branch int32) (minPrefix, maxPrefix, suffix int) {
-	idx := getPosition(spec.ChildOrder, branch)
+func getPadding(spec *InnerSpec, branch int32) (minPrefix, maxPrefix, suffix int, err error) {
+	idx, err := getPosition(spec.ChildOrder, branch)
+	if err != nil {
+		return 0, 0, 0, err
+	}
 
 	// count how many children are in the prefix
 	prefix := idx * int(spec.ChildSize)
@@ -359,74 +406,83 @@ func getPadding(spec *InnerSpec, branch int32) (minPrefix, maxPrefix, suffix int
 
 	// count how many children are in the suffix
 	suffix = (len(spec.ChildOrder) - 1 - idx) * int(spec.ChildSize)
-	return minPrefix, maxPrefix, suffix
+	return minPrefix, maxPrefix, suffix, nil
 }
 
 // leftBranchesAreEmpty returns true if the padding bytes correspond to all empty siblings
 // on the left side of a branch, ie. it's a valid placeholder on a leftmost path
-func leftBranchesAreEmpty(spec *InnerSpec, op *InnerOp) bool {
+func leftBranchesAreEmpty(spec *InnerSpec, op *InnerOp) (bool, error) {
 	idx, err := orderFromPadding(spec, op)
 	if err != nil {
-		return false
+		return false, err
 	}
 	// count branches to left of this
 	leftBranches := int(idx)
 	if leftBranches == 0 {
-		return false
+		return false, nil
 	}
 	// compare prefix with the expected number of empty branches
 	actualPrefix := len(op.Prefix) - leftBranches*int(spec.ChildSize)
 	if actualPrefix < 0 {
-		return false
+		return false, nil
 	}
 	for i := 0; i < leftBranches; i++ {
-		idx := getPosition(spec.ChildOrder, int32(i))
+		idx, err := getPosition(spec.ChildOrder, int32(i))
+		if err != nil {
+			return false, err
+		}
+
 		from := actualPrefix + idx*int(spec.ChildSize)
 		if !bytes.Equal(spec.EmptyChild, op.Prefix[from:from+int(spec.ChildSize)]) {
-			return false
+			return false, nil
 		}
 	}
-	return true
+	return true, nil
 }
 
 // rightBranchesAreEmpty returns true if the padding bytes correspond to all empty siblings
 // on the right side of a branch, ie. it's a valid placeholder on a rightmost path
-func rightBranchesAreEmpty(spec *InnerSpec, op *InnerOp) bool {
+func rightBranchesAreEmpty(spec *InnerSpec, op *InnerOp) (bool, error) {
 	idx, err := orderFromPadding(spec, op)
 	if err != nil {
-		return false
+		return false, err
 	}
 	// count branches to right of this one
 	rightBranches := len(spec.ChildOrder) - 1 - int(idx)
 	if rightBranches == 0 {
-		return false
+		return false, nil
 	}
 	// compare suffix with the expected number of empty branches
 	if len(op.Suffix) != rightBranches*int(spec.ChildSize) {
-		return false // sanity check
+		return false, nil // sanity check
 	}
 	for i := 0; i < rightBranches; i++ {
-		idx := getPosition(spec.ChildOrder, int32(i))
+		idx, err := getPosition(spec.ChildOrder, int32(i))
+		if err != nil {
+			return false, err
+		}
+
 		from := idx * int(spec.ChildSize)
 		if !bytes.Equal(spec.EmptyChild, op.Suffix[from:from+int(spec.ChildSize)]) {
-			return false
+			return false, nil
 		}
 	}
-	return true
+	return true, nil
 }
 
 // getPosition checks where the branch is in the order and returns
 // the index of this branch
-func getPosition(order []int32, branch int32) int {
+func getPosition(order []int32, branch int32) (int, error) {
 	if branch < 0 || int(branch) >= len(order) {
-		panic(fmt.Errorf("invalid branch: %d", branch))
+		return -1, fmt.Errorf("invalid branch: %d", branch)
 	}
 	for i, item := range order {
 		if branch == item {
-			return i
+			return i, nil
 		}
 	}
-	panic(fmt.Errorf("branch %d not found in order %v", branch, order))
+
+	return -1, fmt.Errorf("branch %d not found in order %v", branch, order)
 }
 
 // This will look at the proof and determine which order it is...
@@ -434,7 +490,10 @@ func getPosition(order []int32, branch int32) int {
 func orderFromPadding(spec *InnerSpec, inner *InnerOp) (int32, error) {
 	maxbranch := int32(len(spec.ChildOrder))
 	for branch := int32(0); branch < maxbranch; branch++ {
-		minp, maxp, suffix := getPadding(spec, branch)
+		minp, maxp, suffix, err := getPadding(spec, branch)
+		if err != nil {
+			return 0, err
+		}
 		if hasPadding(inner, minp, maxp, suffix) {
 			return branch, nil
 		}
