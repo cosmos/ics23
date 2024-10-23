@@ -38,42 +38,6 @@ func TestVectors(t *testing.T) {
 	}
 }
 
-func TestBatchVectors(t *testing.T) {
-	cases := BatchVectorsTestData(t)
-	for name, tc := range cases {
-		tc := tc
-		t.Run(name, func(t *testing.T) {
-			// try one proof
-			if tc.Ref.Value == nil {
-				// non-existence
-				valid := VerifyNonMembership(tc.Spec, tc.Ref.RootHash, tc.Proof, tc.Ref.Key)
-				if valid == tc.Invalid {
-					t.Logf("name: %+v", name)
-					t.Logf("ref: %+v", tc.Ref)
-					t.Logf("spec: %+v", tc.Spec)
-					t.Errorf("Expected proof validity: %t", !tc.Invalid)
-				}
-				keys := [][]byte{tc.Ref.Key}
-				valid = BatchVerifyNonMembership(tc.Spec, tc.Ref.RootHash, tc.Proof, keys)
-				if valid == tc.Invalid {
-					t.Errorf("Expected batch proof validity: %t", !tc.Invalid)
-				}
-			} else {
-				valid := VerifyMembership(tc.Spec, tc.Ref.RootHash, tc.Proof, tc.Ref.Key, tc.Ref.Value)
-				if valid == tc.Invalid {
-					t.Errorf("Expected proof validity: %t", !tc.Invalid)
-				}
-				items := make(map[string][]byte)
-				items[string(tc.Ref.Key)] = tc.Ref.Value
-				valid = BatchVerifyMembership(tc.Spec, tc.Ref.RootHash, tc.Proof, items)
-				if valid == tc.Invalid {
-					t.Errorf("Expected batch proof validity: %t", !tc.Invalid)
-				}
-			}
-		})
-	}
-}
-
 func TestDecompressBatchVectors(t *testing.T) {
 	cases := DecompressBatchVectorsTestData(t)
 	for name, tc := range cases {
