@@ -23,10 +23,6 @@ and determine neighbors
 */
 package ics23
 
-import (
-	"bytes"
-)
-
 // CommitmentRoot is a byte slice that represents the merkle root of a tree that can be used to validate proofs
 type CommitmentRoot []byte
 
@@ -62,12 +58,4 @@ func VerifyNonMembership(spec *ProofSpec, root CommitmentRoot, proof *Commitment
 	}
 
 	return np.Verify(spec, root, key) == nil
-}
-
-func isLeft(spec *ProofSpec, left *ExistenceProof, key []byte) bool {
-	return left == nil || bytes.Compare(keyForComparison(spec, left.Key), keyForComparison(spec, key)) < 0
-}
-
-func isRight(spec *ProofSpec, right *ExistenceProof, key []byte) bool {
-	return right == nil || bytes.Compare(keyForComparison(spec, right.Key), keyForComparison(spec, key)) > 0
 }
