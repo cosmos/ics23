@@ -172,37 +172,3 @@ func FuzzVerifyMembership(f *testing.F) {
 		_ = VerifyMembership(spec, ref.RootHash, proof, ref.Key, ref.Value)
 	})
 }
-
-func FuzzCombineProofs(f *testing.F) {
-	// 1. Load in the CommitmentProofs
-	baseDirs := []string{"iavl", "tendermint", "smt"}
-	filenames := []string{
-		"exist_left.json",
-		"exist_right.json",
-		"exist_middle.json",
-		"nonexist_left.json",
-		"nonexist_right.json",
-		"nonexist_middle.json",
-	}
-
-	for _, baseDir := range baseDirs {
-		dir := filepath.Join("..", "testdata", baseDir)
-		for _, filename := range filenames {
-			proofs, _ := LoadFile(new(testing.T), dir, filename)
-			blob, err := json.Marshal(proofs)
-			if err != nil {
-				f.Fatal(err)
-			}
-			f.Add(blob)
-		}
-	}
-
-	// 2. Now let's run the fuzzer.
-	f.Fuzz(func(t *testing.T, proofsJSON []byte) {
-		var proofs []*CommitmentProof
-		if err := json.Unmarshal(proofsJSON, &proofs); err != nil {
-			return
-		}
-		_, _ = CombineProofs(proofs)
-	})
-}
