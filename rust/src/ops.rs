@@ -45,7 +45,7 @@ pub(crate) fn do_hash<H: HostFunctionsProvider>(hash: HashOp, data: &[u8]) -> Ha
         HashOp::Keccak256 => Hash::from(H::keccak_256(data)),
         HashOp::Ripemd160 => Hash::from(H::ripemd160(data)),
         HashOp::Bitcoin => Hash::from(H::ripemd160(&H::sha2_256(data)[..])),
-        HashOp::Sha512256 => Hash::from(H::sha2_512_truncated(data)),
+        HashOp::Sha512256 => Hash::from(H::sha2_512_256(data)),
         HashOp::Blake2b512 => Hash::from(H::blake2b_512(data)),
         HashOp::Blake2s256 => Hash::from(H::blake2s_256(data)),
         HashOp::Blake3 => Hash::from(H::blake3(data)),
