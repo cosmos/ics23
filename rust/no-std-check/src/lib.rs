@@ -6,7 +6,7 @@ extern crate alloc;
 
 // Import the crates that we want to check if they are fully no-std compliance
 
-use ics23;
+use ics23::*;
 
 use core::panic::PanicInfo;
 
