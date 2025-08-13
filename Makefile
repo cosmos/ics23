@@ -12,7 +12,7 @@ protoImageName=ghcr.io/cosmos/proto-builder:$(protoVer)
 protoImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(protoImageName)
 
 ##### Rust #####
-rustVer=1.70-slim
+rustVer=1.88-slim
 rustImageName=rust:$(rustVer)
 rustImage=$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace $(rustImageName)
 
