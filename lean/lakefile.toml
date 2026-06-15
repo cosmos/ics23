@@ -1,0 +1,9 @@
+name = "ics23"
+defaultTargets = ["Ics23"]
+
+# Intentionally dependency-free for the first increment: Lean core + `omega`
+# cover the model and the proofs landed so far. Mathlib can be added later if a
+# proof genuinely needs it (this keeps the build fast and the trusted base small).
+
+[[lean_lib]]
+name = "Ics23"
