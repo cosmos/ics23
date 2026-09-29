@@ -64,6 +64,28 @@ var SmtSpec = &ProofSpec{
 	PrehashKeyBeforeComparison: true,
 }
 
+// JmtSpec constrains the format for JMT proofs (as implemented by https://github.com/penumbra-zone/jmt)
+var JmtSpec = &ProofSpec{
+	LeafSpec: &LeafOp{
+		Hash:         HashOp_SHA256,
+		PrehashKey:   HashOp_SHA256,
+		PrehashValue: HashOp_SHA256,
+		Length:       LengthOp_NO_PREFIX,
+		Prefix:       []byte("JMT::LeafNode"),
+	},
+	InnerSpec: &InnerSpec{
+		Hash:            HashOp_SHA256,
+		ChildOrder:      []int32{0, 1},
+		MinPrefixLength: 16,
+		MaxPrefixLength: 16,
+		ChildSize:       32,
+		EmptyChild:      []byte("SPARSE_MERKLE_PLACEHOLDER_HASH__"),
+	},
+	MinDepth:                   0,
+	MaxDepth:                   64,
+	PrehashKeyBeforeComparison: true,
+}
+
 func encodeVarintProto(l int) []byte {
 	// avoid multiple allocs for normal case
 	res := make([]byte, 0, 8)
