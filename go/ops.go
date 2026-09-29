@@ -232,7 +232,7 @@ func (op *InnerOp) CheckAgainstSpec(spec *ProofSpec, b int) error {
 	return nil
 }
 
-// doHash will preform the specified hash on the preimage.
+// doHash will perform the specified hash on the preimage.
 // if hashOp == NONE, it will return an error (use doHashOrNoop if you want different behavior)
 func doHash(hashOp HashOp, preimage []byte) ([]byte, error) {
 	switch hashOp {
