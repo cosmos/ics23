@@ -12,6 +12,10 @@ version = "0.12.0"
 [workspace]
 members = ["codegen", "no-std-check"]
 
+# `kani` cfg is set only under the Kani model checker (see src/kani_proofs.rs).
+[lints.rust]
+unexpected_cfgs = {level = "warn", check-cfg = ['cfg(kani)']}
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 anyhow = {version = "1.0.40", default-features = false}

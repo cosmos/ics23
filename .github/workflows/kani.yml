@@ -1,0 +1,28 @@
+name: Kani
+
+on:
+  pull_request:
+    paths:
+      - rust/**
+      - .github/workflows/kani.yml
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kani-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  kani:
+    name: Model-check (panic/overflow safety)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Kani harnesses
+        uses: model-checking/kani-github-action@v1
+        with:
+          working-directory: rust

@@ -11,6 +11,9 @@ mod host_functions;
 mod ops;
 mod verify;
 
+#[cfg(kani)]
+mod kani_proofs;
+
 mod ics23 {
     include!("cosmos.ics23.v1.rs");
 
