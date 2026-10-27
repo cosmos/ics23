@@ -118,6 +118,12 @@ fn check_existence_spec(proof: &ics23::ExistenceProof, spec: &ics23::ProofSpec) 
     if let (Some(leaf), Some(leaf_spec)) = (&proof.leaf, &spec.leaf_spec) {
         ensure_leaf_prefix(&leaf.prefix, spec)?;
         ensure_leaf(leaf, leaf_spec)?;
+        if let Some(inner_spec) = &spec.inner_spec {
+            ensure!(
+                !inner_spec.child_order.is_empty(),
+                "spec.inner_spec.child_order must not be empty"
+            );
+        }
         // ensure min/max depths
         if spec.min_depth != 0 {
             ensure!(

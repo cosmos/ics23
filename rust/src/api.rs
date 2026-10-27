@@ -398,6 +398,7 @@ mod tests {
     use crate::compress::compress;
     use crate::helpers::Result;
     use crate::host_functions::host_functions_impl::HostFunctionsManager;
+    use crate::verify::calculate_existence_root;
 
     #[derive(Deserialize, Debug)]
     struct TestVector {
@@ -452,6 +453,42 @@ mod tests {
             ensure!(valid, "invalid test vector");
             Ok(())
         }
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn reject_empty_child_order() -> Result<()> {
+        // Found by fuzzing: `child_order.len() - 1` underflowed instead of failing verification.
+        let mut spec = iavl_spec();
+        spec.inner_spec.as_mut().unwrap().child_order.clear();
+
+        let (proof, data) = load_file("../testdata/iavl/exist_left.json")?;
+        let value = data.value.unwrap();
+        assert!(!verify_membership::<HostFunctionsManager>(
+            &proof, &spec, &data.root, &data.key, &value
+        ));
+
+        // Single-leaf tree: existence passes with an empty path, so the non-existence helpers run.
+        let left = ics23::ExistenceProof {
+            key: b"a".to_vec(),
+            value: b"b".to_vec(),
+            leaf: spec.leaf_spec.clone(),
+            path: Vec::new(),
+        };
+        let root = calculate_existence_root::<HostFunctionsManager>(&left)?;
+        let proof = ics23::CommitmentProof {
+            proof: Some(ics23::commitment_proof::Proof::Nonexist(
+                ics23::NonExistenceProof {
+                    key: b"b".to_vec(),
+                    left: Some(left),
+                    right: None,
+                },
+            )),
+        };
+        assert!(!verify_non_membership::<HostFunctionsManager>(
+            &proof, &spec, &root, b"b"
+        ));
+        Ok(())
     }
 
     #[test]
