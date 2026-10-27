@@ -444,15 +444,15 @@ mod tests {
         valid: bool,
     }
 
+    impl InnerOp {
+        fn with_height(mut self, height: u8) -> InnerOp {
+            self.prefix[0] = height;
+            self
+        }
+    }
+
     #[test]
     fn enforce_existence_spec() {
-        impl InnerOp {
-            fn with_height(mut self, height: u8) -> InnerOp {
-                self.prefix[0] = height;
-                self
-            }
-        }
-
         let leaf = LeafOp {
             hash: HashOp::Sha256.into(),
             prehash_key: 0,
@@ -704,7 +704,7 @@ mod tests {
         let non_empty_spec = &api::tendermint_spec();
         let non_empty_inner = non_empty_spec.inner_spec.as_ref().unwrap();
 
-        let cases = vec![
+        let cases = [
             EmptyBranchCase {
                 op: ics23::InnerOp {
                     prefix: [&[1u8], &empty_child[..]].concat().to_vec(),
