@@ -3,6 +3,7 @@
 # Unreleased
 
 - chore(rust): Update `prost` to v0.14 and bump MSRV to 1.85 ([#416](https://github.com/cosmos/ics23/pull/416))
+- chore(rust): `std` feature no longer pulls in `serde` and `informalsystems-pbjson` unless the `serde` feature is enabled; drop the direct `bytes` dependency and make `hex` a dev-dependency
 - fix: guarantee that `spec.InnerSpec.MaxPrefixLength` < `spec.InnerSpec.MinPrefixLength` + `spec.InnerSpec.ChildSize` ([#369](https://github.com/cosmos/ics23/pull/369))
 
 # v0.12.0

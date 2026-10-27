@@ -2,7 +2,7 @@ use alloc::collections::btree_map::BTreeMap;
 use alloc::vec;
 
 use anyhow::{anyhow, ensure};
-use bytes::{Buf, Bytes};
+use prost::bytes::Buf;
 
 use crate::compress::{decompress, is_compressed};
 use crate::helpers::Result;
@@ -230,7 +230,7 @@ fn read_varint<B: Buf>(buf: &mut B) -> Option<i64> {
 }
 
 fn ensure_iavl_prefix(prefix: &[u8], min_height: i64) -> Result<Option<usize>> {
-    let mut prefix = Bytes::copy_from_slice(prefix);
+    let mut prefix = prefix;
 
     let height = read_varint(&mut prefix)
         .ok_or_else(|| anyhow!("error decoding height in IAVL prefix encoding"))?;
@@ -244,7 +244,7 @@ fn ensure_iavl_prefix(prefix: &[u8], min_height: i64) -> Result<Option<usize>> {
         .ok_or_else(|| anyhow!("error decoding version in IAVL prefix encoding"))?;
     ensure!(version >= 0, "wrong version in IAVL prefix encoding");
 
-    Ok(Some(prefix.remaining()))
+    Ok(Some(prefix.len()))
 }
 
 fn is_iavl_spec(spec: &ics23::ProofSpec) -> bool {
@@ -387,7 +387,7 @@ mod tests {
     use alloc::string::String;
     use alloc::vec::Vec;
     use anyhow::{bail, ensure};
-    use bytes::{BufMut, BytesMut};
+    use prost::bytes::{BufMut, BytesMut};
     use prost::Message;
     use serde::Deserialize;
     #[cfg(feature = "std")]
