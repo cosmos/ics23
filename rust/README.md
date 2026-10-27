@@ -30,3 +30,12 @@ Unless you modify the protobuf file, you can ignore this step.
 
 The minimum supported Rust version (MSRV) is 1.60.
 
+
+## Fuzzing
+
+Requires nightly and `cargo install cargo-fuzz`. Targets live in `fuzz/fuzz_targets`; `fuzz/seeds` holds the shared test vectors as protobuf (`verify_arbitrary_spec` pairs each with its built-in spec as a `Case` message).
+
+```
+cargo fuzz run verify_builtin_specs fuzz/corpus/verify_builtin_specs fuzz/seeds/verify_builtin_specs
+cargo fuzz run verify_arbitrary_spec fuzz/corpus/verify_arbitrary_spec fuzz/seeds/verify_arbitrary_spec
+```

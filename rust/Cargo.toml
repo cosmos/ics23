@@ -2,7 +2,7 @@
 authors = ["Ethan Frey <ethanfrey@users.noreply.github.com>"]
 description = "Merkle proof verification library - implements Cosmos ICS23 Spec"
 edition = "2021"
-exclude = ["codegen", "no-std-check"]
+exclude = ["codegen", "no-std-check", "fuzz"]
 license = "Apache-2.0"
 name = "ics23"
 repository = "https://github.com/cosmos/ics23/tree/master/rust"
