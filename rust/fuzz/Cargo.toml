@@ -1,0 +1,30 @@
+[package]
+name = "ics23-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+# Keep out of the parent workspace: it needs nightly and would unify features into the no_std CI runs.
+[workspace]
+
+[dependencies]
+libfuzzer-sys = "0.4"
+prost = "0.13"
+ics23 = { path = ".." }
+
+[[bin]]
+name = "verify_builtin_specs"
+path = "fuzz_targets/verify_builtin_specs.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "verify_arbitrary_spec"
+path = "fuzz_targets/verify_arbitrary_spec.rs"
+test = false
+doc = false
+bench = false
