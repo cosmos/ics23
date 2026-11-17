@@ -3,6 +3,7 @@
 # Unreleased
 
 - fix: guarantee that `spec.InnerSpec.MaxPrefixLength` < `spec.InnerSpec.MinPrefixLength` + `spec.InnerSpec.ChildSize` ([#369](https://github.com/cosmos/ics23/pull/369))
+- chore(rust)!: Update `prost` to v0.14 and bump MSRV to 1.88 ([#416](https://github.com/cosmos/ics23/pull/416))
 
 # v0.12.0
 

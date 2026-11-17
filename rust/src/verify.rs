@@ -210,7 +210,10 @@ fn ensure_inner(inner: &ics23::InnerOp, spec: &ics23::ProofSpec) -> Result<()> {
                 "spec.inner_spec.max_prefix_length must be < spec.inner_spec.min_prefix_length + spec.inner_spec.child_size"
             );
             ensure!(
-                inner.suffix.len() % (inner_spec.child_size as usize) == 0,
+                inner
+                    .suffix
+                    .len()
+                    .is_multiple_of(inner_spec.child_size as usize),
                 "InnerOp suffix malformed"
             );
             Ok(())
