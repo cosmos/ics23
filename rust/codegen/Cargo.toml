@@ -8,6 +8,6 @@ edition = "2018"
 
 [dependencies]
 bytes = "1.0.1"
-prost = "0.13"
-prost-build = "0.13"
+prost = "0.14.1"
+prost-build = "0.14.1"
 informalsystems-pbjson-build = "0.7.0"
