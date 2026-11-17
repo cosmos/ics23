@@ -1,6 +1,6 @@
 [package]
 name = "codegen"
-version = "0.1.1"
+version = "0.1.0"
 authors = ["Ethan Frey <ethanfrey@users.noreply.github.com>"]
 edition = "2018"
 
