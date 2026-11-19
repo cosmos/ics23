@@ -3,6 +3,9 @@
 # Unreleased
 
 - chore(rust): Update `prost` to v0.14 and bump MSRV to 1.85 ([#416](https://github.com/cosmos/ics23/pull/416))
+- chore(rust)!: The `std` feature (and therefore the default feature set) no longer enables the `serde` feature.
+  The `Serialize` and `Deserialize` impls are now only available with `features = ["serde"]`, so enable it explicitly if you relied on them.
+  Also drop the direct `bytes` dependency and make `hex` a dev-dependency
 - fix: guarantee that `spec.InnerSpec.MaxPrefixLength` < `spec.InnerSpec.MinPrefixLength` + `spec.InnerSpec.ChildSize` ([#369](https://github.com/cosmos/ics23/pull/369))
 
 # v0.12.0
