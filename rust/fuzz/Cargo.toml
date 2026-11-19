@@ -12,7 +12,7 @@ cargo-fuzz = true
 
 [dependencies]
 libfuzzer-sys = "0.4"
-prost = "0.13"
+prost = "0.14"
 ics23 = { path = ".." }
 
 [[bin]]
