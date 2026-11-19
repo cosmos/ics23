@@ -78,6 +78,10 @@ jobs:
         working-directory: ./rust
         run: cargo test --all
 
+      - name: Run all tests with std and serde
+        working-directory: ./rust
+        run: cargo test --all --features serde
+
       - name: Check no_std compatibility
         run: cd rust/no-std-check/; make setup; make all
 
