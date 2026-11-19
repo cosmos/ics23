@@ -164,7 +164,7 @@ fn proof_spec() -> impl Strategy<Value = ProofSpec> {
         )
 }
 
-fn assert_protobuf_roundtrip<T: Message + Default + PartialEq>(value: &T) {
+fn assert_protobuf_roundtrip<T: Message + Default + PartialEq + std::fmt::Debug>(value: &T) {
     assert_eq!(&T::decode(value.encode_to_vec().as_slice()).unwrap(), value);
 }
 
